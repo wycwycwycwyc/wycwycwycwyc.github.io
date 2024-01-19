@@ -1,0 +1,5 @@
+body {  
+    background-image: url('Tree.png');  /* 替换为你的图片路径 */  
+    background-repeat: no-repeat;  
+    background-size: cover;  /* 使背景图片覆盖整个页面 */  
+}
