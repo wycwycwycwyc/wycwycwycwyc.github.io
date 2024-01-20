@@ -1,0 +1,92 @@
+<!DOCTYPE html>    
+<html>    
+<head>    
+    <title>抢车票（普通版）</title>  
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>    
+    <style>    
+        body {    
+            font-family: Arial, sans-serif;    
+        }    
+        .title {    
+            text-align: center;    
+            font-size: 24px;    
+            margin-bottom: 20px;    
+        }    
+        .subtitle {    
+            font-size: 16px;    
+            color: #666;    
+        }    
+        .content {    
+            background-color: #f2f2f2;    
+            padding: 20px;    
+            margin-bottom: 20px;    
+        }    
+        .footer {    
+            background-color: #333;    
+            color: #fff;    
+            padding: 10px;    
+            text-align: center;    
+        }    
+    </style>    
+</head>    
+<body>    
+    <div class="title">抢车票（普通版）</div>
+    <button class="custom-button" onclick="openPage('index.html')">返回</button>
+    <br>  
+    <br>
+    <br>  
+    <div class="subtitle">源代码</div>    
+    <div class="content">      
+    <pre>    
+from selenium import webdriver  
+from selenium.webdriver.common.keys import Keys  
+from selenium.webdriver.common.by import By  
+from selenium.webdriver.support.ui import WebDriverWait  
+from selenium.webdriver.support import expected_conditions as EC  #导入相关库
+from selenium.webdriver import ActionChains   
+import time
+import os  
+import psutil
+driver = webdriver.Edge()  # 或者使用webdriver.Firefox()，取决于你使用的浏览器驱动程序  
+driver.maximize_window()    
+# 登录账号  
+driver.get("https://kyfw.12306.cn/otn/resources/login.html")  
+time.sleep(60)  #等待用户登录
+driver.get("https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=%E6%B8%A0%E5%8E%BF,QRW&ts=%E9%87%8D%E5%BA%86%E5%8C%97,CUW&date=2024-01-31&flag=N,N,Y")           
+while True:  
+    try:
+        element = driver.find_element(By.ID, "preFilled1href")  # 确保你找到了正确的元素    
+        action = ActionChains(driver)    
+        action.click(element).perform() #点击查询按钮 
+        time.sleep(0.2)   
+        button1 = driver.find_element(By.XPATH, "//*[@id=\"ticket_77000K10640Z_01_03\"]/td[13]/a")  # 注意这里使用了By.XPATH而不是By.ID或者其他方式，并且要确保XPath是正确的。XPath可能需要根据网页结构进行调整。  
+        button1.click() #点击预订按钮
+        time.sleep(0.67)
+        button2 = driver.find_element(By.XPATH, "//*[@id=\"dj_passenger_id\"]/li[3]/label") 
+        button2.click()     #选择乘车人
+        button3 = driver.find_element(By.XPATH, "//*[@id=\"seatType_1\"]")
+        button3.click()     #点击席别
+        button4 = driver.find_element(By.XPATH, "//*[@id=\"seatType_1\"]/option[1]")
+        button4.click() #选择席别
+        submitOrder_id = driver.find_element(By.ID, "submitOrder_id")
+        submitOrder_id.click()  #确定提交
+        time.sleep(0.5)
+  
+      
+    # 等待一段时间，以便操作系统可以处理终止的进程  
+        time.sleep(2.5)
+        qr_submit_id = driver.find_element(By.ID, "qr_submit_id")
+        qr_submit_id.click()
+        time.sleep(600)
+        print("抢票成功")
+        break
+    except:
+        continue
+    </pre>    
+</div>    
+   <div class="footer">      
+<button class="custom-button" onclick="openPage('https://i-550.wwentua.com:446/01200900158974635bb/2024/01/20/e163d7caa0b225f25edb31d99eb06047.exe?st=9yIkJSoVjaPbj2PMBfEE5w&e=1705716761&b=U_bRewQC6AuAH81KEALZVxFK3WeMHiwWtBL9Y6AGqUbVWiQyuAC5SMgQpXm0_c&fi=158974635&pid=118-125-181-149&up=2&mp=0&co=0')">下载源代码</button>  
+</div> <!-- 这里是修复的地方 -->  
+</body>    
+</html>
