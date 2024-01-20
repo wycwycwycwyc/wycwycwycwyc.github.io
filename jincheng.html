@@ -1,44 +1,46 @@
-<!DOCTYPE html>    
-<html>    
-<head>    
-    <title>进程管理</title>  
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>进程</title>  
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>    
-    <style>    
-        body {    
-            font-family: Arial, sans-serif;    
-        }    
-        .title {    
-            text-align: center;    
-            font-size: 24px;    
-            margin-bottom: 20px;    
-        }    
-        .subtitle {    
-            font-size: 16px;    
-            color: #666;    
-        }    
-        .content {    
-            background-color: #f2f2f2;    
-            padding: 20px;    
-            margin-bottom: 20px;    
-        }    
-        .footer {       
-            text-align: center;    
-        }    
-    </style>    
-</head>    
-<body>    
+    <script src="script.js"></script>  
+    <script src="script1.js"></script>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+        }  
+        .title {  
+            text-align: center;  
+            font-size: 24px;  
+            margin-bottom: 20px;  
+        }  
+        .subtitle {  
+            font-size: 16px;  
+            color: #666;  
+        }  
+        .content {  
+            background-color: #f2f2f2;  
+            padding: 20px;  
+            position: relative;  
+        }  
+        .footer {  
+            text-align: center;  
+        }  
+    </style>  
+</head>  
+<body>  
     <div class="title">进程管理</div>
-    <button class="custom-button" onclick="openPage('index.html')">返回</button>
+    <br>  
+    <Button class="custom-button" onclick="openPage('index.html')">返回</button>
     <br>  
     <br>
     <br>
     <div class="info">作者已停止维护</div>  
     <br>  
-    <div class="subtitle">源代码</div>    
-    <div class="content">      
-    <pre>    
+    <br>    
+    <div class="subtitle">源代码</div>  
+    <div class="content">  
+        <pre id="sourceCode">
 from ast import Delete
 import os
 import psutil
@@ -555,11 +557,11 @@ while True:
                         os.system("COLOR 1E")
                     elif user_input21 == "n":
                         print("已取消删除")
-                        os.system("COLOR 1E ")
-    </pre>    
-</div>    
-   <div class="footer">      
-<button class="custom-button" onclick="openPage('https://112-28-188-226.pd1.123pan.cn:30443/download-cdn.123pan.cn/123-560/aa0fdc51/1815614102-0/aa0fdc51373a9172c22bf32aa134ba30/c-m23?v=5&t=1705816009&s=17058160091e195a464f931706dc95c3029ff752e6&r=31CRTN&bzc=2&bzs=313831353631343130323a36323635303231353a373237383134333a31383135363134313032&filename=%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.exe&x-mf-biz-cid=651c1dd6-daf7-4753-a54b-6c9721e247dd-a0d664&auto_redirect=0&ndcp=1&cache_type=1&xmfcid=55d89e6c-5b36-4afc-ba5c-110c9306c0a9-1-abf611255')">下载可执行文件</button>  
-</div> <!-- 这里是修复的地方 -->  
-</body>    
+                        os.system("COLOR 1E ")</pre>  
+        <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
+    </div>  
+    <div class="footer">  
+        <button class="custom-button" onclick="openPage('https://112-28-188-226.pd1.123pan.cn:30443/download-cdn.123pan.cn/123-560/aa0fdc51/1815614102-0/aa0fdc51373a9172c22bf32aa134ba30/c-m23?v=5&t=1705816009&s=17058160091e195a464f931706dc95c3029ff752e6&r=31CRTN&bzc=2&bzs=313831353631343130323a36323635303231353a373237383134333a31383135363134313032&filename=%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.exe&x-mf-biz-cid=651c1dd6-daf7-4753-a54b-6c9721e247dd-a0d664&auto_redirect=0&ndcp=1&cache_type=1&xmfcid=55d89e6c-5b36-4afc-ba5c-110c9306c0a9-1-abf611255')">下载源代码</button>    
+    </div> <!-- 这里是修复的地方 -->    
+</body>  
 </html>

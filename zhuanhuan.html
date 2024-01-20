@@ -1,41 +1,43 @@
-<!DOCTYPE html>    
-<html>    
-<head>    
+<!DOCTYPE html>  
+<html>  
+<head>  
     <title>基础数据转换</title>  
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>    
-    <style>    
-        body {    
-            font-family: Arial, sans-serif;    
-        }    
-        .title {    
-            text-align: center;    
-            font-size: 24px;    
-            margin-bottom: 20px;    
-        }    
-        .subtitle {    
-            font-size: 16px;    
-            color: #666;    
-        }    
-        .content {    
-            background-color: #f2f2f2;    
-            padding: 20px;    
-            margin-bottom: 20px;    
-        }    
-        .footer {        
-            text-align: center;    
-        }    
-    </style>    
-</head>    
-<body>    
-    <div class="title">基础数据转换</div>
-    <button class="custom-button" onclick="openPage('index.html')">返回</button>
+    <script src="script.js"></script>  
+    <script src="script1.js"></script>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+        }  
+        .title {  
+            text-align: center;  
+            font-size: 24px;  
+            margin-bottom: 20px;  
+        }  
+        .subtitle {  
+            font-size: 16px;  
+            color: #666;  
+        }  
+        .content {  
+            background-color: #f2f2f2;  
+            padding: 20px;  
+            position: relative;  
+        }  
+        .footer {  
+            text-align: center;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="title">基础数据转换</div>  
+    <button class="custom-button" onclick="openPage('index.html')">返回</button>  
     <br>  
-    <br>
-    <br>    
-    <div class="subtitle">源代码</div>    
-    <div class="content">      
-    <pre>    
+    <br>  
+    <br>  
+    <div class="subtitle">源代码</div>  
+    <div class="content">  
+        <pre id="sourceCode">
+# 等待一段时间，以便操作系统可以处理终止的进程    
 import tkinter as tk  
 from tkinter import filedialog  
 from tkinter import messagebox  
@@ -119,11 +121,11 @@ select_button.pack(pady=10)
 confirm_button = tk.Button(root, text="确定", command=start_thread)    
 confirm_button.pack(pady=10)
 root.protocol("WM_DELETE_WINDOW", on_closing)
-root.mainloop()
-    </pre>    
-</div>    
-   <div class="footer">      
-<button class="custom-button" onclick="openPage('https://112-28-188-234.pd1.123pan.cn:30443/download-cdn.123pan.cn/123-646/3abdc85b/1815614102-0/3abdc85bf305f1b03507ff3ff9c94e86/c-m23?v=5&t=1705816498&s=1705816498f9a1c043cc8566d4577749f8043ba13a&r=XNU1HU&bzc=2&bzs=313831353631343130323a36323635303231373a34313136363032363a31383135363134313032&filename=%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2.exe&x-mf-biz-cid=5cced16c-f32b-4054-b8e9-0f73be0ee135-47df1e&auto_redirect=0&ndcp=1&cache_type=1&xmfcid=c42ce1bc-9415-4f74-bc7c-9eb665444b62-1-abf611255')">下载可执行文件</button>  
-</div> <!-- 这里是修复的地方 -->  
-</body>    
+root.mainloop()</pre>  
+        <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
+    </div>  
+    <div class="footer">  
+        <button class="custom-button" onclick="openPage('https://112-28-188-234.pd1.123pan.cn:30443/download-cdn.123pan.cn/123-646/3abdc85b/1815614102-0/3abdc85bf305f1b03507ff3ff9c94e86/c-m23?v=5&t=1705816498&s=1705816498f9a1c043cc8566d4577749f8043ba13a&r=XNU1HU&bzc=2&bzs=313831353631343130323a36323635303231373a34313136363032363a31383135363134313032&filename=%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2.exe&x-mf-biz-cid=5cced16c-f32b-4054-b8e9-0f73be0ee135-47df1e&auto_redirect=0&ndcp=1&cache_type=1&xmfcid=c42ce1bc-9415-4f74-bc7c-9eb665444b62-1-abf611255')">下载源代码</button>    
+    </div> <!-- 这里是修复的地方 -->    
+</body>  
 </html>
