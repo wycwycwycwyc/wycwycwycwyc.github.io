@@ -1,0 +1,90 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>抢车票（升级版）</title>  
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>  
+    <script src="script1.js"></script>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+        }  
+        .title {  
+            text-align: center;  
+            font-size: 24px;  
+            margin-bottom: 20px;  
+        }  
+        .subtitle {  
+            font-size: 16px;  
+            color: #666;  
+        }  
+        .content {  
+            background-color: #f2f2f2;  
+            padding: 20px;  
+            position: relative;  
+        }  
+        .footer {  
+            text-align: center;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="title">抢车票（升级版）</div>  
+    <button class="custom-button" onclick="openPage('index.html')">返回</button>  
+    <br>  
+    <br>  
+    <br>  
+    <div class="subtitle">源代码</div>  
+    <div class="content">  
+        <pre id="sourceCode">
+# 等待一段时间，以便操作系统可以处理终止的进程    
+from selenium import webdriver  
+from selenium.webdriver.common.keys import Keys  
+from selenium.webdriver.common.by import By  
+from selenium.webdriver.support.ui import WebDriverWait  
+from selenium.webdriver.support import expected_conditions as EC  #导入相关库
+from selenium.webdriver import ActionChains   
+import time
+from datetime import datetime
+import subprocess
+driver = webdriver.Chrome()
+driver.get("https://kyfw.12306.cn/otn/resources/login.html")
+while True:
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%H:%M:%S")
+    if formatted_time == "10:32:50":
+        driver.get("https://kyfw.12306.cn/otn/view/prefill_list.html?from=CUW&to=QRW&train=K1064&date=2024-02-04&fromName=%E9%87%8D%E5%BA%86%E5%8C%97&toName=%E6%B8%A0%E5%8E%BF")
+        time.sleep(1.5)
+        time.sleep(1)
+        Button1 = driver.find_element(By.XPATH, "//*[@id=\"passenge_list\"]/li[7]/label/div/ins")
+        Button1.click()
+        Button2 = driver.find_element(By.XPATH, "//*[@id=\"panel-order-con\"]/div/div/a")
+        Button2.click()
+        time.sleep(2.7)
+        Button3 = driver.find_element(By.XPATH, "//*[@id=\"trainList\"]/div[9]/div[2]/div/div[3]/div[4]/a")
+        Button3.click()
+        Button4 = driver.find_element(By.ID, "saveBtn")
+        Button4.click()
+        time.sleep(1)
+        driver.get("https://kyfw.12306.cn/otn/view/prefill_order.html?fromName=%E9%87%8D%E5%BA%86%E5%8C%97&from=CUW&toName=%E6%B8%A0%E5%8E%BF&to=QRW&date=2024-02-04")
+        time.sleep(2)
+        while True:   
+            count_down_text = driver.find_element(By.CLASS_NAME, 'count-down-text')
+            if count_down_text == "1秒":
+                time.sleep(1.3)
+                button6 = driver.find_element(By.CSS_SELECTOR, "btn btn-hollow btn-sm w120 buy-ticket-button")  
+                button6.click()
+                button7 = driver.find_element(By.XPATH, "//*[@id=\"pop_170556355537687123\"]/div[2]/div[3]/a[2]")  
+                button7.click()
+                break
+            else:
+                continue
+    else:
+        continue</pre>  
+        <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
+    </div>  
+    <div class="footer">  
+        <button class="custom-button" onclick="openPage('https://download-defalut.123pan.cn:30443/download-cdn.123pan.cn/123-837/6c5e1b03/1815614102-0/6c5e1b036dd5087198ccad625c7f1745/c-m23?v=5&t=1705891269&s=1705891269dc37ca26a7f0bb0e1eb39296aa62dc3e&r=G2K897&bzc=2&bzs=313831353631343130323a36323635303235343a323131383a31383135363134313032&filename=%E6%8A%A2%E8%BD%A6%E7%A5%A8%EF%BC%88%E5%8D%87%E7%BA%A7%E7%89%88%EF%BC%89.txt&x-mf-biz-cid=97d8fed7-3c98-4d72-84c9-6d32bf933606-63d50b&auto_redirect=0&ndcp=1&cache_type=1&xmfcid=2bd90c5e-c13a-4dec-afe4-d15fe7457c5f-1-abf611255')">下载源代码</button>    
+    </div> <!-- 这里是修复的地方 -->    
+</body>  
+</html>
