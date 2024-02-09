@@ -1,0 +1,663 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <title>基础数据处理</title>  
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>  
+    <script src="script1.js"></script>  
+    <style>  
+        body {  
+            font-family: Arial, sans-serif;  
+        }  
+        .title {  
+            text-align: center;  
+            font-size: 24px;  
+            margin-bottom: 20px;  
+        }  
+        .subtitle {  
+            font-size: 16px;  
+            color: #666;  
+        }  
+        .content {  
+            background-color: #f2f2f2;  
+            padding: 20px;  
+            position: relative;  
+        }  
+        .footer {  
+            text-align: center;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="title">基础数据处理</div>  
+    <button class="custom-button" onclick="openPage('index.html')">返回</button>  
+    <br>  
+    <br>  
+    <br>  
+    <div class="subtitle">源代码</div>  
+    <div class="content">  
+        <pre id="sourceCode">
+from plyer import notification
+from sre_parse import State
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
+from tkinter import font
+from tkinter import simpledialog
+from tkinter import colorchooser
+from tkinter import scrolledtext
+import os
+import glob
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import load_workbook
+import pandas as pd
+import xlrd
+import threading
+from openpyxl.workbook import Workbook
+from datetime import datetime, timedelta
+current_date = datetime.now()
+
+# 计算上一周的日期
+last_week_date = current_date - timedelta(days=7)
+
+# 获取上一周的年、周和星期
+year, week, weekday = last_week_date.isocalendar()
+
+# 如果上一周是当前年份的第一周，那么我们需要减去1，因为isocalendar()的周数是从1开始的
+if last_week_date.year == current_date.year:
+    week_number = week
+else:
+    week_number = week - 1
+
+month_time = f"{last_week_date.month}月第{week_number}周"
+def process_date():
+    global month_time
+    month_time = folder_entry.get()
+    xlsx_handle()
+def time():
+    global month_time
+    result = messagebox.askyesno("提示", f"请核对日期:{month_time}\n是否正确?")  
+    if result == False:
+# 创建一个新的Tkinter窗口
+        # 创建一个新的Tkinter窗口
+        root1 = tk.Tk()
+        root1.title("手动输入日期")
+
+# 创建标签和输入框
+        folder_label = ttk.Label(root1, text="请手动输入日期:")
+        folder_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        folder_entry = ttk.Entry(root1, width=30)
+        folder_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+        # 创建确定按钮
+        confirm_button = ttk.Button(root1, text="确定", command=process_date)
+        confirm_button.grid(row=0, column=2, padx=10, pady=10, sticky="w")
+        month_time = folder_entry.get()
+        # 在这里添加您想要执行的程序逻辑
+        # 例如，您可以在这里调用xlsx_handle函数
+
+# 运行Tkinter主循环
+        root1.mainloop()
+# 获取用户输入的日期
+# 定义处理日期的函数
+    else:
+        xlsx_handle()
+def xlsx_handle():
+# 注意：在实际应用中，您可能需要添加按钮来触发日期的获取和后续操作
+    def NCA(source_file,source_sheetname,source_col,source_start_row,source_start_col,source_end_col,target_file,target_sheetname1,target_sheetname2,target_sheetname3,target_sheetname4,target_start_row,target_start_col,target_end_col,offset):
+        file_path = source_file
+        df = pd.read_excel(file_path, sheet_name=source_sheetname, header=0, index_col=None, usecols=source_col)
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2[target_sheetname2]
+        ws4 = wb2[target_sheetname3]
+        ws5 = wb2[target_sheetname4]
+        df= df.iloc[source_start_row:, source_start_col:source_end_col]
+        # 筛选首检
+        df = df[df['检测次数']<2]#去掉非首检的值
+        df = df[df['方向盘角度']<90]#去掉检测中止的非正常值
+        log_text.insert(tk.END, df,"\n")
+        root.update()
+        required_data_CN = df[df['车型'].str.contains('CN110V|CN112|CN115')]
+        required_data_N1 = df[df['车型'].str.contains('N111|N111P|N111PS')]
+        ks_row=target_start_row
+        #选取录入开始列
+        ks_col=target_start_col-offset
+        total_row_CN=len(required_data_CN['检测次数'])+2
+        log_text.insert(tk.END, "CN系列首检数量"+ str(total_row_CN-2)+"台\n")
+        status_label.config(text="CN系列首检数量"+ str(total_row_CN-2)+"台")
+        root.update()
+        total_row_N1 = len(required_data_N1['检测次数']) + 2
+        log_text.insert(tk.END, "N1系列首检数量" + str(total_row_N1 - 2) + "台\n")
+        status_label.config(text="N1系列首检数量" + str(total_row_N1 - 2) + "台")
+        root.update()
+        #遍历需要替换的区域行和列，将每个单元格的值替换成替换数据列中对应行的值
+        # CN系列录入
+        for i in range(target_start_row, total_row_CN):
+            for j in range(target_start_col, target_end_col):
+                #print(i, j)
+                # 将数据写入第i行第j列
+                ws2.cell(row=i, column=j, value=required_data_CN.iloc[i - ks_row, j - ks_col])
+        #保存修改后的第一个Excel文件
+        log_text.insert(tk.END, 'NCA_CN系列录入结束\n')
+        status_label.config(text='NCA_CN系列录入结束')
+        root.update()
+        for i in range(target_start_row, total_row_CN):
+            ws3.cell(row=i, column=7, value=required_data_CN.iloc[i - ks_row, 24])
+
+    #N1系列录入
+        for i in range(target_start_row, total_row_N1):
+            for j in range(target_start_col, target_end_col):
+                #print(i, j)
+                # 将数据写入第i行第j列
+                ws4.cell(row=i, column=j, value=required_data_N1.iloc[i - ks_row, j - ks_col])
+    #保存修改后的第一个Excel文件
+        for i in range(target_start_row, total_row_N1):
+            ws5.cell(row=i, column=7, value=required_data_N1.iloc[i - ks_row, 24])
+        log_text.insert(tk.END, 'NCA_N1系列录入结束\n')
+        status_label.config(text='NCA_CN系列录入结束')
+        root.update()
+        wb2.save(target_file)
+    NCA('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/NCA.xlsx','Sheet','A:Z',0,0,25,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','CN系列外倾','CN方向盘' ,'N1系列外倾','N1方向盘',2,1,10,9)
+    log_text.insert(tk.END, '四轮定位录入结束\n')
+    status_label.config(text='四轮定位录入结束')
+    root.update()
+    def LAMP(source_file,source_sheetname,source_col,source_start_row,source_start_col,source_end_col,target_file,target_sheetname1,target_sheetname2,target_start_row,target_start_col,target_end_col,offset):
+        file_path = source_file
+        df = pd.read_excel(file_path, sheet_name=source_sheetname, header=0, index_col=None, usecols=source_col)
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2[target_sheetname2]
+        df= df.iloc[source_start_row:, source_start_col:source_end_col]
+        # 筛选首检
+        df=df[df['检测次数']<2]
+        df_str = df.to_string()  # 将DataFrame转换为字符串
+        log_text.insert(tk.END, df_str + "\n")  # 拼接字符串并插入到日志中
+        root.update()
+        required_data_N1 = df[df['检测标准'].str.contains('BASE N111|BASE N111P')]
+        required_data_CN = df[df['检测标准'].str.contains('BASE CN110V|BASE CN112|BASE CN115|BASE CN115G')]
+        ks_row=target_start_row
+        #选取录入开始列
+        ks_col=target_start_col-offset
+        total_row_N1=len(required_data_N1['检测次数'])+2
+        log_text.insert(tk.END, "N1系列首检数量"+ str(total_row_N1-2)+"台\n")
+        status_label.config(text="N1系列首检数量"+ str(total_row_N1-2)+"台")
+        root.update()
+        total_row_CN=len(required_data_CN['检测次数'])+2
+        log_text.insert(tk.END, "CN系列首检数量"+ str(total_row_CN-2)+"台\n")
+        status_label.config(text="CN系列首检数量"+ str(total_row_CN-2)+"台")
+        root.update()
+        #遍历需要替换的区域行和列，将每个单元格的值替换成替换数据列中对应行的值
+        #N1系列数据录入
+        for i in range(target_start_row, total_row_N1):
+            for j in range(target_start_col, target_end_col):
+                #log_text.insert(tk.END, i, j)
+                # 将数据写入第i行第j列
+                ws2.cell(row=i, column=j, value=required_data_N1.iloc[i - ks_row, j - ks_col])
+        #保存修改后的第一个Excel文件
+        log_text.insert(tk.END, '大灯_N1系列录入结束\n')
+        status_label.config(text='大灯_N1系列录入结束')
+        # CN系列数据录入
+        for i in range(target_start_row, total_row_CN):
+            for j in range(target_start_col, target_end_col):
+                #log_text.insert(tk.END, i, j)
+                # 将数据写入第i行第j列
+                ws3.cell(row=i, column=j, value=required_data_CN.iloc[i - ks_row, j - ks_col])
+        #保存修改后的第一个Excel文件
+        log_text.insert(tk.END, '大灯_CN系列录入结束\n')
+        status_label.config(text='大灯_CN系列录入结束')
+        root.update()
+        wb2.save(target_file)
+    LAMP('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/大灯.xlsx','Sheet','A:N',0,0,14,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯' ,2,1,7,8)
+    log_text.insert(tk.END, '大灯录入结束\n')
+    status_label.config(text='大灯录入结束')
+    root.update()
+    def 周报(source_file,source_sheetname,source_col,source_start_row,source_start_col,source_end_col,target_file,target_sheetname,target_start_row,target_start_col,target_end_col,offset):
+        file_path = source_file
+        df = pd.read_excel(file_path, sheet_name=source_sheetname, header=0, index_col=None, usecols=source_col)
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname]
+        df= df.iloc[source_start_row:, source_start_col:source_end_col]
+        # 筛选首检
+        required_data=df[df['检测次数']<2]
+        ks_row=target_start_row
+        #选取录入开始列
+        ks_col=target_start_col-offset
+        total_row=len(required_data['检测次数'])+2
+        log_text.insert(tk.END, "首检数量"+ str(total_row-2)+"台\n")
+        status_label.config(text="首检数量"+ str(total_row-2)+"台")
+        root.update()
+        #遍历需要替换的区域行和列，将每个单元格的值替换成替换数据列中对应行的值
+        for i in range(target_start_row, total_row):
+            for j in range(target_start_col, target_end_col):
+                #log_text.insert(tk.END, i, j)
+                # 将数据写入第i行第j列
+                ws2.cell(row=i, column=j, value=required_data.iloc[i - ks_row, j - ks_col])
+        #保存修改后的第一个Excel文件
+        wb2.save(target_file)
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/车速.xlsx','Sheet','A:K',0,0,12,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','车速' ,2,1,4,8)
+    log_text.insert(tk.END, '车速录入结束\n')
+    status_label.config(text='车速录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/ABS.xlsx','Sheet','A:G',0,0,12,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','ABS' ,2,1,3,2)
+    log_text.insert(tk.END, 'ABS录入结束\n')
+    status_label.config(text='ABS录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/ESC.xlsx','Sheet','A:G',0,0,12,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','ABS' ,2,3,5,2)
+    log_text.insert(tk.END, 'ESC录入结束\n')
+    status_label.config(text='ESC录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/喇叭声级.xlsx','Sheet','A:L',0,0,12,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','喇叭声级' ,2,1,5,8)
+    log_text.insert(tk.END, '喇叭声级录入结束\n')
+    status_label.config(text='喇叭声级录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/制动.xlsx','Sheet','A:AW',0,0,49,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','制动' ,2,1,42,8)
+    log_text.insert(tk.END, '制动录入结束\n')
+    status_label.config(text='制动录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/侧滑.xlsx','Sheet','A:J',0,0,11,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','侧滑' ,2,1,3,8)
+    log_text.insert(tk.END, '侧滑录入结束\n')
+    status_label.config(text='侧滑录入结束')
+    root.update()
+    周报('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/基础数据/排放.xlsx','Sheet','A:T',0,0,20,'//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','双怠速排放' ,2,1,13,8)
+    log_text.insert(tk.END, '排放录入结束\n')
+    status_label.config(text='排放录入结束')
+    root.update()
+    df_N1 = pd.read_excel('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx', sheet_name='N1方向盘', header=0, index_col=None)
+    df_CN = pd.read_excel('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx', sheet_name='CN方向盘', header=0, index_col=None)
+    N1_SUM = len(df_N1["方向盘角度"])
+    CN_SUM = len(df_CN["方向盘角度"])
+    log_text.insert(tk.END, "N1方向盘数量：\n")
+    status_label.config(text="N1方向盘数量：")
+    root.update()
+    N1_SUM_str = str(N1_SUM)  # 将整数转换为字符串
+    log_text.insert(tk.END, N1_SUM_str + "\n")
+    root.update()
+    log_text.insert(tk.END, "CN方向盘数量：\n")
+    root.update()
+    # 假设 CN_SUM 是一个数值类型，我们需要将其转换为字符串
+    CN_SUM_str = str(CN_SUM)
+    log_text.insert(tk.END, CN_SUM_str + "\n")
+    root.update()
+    N1_NOK = df_N1.iloc[16, 17]
+    CN_NOK = df_CN.iloc[16, 17]
+    log_text.insert(tk.END, "不合格数量：\n")
+    root.update()
+    log_text.insert(tk.END, str(N1_NOK) + str(CN_NOK) + "\n")
+    root.update()
+    OK_rate = (N1_SUM+CN_SUM-CN_NOK-N1_NOK)/(N1_SUM+CN_SUM)
+    log_text.insert(tk.END, "方向盘首检合格率：\n")
+    root.update()
+    log_text.insert(tk.END, str(OK_rate)+"\n")
+    root.update()
+    def month_NCA(source_file,source_sheetname1,source_sheetname2,target_file,target_sheetname1):
+        file_path = source_file
+        df_N1 = pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_CN = pd.read_excel(file_path, sheet_name=source_sheetname2, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "N1外倾值：\n")
+        root.update()
+        log_text.insert(tk.END, str(df_N1.iloc[13,18:20])+"\n")
+        root.update()
+        log_text.insert(tk.END, "CN外倾值：\n")
+        root.update()
+        log_text.insert(tk.END, str(df_CN.iloc[15,18:20])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        ws1 = wb2['方向盘角度']
+        write_row = len(df_Month["N1"])+2
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws3.cell(row=29, column=3, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df_N1.iloc[13, 18])
+        ws2.cell(row=write_row, column=3, value=df_N1.iloc[13, 19])
+        ws3.cell(row=30, column=3, value=df_N1.iloc[13, 18])
+        ws3.cell(row=31, column=3, value=df_N1.iloc[13, 19])
+        ws2.cell(row=write_row, column=9, value=month_time)
+        ws2.cell(row=write_row, column=10, value=df_CN.iloc[15, 18])
+        ws2.cell(row=write_row, column=11, value=df_CN.iloc[15, 19])
+        ws3.cell(row=32, column=3, value=df_CN.iloc[15, 18])
+        ws3.cell(row=33, column=3, value=df_CN.iloc[15, 19])
+        ws1.cell(row=write_row, column=1, value=month_time)
+        ws1.cell(row=write_row, column=2, value=OK_rate)
+        ws3.cell(row=49, column=3, value=OK_rate)
+        wb2.save(target_file)
+    month_NCA('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1系列外倾','CN系列外倾','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','外倾')
+    log_text.insert(tk.END, "NCA完成\n")
+    status_label.config(text='NCA完成')
+    root.update()
+    """"""
+    def month_LAMP(source_file,source_sheetname1,source_sheetname2,target_file,target_sheetname1):
+        file_path = source_file
+        df_N1 = pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_CN = pd.read_excel(file_path, sheet_name=source_sheetname2, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "N1大灯值：\n")
+        root.update()
+        log_text.insert(tk.END, str(df_N1.iloc[14,11:13])+"\n")
+        root.update()
+        log_text.insert(tk.END, "CN大灯值：\n")
+        root.update()
+        log_text.insert(tk.END, str(df_CN.iloc[14,11:13])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["N1"])+2
+        #log_text.insert(tk.END, len(df_Month["N1"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df_N1.iloc[14, 11])
+        ws2.cell(row=write_row, column=3, value=df_N1.iloc[14, 12])
+        ws3.cell(row=39, column=3, value=df_N1.iloc[14, 11])
+        ws3.cell(row=40, column=3, value=df_N1.iloc[14, 12])
+        ws2.cell(row=write_row, column=10, value=month_time)
+        ws2.cell(row=write_row, column=11, value=df_CN.iloc[14, 11])
+        ws2.cell(row=write_row, column=12, value=df_CN.iloc[14, 12])
+        ws3.cell(row=41, column=3, value=df_CN.iloc[14, 11])
+        ws3.cell(row=42, column=3, value=df_CN.iloc[14, 12])
+        wb2.save(target_file)
+    month_LAMP('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','大灯')
+    log_text.insert(tk.END, "大灯完成\n")
+    status_label.config(text='大灯完成')
+    root.update()
+    def slide(source_file,source_sheetname1,target_file,target_sheetname1):
+        file_path = source_file
+        df= pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "侧滑值：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[14,5])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["ALL"])+2
+        #log_text.insert(tk.END, len(df_Month["ALL"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df.iloc[14,5])
+        ws3.cell(row=34, column=3, value=df.iloc[14, 5])
+        wb2.save(target_file)
+    slide('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','侧滑','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','侧滑')
+    log_text.insert(tk.END, "侧滑完成\n")
+    status_label.config(text='侧滑完成')
+    root.update()
+    def speed(source_file,source_sheetname1,target_file,target_sheetname1):
+        file_path = source_file
+        df= pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "车速值\n：")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[14,6])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["ALL"])+2
+        #log_text.insert(tk.END, len(df_Month["ALL"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df.iloc[14,6])
+        ws3.cell(row=35, column=3, value=df.iloc[14, 6])
+        wb2.save(target_file)
+    speed('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','车速','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','车速')
+    log_text.insert(tk.END, "车速完成\n")
+    status_label.config(text='车速完成')
+    root.update()
+    def sound(source_file,source_sheetname1,target_file,target_sheetname1):
+        file_path = source_file
+        df= pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "喇叭声级：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[14,7])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["ALL"])+2
+        #log_text.insert(tk.END, len(df_Month["ALL"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df.iloc[14,7])
+        ws3.cell(row=36, column=3, value=df.iloc[14, 7])
+        wb2.save(target_file)
+    sound('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','喇叭声级','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','喇叭声级')
+    log_text.insert(tk.END, "喇叭声级完成\n")
+    status_label.config(text='喇叭声级完成')
+    root.update()
+    def abs(source_file,source_sheetname1,target_file,target_sheetname1):
+        file_path = source_file
+        df= pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "ABS：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[4,8:10])+"\n")
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["ALL"])+2
+        #log_text.insert(tk.END, len(df_Month["ALL"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df.iloc[4, 8])
+        ws2.cell(row=write_row, column=3, value=df.iloc[4, 9])
+        ws3.cell(row=37, column=3, value=df.iloc[4, 8])
+        ws3.cell(row=38, column=3, value=df.iloc[4, 9])
+        wb2.save(target_file)
+    abs('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','ABS','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','ABS')
+    log_text.insert(tk.END, "ABS完成\n")
+    status_label.config(text='ABS完成')
+    root.update()
+    def brake(source_file,source_sheetname1,target_file,target_sheetname1):
+        file_path = source_file
+        df= pd.read_excel(file_path, sheet_name=source_sheetname1, header=0, index_col=None)
+        df_Month = pd.read_excel(target_file, sheet_name=target_sheetname1, header=0, index_col=None)
+        log_text.insert(tk.END, "前轴和与前轴差：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[12,46:48])+"\n")#前轴和与前轴差
+        root.update()
+        log_text.insert(tk.END, "后轴和与后轴差：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[13,55:57])+"\n")#后轴和与后轴差
+        root.update()
+        log_text.insert(tk.END, "阻滞率：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[13:17,64])+"\n")#阻滞率
+        root.update()
+        log_text.insert(tk.END, "整车与手刹：\n")
+        root.update()
+        log_text.insert(tk.END, str(df.iloc[14,77:79])+"\n")#整车与手刹
+        root.update()
+        wb2 = load_workbook(target_file)
+        ws2 = wb2[target_sheetname1]
+        ws3 = wb2['月报']
+        write_row = len(df_Month["ALL"])+2
+        #log_text.insert(tk.END, len(df_Month["ALL"]))
+        ws2.cell(row=write_row, column=1, value=month_time)
+        ws2.cell(row=write_row, column=2, value=df.iloc[12, 46])
+        ws2.cell(row=write_row, column=3, value=df.iloc[12, 47])
+        ws3.cell(row=43, column=3, value=df.iloc[12, 46])
+        ws3.cell(row=44, column=3, value=df.iloc[12, 47])
+        ws2.cell(row=write_row, column=5, value=month_time)
+        ws2.cell(row=write_row, column=6, value=df.iloc[13, 55])
+        ws2.cell(row=write_row, column=7, value=df.iloc[13, 56])
+        ws3.cell(row=45, column=3, value=df.iloc[13, 55])
+        ws3.cell(row=46, column=3, value=df.iloc[13, 56])
+        ws2.cell(row=write_row, column=9, value=month_time)
+        ws2.cell(row=write_row, column=10, value=df.iloc[14, 77])
+        ws2.cell(row=write_row, column=11, value=df.iloc[14, 78])
+        ws3.cell(row=47, column=3, value=df.iloc[14, 77])
+        ws3.cell(row=48, column=3, value=df.iloc[14, 78])
+        ws2.cell(row=write_row, column=13, value=month_time)
+        ws2.cell(row=write_row, column=14, value=df.iloc[13, 64])
+        ws2.cell(row=write_row, column=15, value=df.iloc[14, 64])
+        ws3.cell(row=50, column=3, value=df.iloc[13, 64])
+        ws3.cell(row=51, column=3, value=df.iloc[14, 64])
+        ws2.cell(row=write_row, column=17, value=month_time)
+        ws2.cell(row=write_row, column=18, value=df.iloc[15, 64])
+        ws2.cell(row=write_row, column=19, value=df.iloc[16, 64])
+        ws3.cell(row=52, column=3, value=df.iloc[15, 64])
+        ws3.cell(row=53, column=3, value=df.iloc[16, 64])
+        #wb2.save(target_file)
+    brake('//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','制动','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/周报 - 副本.xlsx','N1大灯','CN大灯','//10.64.244.5/重庆质量区域/5.质量工具及保障科/10.PIE/1.周报/1.周报操作模板/FTQ—月报2024年.xlsx','制动')
+    log_text.insert(tk.END, "制动完成\n")
+    status_label.config(text='制动完成')
+    root.update()  
+    notification.notify(
+        title="完成",
+        message="请及时查看详情",
+        app_name="基础数据专用转换",
+    )
+    messagebox.showinfo("提示","处理完成")
+    status_label.config(text='')
+def on_notification_click():
+    # 将Tkinter窗口置于最上层，但不保持置顶状态
+    root.attributes('-topmost', True)
+    root.after(1, lambda: root.attributes('-topmost', False))  # 1毫秒后取消置顶
+def delete_source_files():
+    result = messagebox.askyesno("提示", "是否删除源文件？")  
+    if result == True:
+        selected_text = folder_entry.get()
+    # 在此处删除原始文件，避免在 with 块中删除文件时引发错误    
+        for xls_file in glob.glob(os.path.join(selected_text, '*.xls')):  
+            os.remove(xls_file)
+        messagebox.showinfo("提示","删除成功")    
+    elif result == False:
+        messagebox.showinfo("提示","已取消删除")
+
+def on_closing():
+    if messagebox.askyesno("退出", "您确定要退出吗？"):
+        root.destroy()
+    else:
+        pass
+
+def start_thread():
+    global files_to_process, processed_files, delete_source_files
+    if not selected_folder:
+        messagebox.showerror("错误", "请先选择文件夹。")
+        return
+    files_to_process = glob.glob(os.path.join(selected_folder, '*.xls'))
+    confirm_button.config(state=tk.DISABLED)
+    for xls_file in files_to_process:
+        thread = threading.Thread(target=process_file, args=(xls_file,))
+        thread.start()
+    confirm_button.config(state=tk.ACTIVE)
+    status_label.config(text="正在读取 ")
+    try:
+    # 等待所有线程完成
+        for thread in threading.enumerate():
+            if thread.is_alive():
+                thread.join()
+                
+    except:
+        status_label.config(text="正在转换")
+        notification.notify(
+            title="即将完成",
+            message="请及时查看详情",
+            app_name="基础数据专用转换",
+        )      
+        result = messagebox.askyesno("提示", "读取完成，是否删除源文件？")  
+        if result == True:
+            selected_text = folder_entry.get()
+    # 在此处删除原始文件，避免在 with 块中删除文件时引发错误    
+            for xls_file in glob.glob(os.path.join(selected_text, '*.xls')):  
+                os.remove(xls_file)
+            messagebox.showinfo("提示","删除成功")    
+        elif result == False:
+            messagebox.showinfo("提示","已取消删除")
+
+# 创建通知并设置点击事件
+
+        
+    # 在所有文件处理完成后，询问用户是否删除源文件
+def select_folder():
+    global selected_folder
+    selected_folder = filedialog.askdirectory()
+    folder_entry.delete(0, tk.END)
+    folder_entry.insert(0, selected_folder)
+    status_label.config(text=f"已选择文件夹: {selected_folder}")
+# 创建主窗口
+root = tk.Tk()
+root.title("基础数据专用处理")
+root.geometry("857x400")
+root.resizable(False, False)
+
+# 创建样式
+style = ttk.Style()
+style.theme_use("clam")
+
+# 创建标签和输入框
+folder_label = ttk.Label(root, text="路径（只支持选择路径）:")
+folder_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+folder_entry = ttk.Entry(root, width=80)
+folder_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+browse_button = ttk.Button(root, text="浏览", command=select_folder)
+browse_button.grid(row=0, column=2, padx=10, pady=10, sticky="w")
+
+# 创建进度条
+progress_bar = ttk.Progressbar(root, orient="horizontal", length=200, mode="determinate")
+progress_bar.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="ew")
+
+# 创建状态栏
+status_label = ttk.Label(root, text="准备就绪", font=("Arial", 12))
+status_label.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="ew")
+
+# 创建按钮
+confirm_button = ttk.Button(root, text="开始转换", command=start_thread)
+confirm_button.grid(row=3, column=0, padx=10, pady=10, sticky="w")
+
+confirm_button1 = ttk.Button(root, text="开始处理", command=time)
+confirm_button1.grid(row=3, column=1, padx=10, pady=10, sticky="w")
+
+delete_button = ttk.Button(root, text="删除源文件", command=delete_source_files)
+delete_button.grid(row=3, column=2, padx=10, pady=10, sticky="w")
+
+# 创建日志框
+log_frame = ttk.Frame(root)
+log_frame.grid(row=4, column=0, columnspan=3, padx=10, pady=10, sticky="ew")
+
+log_text = scrolledtext.ScrolledText(log_frame, width=80, height=14)
+log_text.pack(expand=True, fill="both")
+# 定义全局变量
+selected_folder = ""
+files_to_process = []
+processed_files = []
+delete_source_files = False
+
+# 定义函数
+
+def process_file(xls_file):
+    try:
+        df = pd.read_excel(xls_file)
+        xlsx_file = os.path.splitext(xls_file)[0] + '.xlsx'
+        wb = Workbook()
+        ws = wb.active
+        rows = dataframe_to_rows(df, index=False, header=True)
+        for r in rows:
+            ws.append(r)
+        wb.save(xlsx_file)
+        processed_files.append(xlsx_file)
+        status_label.config(text=f"已转换: {xlsx_file}")
+        progress_bar['value'] = (len(processed_files) / len(files_to_process)) * 100
+        log_text.insert(tk.END, f"转换完成: {xlsx_file}\n")
+    except Exception as e:
+        log_text.insert(tk.END, f"转换文件 {xls_file} 时出错: {e}")
+        log_text.insert(tk.END, f"错误: {e}\n")
+
+
+# 设置窗口关闭时的事件
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
+# 运行主循环
+root.mainloop()</pre>  
+        <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
+    </div>  
+    <div class="footer">
+        <br>  
+        <button class="custom-button" onclick="openPage('http://2frp.bibl.love:24756/')">下载源代码</button>    
+    </div> <!-- 这里是修复的地方 -->    
+</body>  
+</html>
