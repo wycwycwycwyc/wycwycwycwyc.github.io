@@ -1,34 +1,82 @@
-<!DOCTYPE html>    
-<html lang="en">    
-<head>    
-    <meta charset="UTF-8">    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>脚本存放站</title>    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="styles1.css">    
-    <script src="script.js"></script>    
-</head>    
-<body>    
-    <div class="centered-title">    
-        <h1 id="main-title">脚本存放站</h1>    
+    <link rel="stylesheet" href="styles1.css">
+    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .centered-title {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.8); /* 添加透明度 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: rgba(242, 242, 242, 0.8); /* 添加透明度 */
+            font-weight: bold;
+    </style>
+</head>
+<body>
+    <div class="centered-title">
+        <h1 id="main-title">脚本存放站</h1>
     </div>
-        <p>基础数据转换</p>    
-        <button class="custom-button" onclick="openPage('./zhuanhuan.html')">查看</button>  
-        <br> <!-- 使用<br>元素来换行 -->
-        <br>
-        <br>
-        <p>抢车票（普通版）</p>
-        <button class="custom-button" onclick="openPage('./qiangchepiao.html')">查看</button>
-        <br>
-        <br>
-        <br>
-        <p>抢车票（升级版）</p>
-        <button class="custom-button" onclick="openPage('./qiangchepiao1.html')">查看</button>
-        <br>
-        <br>
-        <br> 
-        <p>进程管理</p>
-        <button class="custom-button" onclick="openPage('./jincheng.html')">查看</button>       
-    <!-- 你可以添加更多的按钮，每个按钮绑定不同的页面URL -->    
-</body>    
+    <table>
+        <tr>
+            <th>脚本名</th>
+            <th>简介</th>
+            <th>备注</th>
+            <th>查看</th>
+        </tr>
+        <tr>
+            <td>基础数据转换</td>
+            <td>用于基础数据的转换处理。</td>
+            <td>无</td>
+            <td><button class="custom-button" onclick="openPage('./zhuanhuan.html')">查看</button></td>
+        </tr>
+        <tr>
+            <td>抢车票（普通版）</td>
+            <td>普通版抢车票脚本。</td>
+            <td>适用于一般抢票需求。</td>
+            <td><button class="custom-button" onclick="openPage('./qiangchepiao.html')">查看</button></td>
+        </tr>
+        <tr>
+            <td>抢车票（升级版）</td>
+            <td>升级版抢车票脚本，功能更强大。</td>
+            <td>适用于高级抢票需求。</td>
+            <td><button class="custom-button" onclick="openPage('./qiangchepiao1.html')">查看</button></td>
+        </tr>
+        <tr>
+            <td>进程管理</td>
+            <td>用于管理计算机进程。</td>
+            <td>无</td>
+            <td><button class="custom-button" onclick="openPage('./jincheng.html')">查看</button></td>
+        </tr>
+        <!-- 可以根据需要添加更多脚本信息 -->
+    </table>
+    <script>
+        function openPage(url) {
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
 </html>
