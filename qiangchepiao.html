@@ -6,6 +6,13 @@
     <script src="script.js"></script>  
     <script src="script1.js"></script>  
     <style>  
+        pre {
+            white-space: pre; /* 保持预格式化文本的原始格式，不换行 */
+            word-wrap: normal; /* 取消单词在边界处的换行 */
+            overflow-x: auto; /* 水平方向超出时显示滚动条 */
+            max-width: 100%; /* 设置最大宽度，防止溢出 */
+           max-height: 1000px; /* 设置最大高度，防止内容过长 */
+        }
         body {  
             font-family: Arial, sans-serif;  
         }  
