@@ -6,8 +6,51 @@
     <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles1.css">
+    <link rel="stylesheet" href="styles1.css">
     <script src="script.js"></script>
     <style>
+/* 原有的样式保持不变 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.centered-title {
+    text-align: center;
+    margin: 20px 0;
+}
+
+table {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-collapse: separate; /* 保持边框分离 */
+    border-spacing: 0; /* 设置单元格间距为0 */
+    background-color: rgba(255, 255, 255, 0.8); /* 添加透明度 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 15px; /* 添加圆角 */
+    overflow: hidden; /* 隐藏溢出内容 */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    border-radius: 0; /* 移除单元格的圆角，以便与表格的圆角相匹配 */
+}
+
+th {
+    background-color: rgba(242, 242, 242, 0.8); /* 添加透明度 */
+    font-weight: bold;
+    border-radius: 10px 10px 0 0; /* 为表头添加圆角 */
+}
+
+td {
+    border-radius: 0 0 15px 10px; /* 为单元格添加圆角 */
+}
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
