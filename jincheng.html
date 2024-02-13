@@ -32,7 +32,27 @@
         }  
         .footer {  
             text-align: center;  
-        }  
+        }
+/* 在styles.css中添加以下样式 */
+@keyframes fadeInBlur {
+    0% {
+        opacity: 0;
+        filter: blur(20px);
+        transform: translateY(50px); /* 开始时代码框在下方 */
+    }
+    50% {
+        opacity: 1;
+        filter: blur(0);
+    }
+    100% {
+        transform: translateY(0); /* 结束时代码框回到原位 */
+    }
+}
+
+/* 应用动画到源代码框 */
+#sourceCode {
+    animation: fadeInBlur 1s ease-in-out forwards; /* 动画持续时间、缓动函数和填充模式 */
+}  
     </style>  
 </head>  
 <body>  
