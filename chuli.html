@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="script.js"></script>  
     <script src="script1.js"></script>  
-    <style>
+    <style>  
         pre {
             white-space: pre; /* 保持预格式化文本的原始格式，不换行 */
             word-wrap: normal; /* 取消单词在边界处的换行 */
@@ -21,15 +21,17 @@
             font-size: 24px;  
             margin-bottom: 20px;  
         }  
-        .subtitle {  
-            font-size: 16px;  
-            color: #666;  
-        }  
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-indent: 1em; /* 这里设置为3em，相当于3倍的字体大小，你可以根据需要调整这个值 */
+        }
         .content {  
             background-color: #f2f2f2;  
             padding: 20px;  
             position: relative;  
-        }  
+            border-radius: 20px; /* 这里可以根据需要调整圆角的大小 */
+        }
         .footer {  
             text-align: center;  
         }  
@@ -47,13 +49,40 @@
         transform: translateY(0); /* 结束时代码框回到原位 */
     }
 }
-
 /* 应用动画到源代码框 */
 #sourceCode {
     animation: fadeInBlur 1s ease-in-out forwards; /* 动画持续时间、缓动函数和填充模式 */
 }  
+/* 自定义Python函数的样式 */
+.hljs-keyword {
+    color: #81E8EB;
+}
+/* 自定义变量的样式 */
+.custom-variable {
+    color: #F0C314 !important; /* 或者使用十六进制颜色代码，例如 #FFA500 */
+}
 
-    </style>  
+/* 自定义字符串的样式 */
+.hljs-string {
+    color: green !important; /* 设置为蓝色，并且提高优先级 */
+}
+.hljs-comment {
+    color: #EB64DE !important;
+}
+pre, code {
+    font-size: 16px; /* 设置字体大小为14像素 */
+}
+    </style>
+<!-- 引入样式文件 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+<!-- 引入JavaScript文件 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>  
+</head>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    hljs.highlightAll();
+});
+</script> 
 </head>  
 <body>  
     <div class="title">基础数据处理</div>  
@@ -63,7 +92,7 @@
     <br>  
     <div class="subtitle">源代码</div>  
     <div class="content">  
-        <pre id="sourceCode">
+        <pre id="sourceCode"><code class="language-python custom-variable">
 from plyer import notification
 from sre_parse import State
 import tkinter as tk
@@ -679,7 +708,7 @@ def process_file(xls_file):
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # 运行主循环
-root.mainloop()</pre>  
+root.mainloop()</code></pre>    
         <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
     </div>  
     <div class="footer">
