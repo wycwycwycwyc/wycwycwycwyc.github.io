@@ -78,7 +78,21 @@ table {
         opacity: 1;
     }
 }
+        /* ...（此处省略其他样式）... */
 
+        /* 添加不蒜子计数器的样式 */
+        #busuanzi-container {
+            position: fixed;
+            bottom: 0; /* 紧贴底部 */
+            right: 0; /* 紧贴右侧 */
+            color: black ;
+            background-color:rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            font-size: 14px;
+            text-align: right; /* 文本靠右对齐 */
+            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            border-top-left-radius: 10px;
+            }
 /* 为表格添加动画 */
 table {
     animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
@@ -129,6 +143,14 @@ table {
         </tr>
         <!-- 可以根据需要添加更多脚本信息 -->
     </table>
+    <!-- 不蒜子计数器 -->
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div id="busuanzi-container">
+        <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+        <span id="busuanzi_container_site_uv">本站访客数<span id="busuanzi_value_site_uv"></span>人次</span>
+    </div>
+
+    <!-- 引入不蒜子的JavaScript脚本 -->
     <script>
     </script>
     </script>
