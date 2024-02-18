@@ -6,9 +6,9 @@
     <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles1.css">
-    <link rel="stylesheet" href="styles1.css">
-    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles1.css">  <script src="script.js"></script>
     <style>
+  
         /* 原有的样式保持不变 */
         body {
             font-family: Arial, sans-serif;
@@ -97,14 +97,68 @@ table {
 table {
     animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
     animation-delay: 0s; /* 延迟0.5秒开始动画 */
+} 
+/* 深色模式样式 */
+body.dark-mode {
+    background-color: #1a1a1a; /* 深色背景 */
+    color: #f4f4f4; /* 白色文本 */
 }
-    </style>
+
+.dark-mode th {
+    background-color: #333;
+    border-color: #444;
+}
+
+.dark-mode td {
+    border-color: #444;
+}
+
+.dark-mode #busuanzi-container {
+    background-color: rgba(18, 18, 18, 0.6);
+    color: #f4f4f4;
+}
+
+/* 保持原有的动画效果 */
+.dark-mode table {
+    background-color: rgba(18, 18, 18, 0.6);
+}
+
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var body = document.body;
+    var isDarkMode = body.classList.contains('dark-mode');
+
+    // 普通模式的背景图片URL
+    var lightModeBackground = 'url("https://img1.wallspic.com/crops/5/9/8/1/7/171895-zi_ran_jing_guan-yang_guang-zhi_bei-gao_de-ri_luo-7680x4320.jpg")';
+    // 深色模式的背景图片URL
+    var darkModeBackground = 'url("https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg")';
+
+    function toggleDarkMode() {
+        // 切换背景图片
+        body.style.backgroundImage = body.classList.contains('dark-mode') ? lightModeBackground : darkModeBackground;
+
+        // 切换深色模式类
+        body.classList.toggle('dark-mode');
+    }
+
+    var darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+
+    // 初始化深色模式
+    if (isDarkMode) {
+        toggleDarkMode(); // 这行代码会根据当前的isDarkMode状态来决定是否切换模式
+    }
+});
+</script> 
 </head>
 <body>
+<!-- 在<body>标签中的适当位置添加 -->
     <div class="centered-title">
         <h1 id="main-title">脚本存放站</h1>
     </div>
     <table>
+<button id="darkModeToggle"button class="custom-button" >切换深色模式</button>
         <tr>
             <th>脚本名</th>
             <th>简介</th>
