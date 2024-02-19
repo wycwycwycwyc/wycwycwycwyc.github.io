@@ -68,16 +68,6 @@ table {
     }
 }
 
-@keyframes blurIn {
-    0% {
-        filter: blur(100px);
-        opacity: 0;
-    }
-    100% {
-        filter: blur(0);
-        opacity: 1;
-    }
-}
         /* ...（此处省略其他样式）... */
 
         /* 添加不蒜子计数器的样式 */
@@ -92,6 +82,18 @@ table {
             text-align: right; /* 文本靠右对齐 */
             /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
             border-top-left-radius: 10px;
+            }
+        #tips {
+            position: fixed;
+            bottom: 0; /* 紧贴底部 */
+            left: 0; /* 紧贴右侧 */
+            color: black ;
+            background-color:rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            font-size: 14px;
+            text-align: left; /* 文本靠右对齐 */
+            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            border-top-right-radius: 10px;
             }
 /* 为表格添加动画 */
 table {
@@ -117,12 +119,39 @@ body.dark-mode {
     background-color: rgba(18, 18, 18, 0.6);
     color: #f4f4f4;
 }
-
+.dark-mode #tips {
+    background-color: rgba(18, 18, 18, 0.6);
+    color: #f4f4f4;
+}
 /* 保持原有的动画效果 */
 .dark-mode table {
     background-color: rgba(18, 18, 18, 0.6);
 }
+/* Ripple effect styles */
+.ripple {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: rippleEffect 1s ease-out forwards;
+}
 
+@keyframes rippleEffect {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(10);
+    opacity: 0;
+  }
+}
+body {
+    overflow: hidden; /* 这会隐藏整个页面的滚动条 */
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -140,6 +169,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 切换深色模式类
         body.classList.toggle('dark-mode');
+
+        // 创建全屏涟漪效果
+        var ripple = document.createElement('div');
+        ripple.classList.add('ripple');
+        ripple.style.position = 'fixed';
+        ripple.style.top = '0';
+        ripple.style.left = '0';
+        ripple.style.width = '100%';
+        ripple.style.height = '100%';
+        ripple.style.opacity = '0.5';
+        ripple.style.backgroundColor = 'white';
+        ripple.style.borderRadius = '50%';
+        ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+
+        // 将涟漪效果添加到body
+        body.appendChild(ripple);
+
+        // 动画结束后移除涟漪效果
+        setTimeout(function() {
+            ripple.remove();
+        }, 1000); // 1秒后移除涟漪效果
     }
 
     var darkModeToggle = document.getElementById('darkModeToggle');
@@ -147,10 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化深色模式
     if (isDarkMode) {
-        toggleDarkMode(); // 这行代码会根据当前的isDarkMode状态来决定是否切换模式
+        toggleDarkMode();
     }
-});
-</script> 
+});</script> 
 </head>
 <body>
 <!-- 在<body>标签中的适当位置添加 -->
@@ -158,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <h1 id="main-title">脚本存放站</h1>
     </div>
     <table>
-<button id="darkModeToggle"button class="custom-button" >切换深色模式</button>
+<button id="darkModeToggle" class="custom-button ripple">脚本存放站</button>
         <tr>
             <th>脚本名</th>
             <th>简介</th>
@@ -203,7 +252,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
         <span id="busuanzi_container_site_uv">本站访客数<span id="busuanzi_value_site_uv"></span>人次</span>
     </div>
-
+    <div id="tips">
+        <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
+    </div>
     <!-- 引入不蒜子的JavaScript脚本 -->
     <script>
     </script>
