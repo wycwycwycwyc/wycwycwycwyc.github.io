@@ -151,52 +151,58 @@ body.dark-mode {
 }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var body = document.body;
-    var isDarkMode = body.classList.contains('dark-mode');
-
-    // 普通模式的背景图片URL
-    var lightModeBackground = 'url("https://img1.wallspic.com/crops/5/9/8/1/7/171895-zi_ran_jing_guan-yang_guang-zhi_bei-gao_de-ri_luo-7680x4320.jpg")';
-    // 深色模式的背景图片URL
-    var darkModeBackground = 'url("https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg")';
-
-    function toggleDarkMode() {
-        // 切换背景图片
-        body.style.backgroundImage = body.classList.contains('dark-mode') ? lightModeBackground : darkModeBackground;
-
-        // 切换深色模式类
-        body.classList.toggle('dark-mode');
-
-        // 创建全屏涟漪效果
-        var ripple = document.createElement('div');
-        ripple.classList.add('ripple');
-        ripple.style.position = 'fixed';
-        ripple.style.top = '0';
-        ripple.style.left = '0';
-        ripple.style.width = '100%';
-        ripple.style.height = '100%';
-        ripple.style.opacity = '0.5';
-        ripple.style.backgroundColor = 'white';
-        ripple.style.borderRadius = '50%';
-        ripple.style.animation = 'rippleEffect 1s ease-out forwards';
-
-        // 将涟漪效果添加到body
-        body.appendChild(ripple);
-
-        // 动画结束后移除涟漪效果
-        setTimeout(function() {
-            ripple.remove();
-        }, 1000); // 1秒后移除涟漪效果
-    }
-
-    var darkModeToggle = document.getElementById('darkModeToggle');
-    darkModeToggle.addEventListener('click', toggleDarkMode);
-
-    // 初始化深色模式
-    if (isDarkMode) {
-        toggleDarkMode();
-    }
-});</script> 
+document.addEventListener('DOMContentLoaded', function() {  
+    var body = document.body;  
+    var darkModeToggle = document.getElementById('darkModeToggle');  
+    var lightModeBackground = 'url("https://img1.wallspic.com/crops/5/9/8/1/7/171895-zi_ran_jing_guan-yang_guang-zhi_bei-gao_de-ri_luo-7680x4320.jpg")';  
+    var darkModeBackground = 'url("https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg")';  
+  
+    // 从localStorage中获取深色模式的状态和背景图片设置  
+    var isDarkMode = localStorage.getItem('darkMode') === 'enabled';  
+    var storedBackgroundImage = localStorage.getItem('backgroundImage');  
+  
+    // 根据localStorage中的设置初始化页面  
+    body.style.backgroundImage = storedBackgroundImage || (isDarkMode ? darkModeBackground : lightModeBackground);  
+    body.classList.toggle('dark-mode', isDarkMode);  
+  
+    // 切换深色模式的函数  
+    function toggleDarkMode() {  
+        // 切换背景图片  
+        body.style.backgroundImage = body.classList.contains('dark-mode') ? lightModeBackground : darkModeBackground;  
+  
+        // 切换深色模式类  
+        body.classList.toggle('dark-mode');  
+  
+        // 创建全屏涟漪效果  
+        var ripple = document.createElement('div');  
+        ripple.classList.add('ripple');  
+        ripple.style.position = 'fixed';  
+        ripple.style.top = '0';  
+        ripple.style.left = '0';  
+        ripple.style.width = '100%';  
+        ripple.style.height = '100%';  
+        ripple.style.opacity = '0.5';  
+        ripple.style.backgroundColor = body.classList.contains('dark-mode') ? 'black' : 'white';  
+        ripple.style.borderRadius = '50%';  
+        ripple.style.animation = 'rippleEffect 1s ease-out forwards';  
+  
+        // 将涟漪效果添加到body  
+        body.appendChild(ripple);  
+  
+        // 动画结束后移除涟漪效果  
+        setTimeout(function() {  
+            ripple.remove();  
+        }, 1000);  
+  
+        // 存储用户偏好到localStorage  
+        localStorage.setItem('darkMode', body.classList.contains('dark-mode') ? 'enabled' : 'disabled');  
+        localStorage.setItem('backgroundImage', body.style.backgroundImage);  
+    }  
+  
+    // 为深色模式切换按钮添加点击事件监听器  
+    darkModeToggle.addEventListener('click', toggleDarkMode);  
+});
+</script> 
 </head>
 <body>
 <!-- 在<body>标签中的适当位置添加 -->
