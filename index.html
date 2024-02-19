@@ -258,8 +258,20 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
     </div>
     <!-- 引入不蒜子的JavaScript脚本 -->
-    <script>
-    </script>
-    </script>
+     <script>
+// 假设这是你的openPage函数
+function openPage(url) {
+    // 获取当前页面的深色模式状态
+    var isDarkMode = document.body.classList.contains('dark-mode');
+    
+    // 如果当前是深色模式，添加?theme=dark参数
+    if (isDarkMode) {
+        url += (url.includes('?') ? '&' : '?') + 'theme=dark';
+    }
+    
+    // 使用修改后的URL打开新页面
+    window.open(url, '_blank');
+}
+     </script>
 </body>
 </html>

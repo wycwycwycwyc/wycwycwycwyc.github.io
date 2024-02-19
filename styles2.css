@@ -5,6 +5,11 @@
             max-width: 100%; /* 设置最大宽度，防止溢出 */
            max-height: 1000px; /* 设置最大高度，防止内容过长 */
         }
+#themeToggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
         body {  
             font-family: Arial, sans-serif;  
         }  
@@ -27,6 +32,18 @@
         .footer {  
             text-align: center;  
         }  
+        #tips {
+            position: fixed;
+            bottom: 0; /* 紧贴底部 */
+            right: 0; /* 紧贴右侧 */
+            color: black ;
+            background-color:rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            font-size: 14px;
+            text-align: right; /* 文本靠右对齐 */
+            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            border-top-left-radius: 10px;
+            }
 @keyframes fadeInBlur {
     0% {
         opacity: 0;
@@ -63,4 +80,47 @@
 }
 pre, code {
     font-size: 16px; /* 设置字体大小为14像素 */
+}
+
+/* 深色模式的全局样式 */
+/* 深色模式的全局样式 */
+body.dark-mode {
+    background-color: #1a1a1a; /* 深色背景 */
+    color: #f4f4f4; /* 白色文本 */
+}
+
+/* 深色模式下的标题样式 */
+body.dark-mode .title {
+    color: #f4f4f4; /* 白色标题 */
+}
+
+/* 深色模式下的副标题样式 */
+body.dark-mode .subtitle {
+    color: #999; /* 较浅的灰色副标题 */
+}
+
+/* 深色模式下的内容区域样式 */
+body.dark-mode .content {
+    background-color: #3a3f4b; /* 深色背景 */
+    border: 1px solid #3a3f4b; /* 深色边框 */
+}
+
+/* 深色模式下的页脚样式 */
+body.dark-mode .footer {
+    color: #f4f4f4; /* 白色页脚文本 */
+}
+
+/* 深色模式下的代码框样式 */
+body.dark-mode pre {
+    background-color: #3a3f4b; /* 深色背景 */
+    border-color: #3a3f4b; /* 深色边框 */
+}
+
+/* 深色模式下的代码样式 */
+body.dark-mode code {
+    color: #f4f4f4; /* 白色代码文本 */
+}
+.dark-mode #tips {
+    background-color: rgba(18, 18, 18, 0.6);
+    color: #f4f4f4;
 }
