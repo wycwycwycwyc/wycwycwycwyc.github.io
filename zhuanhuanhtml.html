@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基础数据转换</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+  }
+  #dropZone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    margin: 20px;
+    width: 500px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .hidden { display: none; }
+  #downloadLinks {
+    margin-top: 20px;
+  }
+  #downloadLinks a {
+    margin-right: 10px;
+  }
+</style>
+</head>
+<body>
+  <h1>XLS转XLSX转换器(基础数据转换)</h1>
+  <div id="dropZone">将XLS文件拖拽到这里转换为XLSX</div>
+  <div id="downloadLinks" class="hidden"></div>
+
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script> 
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const downloadLinks = document.getElementById('downloadLinks');
+
+    // 设置拖拽事件监听器
+    dropZone.addEventListener('dragover', handleDragOver, false);
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDragOver(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      dropZone.style.border = '2px dashed #000';
+    }
+
+    function handleDrop(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      dropZone.style.border = '2px dashed #ccc';
+
+      const files = event.dataTransfer.files;
+      processFiles(files);
+    }
+
+    function processFiles(files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type === 'application/vnd.ms-excel') {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.name.replace('.xls', '.xlsx');
+            a.textContent = `下载 ${file.name.replace('.xls', '.xlsx')}`;
+            downloadLinks.appendChild(a);
+          };
+          reader.readAsBinaryString(file);
+        } else {
+          alert('请只拖拽XLS文件。');
+        }
+      }
+      downloadLinks.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
