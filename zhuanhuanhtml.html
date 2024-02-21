@@ -3,50 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>基础数据转换</title>
+<title>XLS转XLSX转换器(基础数据转换)</title>
+    <link rel="stylesheet" href="styles.css">
+<script src="script.js"></script>
+<script src="script3.js"></script> 
 <style>
   body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    flex-direction: column;
+    min-height: 100vh;
     background-color: #f7f7f7;
+  }
+  header {
+    width: 100%;
+    background-color: #f7f7f7;
+    color: black;
+    text-align: center;
+    padding: 5px;
   }
   #dropZone {
     border: 2px dashed #ccc;
     padding: 20px;
     text-align: center;
-    margin: 20px;
-    width: 500px;
-    height: 300px;
+    margin: 50px auto;
+    width: 1000px;
+    height: 600px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 15px; /* 添加圆角样式 */
+}
+
+.download-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  border-radius: 10px; /* 添加圆角样式 */
+}
+
+  .download-table td, .download-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
   }
-  .hidden { display: none; }
-  #downloadLinks {
-    margin-top: 20px;
+  .download-table th {
+    background-color: #f2f2f2;
   }
-  #downloadLinks a {
-    margin-right: 10px;
+  .download-table tr:nth-child(even) {
+    background-color: #f2f2f2;
   }
+#downloadAllButton {
+  display: block; /* 将按钮设置为块级元素，以便应用 margin 属性 */
+  margin: 0 auto; /* 这会使按钮在水平方向上居中 */
+  margin-top: 20px; /* 保持原有的顶部外边距 */
+}
 </style>
 </head>
 <body>
-  <h1>XLS转XLSX转换器(基础数据转换)</h1>
-  <div id="dropZone">将XLS文件拖拽到这里转换为XLSX</div>
-  <div id="downloadLinks" class="hidden"></div>
+  <header>
+    <h1>XLS转XLSX转换器(基础数据转换)</h1>
+  </header>
+  <div id="dropZone">
+    <button class="file-upload-button custom-button" id="fileUploadButton">选择文件</button>
+    <input type="file" id="fileInput" accept=".xls" multiple style="display:none;">
+    <div>或者将XLS文件拖拽到这里转换为XLSX</div>
+  </div>
+  <table id="downloadLinks" class="download-table hidden">
+    <thead>
+      <tr>
+        <th>文件名</th>
+        <th>下载</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 下载链接将在这里动态生成 -->
+    </tbody>
+  </table>
+  <button id="downloadAllButton" class=" custom-button">一键下载所有文件</button>
 
+  <!-- JavaScript代码保持不变 -->
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script> 
   <script>
     const dropZone = document.getElementById('dropZone');
-    const downloadLinks = document.getElementById('downloadLinks');
+    const downloadLinksTable = document.getElementById('downloadLinks');
+    const downloadAllButton = document.getElementById('downloadAllButton');
+    const fileInput = document.getElementById('fileInput');
 
     // 设置拖拽事件监听器
     dropZone.addEventListener('dragover', handleDragOver, false);
@@ -64,10 +110,15 @@
       dropZone.style.border = '2px dashed #ccc';
 
       const files = event.dataTransfer.files;
-      processFiles(files);
+      processFiles(files, () => {
+        downloadLinksTable.classList.remove('hidden');
+        downloadAllButton.disabled = false;
+      });
     }
 
-    function processFiles(files) {
+    function processFiles(files, callback) {
+      let linksCreated = 0;
+      const tbody = downloadLinksTable.getElementsByTagName('tbody')[0];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file.type === 'application/vnd.ms-excel') {
@@ -81,16 +132,47 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = file.name.replace('.xls', '.xlsx');
-            a.textContent = `下载 ${file.name.replace('.xls', '.xlsx')}`;
-            downloadLinks.appendChild(a);
+            a.textContent = file.name.replace('.xls', '.xlsx');
+            const row = document.createElement('tr');
+            const filenameCell = document.createElement('td');
+            const downloadCell = document.createElement('td');
+            filenameCell.textContent = file.name.replace('.xls', '.xlsx');
+            downloadCell.appendChild(a);
+            row.appendChild(filenameCell);
+            row.appendChild(downloadCell);
+            tbody.appendChild(row);
+            linksCreated++;
+            if (linksCreated === files.length) {
+              callback();
+            }
           };
           reader.readAsBinaryString(file);
         } else {
           alert('请只拖拽XLS文件。');
         }
       }
-      downloadLinks.style.display = 'block';
     }
+
+    // 新增一键下载所有文件的功能
+    downloadAllButton.addEventListener('click', function() {
+      const links = downloadLinksTable.getElementsByTagName('a');
+      for (let i = 0; i < links.length; i++) {
+        links[i].click(); // 触发每个下载链接的点击事件
+      }
+    });
+
+    // 添加文件选择按钮的事件监听器
+    document.getElementById('fileUploadButton').addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    // 监听文件选择事件
+    fileInput.addEventListener('change', function(event) {
+      processFiles(event.target.files, () => {
+        downloadLinksTable.classList.remove('hidden');
+        downloadAllButton.disabled = false;
+      });
+    });
   </script>
 </body>
 </html>
