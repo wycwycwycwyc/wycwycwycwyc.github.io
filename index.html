@@ -275,8 +275,8 @@ function openPage(url) {
         url += (url.includes('?') ? '&' : '?') + 'theme=dark';
     }
     
-    // 使用修改后的URL打开新页面
-    window.open(url, '_blank');
+    // 使用修改后的URL在当前页面跳转
+    window.location.href = url;
 }
      </script>
 </body>
