@@ -149,6 +149,50 @@ body.dark-mode {
     opacity: 0;
   }
 }
+        .login-icon-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+        .login-icon-container:hover {
+            background-color: #0056b3;
+        }
+        .login-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .login-status {
+            margin-left: 2px;
+            font-size: 14px;
+        }
+.logout-btn {
+    position: absolute;
+    top: 10px;    /* 距离顶部的距离 */
+    right: 10px;   /* 距离右侧的距离 */
+    background-color: #f44336; /* 红色背景，您可以根据需要更改 */
+    color: white;    /* 白色文字 */
+    border: none;     /* 无边框 */
+    padding: 5px 15px; /* 内边距 */
+    border-radius: 5px; /* 圆角 */
+    cursor: pointer;  /* 鼠标指针变为手形 */
+    z-index: 1000;    /* 确保按钮在最上层 */
+}
+
+/* 当鼠标悬停在退出登录按钮上时的样式 */
+.logout-btn:hover {
+    background-color: #d32f2f; /* 深红色背景 */
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {  
@@ -205,6 +249,49 @@ document.addEventListener('DOMContentLoaded', function() {
 </script> 
 </head>
 <body>
+<div id="loginStatus" class="login-icon-container">
+    <span class="login-status">登录</span>
+</div>
+<button id="logoutButton" class="logout-btn">退出登录</button>
+
+<script>
+// 检查localStorage中的登录状态
+document.addEventListener('DOMContentLoaded', function() {
+    var loginStatusElement = document.getElementById('loginStatus');
+    var logoutButton = document.getElementById('logoutButton');
+    var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    // 如果用户未登录，隐藏退出登录按钮
+    if (!isLoggedIn) {
+        logoutButton.style.display = 'none';
+    }
+
+    // 如果用户已登录，显示退出登录按钮
+    if (isLoggedIn) {
+        logoutButton.style.display = 'block';
+    }
+    if (isLoggedIn) {
+        // 如果已经登录，显示“已登录”状态并添加退出登录按钮的点击事件
+        loginStatusElement.querySelector('.login-status').textContent = '已登录';
+        loginStatusElement.style.cursor = 'default';
+        loginStatusElement.onclick = null;
+
+        // 添加退出登录按钮的点击事件
+        logoutButton.onclick = function() {
+            if (confirm('您确定要退出登录吗？')) {
+                // 清除本地存储中的登录状态
+                localStorage.removeItem('isLoggedIn');
+                // 重定向到登录页面
+                window.location.reload();
+            }
+        };
+    } else {
+        // 如果未登录，设置点击事件以跳转到登录页面
+        loginStatusElement.onclick = function() {
+            window.location.href = 'Login.html'; // 替换为您的登录页面URL
+        };
+    }
+});
+</script>
 <!-- 在<body>标签中的适当位置添加 -->
     <div class="centered-title">
         <h1 id="main-title">脚本存放站</h1>

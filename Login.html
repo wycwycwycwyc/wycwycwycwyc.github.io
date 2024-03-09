@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录页面</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
+.login-container h2 {
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #666;
+    font-size: 18px;
+}
+
+.form-group input {
+    width: 96%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 16px; /* 增加输入框字体大小 */
+}
+
+.form-group button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 20px;
+    background-color: #5cb85c;
+    color: white;
+    cursor: pointer;
+    font-size: 16px; /* 增加按钮字体大小 */
+}
+
+.form-group button:hover {
+    background-color: #4cae4c;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+    display: none;
+}
+/* ...（此处省略其他样式）... */
+
+/* 添加返回按钮的样式 */
+/* ...（此处省略其他样式）... */
+
+/* 添加返回按钮的样式 */
+.back-btn {
+    display: inline-block; /* 使按钮与文本并排显示 */
+    padding: 5px 10px; /* 减少内边距以节省空间 */
+    color: #5cb85c; /* 与登录按钮的颜色相同 */
+    text-decoration: none; /* 去除下划线 */
+    font-size: 16px; /* 与表单标签的字体大小相同 */
+    cursor: pointer; /* 鼠标指针变为手形 */
+    background-color: #f7f7f7; /* 添加背景颜色，与表单背景颜色相似 */
+    border: 1px solid #ddd; /* 添加边框 */
+    border-radius: 20px; /* 添加圆角 */
+}
+
+.back-btn:hover {
+    color: #4cae4c; /* 鼠标悬停时的颜色 */
+    background-color: #e7e7e7; /* 鼠标悬停时的背景颜色 */
+    border-color: #ccc; /* 鼠标悬停时的边框颜色 */
+}
+</style>
+</head>
+<body>
+<div class="login-container">
+<a href="index.html" class="back-btn">返回</a> 
+    <h2>登录</h2>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">登录</button>
+        </div>
+        <div class="error" id="error"></div>
+    </form>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // 阻止表单的默认提交行为
+
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    var errorElement = document.getElementById('error');
+
+    // 这里只是一个示例，实际应用中不应该在前端存储任何密码
+    var correctCredentials = {
+        username: "wyc",
+        password: "W12345abc"
+    };
+
+    if (username === correctCredentials.username && password === correctCredentials.password) {
+        // 登录成功
+        errorElement.textContent = ''; // 清空错误信息
+        errorElement.style.display = 'none'; // 隐藏错误信息
+
+        // 存储用户名到localStorage
+        localStorage.setItem('username', username);
+       // 登录成功后设置登录状态
+        localStorage.setItem('isLoggedIn', 'true');
+        // 这里可以执行登录成功后的其他操作，比如跳转到另一个页面
+        alert("登录成功！");
+        window.location.href = 'index.html'; // 示例：跳转到成功页面
+    } else {
+        // 登录失败
+        errorElement.textContent = '用户名或密码错误'; // 显示错误信息
+        errorElement.style.display = 'block'; // 显示错误信息
+        alert("用户名或密码错误");
+    }
+});
+</script>
+</body>
+</html>
