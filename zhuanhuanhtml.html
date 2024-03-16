@@ -6,7 +6,8 @@
 <title>XLS转XLSX转换器(基础数据转换)</title>
     <link rel="stylesheet" href="styles.css">
 <script src="script.js"></script>
-<script src="script3.js"></script> 
+<script src="script3.js"></script>
+<script src="script4.js"></script>  
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -62,11 +63,36 @@
   margin: 0 auto; /* 这会使按钮在水平方向上居中 */
   margin-top: 20px; /* 保持原有的顶部外边距 */
 }
+  /* 添加CSS动画 */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+    animation: fadeIn 1s ease-in-out; /* 页面加载时的淡入效果 */
+  }
+
+  /* ... 其他样式保持不变 ... */
+
+  /* 应用动画到表格和按钮 */
+  .download-table, #downloadAllButton {
+    animation: fadeIn 1s ease-in-out;
+  }
+
 </style>
 </head>
 <body>
   <header>
     <h1>XLS转XLSX转换器(基础数据转换)</h1>
+<button class="custom-button" onclick="goBackOrHome()">返回</button>
   </header>
   <div id="dropZone">
     <button class="file-upload-button custom-button" id="fileUploadButton">选择文件</button>
