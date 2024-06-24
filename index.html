@@ -193,6 +193,13 @@ body.dark-mode {
 .logout-btn:hover {
     background-color: #d32f2f; /* 深红色背景 */
 }
+.main-image {
+    width: 100%; /* 或者您希望的宽度 */
+    max-width: 330px; /* 图片的最大宽度 */
+    height: auto; /* 保持图片的宽高比 */
+    display: block; /* 图片不浮动 */
+    margin: 20px auto; /* 居中显示并设置外边距 */
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {  
@@ -294,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- 在<body>标签中的适当位置添加 -->
     <div class="centered-title">
-        <h1 id="main-title">脚本存放站</h1>
+        <img src="logo.svg" alt="脚本存放站" id="main-image" class="main-image">
     </div>
     <table>
 <button id="darkModeToggle" class="custom-button ripple">脚本存放站</button>
