@@ -200,6 +200,21 @@ body.dark-mode {
     display: block; /* 图片不浮动 */
     margin: 20px auto; /* 居中显示并设置外边距 */
 }
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(100%); /* 从右边开始 */
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0); /* 移动到正常位置 */
+        }
+    }
+
+    /* 为Logo添加动画效果 */
+    #main-image {
+        animation: slideInFromRight 1.5s ease-out forwards; /* 应用动画 */
+    }
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
