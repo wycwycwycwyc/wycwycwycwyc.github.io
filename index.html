@@ -202,57 +202,69 @@ body.dark-mode {
 }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function() {  
-    var body = document.body;  
-    var darkModeToggle = document.getElementById('darkModeToggle');  
-    var lightModeBackground = 'url("https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark")';  
-    var darkModeBackground = 'url("https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg")';  
-  
-    // 从localStorage中获取深色模式的状态和背景图片设置  
-    var isDarkMode = localStorage.getItem('darkMode') === 'enabled';  
-    var storedBackgroundImage = localStorage.getItem('backgroundImage');  
-  
-    // 根据localStorage中的设置初始化页面  
-    body.style.backgroundImage = storedBackgroundImage || (isDarkMode ? darkModeBackground : lightModeBackground);  
-    body.classList.toggle('dark-mode', isDarkMode);  
-  
-    // 切换深色模式的函数  
-    function toggleDarkMode() {  
-        // 切换背景图片  
-        body.style.backgroundImage = body.classList.contains('dark-mode') ? lightModeBackground : darkModeBackground;  
-  
-        // 切换深色模式类  
-        body.classList.toggle('dark-mode');  
-  
-        // 创建全屏涟漪效果  
-        var ripple = document.createElement('div');  
-        ripple.classList.add('ripple');  
-        ripple.style.position = 'fixed';  
-        ripple.style.top = '0';  
-        ripple.style.left = '0';  
-        ripple.style.width = '100%';  
-        ripple.style.height = '100%';  
-        ripple.style.opacity = '0.5';  
-        ripple.style.backgroundColor = body.classList.contains('dark-mode') ? 'black' : 'white';  
-        ripple.style.borderRadius = '50%';  
-        ripple.style.animation = 'rippleEffect 1s ease-out forwards';  
-  
-        // 将涟漪效果添加到body  
-        body.appendChild(ripple);  
-  
-        // 动画结束后移除涟漪效果  
-        setTimeout(function() {  
-            ripple.remove();  
-        }, 1000);  
-  
-        // 存储用户偏好到localStorage  
-        localStorage.setItem('darkMode', body.classList.contains('dark-mode') ? 'enabled' : 'disabled');  
-        localStorage.setItem('backgroundImage', body.style.backgroundImage);  
-    }  
-  
-    // 为深色模式切换按钮添加点击事件监听器  
-    darkModeToggle.addEventListener('click', toggleDarkMode);  
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        var body = document.body;
+        var darkModeToggle = document.getElementById('darkModeToggle');
+        var mainImage = document.getElementById('main-image');
+        
+        // Logo图片路径
+        var lightModeLogoSrc = 'logo.svg';
+        var darkModeLogoSrc = 'logo_dark.svg';
+        
+        // 背景图片路径
+        var lightModeBackground = "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')";
+        var darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
+
+        // 从localStorage中获取深色模式的状态和背景图片设置
+        var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        var storedBackgroundImage = localStorage.getItem('backgroundImage') || (isDarkMode ? darkModeBackground : lightModeBackground);
+
+        // 初始化页面的背景、Logo和深色模式类
+        body.style.backgroundImage = storedBackgroundImage;
+        mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
+        body.classList.toggle('dark-mode', isDarkMode);
+
+        // 切换深色模式的函数
+        function toggleDarkMode() {
+            // 切换深色模式状态
+            isDarkMode = !isDarkMode;
+
+            // 切换背景图片和Logo
+            body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+            mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
+
+            // 切换深色模式类
+            body.classList.toggle('dark-mode', isDarkMode);
+
+            // 更新localStorage中的状态和背景图片
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            localStorage.setItem('backgroundImage', body.style.backgroundImage);
+
+            // 创建全屏涟漪效果
+            var ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            ripple.style.position = 'fixed';
+            ripple.style.top = '0';
+            ripple.style.left = '0';
+            ripple.style.width = '100%';
+            ripple.style.height = '100%';
+            ripple.style.opacity = '0.5';
+            ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
+            ripple.style.borderRadius = '50%';
+            ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+
+            // 将涟漪效果添加到body
+            body.appendChild(ripple);
+
+            // 动画结束后移除涟漪效果
+            setTimeout(function() {
+                ripple.remove();
+            }, 1000);
+        }
+
+        // 为深色模式切换按钮添加事件监听器
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    });
 </script> 
 </head>
 <body>
