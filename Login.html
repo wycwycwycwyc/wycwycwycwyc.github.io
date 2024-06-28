@@ -12,6 +12,7 @@ body {
     background-color: #f7f7f7;
     margin: 0;
     padding: 0;
+    overflow: hidden; /* 隐藏滚动条 */
 }
 
 .login-container {
@@ -168,6 +169,24 @@ body.dark-mode .back-btn:hover {
     background-color: #303030;
     border-color: #3c3c3c;
 }
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* 应用动画到登录容器 */
+    .login-container {
+        /* 初始状态为下方隐藏，动画完成后不保留动画状态 */
+        opacity: 0;
+        transform: translateY(100%);
+        animation: slideUp 0.8s ease-out forwards;
+    }
 </style>
 </head>
 <body>
