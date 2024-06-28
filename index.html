@@ -6,7 +6,7 @@
     <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles1.css">
-    <link rel="stylesheet" href="styles1.css">  <script src="script.js"></script>
+    <script src="script.js"></script>
     <style>
   
         /* 原有的样式保持不变 */
@@ -95,6 +95,18 @@ table {
             /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
             border-top-right-radius: 10px;
             }
+        #time {
+position: fixed;
+top: 0; /* 紧贴顶部 */
+right: 0; /* 紧贴右侧 */
+color: black;
+background-color: rgba(255, 255, 255, 0.8);
+padding: 5px;
+font-size: 14px;
+text-align: left; /* 文本靠左对齐 */
+/* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+border-top-left-radius: 10px; /* 修改圆角为左上角 */
+            }
 /* 为表格添加动画 */
 table {
     animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
@@ -120,6 +132,10 @@ body.dark-mode {
     color: #f4f4f4;
 }
 .dark-mode #tips {
+    background-color: rgba(18, 18, 18, 0.6);
+    color: #f4f4f4;
+}
+.dark-mode #time {
     background-color: rgba(18, 18, 18, 0.6);
     color: #f4f4f4;
 }
@@ -385,6 +401,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <div id="tips">
         <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
     </div>
+    <div id="time">
+        <span id="time_now">时间：<span>
+    </div>
     <!-- 引入不蒜子的JavaScript脚本 -->
      <script>
 // 假设这是你的openPage函数
@@ -401,5 +420,29 @@ function openPage(url) {
     window.location.href = url;
 }
      </script>
+<script>
+    // 更新页面上的时间
+function updateLocalTime() {
+    // 获取当前UTC时间
+    const nowUtc = new Date();
+
+    // 减去8小时的毫秒数以匹配UTC时间
+    const nowUtcAdjusted = new Date(nowUtc.getTime() + (8 * 60 * 60 * 1000));
+
+    // 格式化UTC时间
+    const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
+    const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
+    const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
+
+    // 更新页面上的时间显示为UTC时间
+    document.getElementById('time_now').textContent =
+        '当前时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+}
+
+// 初始化时间显示
+updateLocalTime();
+// 每1000毫秒（1秒）更新一次时间
+setInterval(updateLocalTime, 1000);
+</script>
 </body>
 </html>
