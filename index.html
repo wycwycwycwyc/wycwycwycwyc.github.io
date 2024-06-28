@@ -320,8 +320,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     } else {
         // 如果未登录，设置点击事件以跳转到登录页面
-        loginStatusElement.onclick = function() {
-            window.location.href = 'Login.html'; // 替换为您的登录页面URL
+    loginStatusElement.onclick = function() {
+        var loginUrl = 'Login.html'; // 替换为您的登录页面URL
+        openPage(loginUrl); // 使用openPage函数进行跳转
         };
     }
 });

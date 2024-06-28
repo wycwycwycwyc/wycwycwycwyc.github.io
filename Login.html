@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>登录页面</title>
-<script src="script4.js"></script>  
+<script src="script4.js"></script> 
+<script src="script3.js"></script> 
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -88,6 +89,84 @@ body {
     color: #4cae4c; /* 鼠标悬停时的颜色 */
     background-color: #e7e7e7; /* 鼠标悬停时的背景颜色 */
     border-color: #ccc; /* 鼠标悬停时的边框颜色 */
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+
+/* 其他现有样式... */
+
+/* 深色模式基础样式 */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+/* 深色模式下登录容器样式 */
+body.dark-mode .login-container {
+    background-color: #272727;
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+}
+
+/* 深色模式下文本和按钮样式 */
+body.dark-mode .login-container h2,
+body.dark-mode .form-group label {
+    color: #ffffff;
+}
+
+/* 深色模式下输入框的背景色调整 */
+.dark-mode .form-group input {
+    background-color: #333; /* 深灰色背景，比周围环境稍微亮一点 */
+    border-color: #444; /* 边框颜色，与背景色形成对比 */
+    color: #fff; /* 文本颜色为白色 */
+}
+body.dark-mode .form-group button {
+    background-color: #4caf50;
+    color: white;
+}
+
+body.dark-mode .form-group button:hover {
+    background-color: #45a049;
+}
+
+/* 深色模式下错误消息样式 */
+body.dark-mode .error {
+    color: #ff5555;
+}
+
+/* 返回按钮的样式 */
+.back-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    color: #5cb85c;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+}
+
+.back-btn:hover {
+    color: #4cae4c;
+    background-color: #e7e7e7;
+    border-color: #ccc;
+}
+
+/* 深色模式下返回按钮的样式 */
+body.dark-mode .back-btn {
+    color: #4caf50;
+    background-color: #333333;
+    border-color: #555555;
+}
+
+body.dark-mode .back-btn:hover {
+    color: #45a049;
+    background-color: #303030;
+    border-color: #3c3c3c;
 }
 </style>
 </head>
