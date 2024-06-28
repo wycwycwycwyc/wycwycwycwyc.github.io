@@ -86,7 +86,54 @@
   .download-table, #downloadAllButton {
     animation: fadeIn 1s ease-in-out;
   }
+/* 基础样式保持不变 */
 
+/* 深色模式样式 */
+body.dark-mode {
+    background-color: #121212; /* 深色背景 */
+    color: #ffffff; /* 浅色文字 */
+}
+
+body.dark-mode header {
+    background-color: #333; /* 深色头部背景 */
+    color: #ffffff; /* 浅色文字 */
+}
+
+body.dark-mode #dropZone {
+    border: 2px dashed #555; /* 深色模式下边框颜色 */
+    background-color: #222; /* 深色背景 */
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 深色模式下的盒阴影 */
+}
+
+body.dark-mode .download-table {
+    color: #ffffff; /* 浅色文本 */
+}
+
+body.dark-mode .download-table td, body.dark-mode .download-table th {
+    border: 1px solid #444; /* 深色表格边框 */
+}
+
+body.dark-mode .download-table th {
+    background-color: #333; /* 深色表头背景 */
+}
+
+body.dark-mode .download-table tr:nth-child(even) {
+    background-color: #333; /* 深色偶数行背景 */
+}
+
+body.dark-mode #downloadAllButton {
+    /* 深色模式下按钮样式，根据需要自定义 */
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid #333;
+}
+
+/* 深色模式下淡入动画 */
+body.dark-mode {
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* 其他深色模式下动画样式保持不变 */
 </style>
 </head>
 <body>
