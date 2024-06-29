@@ -271,26 +271,28 @@ body.dark-mode {
             localStorage.setItem('backgroundImage', body.style.backgroundImage);
 
             // 创建全屏涟漪效果
-            var ripple = document.createElement('div');
-            ripple.classList.add('ripple');
-            ripple.style.position = 'fixed';
-            ripple.style.top = '0';
-            ripple.style.left = '0';
-            ripple.style.width = '100%';
-            ripple.style.height = '100%';
-            ripple.style.opacity = '0.5';
-            ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
-            ripple.style.borderRadius = '50%';
-            ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+    var ripple = document.createElement('div');
+    ripple.classList.add('ripple');
+    ripple.style.position = 'fixed';
+    ripple.style.top = '0';
+    ripple.style.left = '0';
+    ripple.style.width = '100%';
+    ripple.style.height = '100%';
+    ripple.style.opacity = '0.5';
+    ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
+    ripple.style.borderRadius = '50%';
+    ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+    // 确保涟漪效果不会捕获鼠标事件
+    ripple.style.pointerEvents = 'none';
 
-            // 将涟漪效果添加到body
-            body.appendChild(ripple);
+    // 将涟漪效果添加到body
+    document.body.appendChild(ripple);
 
-            // 动画结束后移除涟漪效果
-            setTimeout(function() {
-                ripple.remove();
-            }, 1000);
-        }
+    // 动画结束后移除涟漪效果
+    setTimeout(function() {
+        ripple.remove();
+    }, 1000);
+}
 
         // 为深色模式切换按钮添加事件监听器
         darkModeToggle.addEventListener('click', toggleDarkMode);
