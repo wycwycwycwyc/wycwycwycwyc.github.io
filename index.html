@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
     </div>
     <div id="time">
-        <span id="time_now">时间：<span>
+        <span id="time_now">正在获取时间...<span>
     </div>
     <!-- 引入不蒜子的JavaScript脚本 -->
      <script>
@@ -420,39 +420,27 @@ function openPage(url) {
 }
      </script>
 <script>
-function fetchServerTime() {
-    // 使用一个可靠的时间API来获取UTC时间
-    fetch('https://worldtimeapi.org/api/ip')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('网络响应错误');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // 假设API返回的UTC时间在data.datetime字段
-            const serverTime = new Date(data.datetime);
+function updateLocalTime() {
+    // 获取当前UTC时间
+    const nowUtc = new Date();
 
-            const adjustedTime = serverTime
+    // 减去8小时的毫秒数以匹配UTC时间
+    const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
 
-            // 格式化时间
-            const hours = adjustedTime.getHours().toString().padStart(2, '0');
-            const minutes = adjustedTime.getMinutes().toString().padStart(2, '0');
-            const seconds = adjustedTime.getSeconds().toString().padStart(2, '0');
+    // 格式化UTC时间
+    const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
+    const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
+    const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
 
-            // 更新页面上的时间显示
-            document.getElementById('time_now').textContent =
-                '当前时间：' + hours + ':' + minutes + ':' + seconds;
-        })
-        .catch(error => {
-            console.error('获取服务器时间失败:', error);
-        });
+    // 更新页面上的时间显示为UTC时间
+    document.getElementById('time_now').textContent =
+        '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
 }
 
 // 初始化时间显示
-fetchServerTime();
+updateLocalTime();
 // 每1000毫秒（1秒）更新一次时间
-setInterval(fetchServerTime, 1000);
+setInterval(updateLocalTime, 1000);
 </script>
 </body>
 </html>
