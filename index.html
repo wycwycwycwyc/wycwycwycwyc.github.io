@@ -420,28 +420,39 @@ function openPage(url) {
 }
      </script>
 <script>
-    // 更新页面上的时间
-function updateLocalTime() {
-    // 获取当前UTC时间
-    const nowUtc = new Date();
+function fetchServerTime() {
+    // 使用一个可靠的时间API来获取UTC时间
+    fetch('https://worldtimeapi.org/api/ip')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应错误');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 假设API返回的UTC时间在data.datetime字段
+            const serverTime = new Date(data.datetime);
 
-    // 减去8小时的毫秒数以匹配UTC时间
-    const nowUtcAdjusted = new Date(nowUtc.getTime() + (8 * 60 * 60 * 1000));
+            const adjustedTime = serverTime
 
-    // 格式化UTC时间
-    const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
-    const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
-    const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
+            // 格式化时间
+            const hours = adjustedTime.getHours().toString().padStart(2, '0');
+            const minutes = adjustedTime.getMinutes().toString().padStart(2, '0');
+            const seconds = adjustedTime.getSeconds().toString().padStart(2, '0');
 
-    // 更新页面上的时间显示为UTC时间
-    document.getElementById('time_now').textContent =
-        '当前时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+            // 更新页面上的时间显示
+            document.getElementById('time_now').textContent =
+                '当前时间：' + hours + ':' + minutes + ':' + seconds;
+        })
+        .catch(error => {
+            console.error('获取服务器时间失败:', error);
+        });
 }
 
 // 初始化时间显示
-updateLocalTime();
+fetchServerTime();
 // 每1000毫秒（1秒）更新一次时间
-setInterval(updateLocalTime, 1000);
+setInterval(fetchServerTime, 1000);
 </script>
 </body>
 </html>
