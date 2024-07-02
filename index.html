@@ -15,6 +15,7 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            overflow: hidden; /* 隐藏溢出的内容和滚动条 */
         }
 
         .centered-title {
@@ -26,6 +27,7 @@ th, td {
     border: 1px solid #ddd;
     padding: 15px;
     text-align: left;
+    white-space: nowrap;
     /* 设置不同的圆角值以避免接触部分的圆角 */
     border-radius: 0;
 }
@@ -43,18 +45,43 @@ td {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-
+*, *:before, *:after {
+    box-sizing: border-box;
+}
 /* 为表格设置圆角 */
 table {
     width: 90%;
+    max-width: 1200px; /* 设置表格的最大宽度，例如800px */
+    table-layout: fixed;
     margin: 20px auto;
-    border-collapse: separate;
+    border-collapse: collapse; /* 确保边框合并，避免滚动条间隙 */
+    position: relative; /* 设置表格为相对定位，以便 thead 可以基于它进行固定 */
     border-spacing: 0;
     background-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 15px; /* 设置整个表格的圆角 */
-    overflow: hidden;
+    border-radius: 15px;
+    max-height: 500px;
+    display: block;
+    overflow-y: auto; /* 当内容超过表格高度时显示垂直滚动条 */
 }
+
+/* 固定表头 */
+thead {
+    background-color: rgba(242, 242, 242, 0.8);
+    position: sticky;
+    top: 0; /* 当滚动到顶部时，表头固定在顶部 */
+    z-index: 10; /* 确保表头在其他内容之上 */
+}
+
+/* 确保表头的圆角不会被滚动内容覆盖 */
+th {
+    position: sticky;
+    top: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: 20; /* 确保表头边框在表头背景之上 */
+}
+
 
 @keyframes slideUp {
     0% {
@@ -111,6 +138,39 @@ table {
     animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
     animation-delay: 0s; /* 延迟0.5秒开始动画 */
 } 
+
+.more-button {
+    position: absolute; /* 绝对定位，根据需要调整 */
+    top: 50%; /* 垂直居中 */
+    transform: translateY(-50%);
+    cursor: pointer;
+    background-color: transparent; /* 透明背景 */
+    border: none; /* 无边框 */
+    font-size: 24px; /* 字体大小 */
+    color: #007bff; /* 字体颜色 */
+    transition: color 0.3s; /* 颜色变化动画 */
+}
+
+.more-button:hover {
+    color: #0056b3; /* 鼠标悬停时颜色变深 */
+}
+.more-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-size: 100px;
+    color: #007bff;
+    transition: color 0.3s, left 0.3s; /* 添加left属性的过渡效果 */
+}
+
+/* 按钮在左侧的样式 */
+.more-button.left {
+    left: 20px; /* 根据需要调整位置 */
+    right: auto; /* 确保right属性不会影响布局 */
+}
 /* 深色模式样式 */
 body.dark-mode {
     background-color: #1a1a1a; /* 深色背景 */
@@ -348,14 +408,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="centered-title">
         <img src="logo.svg" alt="脚本存放站" id="main-image" class="main-image">
     </div>
-    <table>
 <button id="darkModeToggle" class="custom-button ripple">脚本存放站</button>
+<table class="main-table" style="display: block;">
+    <thead>
         <tr>
-            <th>脚本名</th>
+            <th>脚本名(python)</th>
             <th>简介</th>
             <th>备注</th>
             <th>查看</th>
         </tr>
+    </thead>
         <tr>
             <td>基础数据转换</td>
             <td>用于基础数据的转换处理。</td>
@@ -370,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </tr> 
         <tr>
             <td>基础数据处理</td>
-            <td>用于基础数据的转换处理，比基础数据转换高效又高级</td>
+            <td>用于基础数据的转换处理，比基础数据转换高效</td>
             <td>高效地批量将同一文件夹下的xls文件转换为xlsx，附带填写周报功能</td>
             <td><button class="custom-button" onclick="openPage('./chuli.html')">查看</button></td>
         </tr>        
@@ -394,6 +456,24 @@ document.addEventListener('DOMContentLoaded', function() {
         </tr>
         <!-- 可以根据需要添加更多脚本信息 -->
     </table>
+<!-- 表格旁边的触发按钮 -->
+<button id="toggleTableButton" class="more-button" title="显示更多表格" style="right: 20px;">&gt;</button>
+<table id="additionalTable" style="display: none;">
+    <thead>
+        <tr>
+            <th>脚本名(C++)</th>
+            <th>简介</th>
+            <th>备注</th>
+            <th>查看</th>
+        </tr>
+    </thead>
+        <tr>
+            <td>多功能智能排序系统</td>
+            <td>智能排序：一键排序，支持多种算法，文件导入</td>
+            <td>本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。</td>
+            <td><button class="custom-button" onclick="openPage('./paixv.html')">查看</button></td>
+        </tr>
+</table>
     <!-- 不蒜子计数器 -->
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     <div id="busuanzi-container">
@@ -443,6 +523,41 @@ function updateLocalTime() {
 updateLocalTime();
 // 每1000毫秒（1秒）更新一次时间
 setInterval(updateLocalTime, 1000);
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleButton = document.getElementById('toggleTableButton');
+    var mainTable = document.querySelector('.main-table'); // 第一个表格
+    var additionalTable = document.getElementById('additionalTable'); // 第二个表格
+
+    // 初始化变量以跟踪表格的显示状态
+    var isMainTableVisible = true;
+
+    toggleButton.addEventListener('click', function() {
+        // 切换表格显示状态
+        isMainTableVisible = !isMainTableVisible; // 更新显示状态
+        mainTable.style.display = isMainTableVisible ? 'block' : 'none';
+        additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
+
+        // 切换按钮内容
+        if (isMainTableVisible) {
+            toggleButton.textContent = '>';
+        } else {
+            toggleButton.textContent = '<';
+        }
+
+        // 切换按钮位置
+        if (isMainTableVisible) {
+            toggleButton.style.left = '';
+            toggleButton.style.right = '20px';
+            toggleButton.classList.remove('left');
+        } else {
+            toggleButton.style.right = '';
+            toggleButton.style.left = '20px';
+            toggleButton.classList.add('left');
+        }
+    });
+});
 </script>
 </body>
 </html>
