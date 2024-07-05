@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>XLS转XLSX转换器(基础数据转换)</title>
     <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles4.css">
 <script src="script.js"></script>
 <script src="script3.js"></script>
 <script src="script4.js"></script>  
@@ -125,12 +126,71 @@ body.dark-mode .download-table tr:nth-child(even) {
 body.dark-mode {
     animation: fadeIn 1s ease-in-out;
 }
+#loadingAnimation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+  z-index: 10000; /* 确保遮罩层在页面其他内容之上 */
+  backdrop-filter: blur(5px); /* 添加模糊效果 */
+}
+
+  .spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px; /* 增加与文本的距离 */
+    animation: spin 2s linear infinite;
+  }
+
+#loadingAnimation .spinner {
+  border: 5px solid #f3f3f3; /* 静态部分 */
+  border-top: 5px solid #3498db; /* 动态旋转部分 */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s infinite;
+  /* 使用自定义贝塞尔曲线 */
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+#loadingAnimation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* 使文本垂直居中显示 */
+  font-size: 24px; /* 增大字体大小 */
+  text-align: center; /* 文本水平居中 */
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 /* 其他深色模式下动画样式保持不变 */
 </style>
 </head>
 <body>
-  <header>
+<div id="loadingAnimation" class="hidden">
+  <div class="spinner"></div>
+<div class="loadingText">正在加载</div>
+  </div>
+<header>
     <h1>XLS转XLSX转换器(基础数据转换)</h1>
 <button class="custom-button" onclick="goBackOrHome()">返回</button>
   </header>
@@ -151,9 +211,16 @@ body.dark-mode {
     </tbody>
   </table>
   <button id="downloadAllButton" class=" custom-button">一键下载所有文件</button>
-
+  <script>
+function scriptLoaded() {
+  // 这个函数将在脚本加载完成后执行
+  // 获取加载动画元素
+  var loadingAnimation = document.getElementById('loadingAnimation');
+  loadingAnimation.style.display = 'none';
+}
+  </script>
   <!-- JavaScript代码保持不变 -->
-  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script> 
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>  
   <script>
     const dropZone = document.getElementById('dropZone');
     const downloadLinksTable = document.getElementById('downloadLinks');
@@ -240,5 +307,3 @@ body.dark-mode {
       });
     });
   </script>
-</body>
-</html>
