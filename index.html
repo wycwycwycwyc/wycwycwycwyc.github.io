@@ -253,7 +253,7 @@ body.dark-mode {
         }
 .logout-btn {
     position: absolute;
-    top: 40px;    /* 距离顶部的距离 */
+    top: 60px;    /* 距离顶部的距离 */
     right: 10px;   /* 距离右侧的距离 */
     background-color: #f44336; /* 红色背景，您可以根据需要更改 */
     color: white;    /* 白色文字 */
@@ -488,9 +488,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <div id="tips">
         <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
     </div>
-    <div id="time">
-        <span id="time_now">正在获取时间...<span>
-    </div>
+<div id="time">
+    <span id="time_now">正在获取时间...</span>
+<br>
+    <span id="date_now">正在获取日期...</span>
+</div>
     <!-- 引入不蒜子的JavaScript脚本 -->
      <script>
 // 假设这是你的openPage函数
@@ -508,7 +510,7 @@ function openPage(url) {
 }
      </script>
 <script>
-function updateLocalTime() {
+function updateLocalDateTime() {
     // 获取当前UTC时间
     const nowUtc = new Date();
 
@@ -516,6 +518,9 @@ function updateLocalTime() {
     const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
 
     // 格式化UTC时间
+    const year = nowUtcAdjusted.getFullYear();
+    const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始
+    const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
     const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
     const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
     const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
@@ -523,12 +528,16 @@ function updateLocalTime() {
     // 更新页面上的时间显示为UTC时间
     document.getElementById('time_now').textContent =
         '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+
+    // 更新页面上的日期显示为UTC日期
+    document.getElementById('date_now').textContent =
+        '本地日期：' + year + '-' + month + '-' + day;
 }
 
-// 初始化时间显示
-updateLocalTime();
-// 每1000毫秒（1秒）更新一次时间
-setInterval(updateLocalTime, 1000);
+// 初始化日期和时间显示
+updateLocalDateTime();
+// 每1000毫秒（1秒）更新一次日期和时间
+setInterval(updateLocalDateTime, 1000);
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
