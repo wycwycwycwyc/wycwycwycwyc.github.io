@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="styles1.css">
     <script src="script.js"></script>
     <style>
-  
         /* 原有的样式保持不变 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            overflow: hidden; /* 隐藏溢出的内容和滚动条 */
+            overflow: hidden; /* 隐藏溢出的内容和滚动条 */	
+            background-image: url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark');  /* 替换为你的图片路径 */  
+            background-repeat: no-repeat;  
+            background-size: cover;  /* 使背景图片覆盖整个页面 */ 
         }
 
         .centered-title {
@@ -23,207 +24,177 @@
             margin: 20px 0;
         }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 15px;
-    text-align: left;
-    white-space: nowrap;
-    /* 设置不同的圆角值以避免接触部分的圆角 */
-    border-radius: 0;
-}
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+            white-space: nowrap;
+            border-radius: 0;
+        }
 
-th {
-    background-color: rgba(242, 242, 242, 0.8);
-    font-weight: bold;
-    /* 为表头设置圆角 */
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
+        th {
+            background-color: rgba(242, 242, 242, 0.8);
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
 
-td {
-    /* 为单元格设置圆角，但保持接触部分为直角 */
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-*, *:before, *:after {
-    box-sizing: border-box;
-}
-/* 为表格设置圆角 */
-table {
-    width: 90%;
-    max-width: 1200px; /* 设置表格的最大宽度，例如800px */
-    table-layout: fixed;
-    margin: 20px auto;
-    border-collapse: collapse; /* 确保边框合并，避免滚动条间隙 */
-    position: relative; /* 设置表格为相对定位，以便 thead 可以基于它进行固定 */
-    border-spacing: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
-    max-height: 500px;
-    display: block;
-    overflow-y: auto; /* 当内容超过表格高度时显示垂直滚动条 */
-}
+        td {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
 
-/* 固定表头 */
-thead {
-    background-color: rgba(242, 242, 242, 0.8);
-    position: sticky;
-    top: 0; /* 当滚动到顶部时，表头固定在顶部 */
-    z-index: 10; /* 确保表头在其他内容之上 */
-}
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
 
-/* 确保表头的圆角不会被滚动内容覆盖 */
-th {
-    position: sticky;
-    top: 0;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    z-index: 20; /* 确保表头边框在表头背景之上 */
-}
+        table {
+            width: 90%;
+            max-width: 1200px;
+            table-layout: fixed;
+            margin: 20px auto;
+            border-collapse: collapse;
+            position: relative;
+            border-spacing: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            max-height: 500px;
+            display: block;
+            overflow-y: auto;
+        }
 
+        thead {
+            background-color: rgba(242, 242, 242, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-@keyframes slideUp {
-    0% {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+        th {
+            position: sticky;
+            top: 0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            z-index: 20;
+        }
 
-        /* ...（此处省略其他样式）... */
+        @keyframes slideUp {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-        /* 添加不蒜子计数器的样式 */
         #busuanzi-container {
             position: fixed;
-            bottom: 0; /* 紧贴底部 */
-            right: 0; /* 紧贴右侧 */
-            color: black ;
-            background-color:rgba(255, 255, 255, 0.8);
+            bottom: 0;
+            right: 0;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 5px;
             font-size: 14px;
-            text-align: right; /* 文本靠右对齐 */
-            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            text-align: right;
             border-top-left-radius: 10px;
-            }
+        }
+
         #tips {
             position: fixed;
-            bottom: 0; /* 紧贴底部 */
-            left: 0; /* 紧贴右侧 */
-            color: black ;
-            background-color:rgba(255, 255, 255, 0.8);
+            bottom: 0;
+            left: 0;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 5px;
             font-size: 14px;
-            text-align: left; /* 文本靠右对齐 */
-            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            text-align: left;
             border-top-right-radius: 10px;
-            }
+        }
+
         #time {
-             position: fixed;
-             top: 0; /* 紧贴顶部 */
-             right: 0; /* 紧贴右侧 */
-             color: black;
-             background-color: rgba(255, 255, 255, 0.8);
-             padding: 5px;
-             font-size: 14px;
-             text-align: left; /* 文本靠左对齐 */
-             /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
-             border-bottom-left-radius: 10px; /* 修改圆角为左上角 */
+            position: fixed;
+            top: 0;
+            right: 0;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            font-size: 14px;
+            text-align: left;
+            border-bottom-left-radius: 10px;
+        }
+
+        table {
+            animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
+            animation-delay: 0s;
+        }
+
+        .more-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            font-size: 100px;
+            color: #007bff;
+            transition: color 0.3s, left 0.3s;
+        }
+
+        .more-button.left {
+            left: 20px;
+            right: auto;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f4f4f4;
+        }
+
+        .dark-mode th {
+            background-color: #333;
+            border-color: #444;
+        }
+
+        .dark-mode td {
+            border-color: #444;
+        }
+
+        .dark-mode #busuanzi-container,
+        .dark-mode #tips,
+        .dark-mode #time {
+            background-color: rgba(18, 18, 18, 0.6);
+            color: #f4f4f4;
+        }
+
+        .dark-mode table {
+            background-color: rgba(18, 18, 18, 0.6);
+        }
+
+        .ripple {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: rippleEffect 1s ease-out forwards;
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(0);
+                opacity: 1;
             }
-/* 为表格添加动画 */
-table {
-    animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
-    animation-delay: 0s; /* 延迟0.5秒开始动画 */
-} 
+            100% {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
 
-.more-button {
-    position: absolute; /* 绝对定位，根据需要调整 */
-    top: 50%; /* 垂直居中 */
-    transform: translateY(-50%);
-    cursor: pointer;
-    background-color: transparent; /* 透明背景 */
-    border: none; /* 无边框 */
-    font-size: 24px; /* 字体大小 */
-    color: #007bff; /* 字体颜色 */
-    transition: color 0.3s; /* 颜色变化动画 */
-}
-
-.more-button:hover {
-    color: #0056b3; /* 鼠标悬停时颜色变深 */
-}
-.more-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-    font-size: 100px;
-    color: #007bff;
-    transition: color 0.3s, left 0.3s; /* 添加left属性的过渡效果 */
-}
-
-/* 按钮在左侧的样式 */
-.more-button.left {
-    left: 20px; /* 根据需要调整位置 */
-    right: auto; /* 确保right属性不会影响布局 */
-}
-/* 深色模式样式 */
-body.dark-mode {
-    background-color: #1a1a1a; /* 深色背景 */
-    color: #f4f4f4; /* 白色文本 */
-}
-
-.dark-mode th {
-    background-color: #333;
-    border-color: #444;
-}
-
-.dark-mode td {
-    border-color: #444;
-}
-
-.dark-mode #busuanzi-container {
-    background-color: rgba(18, 18, 18, 0.6);
-    color: #f4f4f4;
-}
-.dark-mode #tips {
-    background-color: rgba(18, 18, 18, 0.6);
-    color: #f4f4f4;
-}
-.dark-mode #time {
-    background-color: rgba(18, 18, 18, 0.6);
-    color: #f4f4f4;
-}
-/* 保持原有的动画效果 */
-.dark-mode table {
-    background-color: rgba(18, 18, 18, 0.6);
-}
-/* Ripple effect styles */
-.ripple {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  animation: rippleEffect 1s ease-out forwards;
-}
-
-@keyframes rippleEffect {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(10);
-    opacity: 0;
-  }
-}
         .login-icon-container {
             position: fixed;
             top: 10px;
@@ -240,339 +211,393 @@ body.dark-mode {
             z-index: 1000;
             transition: background-color 0.3s;
         }
+
         .login-icon-container:hover {
             background-color: #0056b3;
         }
+
         .login-icon {
             width: 20px;
             height: 20px;
         }
+
         .login-status {
             margin-left: 2px;
             font-size: 14px;
         }
-.logout-btn {
-    position: absolute;
-    top: 60px;    /* 距离顶部的距离 */
-    right: 10px;   /* 距离右侧的距离 */
-    background-color: #f44336; /* 红色背景，您可以根据需要更改 */
-    color: white;    /* 白色文字 */
-    border: none;     /* 无边框 */
-    padding: 5px 15px; /* 内边距 */
-    border-radius: 5px; /* 圆角 */
-    cursor: pointer;  /* 鼠标指针变为手形 */
-    z-index: 1000;    /* 确保按钮在最上层 */
-}
 
-/* 当鼠标悬停在退出登录按钮上时的样式 */
-.logout-btn:hover {
-    background-color: #d32f2f; /* 深红色背景 */
-}
-.main-image {
-    width: 100%; /* 或者您希望的宽度 */
-    max-width: 330px; /* 图片的最大宽度 */
-    height: auto; /* 保持图片的宽高比 */
-    display: block; /* 图片不浮动 */
-    margin: 20px auto; /* 居中显示并设置外边距 */
-}
-    @keyframes slideInFromRight {
-        from {
-            opacity: 0;
-            transform: translateX(100%); /* 从右边开始 */
+        .logout-btn {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
         }
-        to {
-            opacity: 1;
-            transform: translateX(0); /* 移动到正常位置 */
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
         }
-    }
 
-    /* 为Logo添加动画效果 */
-    #main-image {
-        animation: slideInFromRight 1.5s ease-out forwards; /* 应用动画 */
-    }
-</style>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var body = document.body;
-        var darkModeToggle = document.getElementById('darkModeToggle');
-        var mainImage = document.getElementById('main-image');
-        
-        // Logo图片路径
-        var lightModeLogoSrc = 'logo.svg';
-        var darkModeLogoSrc = 'logo_dark.svg';
-        
-        // 背景图片路径
-        var lightModeBackground = "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')";
-        var darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
+        .main-image {
+            width: 100%;
+            max-width: 330px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
 
-        // 从localStorage中获取深色模式的状态和背景图片设置
-        var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-        var storedBackgroundImage = localStorage.getItem('backgroundImage') || (isDarkMode ? darkModeBackground : lightModeBackground);
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-        // 初始化页面的背景、Logo和深色模式类
-        body.style.backgroundImage = storedBackgroundImage;
-        mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-        body.classList.toggle('dark-mode', isDarkMode);
+        #main-image {
+            animation: slideInFromRight 1.5s ease-out forwards;
+        }
 
-        // 切换深色模式的函数
-        function toggleDarkMode() {
-            // 切换深色模式状态
-            isDarkMode = !isDarkMode;
+        @media only screen and (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding: 10px;
+            }
 
-            // 切换背景图片和Logo
-            body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+            .centered-title {
+                margin: 10px 0;
+            }
+
+            table {
+                width: 100%;
+                max-width: none;
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .main-image {
+                max-width: 50%;
+            }
+
+            .login-icon-container {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logout-btn {
+                top: 50px;
+                right: 5px;
+                padding: 5px 10px;
+            }
+
+            #busuanzi-container, #tips, #time {
+                font-size: 12px;
+                padding: 5px;
+            }
+
+            .more-button {
+                font-size: 40px;
+            }
+
+            .custom-button {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var body = document.body;
+            var darkModeToggle = document.getElementById('darkModeToggle');
+            var mainImage = document.getElementById('main-image');
+            
+            // Logo图片路径
+            var lightModeLogoSrc = 'logo.svg';
+            var darkModeLogoSrc = 'logo_dark.svg';
+            
+                       // 背景图片路径
+            var lightModeBackground = "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')";
+            var darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
+
+            // 从localStorage中获取深色模式的状态和背景图片设置
+            var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+            var storedBackgroundImage = localStorage.getItem('backgroundImage') || (isDarkMode ? darkModeBackground : lightModeBackground);
+
+            // 初始化页面的背景、Logo和深色模式类
+            body.style.backgroundImage = storedBackgroundImage;
             mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-
-            // 切换深色模式类
             body.classList.toggle('dark-mode', isDarkMode);
 
-            // 更新localStorage中的状态和背景图片
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            localStorage.setItem('backgroundImage', body.style.backgroundImage);
+            // 切换深色模式的函数
+            function toggleDarkMode() {
+                // 切换深色模式状态
+                isDarkMode = !isDarkMode;
 
-            // 创建全屏涟漪效果
-    var ripple = document.createElement('div');
-    ripple.classList.add('ripple');
-    ripple.style.position = 'fixed';
-    ripple.style.top = '0';
-    ripple.style.left = '0';
-    ripple.style.width = '100%';
-    ripple.style.height = '100%';
-    ripple.style.opacity = '0.5';
-    ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
-    ripple.style.borderRadius = '50%';
-    ripple.style.animation = 'rippleEffect 1s ease-out forwards';
-    // 确保涟漪效果不会捕获鼠标事件
-    ripple.style.pointerEvents = 'none';
+                // 切换背景图片和Logo
+                body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+                mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
 
-    // 将涟漪效果添加到body
-    document.body.appendChild(ripple);
+                // 切换深色模式类
+                body.classList.toggle('dark-mode', isDarkMode);
 
-    // 动画结束后移除涟漪效果
-    setTimeout(function() {
-        ripple.remove();
-    }, 1000);
-}
+                // 更新localStorage中的状态和背景图片
+                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+                localStorage.setItem('backgroundImage', body.style.backgroundImage);
 
-        // 为深色模式切换按钮添加事件监听器
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-    });
-</script> 
+                // 创建全屏涟漪效果
+                var ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                ripple.style.position = 'fixed';
+                ripple.style.top = '0';
+                ripple.style.left = '0';
+                ripple.style.width = '100%';
+                ripple.style.height = '100%';
+                ripple.style.opacity = '0.5';
+                ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
+                ripple.style.borderRadius = '50%';
+                ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+                ripple.style.pointerEvents = 'none';
+
+                // 将涟漪效果添加到body
+                document.body.appendChild(ripple);
+
+                // 动画结束后移除涟漪效果
+                setTimeout(function() {
+                    ripple.remove();
+                }, 1000);
+            }
+
+            // 为深色模式切换按钮添加事件监听器
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        });
+    </script>
 </head>
 <body>
-<div id="loginStatus" class="login-icon-container">
-    <span class="login-status">登录</span>
-</div>
-<button id="logoutButton" class="logout-btn">退出登录</button>
+    <div id="loginStatus" class="login-icon-container">
+        <span class="login-status">登录</span>
+    </div>
+    <button id="logoutButton" class="logout-btn">退出登录</button>
 
-<script>
-// 检查localStorage中的登录状态
-document.addEventListener('DOMContentLoaded', function() {
-    var loginStatusElement = document.getElementById('loginStatus');
-    var logoutButton = document.getElementById('logoutButton');
-    var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    // 如果用户未登录，隐藏退出登录按钮
-    if (!isLoggedIn) {
-        logoutButton.style.display = 'none';
-    }
-
-    // 如果用户已登录，显示退出登录按钮
-    if (isLoggedIn) {
-        logoutButton.style.display = 'block';
-    }
-    if (isLoggedIn) {
-        // 如果已经登录，显示“已登录”状态并添加退出登录按钮的点击事件
-        loginStatusElement.querySelector('.login-status').textContent = '已登录';
-        loginStatusElement.style.cursor = 'default';
-        loginStatusElement.onclick = null;
-
-        // 添加退出登录按钮的点击事件
-        logoutButton.onclick = function() {
-            if (confirm('您确定要退出登录吗？')) {
-                // 清除本地存储中的登录状态
-                localStorage.removeItem('isLoggedIn');
-                // 重定向到登录页面
-                window.location.reload();
+    <script>
+        // 检查localStorage中的登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginStatusElement = document.getElementById('loginStatus');
+            var logoutButton = document.getElementById('logoutButton');
+            var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            // 如果用户未登录，隐藏退出登录按钮
+            if (!isLoggedIn) {
+                logoutButton.style.display = 'none';
             }
-        };
-    } else {
-        // 如果未登录，设置点击事件以跳转到登录页面
-    loginStatusElement.onclick = function() {
-        var loginUrl = 'Login.html'; // 替换为您的登录页面URL
-        openPage(loginUrl); // 使用openPage函数进行跳转
-        };
-    }
-});
-</script>
-<!-- 在<body>标签中的适当位置添加 -->
+
+            // 如果用户已登录，显示退出登录按钮
+            if (isLoggedIn) {
+                logoutButton.style.display = 'block';
+            }
+            if (isLoggedIn) {
+                // 如果已经登录，显示“已登录”状态并添加退出登录按钮的点击事件
+                loginStatusElement.querySelector('.login-status').textContent = '已登录';
+                loginStatusElement.style.cursor = 'default';
+                loginStatusElement.onclick = null;
+
+                // 添加退出登录按钮的点击事件
+                logoutButton.onclick = function() {
+                    if (confirm('您确定要退出登录吗？')) {
+                        // 清除本地存储中的登录状态
+                        localStorage.removeItem('isLoggedIn');
+                        // 重定向到登录页面
+                        window.location.reload();
+                    }
+                };
+            } else {
+                // 如果未登录，设置点击事件以跳转到登录页面
+                loginStatusElement.onclick = function() {
+                    var loginUrl = 'Login.html'; // 替换为您的登录页面URL
+                    openPage(loginUrl); // 使用openPage函数进行跳转
+                };
+            }
+        });
+    </script>
     <div class="centered-title">
         <img src="logo.svg" alt="脚本存放站" id="main-image" class="main-image">
     </div>
-<button id="darkModeToggle" class="custom-button ripple">脚本存放站</button>
-<table class="main-table" style="display: block;">
-    <thead>
-        <tr>
-            <th>脚本名(python)</th>
-            <th>简介</th>
-            <th>备注</th>
-            <th>查看</th>
-        </tr>
-    </thead>
-        <tr>
-            <td>基础数据转换</td>
-            <td>用于基础数据的转换处理。</td>
-            <td>能够批量将同一文件夹下的xls文件转换为xlsx</td>
-            <td><button class="custom-button" onclick="openPage('./zhuanhuan.html')">查看</button></td>
-        </tr>
-        <tr>
-            <td>基础数据转换（网页版）</td>
-            <td>基础数据转换的网页版</td>
-            <td>比基础数据转换更快</td>
-            <td><button class="custom-button" onclick="openPage('./zhuanhuanhtml.html')">查看</button></td>
-        </tr> 
-        <tr>
-            <td>基础数据处理</td>
-            <td>用于基础数据的转换处理，比基础数据转换高效</td>
-            <td>高效地批量将同一文件夹下的xls文件转换为xlsx，附带填写周报功能</td>
-            <td><button class="custom-button" onclick="openPage('./chuli.html')">查看</button></td>
-        </tr>        
-        <tr>
-            <td>抢车票（普通版）</td>
-            <td>普通版抢车票脚本。</td>
-            <td>适用于一般抢票需求。</td>
-            <td><button class="custom-button" onclick="openPage('./qiangchepiao.html')">查看</button></td>
-        </tr>
-        <tr>
-            <td>抢车票（升级版）</td>
-            <td>升级版抢车票脚本，功能更强大。</td>
-            <td>适用于高级抢票需求。</td>
-            <td><button class="custom-button" onclick="openPage('./qiangchepiao1.html')">查看</button></td>
-        </tr>
-        <tr>
-            <td>进程管理</td>
-            <td>用于管理计算机进程。</td>
-            <td>可精细的控制计算机上的进程、服务,附带映像劫持功能</td>
-            <td><button class="custom-button" onclick="openPage('./jincheng.html')">查看</button></td>
-        </tr>
-        <tr>
-            <td>多功能智能排序系统</td>
-            <td>智能排序：一键排序，支持多种算法，文件导入</td>
-            <td>本程序集成多种算法,支持手动输入,文件导入,执行升序降序排列。</td>
-            <td><button class="custom-button" onclick="openPage('./paixvpy.html')">查看</button></td>
-        </tr>
-        <!-- 可以根据需要添加更多脚本信息 -->
+    <button id="darkModeToggle" class="custom-button ripple">脚本存放站</button>
+    <table class="main-table" style="display: block;">
+        <thead>
+            <tr>
+                <th>脚本名(python)</th>
+                <th>简介</th>
+                <th>备注</th>
+                <th>查看</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>基础数据转换</td>
+                <td>用于基础数据的转换处理。</td>
+                <td>能够批量将同一文件夹下的xls文件转换为xlsx</td>
+                <td><button class="custom-button" onclick="openPage('./zhuanhuan.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>基础数据转换（网页版）</td>
+                <td>基础数据转换的网页版</td>
+                <td>比基础数据转换更快</td>
+                <td><button class="custom-button" onclick="openPage('./zhuanhuanhtml.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>基础数据处理</td>
+                <td>用于基础数据的转换处理，比基础数据转换高效</td>
+                <td>高效地批量将同一文件夹下的xls文件转换为xlsx，附带填写周报功能</td>
+                <td><button class="custom-button" onclick="openPage('./chuli.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>抢车票（普通版）</td>
+                <td>普通版抢车票脚本。</td>
+                <td>适用于一般抢票需求。</td>
+                <td><button class="custom-button" onclick="openPage('./qiangchepiao.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>抢车票（升级版）</td>
+                <td>升级版抢车票脚本，功能更强大。</td>
+                <td>适用于高级抢票需求。</td>
+                <td><button class="custom-button" onclick="openPage('./qiangchepiao1.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>进程管理</td>
+                <td>用于管理计算机进程。</td>
+                <td>可精细的控制计算机上的进程、服务,附带映像劫持功能</td>
+                <td><button class="custom-button" onclick="openPage('./jincheng.html')">查看</button></td>
+            </tr>
+            <tr>
+                <td>多功能智能排序系统</td>
+                <td>智能排序：一键排序，支持多种算法，文件导入</td>
+                <td>本程序集成多种算法,支持手动输入,文件导入,执行升序降序排列。</td>
+                <td><button class="custom-button" onclick="openPage('./paixvpy.html')">查看</button></td>
+            </tr>
+        </tbody>
     </table>
-<!-- 表格旁边的触发按钮 -->
-<button id="toggleTableButton" class="more-button" title="显示更多表格" style="right: 20px;">&gt;</button>
-<table id="additionalTable" style="display: none;">
-    <thead>
-        <tr>
-            <th>脚本名(C++)</th>
-            <th>简介</th>
-            <th>备注</th>
-            <th>查看</th>
-        </tr>
-    </thead>
-        <tr>
-            <td>多功能智能排序系统</td>
-            <td>智能排序：一键排序，支持多种算法，文件导入</td>
-            <td>本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。</td>
-            <td><button class="custom-button" onclick="openPage('./paixv.html')">查看</button></td>
-        </tr>
-</table>
+    <!-- 表格旁边的触发按钮 -->
+    <button id="toggleTableButton" class="more-button" title="显示更多表格" style="right: 20px;">&gt;</button>
+    <table id="additionalTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>脚本名(C++)</th>
+                <th>简介</th>
+                <th>备注</th>
+                <th>查看</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>多功能智能排序系统</td>
+                <td>智能排序：一键排序，支持多种算法，文件导入</td>
+                <td>本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。</td>
+                <td><button class="custom-button" onclick="openPage('./paixv.html')">查看</button></td>
+            </tr>
+        </tbody>
+    </table>
     <!-- 不蒜子计数器 -->
-    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <script async src="https://busuanzi    .ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
     <div id="busuanzi-container">
         <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
     </div>
     <div id="tips">
         <span id="lightanddark">提示:轻点背景可切换白天黑夜<span>
     </div>
-<div id="time">
-    <span id="time_now">正在获取时间...</span>
-<br>
-    <span id="date_now">正在获取日期...</span>
-</div>
-    <!-- 引入不蒜子的JavaScript脚本 -->
-     <script>
-// 假设这是你的openPage函数
-function openPage(url) {
-    // 获取当前页面的深色模式状态
-    var isDarkMode = document.body.classList.contains('dark-mode');
-    
-    // 如果当前是深色模式，添加?theme=dark参数
-    if (isDarkMode) {
-        url += (url.includes('?') ? '&' : '?') + 'theme=dark';
-    }
-    
-    // 使用修改后的URL在当前页面跳转
-    window.location.href = url;
-}
-     </script>
-<script>
-function updateLocalDateTime() {
-    // 获取当前UTC时间
-    const nowUtc = new Date();
+    <div id="time">
+        <span id="time_now">正在获取时间...</span>
+        <br>
+        <span id="date_now">正在获取日期...</span>
+    </div>
+    <script>
+        // 假设这是你的openPage函数
+        function openPage(url) {
+            // 获取当前页面的深色模式状态
+            var isDarkMode = document.body.classList.contains('dark-mode');
+            
+            // 如果当前是深色模式，添加?theme=dark参数
+            if (isDarkMode) {
+                url += (url.includes('?') ? '&' : '?') + 'theme=dark';
+            }
+            
+            // 使用修改后的URL在当前页面跳转
+            window.location.href = url;
+        }
+    </script>
+    <script>
+        function updateLocalDateTime() {
+            // 获取当前UTC时间
+            const nowUtc = new Date();
 
-    // 减去8小时的毫秒数以匹配UTC时间
-    const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
+            // 减去8小时的毫秒数以匹配UTC时间
+            const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
 
-    // 格式化UTC时间
-    const year = nowUtcAdjusted.getFullYear();
-    const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始
-    const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
-    const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
-    const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
-    const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
+            // 格式化UTC时间
+            const year = nowUtcAdjusted.getFullYear();
+            const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始
+            const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
+            const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
+            const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
+            const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
 
-    // 更新页面上的时间显示为UTC时间
-    document.getElementById('time_now').textContent =
-        '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+            // 更新页面上的时间显示为UTC时间
+            document.getElementById('time_now').textContent =
+                '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
 
-    // 更新页面上的日期显示为UTC日期
-    document.getElementById('date_now').textContent =
-        '本地日期：' + year + '-' + month + '-' + day;
-}
-
-// 初始化日期和时间显示
-updateLocalDateTime();
-// 每1000毫秒（1秒）更新一次日期和时间
-setInterval(updateLocalDateTime, 1000);
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var toggleButton = document.getElementById('toggleTableButton');
-    var mainTable = document.querySelector('.main-table'); // 第一个表格
-    var additionalTable = document.getElementById('additionalTable'); // 第二个表格
-
-    // 初始化变量以跟踪表格的显示状态
-    var isMainTableVisible = true;
-
-    toggleButton.addEventListener('click', function() {
-        // 切换表格显示状态
-        isMainTableVisible = !isMainTableVisible; // 更新显示状态
-        mainTable.style.display = isMainTableVisible ? 'block' : 'none';
-        additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
-
-        // 切换按钮内容
-        if (isMainTableVisible) {
-            toggleButton.textContent = '>';
-        } else {
-            toggleButton.textContent = '<';
+            // 更新页面上的日期显示为UTC日期
+            document.getElementById('date_now').textContent =
+                '本地日期：' + year + '-' + month + '-' + day;
         }
 
-        // 切换按钮位置
-        if (isMainTableVisible) {
-            toggleButton.style.left = '';
-            toggleButton.style.right = '20px';
-            toggleButton.classList.remove('left');
-        } else {
-            toggleButton.style.right = '';
-            toggleButton.style.left = '20px';
-            toggleButton.classList.add('left');
-        }
-    });
-});
-</script>
+        // 初始化日期和时间显示
+        updateLocalDateTime();
+        // 每1000毫秒（1秒）更新一次日期和时间
+        setInterval(updateLocalDateTime, 1000);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleButton = document.getElementById('toggleTableButton');
+            var mainTable = document.querySelector('.main-table'); // 第一个表格
+            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
+
+            // 初始化变量以跟踪表格的显示状态
+            var isMainTableVisible = true;
+
+            toggleButton.addEventListener('click', function() {
+                // 切换表格显示状态
+                isMainTableVisible = !isMainTableVisible; // 更新显示状态
+                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
+                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
+
+                // 切换按钮内容
+                if (isMainTableVisible) {
+                    toggleButton.textContent = '>';
+                } else {
+                    toggleButton.textContent = '<';
+                }
+
+                // 切换按钮位置
+                if (isMainTableVisible) {
+                    toggleButton.style.left = '';
+                    toggleButton.style.right = '20px';
+                    toggleButton.classList.remove('left');
+                } else {
+                    toggleButton.style.right = '';
+                    toggleButton.style.left = '20px';
+                    toggleButton.classList.add('left');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
