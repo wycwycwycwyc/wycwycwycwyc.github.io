@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles3.css">
+    <script src="script4.js"></script>
+    <script src="script5.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            transition: background-color 0.5s, color 0.5s; /* 添加过渡效果 */
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #fff; /* 将背景颜色改为白色 */
+            padding-top: 20px;
+            transition: width 0.3s, background-color 0.5s; /* 添加过渡效果 */
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #333; /* 将文字颜色改为深色，以便在白色背景上清晰显示 */
+            display: block;
+            transition: background-color 0.3s, color 0.5s; /* 添加过渡效果 */
+        }
+
+        .sidebar a:hover {
+            background-color: #f0f0f0; /* 将悬停时的背景颜色改为浅灰色 */
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .bake {
+            position: relative;
+            left: 10px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        /* 深色模式样式 */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f4f4f4;
+        }
+
+        body.dark-mode .sidebar {
+            background-color: #333;
+        }
+
+        body.dark-mode .sidebar a {
+            color: #f4f4f4;
+        }
+
+        body.dark-mode .sidebar a:hover {
+            background-color: #444;
+        }
+
+        body.dark-mode .slider {
+            background-color: #555;
+        }
+
+        body.dark-mode .slider:before {
+            background-color: #ccc;
+        }
+
+        body.dark-mode input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        body.dark-mode input:checked + .slider:before {
+            background-color: #fff;
+        }
+
+        /* 动画关闭样式 */
+        body.no-animation * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        body.no-animation *:before,
+        body.no-animation *:after {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+<button class="custom-button bake" onclick="goBackOrHome()">返回</button>
+        <a href="#appearance">外观</a>
+        <a href="#account">账户</a>
+    </div>
+
+    <div class="content">
+        <div id="appearance" class="section">
+            <h1>外观</h1>
+            <div class="input-group">
+                <label for="darkModeToggle">深色模式</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="input-group">
+                <label for="animationToggle">动画</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="animationToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="input-group">
+                <input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL">
+            </div>
+            <div class="input-group">
+                <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
+            </div>
+        </div>
+
+<div id="account" class="section">
+    <h1>账户</h1>
+    <button id="loginButton" class="login-btn custom-button">登录</button>
+    <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var darkModeToggle = document.getElementById('darkModeToggle');
+        var animationToggle = document.getElementById('animationToggle');
+        var lightModeBgUrlInput = document.getElementById('lightModeBgUrl');
+        var darkModeBgUrlInput = document.getElementById('darkModeBgUrl');
+
+        // 从 localStorage 中获取设置
+        var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        var isAnimationEnabled = localStorage.getItem('animation') === 'enabled';
+        var lightModeBgUrl = localStorage.getItem('lightModeBgUrl') || '';
+        var darkModeBgUrl = localStorage.getItem('darkModeBgUrl') || '';
+
+        // 初始化设置
+        darkModeToggle.checked = isDarkMode;
+        animationToggle.checked = isAnimationEnabled;
+        lightModeBgUrlInput.value = lightModeBgUrl;
+        darkModeBgUrlInput.value = darkModeBgUrl;
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        document.body.classList.toggle('no-animation', !isAnimationEnabled);
+
+        // 切换深色模式
+        darkModeToggle.addEventListener('change', function() {
+            isDarkMode = darkModeToggle.checked;
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            if (!isDarkMode) {
+                localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
+            } else {
+                localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
+            }
+            document.body.classList.toggle('dark-mode', isDarkMode);
+        });
+
+        // 检查localStorage中的登录状态
+        var loginButton = document.getElementById('loginButton');
+        var logoutButton = document.getElementById('logoutButton');
+        var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+        // 如果用户未登录，隐藏退出登录按钮
+        if (!isLoggedIn) {
+            logoutButton.style.display = 'none';
+        }
+
+        // 如果用户已登录，显示退出登录按钮
+        if (isLoggedIn) {
+            logoutButton.style.display = 'block';
+            loginButton.style.display = 'none';
+
+            // 添加退出登录按钮的点击事件
+            logoutButton.onclick = function() {
+                if (confirm('您确定要退出登录吗？')) {
+                    // 清除本地存储中的登录状态
+                    localStorage.removeItem('isLoggedIn');
+                    // 重定向到登录页面
+                    window.location.reload();
+                }
+            };
+        } else {
+            // 如果未登录，设置点击事件以跳转到登录页面
+            loginButton.onclick = function() {
+                var loginUrl = 'Login.html'; // 替换为您的登录页面URL
+                openPage(loginUrl); // 使用openPage函数进行跳转
+            };
+        }
+    });
+
+    // 假设这是你的openPage函数
+    function openPage(url) {
+        // 获取当前页面的深色模式状态
+        var isDarkMode = document.body.classList.contains('dark-mode');
+        
+        // 如果当前是深色模式，添加?theme=dark参数
+        if (isDarkMode) {
+            url += (url.includes('?') ? '&' : '?') + 'theme=dark';
+        }
+        
+        // 使用修改后的URL在当前页面跳转
+        window.location.href = url;
+    }
+</script>
+</body>
+</html>

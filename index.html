@@ -6,7 +6,30 @@
     <title>脚本存放站</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js"></script>
+    <link rel="stylesheet" href="styles3.css">
+    <script src="script5.js"></script>
     <style>
+#settingsButton {
+    position: fixed;
+    top: 0;
+    right: 150px; /* 调整位置，使其在时间旁边 */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 1000;
+    transition: transform 0.3s ease; /* 添加过渡效果 */
+}
+
+#settingsButton img {
+    width: 40px;
+    height: 40px;
+    transition: transform 0.3s ease; /* 添加过渡效果 */
+}
+
+#settingsButton:hover img {
+    transform: rotate(90deg); /* 悬停时旋转180度 */
+}
         /* 原有的样式保持不变 */
         body {
             font-family: Arial, sans-serif;
@@ -315,6 +338,7 @@
                 font-size: 14px;
             }
         }
+
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -518,6 +542,9 @@
         <span id="time_now">正在获取时间...</span>
         <br>
         <span id="date_now">正在获取日期...</span>
+        <button id="settingsButton" onclick="openPage('./settings.html')">
+            <img src="settings.svg" alt="Settings">
+        </button>
     </div>
     <script>
         // 假设这是你的openPage函数
