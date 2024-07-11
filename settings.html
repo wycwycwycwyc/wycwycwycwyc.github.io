@@ -42,7 +42,7 @@
         }
 
         .content {
-            margin-left: 250px;
+            margin-left: 100px;
             padding: 20px;
         }
 
@@ -117,7 +117,17 @@
             box-sizing: border-box;
             display: none;
         }
-
+/* 针对视口宽度小于768px的样式 */
+@media only screen and (max-width: 768px) {
+        .sidebar {
+            width: 100px;
+        }
+    .sidebar a {
+        font-size: 16px; /* 调整字体大小 */
+        padding: 10px 20px; /* 调整内边距 */
+        color: #000; /* 将文字颜色改为黑色 */
+    }
+}
         /* 深色模式样式 */
         body.dark-mode {
             background-color: #1a1a1a;
