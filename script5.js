@@ -1,10 +1,14 @@
-// script.js
-
 document.addEventListener('DOMContentLoaded', function() {
     var animationToggle = document.getElementById('animationToggle');
 
-    // 从 localStorage 中获取设置
-    var isAnimationEnabled = localStorage.getItem('animation') === 'enabled';
+    // 从 localStorage 中获取设置，如果没有设置则默认启用动画
+    var isAnimationEnabled = localStorage.getItem('animation');
+    if (isAnimationEnabled === null) {
+        isAnimationEnabled = true;
+        localStorage.setItem('animation', 'enabled');
+    } else {
+        isAnimationEnabled = isAnimationEnabled === 'enabled';
+    }
 
     // 初始化设置
     if (animationToggle) {
@@ -25,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleAnimations(enable) {
         if (!enable) {
             disableAllTransitionsAndAnimations();
-
         } else {
             enableAllTransitionsAndAnimations();
         }
@@ -43,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             `;
             document.head.appendChild(style);
-            document.body.appendChild(style);
         }
     }
 
