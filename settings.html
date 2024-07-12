@@ -270,7 +270,7 @@ body.dark-mode .styled-select:focus {
             box-sizing: border-box;
         }
         .input-group1 input[type="range"] {
-            width: calc(60% - 50px); /* 为数字输入框留出空间 */
+            width: calc(100% - 60px); /* 为数字输入框留出空间 */
             display: inline-block;
         }
 
@@ -316,7 +316,7 @@ body.dark-mode .input-group input[type="number"] {
                 </label>
             </div>
             <div class="input-group1">
-                <label for="opacityRange">透明度(可见度)</label>
+                <label for="opacityRange">可见度</label>
                 <input type="range" id="opacityRange" min="0" max="100" step="1">
                 <input type="number" id="opacityNumber" min="0" max="100" step="1"<p>%<p>
             </div>
@@ -387,28 +387,30 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('animation', isAnimationEnabled ? 'enabled' : 'disabled');
         document.body.classList.toggle('no-animation', !isAnimationEnabled);
     });
-            // 获取之前保存的透明度值
-            const savedOpacity = localStorage.getItem('opacity');
-            const defaultOpacity = savedOpacity !== null ? savedOpacity : 0.8; // 默认值为100
+        const savedOpacity = localStorage.getItem('opacity');
+        const defaultOpacity = savedOpacity !== null ? savedOpacity : 0.8; // 默认值为0.8
 
-            // 设置初始透明度
-            const opacityRange = document.getElementById('opacityRange');
-            const opacityNumber = document.getElementById('opacityNumber');
-            opacityRange.value = defaultOpacity*100;
-            opacityNumber.value = defaultOpacity*100;
+        // 设置初始透明度
+        const opacityRange = document.getElementById('opacityRange');
+        const opacityNumber = document.getElementById('opacityNumber');
+        opacityRange.value = defaultOpacity * 100;
+        opacityNumber.value = defaultOpacity * 100;
 
-            // 添加事件监听器
-            opacityRange.addEventListener('input', function() {
-                const opacity = opacityRange.value;
-                opacityNumber.value = opacity;
-                localStorage.setItem('opacity', opacity / 100);
-            });
+        // 添加事件监听器
+        opacityRange.addEventListener('input', function() {
+            const opacity = opacityRange.value;
+            opacityNumber.value = opacity;
+            localStorage.setItem('opacity', opacity / 100);
+        });
 
-            opacityNumber.addEventListener('input', function() {
-                const opacity = opacityNumber.value;
-                opacityRange.value = opacity;
-                localStorage.setItem('opacity', opacity / 100);
-            });
+        opacityNumber.addEventListener('input', function() {
+            let opacity = opacityNumber.value;
+            if (opacity < 0) opacity = 0;
+            if (opacity > 100) opacity = 100;
+            opacityNumber.value = opacity;
+            opacityRange.value = opacity;
+            localStorage.setItem('opacity', opacity / 100);
+        });
 
     // 检查localStorage中的登录状态
     var loginButton = document.getElementById('loginButton');
