@@ -722,5 +722,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
     </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取访问量元素
+    var busuanziValueElement = document.getElementById('busuanzi_value_site_pv');
+
+    // 确保访问量元素存在
+    if (busuanziValueElement) {
+        // 获取当前访问量
+        var currentValue = parseInt(busuanziValueElement.textContent, 10) || 0;
+
+        // 动画持续时间（毫秒）
+        var duration = 1000;
+
+        // 动画帧率（每秒帧数）
+        var frameRate = 60;
+
+        // 计算每帧增加的访问量
+        var increment = currentValue / (duration / (1000 / frameRate));
+
+        // 初始化当前显示的访问量
+        var displayedValue = 0;
+
+        // 创建动画函数
+        function animateVisitCount() {
+            displayedValue += increment;
+            if (displayedValue >= currentValue) {
+                displayedValue = currentValue;
+                busuanziValueElement.textContent = Math.floor(displayedValue);
+            } else {
+                busuanziValueElement.textContent = Math.floor(displayedValue);
+                requestAnimationFrame(animateVisitCount);
+            }
+        }
+
+        // 开始动画
+        animateVisitCount();
+    }
+});
+</script>
 </body>
 </html>
