@@ -116,7 +116,7 @@
 .bottom-bar {
     width: 60%;
     background-color: rgba(255, 255, 255,0.8);
-    padding: 5x;
+    padding: 0px;
     text-align: center;
     font-size: 16px;
     position: fixed;
@@ -128,6 +128,7 @@
     display: flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
+    white-space: normal; /* 允许文本换行 */
 }
 
 .bottom-bar a {
@@ -375,6 +376,8 @@ body.dark-mode .bottom-bar a:hover {
                 padding: 5px 10px;
                 font-size: 14px;
             }
+	    .bottom-bar {
+               padding: 0px;		
         }
 
     </style>
@@ -447,8 +450,8 @@ body.dark-mode .bottom-bar a:hover {
 </head>
 <body>
     <div class="bottom-bar">
-        主地址：<a href="https://wycwycwycwyc.github.io" target="_blank">wycwycwycwyc.github.io</a>
-        备用地址：<a href="https://imaginative-babka-6c8416.netlify.app" target="_blank">imaginative-babka-6c8416.netlify.app</a>
+<a href="https://wycwycwycwyc.github.io" target="_blank" title="访问脚本存放站的主地址">主地址</a>
+<a href="https://imaginative-babka-6c8416.netlify.app" target="_blank" title="访问脚本存放站的备用地址">备用地址</a>
     </div>
     <div id="loginStatus" class="login-icon-container">
         <span class="login-status">登录</span>
