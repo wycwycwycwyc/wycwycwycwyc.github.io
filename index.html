@@ -113,6 +113,32 @@
                 opacity: 1;
             }
         }
+.bottom-bar {
+    width: 60%;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5x;
+    text-align: center;
+    font-size: 16px;
+    position: fixed;
+    bottom: 0;
+    left: 50%; /* 将元素的左边缘定位到页面的中间 */
+    transform: translateX(-50%); /* 将元素向左移动自身宽度的50%，实现居中 */
+    z-index: 1001;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+.bottom-bar a {
+    color: #007bff;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.bottom-bar a:hover {
+    text-decoration: underline;
+}
 
         #busuanzi-container {
             position: fixed;
@@ -409,6 +435,10 @@
     </script>
 </head>
 <body>
+    <div class="bottom-bar">
+        主地址：<a href="https://wycwycwycwyc.github.io" target="_blank">wycwycwycwyc.github.io</a>
+        备用地址：<a href="https://imaginative-babka-6c8416.netlify.app" target="_blank">imaginative-babka-6c8416.netlify.app</a>
+    </div>
     <div id="loginStatus" class="login-icon-container">
         <span class="login-status">登录</span>
     </div>
