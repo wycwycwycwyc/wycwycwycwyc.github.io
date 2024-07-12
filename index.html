@@ -10,10 +10,59 @@
     <script src="script5.js"></script>
     <script src="script6.js"></script>
     <style>
+@keyframes fadeInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        transform: translateX(-50%);
+    }
+}
+
+#busuanzi-container {
+    animation: fadeInFromRight 1.5s ease-out forwards;
+}
+
+#tips {
+    animation: fadeInFromLeft 1.5s ease-out forwards;
+}
+
+#time {
+    animation: fadeInFromRight 1.5s ease-out forwards;
+}
+
+.bottom-bar {
+    animation: fadeInFromBottom 1.5s ease-out forwards;
+}
 #settingsButton {
     position: fixed;
     top: 0;
-    right: 150px; /* 调整位置，使其在时间旁边 */
+    right: 250px; /* 调整位置，使其在时间旁边 */
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -115,7 +164,7 @@
         }
 .bottom-bar {
     width: 60%;
-    background-color: rgba(255, 255, 255,0.8);
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 0px;
     text-align: center;
     font-size: 16px;
@@ -192,6 +241,7 @@
             font-size: 100px;
             color: #007bff;
             transition: color 0.3s, left 0.3s;
+            animation: fadeInFromRight 1.5s ease-out forwards;
         }
 
         .more-button.left {
@@ -272,6 +322,7 @@ body.dark-mode .bottom-bar a:hover {
             color: white;
             z-index: 1000;
             transition: background-color 0.3s;
+            animation: fadeInFromLeft 1.5s ease-out forwards;
         }
 
         .login-icon-container:hover {
@@ -607,159 +658,108 @@ body.dark-mode .bottom-bar a:hover {
         }
     </script>
     <script>
-        function updateLocalDateTime() {
-            // 获取当前UTC时间
-            const nowUtc = new Date();
-
-            // 减去8小时的毫秒数以匹配UTC时间
-            const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
-
-            // 格式化UTC时间
-            const year = nowUtcAdjusted.getFullYear();
-            const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始
-            const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
-            const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
-            const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
-            const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
-
-            // 更新页面上的时间显示为UTC时间
-            document.getElementById('time_now').textContent =
-                '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
-
-            // 更新页面上的日期显示为UTC日期
-            document.getElementById('date_now').textContent =
-                '本地日期：' + year + '-' + month + '-' + day;
-        }
-
-        // 初始化日期和时间显示
-        updateLocalDateTime();
-        // 每1000毫秒（1秒）更新一次日期和时间
-        setInterval(updateLocalDateTime, 1000);
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var toggleButton = document.getElementById('toggleTableButton');
-            var mainTable = document.querySelector('.main-table'); // 第一个表格
-            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
-
-            // 初始化变量以跟踪表格的显示状态
-            var isMainTableVisible = true;
-
-            toggleButton.addEventListener('click', function() {
-                // 切换表格显示状态
-                isMainTableVisible = !isMainTableVisible; // 更新显示状态
-                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
-                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
-
-                // 切换按钮内容
-                if (isMainTableVisible) {
-                    toggleButton.textContent = '>';
-                } else {
-                    toggleButton.textContent = '<';
-                }
-
-                // 切换按钮位置
-                if (isMainTableVisible) {
-                    toggleButton.style.left = '';
-                    toggleButton.style.right = '20px';
-                    toggleButton.classList.remove('left');
-                } else {
-                    toggleButton.style.right = '';
-                    toggleButton.style.left = '20px';
-                    toggleButton.classList.add('left');
-                }
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var toggleButton = document.getElementById('toggleTableButton');
-            var mainTable = document.querySelector('.main-table'); // 第一个表格
-            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
-
-            // 初始化变量以跟踪表格的显示状态
-            var isMainTableVisible = true;
-
-            toggleButton.addEventListener('click', function() {
-                // 切换表格显示状态
-                isMainTableVisible = !isMainTableVisible; // 更新显示状态
-                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
-                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
-
-                // 切换按钮内容
-                if (isMainTableVisible) {
-                    toggleButton.textContent = '>';
-                } else {
-                    toggleButton.textContent = '<';
-                }
-
-                // 切换按钮位置
-                if (isMainTableVisible) {
-                    toggleButton.style.left = '';
-                    toggleButton.style.right = '20px';
-                    toggleButton.classList.remove('left');
-                } else {
-                    toggleButton.style.right = '';
-                    toggleButton.style.left = '20px';
-                    toggleButton.classList.add('left');
-                }
-            });
-        });
-    </script>
-    <script>
 document.addEventListener('DOMContentLoaded', function() {
+    function updateLocalDateTime() {
+        const nowUtc = new Date();
+        const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
+        const year = nowUtcAdjusted.getFullYear();
+        const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0');
+        const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
+        const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
+        const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
+        const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
+
+        document.getElementById('time_now').textContent = '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+        document.getElementById('date_now').textContent = '本地日期：' + year + '-' + month + '-' + day;
+    }
+
+    updateLocalDateTime();
+    setInterval(updateLocalDateTime, 1000);
+
+    // 监听动画进行事件
     var timeElement = document.getElementById('time');
     var settingsButton = document.getElementById('settingsButton');
 
-    // 确保 timeElement 和 settingsButton 元素存在
-    if (timeElement && settingsButton) {
-        // 获取 timeElement 的位置和宽度
-        var timeRect = timeElement.getBoundingClientRect();
+    timeElement.addEventListener('animationstart', function() {
+        // 在动画开始时设置按钮的位置
+        settingsButton.style.right = '250px';
+    });
 
-        // 设置 settingsButton 的位置
-        settingsButton.style.top = timeRect.top + 'px';
-        settingsButton.style.left = (timeRect.left - settingsButton.offsetWidth - 100) + 'px'; // 调整位置，距离time元素最左边50px
-    }
+    timeElement.addEventListener('animationend', function() {
+        // 在动画结束时重新定位设置按钮
+        settingsButton.style.right = '250px';
+    });
 });
     </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 获取访问量元素
-    var busuanziValueElement = document.getElementById('busuanzi_value_site_pv');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleButton = document.getElementById('toggleTableButton');
+            var mainTable = document.querySelector('.main-table'); // 第一个表格
+            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
 
-    // 确保访问量元素存在
-    if (busuanziValueElement) {
-        // 获取当前访问量
-        var currentValue = parseInt(busuanziValueElement.textContent, 10) || 0;
+            // 初始化变量以跟踪表格的显示状态
+            var isMainTableVisible = true;
 
-        // 动画持续时间（毫秒）
-        var duration = 1000;
+            toggleButton.addEventListener('click', function() {
+                // 切换表格显示状态
+                isMainTableVisible = !isMainTableVisible; // 更新显示状态
+                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
+                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
 
-        // 动画帧率（每秒帧数）
-        var frameRate = 60;
+                // 切换按钮内容
+                if (isMainTableVisible) {
+                    toggleButton.textContent = '>';
+                } else {
+                    toggleButton.textContent = '<';
+                }
 
-        // 计算每帧增加的访问量
-        var increment = currentValue / (duration / (1000 / frameRate));
+                // 切换按钮位置
+                if (isMainTableVisible) {
+                    toggleButton.style.left = '';
+                    toggleButton.style.right = '20px';
+                    toggleButton.classList.remove('left');
+                } else {
+                    toggleButton.style.right = '';
+                    toggleButton.style.left = '20px';
+                    toggleButton.classList.add('left');
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleButton = document.getElementById('toggleTableButton');
+            var mainTable = document.querySelector('.main-table'); // 第一个表格
+            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
 
-        // 初始化当前显示的访问量
-        var displayedValue = 0;
+            // 初始化变量以跟踪表格的显示状态
+            var isMainTableVisible = true;
 
-        // 创建动画函数
-        function animateVisitCount() {
-            displayedValue += increment;
-            if (displayedValue >= currentValue) {
-                displayedValue = currentValue;
-                busuanziValueElement.textContent = Math.floor(displayedValue);
-            } else {
-                busuanziValueElement.textContent = Math.floor(displayedValue);
-                requestAnimationFrame(animateVisitCount);
-            }
-        }
+            toggleButton.addEventListener('click', function() {
+                // 切换表格显示状态
+                isMainTableVisible = !isMainTableVisible; // 更新显示状态
+                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
+                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
 
-        // 开始动画
-        animateVisitCount();
-    }
-});
-</script>
+                // 切换按钮内容
+                if (isMainTableVisible) {
+                    toggleButton.textContent = '>';
+                } else {
+                    toggleButton.textContent = '<';
+                }
+
+                // 切换按钮位置
+                if (isMainTableVisible) {
+                    toggleButton.style.left = '';
+                    toggleButton.style.right = '20px';
+                    toggleButton.classList.remove('left');
+                } else {
+                    toggleButton.style.right = '';
+                    toggleButton.style.left = '20px';
+                    toggleButton.classList.add('left');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

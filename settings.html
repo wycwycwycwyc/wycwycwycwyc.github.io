@@ -291,12 +291,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.toggle('dark-mode', isDarkMode);
     document.body.classList.toggle('no-animation', !isAnimationEnabled);
 
-    // 切换深色模式
-    darkModeToggle.addEventListener('change', function() {
-        isDarkMode = darkModeToggle.checked;
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        document.body.classList.toggle('dark-mode', isDarkMode);
-    });
+        darkModeToggle.addEventListener('change', function() {
+            isDarkMode = darkModeToggle.checked;
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            if (!isDarkMode) {
+                localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
+            } else {
+                localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
+            }
+            document.body.classList.toggle('dark-mode', isDarkMode);
+        });
 
     // 切换动画
     animationToggle.addEventListener('change', function() {

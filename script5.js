@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             document.head.appendChild(style);
         }
+
+        // 保留需要执行的代码
+        setTimeout(function() {
+            var ripple = document.querySelector('.ripple');
+            if (ripple) {
+                ripple.style.opacity = '0';
+            }
+        }, 0);
     }
 
     function enableAllTransitionsAndAnimations() {
