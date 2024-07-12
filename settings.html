@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
             // 获取之前保存的透明度值
             const savedOpacity = localStorage.getItem('opacity');
-            const defaultOpacity = savedOpacity !== null ? savedOpacity : 80; // 默认值为100
+            const defaultOpacity = savedOpacity !== null ? savedOpacity : 0.8; // 默认值为100
 
             // 设置初始透明度
             const opacityRange = document.getElementById('opacityRange');
