@@ -115,7 +115,7 @@
         }
 .bottom-bar {
     width: 60%;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255,0.8);
     padding: 5x;
     text-align: center;
     font-size: 16px;
@@ -210,15 +210,26 @@
 
         .dark-mode td {
             border-color: #444;
-        }
-
+        }	
         .dark-mode #busuanzi-container,
         .dark-mode #tips,
         .dark-mode #time {
             background-color: rgba(18, 18, 18, 0.6);
             color: #f4f4f4;
         }
+body.dark-mode .bottom-bar {
+    background-color: rgba(18, 18, 18, 0.8);
+    color: #f4f4f4;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.5);
+}
 
+body.dark-mode .bottom-bar a {
+    color: #1e90ff;
+}
+
+body.dark-mode .bottom-bar a:hover {
+    text-decoration: underline;
+}
         .dark-mode table {
             background-color: rgba(18, 18, 18, 0.6);
         }
