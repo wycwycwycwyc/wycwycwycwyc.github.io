@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles3.css">
     <script src="script4.js"></script>
     <script src="script5.js"></script>
+    <script src="script6.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -117,7 +118,35 @@
             box-sizing: border-box;
             display: none;
         }
-/* 针对视口宽度小于768px的样式 */
+    .styled-select {
+        width: 70px; /* 调整宽度 */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        font-size: 16px;
+        color: #333;
+        appearance: none; /* 移除默认的下拉箭头 */
+        -webkit-appearance: none; /* 移除默认的下拉箭头 */
+        -moz-appearance: none; /* 移除默认的下拉箭头 */
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23333" stroke-width=".5" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 10px;
+        transition: all 0.3s ease; /* 添加过渡效果 */
+    }
+
+    .styled-select:focus {
+        border-color: #2196F3;
+        box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+        outline: none;
+    }
+
+    /* 下拉菜单动画 */
+    .styled-select option {
+        transition: all 0.3s ease;
+    }
+        /* 针对视口宽度小于768px的样式 */
         @media only screen and (max-width: 768px) {
             .sidebar {
                 width: 100px; /* 调整侧边栏宽度 */
@@ -134,6 +163,7 @@
                 padding: 10px; /* 调整内边距 */
             }
         }
+
         /* 深色模式样式 */
         body.dark-mode {
             background-color: #1a1a1a;
@@ -179,11 +209,23 @@
             transition: none !important;
             animation: none !important;
         }
+body.dark-mode .styled-select {
+    border: 1px solid #555;
+    background-color: #333;
+    color: #f4f4f4;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23f4f4f4" stroke-width=".5" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+}
+
+body.dark-mode .styled-select:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+    outline: none;
+}
     </style>
 </head>
 <body>
     <div class="sidebar">
-<button class="custom-button bake" onclick="goBackOrHome()">返回</button>
+        <button class="custom-button bake" onclick="goBackOrHome()">返回</button>
         <a href="#appearance">外观</a>
         <a href="#account">账户</a>
     </div>
@@ -211,93 +253,105 @@
             <div class="input-group">
                 <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
             </div>
+<div class="input-group">
+    <label for="fontSizeSelect">字体大小</label>
+    <select id="fontSizeSelect" class="styled-select">
+        <option value="small">小</option>
+        <option value="medium" selected>中</option>
+        <option value="large">大</option>
+        <option value="x-large">特大</option> <!-- 添加特大选项 -->
+    </select>
+</div>
         </div>
 
-<div id="account" class="section">
-    <h1>账户</h1>
-    <button id="loginButton" class="login-btn custom-button">登录</button>
-    <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
-</div>
+        <div id="account" class="section">
+            <h1>账户</h1>
+            <button id="loginButton" class="login-btn custom-button">登录</button>
+            <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
+        </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var darkModeToggle = document.getElementById('darkModeToggle');
-        var animationToggle = document.getElementById('animationToggle');
-        var lightModeBgUrlInput = document.getElementById('lightModeBgUrl');
-        var darkModeBgUrlInput = document.getElementById('darkModeBgUrl');
+document.addEventListener('DOMContentLoaded', function() {
+    var darkModeToggle = document.getElementById('darkModeToggle');
+    var animationToggle = document.getElementById('animationToggle');
+    var lightModeBgUrlInput = document.getElementById('lightModeBgUrl');
+    var darkModeBgUrlInput = document.getElementById('darkModeBgUrl');
 
-        // 从 localStorage 中获取设置
-        var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-        var isAnimationEnabled = localStorage.getItem('animation') === 'enabled';
-        var lightModeBgUrl = localStorage.getItem('lightModeBgUrl') || '';
-        var darkModeBgUrl = localStorage.getItem('darkModeBgUrl') || '';
+    // 从 localStorage 中获取设置
+    var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+    var isAnimationEnabled = localStorage.getItem('animation') === 'enabled';
+    var lightModeBgUrl = localStorage.getItem('lightModeBgUrl') || '';
+    var darkModeBgUrl = localStorage.getItem('darkModeBgUrl') || '';
 
-        // 初始化设置
-        darkModeToggle.checked = isDarkMode;
-        animationToggle.checked = isAnimationEnabled;
-        lightModeBgUrlInput.value = lightModeBgUrl;
-        darkModeBgUrlInput.value = darkModeBgUrl;
+    // 初始化设置
+    darkModeToggle.checked = isDarkMode;
+    animationToggle.checked = isAnimationEnabled;
+    lightModeBgUrlInput.value = lightModeBgUrl;
+    darkModeBgUrlInput.value = darkModeBgUrl;
+    document.body.classList.toggle('dark-mode', isDarkMode);
+    document.body.classList.toggle('no-animation', !isAnimationEnabled);
+
+    // 切换深色模式
+    darkModeToggle.addEventListener('change', function() {
+        isDarkMode = darkModeToggle.checked;
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
         document.body.classList.toggle('dark-mode', isDarkMode);
-        document.body.classList.toggle('no-animation', !isAnimationEnabled);
-
-        // 切换深色模式
-        darkModeToggle.addEventListener('change', function() {
-            isDarkMode = darkModeToggle.checked;
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-            if (!isDarkMode) {
-                localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
-            } else {
-                localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
-            }
-            document.body.classList.toggle('dark-mode', isDarkMode);
-        });
-
-        // 检查localStorage中的登录状态
-        var loginButton = document.getElementById('loginButton');
-        var logoutButton = document.getElementById('logoutButton');
-        var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
-        // 如果用户未登录，隐藏退出登录按钮
-        if (!isLoggedIn) {
-            logoutButton.style.display = 'none';
-        }
-
-        // 如果用户已登录，显示退出登录按钮
-        if (isLoggedIn) {
-            logoutButton.style.display = 'block';
-            loginButton.style.display = 'none';
-
-            // 添加退出登录按钮的点击事件
-            logoutButton.onclick = function() {
-                if (confirm('您确定要退出登录吗？')) {
-                    // 清除本地存储中的登录状态
-                    localStorage.removeItem('isLoggedIn');
-                    // 重定向到登录页面
-                    window.location.reload();
-                }
-            };
-        } else {
-            // 如果未登录，设置点击事件以跳转到登录页面
-            loginButton.onclick = function() {
-                var loginUrl = 'Login.html'; // 替换为您的登录页面URL
-                openPage(loginUrl); // 使用openPage函数进行跳转
-            };
-        }
     });
 
-    // 假设这是你的openPage函数
-    function openPage(url) {
-        // 获取当前页面的深色模式状态
-        var isDarkMode = document.body.classList.contains('dark-mode');
-        
-        // 如果当前是深色模式，添加?theme=dark参数
-        if (isDarkMode) {
-            url += (url.includes('?') ? '&' : '?') + 'theme=dark';
-        }
-        
-        // 使用修改后的URL在当前页面跳转
-        window.location.href = url;
+    // 切换动画
+    animationToggle.addEventListener('change', function() {
+        isAnimationEnabled = animationToggle.checked;
+        localStorage.setItem('animation', isAnimationEnabled ? 'enabled' : 'disabled');
+        document.body.classList.toggle('no-animation', !isAnimationEnabled);
+    });
+
+    // 检查localStorage中的登录状态
+    var loginButton = document.getElementById('loginButton');
+    var logoutButton = document.getElementById('logoutButton');
+    var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    // 如果用户未登录，隐藏退出登录按钮
+    if (!isLoggedIn) {
+        logoutButton.style.display = 'none';
     }
+
+    // 如果用户已登录，显示退出登录按钮
+    if (isLoggedIn) {
+        logoutButton.style.display = 'block';
+        loginButton.style.display = 'none';
+
+        // 添加退出登录按钮的点击事件
+        logoutButton.onclick = function() {
+            if (confirm('您确定要退出登录吗？')) {
+                // 清除本地存储中的登录状态
+                localStorage.removeItem('isLoggedIn');
+                // 重定向到登录页面
+                window.location.reload();
+            }
+        };
+    } else {
+        // 如果未登录，设置点击事件以跳转到登录页面
+        loginButton.onclick = function() {
+            var loginUrl = 'Login.html'; // 替换为您的登录页面URL
+            openPage(loginUrl); // 使用openPage函数进行跳转
+        };
+    }
+});
+
+// 假设这是你的openPage函数
+function openPage(url) {
+    // 获取当前页面的深色模式状态
+    var isDarkMode = document.body.classList.contains('dark-mode');
+    
+    // 如果当前是深色模式，添加?theme=dark参数
+    if (isDarkMode) {
+        url += (url.includes('?') ? '&' : '?') + 'theme=dark';
+    }
+    
+    // 使用修改后的URL在当前页面跳转
+    window.location.href = url;
+}
 </script>
+    </div>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <script src="script.js"></script>
     <link rel="stylesheet" href="styles3.css">
     <script src="script5.js"></script>
-
+    <script src="script6.js"></script>
     <style>
 #settingsButton {
     position: fixed;
@@ -626,6 +626,57 @@
                 }
             });
         });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleButton = document.getElementById('toggleTableButton');
+            var mainTable = document.querySelector('.main-table'); // 第一个表格
+            var additionalTable = document.getElementById('additionalTable'); // 第二个表格
+
+            // 初始化变量以跟踪表格的显示状态
+            var isMainTableVisible = true;
+
+            toggleButton.addEventListener('click', function() {
+                // 切换表格显示状态
+                isMainTableVisible = !isMainTableVisible; // 更新显示状态
+                mainTable.style.display = isMainTableVisible ? 'block' : 'none';
+                additionalTable.style.display = isMainTableVisible ? 'none' : 'block';
+
+                // 切换按钮内容
+                if (isMainTableVisible) {
+                    toggleButton.textContent = '>';
+                } else {
+                    toggleButton.textContent = '<';
+                }
+
+                // 切换按钮位置
+                if (isMainTableVisible) {
+                    toggleButton.style.left = '';
+                    toggleButton.style.right = '20px';
+                    toggleButton.classList.remove('left');
+                } else {
+                    toggleButton.style.right = '';
+                    toggleButton.style.left = '20px';
+                    toggleButton.classList.add('left');
+                }
+            });
+        });
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var timeElement = document.getElementById('time');
+    var settingsButton = document.getElementById('settingsButton');
+
+    // 确保 timeElement 和 settingsButton 元素存在
+    if (timeElement && settingsButton) {
+        // 获取 timeElement 的位置和宽度
+        var timeRect = timeElement.getBoundingClientRect();
+
+        // 设置 settingsButton 的位置
+        settingsButton.style.top = timeRect.top + 'px';
+        settingsButton.style.left = (timeRect.left - settingsButton.offsetWidth - 100) + 'px'; // 调整位置，距离time元素最左边50px
+    }
+});
     </script>
 </body>
 </html>
