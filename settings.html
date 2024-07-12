@@ -387,6 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('animation', isAnimationEnabled ? 'enabled' : 'disabled');
         document.body.classList.toggle('no-animation', !isAnimationEnabled);
     });
+        // 获取之前保存的透明度值
         const savedOpacity = localStorage.getItem('opacity');
         const defaultOpacity = savedOpacity !== null ? savedOpacity : 0.8; // 默认值为0.8
 
@@ -405,13 +406,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         opacityNumber.addEventListener('input', function() {
             let opacity = opacityNumber.value;
+
+            // 限制输入的字符长度为3个
+            if (opacity.length > 3) {
+                opacity = opacity.slice(0, 3);
+            }
+
+            // 确保输入值在0到100之间
             if (opacity < 0) opacity = 0;
             if (opacity > 100) opacity = 100;
+
+            // 确保输入的数字不能以0开头，除非是0本身
+            if (opacity.length > 1 && opacity.startsWith('0')) {
+                opacity = opacity.slice(1);
+            }
+
             opacityNumber.value = opacity;
             opacityRange.value = opacity;
             localStorage.setItem('opacity', opacity / 100);
         });
-
     // 检查localStorage中的登录状态
     var loginButton = document.getElementById('loginButton');
     var logoutButton = document.getElementById('logoutButton');
