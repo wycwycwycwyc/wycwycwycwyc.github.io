@@ -9,6 +9,7 @@
     <script src="script4.js"></script>
     <script src="script5.js"></script>
     <script src="script6.js"></script>
+    <script src="script7.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -135,7 +136,23 @@
         background-size: 10px 10px;
         transition: all 0.3s ease; /* 添加过渡效果 */
     }
-
+    .styled-select1 {
+        width: 100px; /* 调整宽度 */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        font-size: 16px;
+        color: #333;
+        appearance: none; /* 移除默认的下拉箭头 */
+        -webkit-appearance: none; /* 移除默认的下拉箭头 */
+        -moz-appearance: none; /* 移除默认的下拉箭头 */
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23333" stroke-width=".5" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 10px;
+        transition: all 0.3s ease; /* 添加过渡效果 */
+    }
     .styled-select:focus {
         border-color: #2196F3;
         box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
@@ -215,11 +232,52 @@ body.dark-mode .styled-select {
     color: #f4f4f4;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23f4f4f4" stroke-width=".5" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
 }
-
+body.dark-mode .styled-select1 {
+    border: 1px solid #555;
+    background-color: #333;
+    color: #f4f4f4;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="%23f4f4f4" stroke-width=".5" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+}
 body.dark-mode .styled-select:focus {
     border-color: #2196F3;
     box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
     outline: none;
+}
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 60px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .input-group input[type="range"] {
+            width: calc(60% - 50px); /* 为数字输入框留出空间 */
+            display: inline-block;
+        }
+
+        .input-group input[type="number"] {
+    width: 60px; /* 数字输入框的宽度 */
+    display: inline-block;
+    margin-left: 0px;
+    border-radius: 5px; /* 设置圆角 */
+    border: 1px solid #ccc; /* 设置边框 */
+    padding: 7px; /* 设置内边距 */
+    box-sizing: border-box; /* 包括内边距和边框在内的宽度计算 */
+transition: background-color 0.5s, color 0.5s;
+        }
+body.dark-mode .input-group input[type="number"] {
+    background-color: #333333; /* 输入框背景颜色 */
+    color: #ffffff; /* 输入框文字颜色 */
+    border: 1px solid #444444; /* 输入框边框颜色 */
 }
     </style>
 </head>
@@ -246,6 +304,17 @@ body.dark-mode .styled-select:focus {
                     <input type="checkbox" id="animationToggle">
                     <span class="slider"></span>
                 </label>
+            </div>
+            <div class="input-group">
+                <label for="opacityRange">透明度(可见度)</label>
+                <input type="range" id="opacityRange" min="0" max="100" step="1">
+                <input type="number" id="opacityNumber" min="0" max="100" step="1"<p>%<p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL">
+            </div>
+            <div class="input-group">
+                <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
             </div>
             <div class="input-group">
                 <input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL">
@@ -308,6 +377,28 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('animation', isAnimationEnabled ? 'enabled' : 'disabled');
         document.body.classList.toggle('no-animation', !isAnimationEnabled);
     });
+            // 获取之前保存的透明度值
+            const savedOpacity = localStorage.getItem('opacity');
+            const defaultOpacity = savedOpacity !== null ? savedOpacity : 80; // 默认值为100
+
+            // 设置初始透明度
+            const opacityRange = document.getElementById('opacityRange');
+            const opacityNumber = document.getElementById('opacityNumber');
+            opacityRange.value = defaultOpacity*100;
+            opacityNumber.value = defaultOpacity*100;
+
+            // 添加事件监听器
+            opacityRange.addEventListener('input', function() {
+                const opacity = opacityRange.value;
+                opacityNumber.value = opacity;
+                localStorage.setItem('opacity', opacity / 100);
+            });
+
+            opacityNumber.addEventListener('input', function() {
+                const opacity = opacityNumber.value;
+                opacityRange.value = opacity;
+                localStorage.setItem('opacity', opacity / 100);
+            });
 
     // 检查localStorage中的登录状态
     var loginButton = document.getElementById('loginButton');
