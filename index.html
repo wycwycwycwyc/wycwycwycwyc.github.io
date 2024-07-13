@@ -10,6 +10,8 @@
     <script src="script5.js"></script>
     <script src="script6.js"></script>
     <script src="script7.js"></script>
+    <link rel="stylesheet" href="styles4.css">
+    <script src="script8.js"></script>
     <style>
 @keyframes fadeInFromRight {
     from {
@@ -526,7 +528,6 @@ function setElementsOpacity(opacity, isDarkMode) {
     var elements = document.querySelectorAll('th, td, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
 
     if (elements.length === 0) {
-        console.log('未找到任何匹配的元素');
         return;
     }
 
@@ -536,7 +537,6 @@ function setElementsOpacity(opacity, isDarkMode) {
         } else {
             element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
         }
-        console.log(`设置 ${element.tagName} 元素的背景颜色为 ${element.style.backgroundColor}`);
     });
 }
     </script>

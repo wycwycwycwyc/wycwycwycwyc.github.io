@@ -6,10 +6,12 @@
     <title>设置</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles3.css">
+    <link rel="stylesheet" href="styles4.css">
     <script src="script4.js"></script>
     <script src="script5.js"></script>
     <script src="script6.js"></script>
     <script src="script7.js"></script>
+    <script src="script8.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -300,6 +302,7 @@ body.dark-mode .input-group1 input[type="number"] {
     <div class="sidebar">
         <button class="custom-button bake" onclick="goBackOrHome()">返回</button>
         <a href="#appearance">外观</a>
+        <a href="#display">显示</a>
         <a href="#account">账户</a>
     </div>
 
@@ -337,17 +340,25 @@ body.dark-mode .input-group1 input[type="number"] {
             <div class="input-group">
                 <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
             </div>
-<div class="input-group">
+        </div>
+<div id="display" class="section">
+    <h1>显示</h1>
     <label for="fontSizeSelect">字体大小</label>
     <select id="fontSizeSelect" class="styled-select">
         <option value="small">小</option>
         <option value="medium" selected>中</option>
         <option value="large">大</option>
-        <option value="x-large">特大</option> <!-- 添加特大选项 -->
+        <option value="x-large">特大</option>
     </select>
-</div>
-        </div>
-
+    <div class="input-group">
+<br>
+        <label for="eyeCareToggle">护眼模式</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="eyeCareToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</div
         <div id="account" class="section">
             <h1>账户</h1>
             <button id="loginButton" class="login-btn custom-button">登录</button>

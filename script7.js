@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 如果找不到ID为opacitySelect的元素，则直接根据localStorage设置透明度
     if (!opacitySelect) {
-        console.log('opacitySelect 元素未找到，直接根据 localStorage 设置透明度');
         setElementsOpacity(selectedOpacity, isDarkMode);
         return;
     }
@@ -28,7 +27,6 @@ function setElementsOpacity(opacity, isDarkMode) {
     var elements = document.querySelectorAll('th, td, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
 
     if (elements.length === 0) {
-        console.log('未找到任何匹配的元素');
         return;
     }
 
@@ -38,6 +36,5 @@ function setElementsOpacity(opacity, isDarkMode) {
         } if (!isDarkMode) {
             element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
         }
-        console.log(`设置 ${element.tagName} 元素的背景颜色为 ${element.style.backgroundColor}`);
     });
 }
