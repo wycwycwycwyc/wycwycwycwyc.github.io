@@ -6,10 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // 获取元素
     const brightnessRange = document.getElementById('brightnessRange');
     const brightnessNumber = document.getElementById('brightnessNumber');
-    const htmlElement = document.documentElement; // 获取html元素
+
+    // 创建并添加 brightness-overlay 元素
+    const brightnessOverlay = document.createElement('div');
+    brightnessOverlay.classList.add('brightness-overlay');
+    document.body.appendChild(brightnessOverlay);
 
     // 设置初始亮度
-    htmlElement.style.filter = `brightness(${defaultBrightness * 100}%)`;
+    brightnessOverlay.style.opacity = 1 - defaultBrightness;
 
     // 如果存在亮度调节控件，则设置初始值并添加事件监听器
     if (brightnessRange && brightnessNumber) {
@@ -19,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         brightnessRange.addEventListener('input', function() {
             const brightness = brightnessRange.value;
             brightnessNumber.value = brightness;
-            htmlElement.style.filter = `brightness(${brightness}%)`;
+            brightnessOverlay.style.opacity = 1 - brightness / 100;
             localStorage.setItem('brightness', brightness / 100);
         });
 
@@ -42,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             brightnessNumber.value = brightness;
             brightnessRange.value = brightness;
-            htmlElement.style.filter = `brightness(${brightness}%)`;
+            brightnessOverlay.style.opacity = 1 - brightness / 100;
             localStorage.setItem('brightness', brightness / 100);
         });
     }
