@@ -7,11 +7,13 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles3.css">
     <link rel="stylesheet" href="styles4.css">
+    <link rel="stylesheet" href="styles5.css">
     <script src="script4.js"></script>
     <script src="script5.js"></script>
     <script src="script6.js"></script>
     <script src="script7.js"></script>
     <script src="script8.js"></script>
+    <script src="script9.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,8 +21,12 @@
             padding: 0;
             background-color: #f4f4f4;
             transition: background-color 0.5s, color 0.5s; /* 添加过渡效果 */
+            animation: fadeIn 1s ease-in-out;
         }
-
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
         .sidebar {
             height: 100%;
             width: 250px;
@@ -373,6 +379,11 @@ body.dark-mode .input-group1 input[type="number"] {
             <input type="checkbox" id="eyeCareToggle">
             <span class="slider"></span>
         </label>
+            <div class="input-group1">
+                <label for="brightness">亮度</label>
+                <input type="range" id="brightnessRange" min="10" max="100" step="1">
+                <input type="number" id="brightnessNumber" min="10" max="100" step="1"<p>%<p>
+            </div>
     </div>
         <div id="account" class="section">
             <h1>账户</h1>
@@ -494,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
             opacityRange.value = opacity;
             localStorage.setItem('opacity', opacity / 100);
         });
-    // 检查localStorage中的登录状态
+// 检查localStorage中的登录状态
     var loginButton = document.getElementById('loginButton');
     var logoutButton = document.getElementById('logoutButton');
     var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
