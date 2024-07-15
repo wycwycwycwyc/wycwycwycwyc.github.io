@@ -405,7 +405,7 @@ body.dark-mode .input-group1 input[type="number"] {
     <button onclick="clearBrightness()" class="custom-button">清除亮度设置</button>
 <br>
 <br>
-    <button onclick="clearLoginInfo()" class="custom-button">清除登陆信息</button>
+    <button onclick="clearLoginInfo()" class="custom-button">清除登录信息</button>
 <br>
 <br>
     <button onclick="clearAllSettings()" class="custom-button">清除所有设置</button>
@@ -613,9 +613,9 @@ function clearBrightness() {
 }
 
 function clearLoginInfo() {
-    if (confirm('确定要清除登陆信息吗？')) {
+    if (confirm('确定要清除登录信息吗？')) {
         localStorage.removeItem('isLoggedIn');
-        alert('登陆信息已清除');
+        alert('登录信息已清除');
         location.reload();
     }
 }
