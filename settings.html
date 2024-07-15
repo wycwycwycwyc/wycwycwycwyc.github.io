@@ -324,7 +324,7 @@ body.dark-mode .input-group1 input[type="number"] {
         <button class="custom-button bake" onclick="goBackOrHome()">返回</button>
         <a href="#appearance">外观</a>
         <a href="#display">显示</a>
-        <a href="#data">数据</a>
+        <a href="#settingsData">设置数据</a>
         <a href="#account">账户</a> 
         <a href="#about">关于</a>
     </div>
@@ -386,29 +386,48 @@ body.dark-mode .input-group1 input[type="number"] {
                 <input type="number" id="brightnessNumber" min="10" max="100" step="1"<p>%<p>
             </div>
     </div>
-       <div id="data" class="section">
-    <h1>用户数据</h1>
-    <button onclick="clearDarkMode()" class="custom-button">清除深色模式设置</button>
+       <div id="settingsData" class="section">
+    <h1>设置数据</h1>
+<div>
+<div>
+    深色模式设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="clearDarkMode()" class="custom-button">清除</button>
+</div>
 <br>
+<div>
+    动画设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="clearAnimation()" class="custom-button">清除</button>
+</div>
 <br>
-    <button onclick="clearAnimation()" class="custom-button">清除动画设置</button>
+<div>
+    可见度设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="clearVisibility()" class="custom-button">清除</button>
+</div>
 <br>
+<div>
+    字体大小设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="clearFontSize()" class="custom-button">清除</button>
+</div>
 <br>
-    <button onclick="clearVisibility()" class="custom-button">清除可见度设置</button>
+<div>
+    护眼模式设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="clearEyeCare()" class="custom-button">清除</button>
+</div>
 <br>
+<div>
+    亮度设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;
+    <button onclick="clearBrightness()" class="custom-button">清除</button>
+</div>
 <br>
-    <button onclick="clearFontSize()" class="custom-button">清除字体大小设置</button>
+<div>
+    登录信息&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;
+    <button onclick="clearLoginInfo()" class="custom-button">清除</button>
+</div>
 <br>
-<br>
-    <button onclick="clearEyeCare()" class="custom-button">清除护眼模式设置</button>
-<br><br>
-    <button onclick="clearBrightness()" class="custom-button">清除亮度设置</button>
-<br>
-<br>
-    <button onclick="clearLoginInfo()" class="custom-button">清除登录信息</button>
-<br>
-<br>
-    <button onclick="clearAllSettings()" class="custom-button">清除所有设置</button>
+<div>
+    所有设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;
+    <button onclick="clearAllSettings()" class="custom-button">清除</button>
+</div>
 </div>
        <div id="account" class="section">
             <h1>账户</h1>
@@ -442,14 +461,14 @@ body.dark-mode .input-group1 input[type="number"] {
 <h2>开关动画</h2>
 <p>虽然动画效果可以提升用户的视觉体验，但我们也考虑到有些用户可能更喜欢简洁的界面。因此，我们提供了开关动画的选项。用户可以根据自己的喜好，随时开启或关闭动画效果。无论是喜欢动态效果的用户，还是喜欢简洁界面的用户，都可以通过这一功能，定制自己的使用体验。</p>
 
-<h2>登陆账户享受更多功能</h2>
-<p>为了提供更个性化的服务，我们支持用户登陆账户。登陆后，用户可以享受到更多的功能和服务。例如，用户可以保存自己的设置，方便在不同设备上同步使用；还可以访问更多的高级脚本和资源，提升自己的编程技能。此外，登陆账户还可以参与平台的社区互动，与其他用户交流经验和心得，分享自己的作品和创意。</p>
+<h2>登录账户享受更多功能</h2>
+<p>为了提供更个性化的服务，我们支持用户登录账户。登录后，用户可以享受到更多的功能和服务。例如，用户可以保存自己的设置，方便在不同设备上同步使用；还可以访问更多的高级脚本和资源，提升自己的编程技能。此外，登录账户还可以参与平台的社区互动，与其他用户交流经验和心得，分享自己的作品和创意。</p>
 
 <h2>支持下载源代码</h2>
 <p>我们的平台还支持下载源代码。用户可以根据自己的需求，下载所需的脚本源代码，进行二次开发和修改。这一功能不仅方便了用户的学习和研究，还为用户提供了更多的创作空间。通过下载源代码，用户可以深入了解脚本的实现原理，提升自己的编程水平。</p>
 
 <h2>总结</h2>
-<p>我们的脚本存放站致力于为用户提供丰富的脚本资源和优质的使用体验。无论你是初学者还是资深开发者，都可以在这里找到适合自己的脚本和工具。通过多种功能和设置选项，我们希望能够满足不同用户的需求，帮助他们更高效地完成工作和学习。欢迎大家登陆我们的平台，体验更多精彩内容！</p>
+<p>我们的脚本存放站致力于为用户提供丰富的脚本资源和优质的使用体验。无论你是初学者还是资深开发者，都可以在这里找到适合自己的脚本和工具。通过多种功能和设置选项，我们希望能够满足不同用户的需求，帮助他们更高效地完成工作和学习。欢迎大家登录我们的平台，体验更多精彩内容！</p>
 ——脚本存放站
         </div>
 <br>
