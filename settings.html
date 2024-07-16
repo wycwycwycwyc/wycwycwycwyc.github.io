@@ -176,6 +176,45 @@
             word-wrap: break-word; /* 自动换行 */
             transition: background-color 0.5s, color 0.5s; /* 添加过渡效果 */
         }
+/* 说明按钮的样式 */
+.explanation-trigger {
+    width: 90%; /* 设置按钮宽度为90% */
+    padding: 5px; /* 设置按钮内边距 */
+    font-size: 16px; /* 设置按钮文字大小 */
+    text-align: left; /* 文字靠左对齐 */
+    cursor: pointer; /* 鼠标悬停时显示为手形图标 */
+    border: 1px solid #ccc; /* 设置按钮边框 */
+    background-color: #f8f8f8; /* 设置按钮背景颜色 */
+    margin-bottom: 5px; /* 设置按钮与说明内容之间的外边距 */
+    border-radius: 5px; /* 设置按钮圆角 */
+    transition: background-color 0.3s; /* 设置背景颜色变化的过渡效果 */
+}
+
+.explanation-trigger:hover {
+    background-color: #e0e0e0; /* 鼠标悬停时按钮背景颜色变深 */
+}
+
+/* 说明内容的初始样式，隐藏 */
+.explanation {
+    display: none;
+    width: 83%; /* 设置按钮宽度为90% */
+    background-color: #f9f9f9; /* 设置说明内容背景颜色 */
+    border: 1px solid #ccc; /* 设置说明内容边框 */
+    padding: 40px; /* 设置说明内容内边距 */
+    margin-top: 10px; /* 设置说明内容与按钮之间的外边距 */
+    border-radius: 5px; /* 设置说明内容圆角 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加说明内容的阴影效果 */
+    margin-top: -20px; /* 向上移动20像素 */
+    transition: max-height 0.5s ease, opacity 0.5s ease, transform 0.5s ease; /* 设置动画效果 */
+    max-height: 0; /* 初始化时高度为0 */
+}
+
+.explanation.visible {
+    display: block; /* 显示说明内容 */
+    max-height: 200px; /* 设置最大高度，根据内容调整 */
+    opacity: 1; /* 不透明度为1，完全可见 */
+    transform: translateY(0); /* 从按钮下方滑下来 */
+}
     /* 下拉菜单动画 */
     .styled-select option {
         transition: all 0.3s ease;
@@ -196,6 +235,11 @@
                 margin-left: 100px; /* 调整内容区域的左边距 */
                 padding: 10px; /* 调整内边距 */
             }
+.explanation {
+    width: 40%; /* 设置按钮宽度为90% */
+    padding: 80px; /* 设置说明内容内边距 */
+    margin-top: -80px; /* 向上移动20像素 */
+}
         }
 
         /* 深色模式样式 */
@@ -317,6 +361,23 @@ body.dark-mode .input-group1 input[type="number"] {
 }
 
 
+body.dark-mode .explanation-trigger {
+    background-color: #1a1a1a; /* 深色背景 */
+    color: #ffffff; /* 白色文字 */
+    border-color: #333333; /* 边框颜色稍浅于背景 */
+}
+
+body.dark-mode .explanation-trigger:hover {
+    background-color: #222222; /* 鼠标悬停时背景颜色稍浅 */
+}
+
+/* 深色模式下说明内容的样式 */
+body.dark-mode .explanation {
+    background-color: #222222; /* 深色背景 */
+    color: #ffffff; /* 白色文字 */
+    border-color: #333333; /* 边框颜色稍浅于背景 */
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 浅色阴影，增加层次感 */
+}	
     </style>
 </head>
 <body>
@@ -326,6 +387,7 @@ body.dark-mode .input-group1 input[type="number"] {
         <a href="#display">显示</a>
         <a href="#settingsData">设置数据</a>
         <a href="#account">账户</a> 
+        <a href="#section">功能说明</a> 
         <a href="#about">关于</a>
     </div>
 
@@ -434,6 +496,71 @@ body.dark-mode .input-group1 input[type="number"] {
             <button id="loginButton" class="login-btn custom-button">登录</button>
             <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
         </div>
+<!-- 深色模式设置说明 -->
+<div id="section">
+<h1>功能说明</h1>
+<div class="intro-box">
+    <h2>深色模式设置数据</h2>
+    <button class="explanation-trigger" data-target="darkModeHelp">说明</button>
+    <div class="explanation" id="darkModeHelp" style="display: none;">
+深色模式提供了更加舒适的夜间浏览体验，减少屏幕亮度对眼睛的刺激。启用后，界面将以深色背景和浅色文字显示。
+    </div>
+
+
+<!-- 动画设置说明（已有） -->
+    <h2>动画设置数据</h2>
+    <button class="explanation-trigger" data-target="animationHelp">说明</button>
+    <div class="explanation" id="animationHelp" style="display: none;">
+        动画设置允许您开启或关闭页面上的动画效果。这可以帮助提高页面交互的流畅性，或者在您偏好简洁界面时关闭动画。
+    </div>
+<!-- 可见度设置说明 -->
+    <h2>可见度设置数据</h2>
+    <button class="explanation-trigger" data-target="visibilityHelp">说明</button>
+    <div class="explanation" id="visibilityHelp" style="display: none;">
+        可见度设置允许您调整页面元素的透明度，从而根据您的视觉偏好和环境光线条件优化页面的可读性。
+    </div>
+
+
+<!-- 字体大小设置说明 -->
+    <h2>字体大小设置数据</h2>
+    <button class="explanation-trigger" data-target="fontSizeHelp">说明</button>
+    <div class="explanation" id="fontSizeHelp" style="display: none;">
+        字体大小设置允许您根据阅读习惯调整页面上字体的大小，提高阅读的舒适度和易读性。
+    </div>
+
+
+<!-- 护眼模式设置说明 -->
+    <h2>护眼模式设置数据</h2>
+    <button class="explanation-trigger" data-target="eyeCareHelp">说明</button>
+    <div class="explanation" id="eyeCareHelp" style="display: none;">
+        护眼模式通过调整屏幕色温和亮度，减少对眼睛的疲劳和伤害，特别是在长时间使用屏幕的情况下。
+    </div>
+
+
+<!-- 亮度设置说明 -->
+    <h2>亮度设置数据</h2>
+    <button class="explanation-trigger" data-target="brightnessHelp">说明</button>
+    <div class="explanation" id="brightnessHelp" style="display: none;">
+        亮度设置允许您调整屏幕的亮度，以适应不同的环境光线条件，确保屏幕内容的清晰可见。
+    </div>
+
+
+<!-- 登录信息设置说明 -->
+    <h2>登录设置</h2>
+    <button class="explanation-trigger" data-target="loginInfoHelp">说明</button>
+    <div class="explanation" id="loginInfoHelp" style="display: none;">
+        登录设置允许您保存登录状态，以便在不同设备间同步您访问高级功能。
+    </div>
+
+
+<!-- 设置数据说明 -->
+    <h2>设置数据</h2>
+    <button class="explanation-trigger" data-target="allSettingsHelp">说明</button>
+    <div class="explanation" id="allSettingsHelp" style="display: none;">
+        清除部分或所有设置将恢复页面到初始状态，初始化所有个性化设置，包括深色模式、动画、字体大小等。
+    </div>
+</div>
+</div>
         <div id="about" class="section">
 <h1>关于</h1>
 <div class="intro-box">
@@ -663,6 +790,17 @@ function openPage(url) {
     // 使用修改后的URL在当前页面跳转
     window.location.href = url;
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var triggers = document.querySelectorAll('.explanation-trigger');
+    
+    triggers.forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+            var explanationId = this.getAttribute('data-target');
+            var explanation = document.getElementById(explanationId);
+            explanation.style.display = explanation.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+});
 </script>
     </div>
 </body>
