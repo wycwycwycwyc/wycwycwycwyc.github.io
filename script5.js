@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var animationToggle = document.getElementById('animationToggle');
 
     // 从 localStorage 中获取设置，如果没有设置则默认启用动画
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAnimations(isAnimationEnabled);
 
         // 切换动画
-        animationToggle.addEventListener('change', function() {
+        animationToggle.addEventListener('change', function () {
             isAnimationEnabled = animationToggle.checked;
             localStorage.setItem('animation', isAnimationEnabled ? 'enabled' : 'disabled');
             toggleAnimations(isAnimationEnabled);
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // 保留需要执行的代码
-        setTimeout(function() {
+        setTimeout(function () {
             var ripple = document.querySelector('.ripple');
             if (ripple) {
                 ripple.style.opacity = '0';
