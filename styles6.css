@@ -1,8 +1,8 @@
 
 .glow-effect {
-    text-shadow: 0 0 5px #b9b7b7, 0 0 5px #b9b7b7, 0 0 10px #b9b7b7;
+    text-shadow: 0 0 3px #b9b7b7;
 }
 
 body.dark-mode .glow-effect {
-    text-shadow: 0 0 1px #f4f4f4, 0 0 1px #f4f4f4, 0 1px #f4f4f4;
+    text-shadow: 0 0 2px #f4f4f4;
 }
