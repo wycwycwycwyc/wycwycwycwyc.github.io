@@ -296,24 +296,27 @@ int main() {
     <div id="tips">
         <span id="lightanddark">提示:切换白天黑夜请到主页<span>
     </div> 
-<script>
-// 检查用户的登录状态
-function checkLoginStatus() {
-    // 假设用户的登录状态存储在localStorage中，键名为'isLoggedIn'
-    var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    return isLoggedIn;
-}
+    <script src="FileSaver.min.js"></script>
+    <script>
+        // 检查用户的登录状态
+        function checkLoginStatus() {
+            // 假设用户的登录状态存储在localStorage中，键名为'isLoggedIn'
+            var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            return isLoggedIn;
+        }
 
-// 为下载源代码按钮添加点击事件监听器
-document.getElementById('downloadSourceCodeBtn').addEventListener('click', function() {
-    if (checkLoginStatus()) {
-        // 用户已登录，提供下载链接
-        window.location.href = 'http://2frp.bibl.love:24755/'; // 替换为您的源代码下载路径
-    } else {
-        // 用户未登录，重定向到登录页面
-        window.location.href = 'Login.html'; // 替换为您的登录页面URL
-    }
-});
-</script>   
+        document.getElementById('downloadSourceCodeBtn').addEventListener('click', function () {
+            if (checkLoginStatus()) {
+                // 用户已登录，提供下载链接
+                var code = document.getElementById("sourceCode").innerText;
+                var blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+                var filename = "多功能智能排序系统.txt";
+                saveAs(blob, filename);
+            } else {
+                // 用户未登录，重定向到登录页面
+                window.location.href = 'Login.html'; // 替换为您的登录页面URL
+            }
+        });
+    </script 
 </body>  
 </html>
