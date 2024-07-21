@@ -76,7 +76,7 @@
             /* 使用 Consolas 字体 */
             /* 使字体加粗 */
 }
-
+code {
 /* 定义注释的颜色 */
 .hljs-comment,
 .hljs-quote {
@@ -307,7 +307,7 @@
 .dark-mode .hljs-bracket {
     color: #89ddff;
 }
-
+}
 pre, code {
     font-size: 17px; /* 设置字体大小为14像素 */
 }

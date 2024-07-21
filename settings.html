@@ -17,6 +17,7 @@
     <script src="script8.js"></script>
     <script src="script9.js"></script>
     <script src="script10.js"></script>
+    <script src="script11.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -519,6 +520,13 @@
                     <span class="slider"></span>
                 </label>
             </div>
+            <div class="input-group">
+                <label for="code">更好的代码显示</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="settingscode">
+                    <span class="slider"></span>
+                </label>
+            </div>
             <div class="input-group1">
                 <label for="opacityRange">可见度</label>
                 <input type="range" id="opacityRange" min="0" max="100" step="1">
@@ -570,6 +578,16 @@
                     <div>
                         动画设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
                         <button onclick="clearAnimation()" class="custom-button">清除</button>
+                    </div>
+                    <br>
+                    <div>
+                        泛光设置数据&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;
+                        <button onclick="clearglowToggle()" class="custom-button">清除</button>
+                    </div>
+                    <br>
+                    <div>
+                        更好的代码显示设置数据
+                        <button onclick="clearcode()" class="custom-button">清除</button>
                     </div>
                     <br>
                     <div>
@@ -629,6 +647,11 @@
                         <button class="explanation-trigger" data-target="glowToggleHelp">说明</button>
                         <div class="explanation" id="glowToggleHelp" style="display: none;">
                             泛光与阴影设置允许您开启或关闭页面上的泛光效果。深色模式文字泛光，浅色模式文字出现阴影。
+                        </div>
+                        <h2>更好的代码显示设置数据</h2>
+                        <button class="explanation-trigger" data-target="codeHelp">说明</button>
+                        <div class="explanation" id="codeHelp" style="display: none;">
+                            更好的代码显示设置能为您提供更清晰的代码显示效果，包括更好的代码高亮和代码字体。
                         </div>
                         <!-- 可见度设置说明 -->
                         <h2>可见度设置数据</h2>
@@ -850,6 +873,21 @@
                             if (confirm('确定要清除动画设置吗？')) {
                                 localStorage.removeItem('animation');
                                 alert('动画设置已清除');
+                                location.reload();
+                            }
+                        }
+
+                        function clearglowToggle() {
+                            if (confirm('确定要清除泛光设置吗？')) {
+                                localStorage.removeItem('glowEnabled');
+                                alert('泛光设置已清除');
+                                location.reload();
+                            }
+                        }
+                        function clearcode() {
+                            if (confirm('确定要清除更好的代码显示设置吗？')) {
+                                localStorage.removeItem('isCodeVisible');
+                                alert('更好的代码显示设置已清除');
                                 location.reload();
                             }
                         }
