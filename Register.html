@@ -49,6 +49,7 @@
             input[type="text"],
             input[type="email"],
             input[type="password"],
+            input[type="verification_code"],
             select,
             input[type="submit"] {
                 width: calc(100% - 22px);
@@ -57,6 +58,11 @@
                 border: 1px solid #ccc;
                 border-radius: 4px;
             }
+
+            input[type="verification_code"] {
+                width: 65%;
+            }
+
 
             input[type="submit"] {
                 width: 100%;
@@ -117,7 +123,7 @@
 
             /* 发送验证码按钮样式 */
             .verification-code-button {
-                background-color: #007bff;
+                background-color: #4caf50;
                 color: white;
                 border: none;
                 padding: 8px 15px;
@@ -253,7 +259,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('验证码发送失败，请稍后重试。');
+                        alert('验证码发送失败，请检查你的邮箱地址，或稍后重试。');
                     });
             }
 
@@ -302,7 +308,7 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="verification_code">验证码:</label>
-                <input type="text" id="verification_code" name="verification_code" required>
+                <input type="verification_code" id="verification_code" name="verification_code" required>
                 <button type="button" class="verification-code-button" onclick="sendVerificationCode()">发送验证码</button>
 
                 <label for="password">密码:</label>
