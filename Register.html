@@ -4,17 +4,6 @@
     <head>
         <meta charset="UTF-8">
         <title>用户注册</title>
-        <script src="script4.js"></script>
-        <script src="script3.js"></script>
-        <link rel="stylesheet" href="styles3.css">
-        <script src="script5.js"></script>
-        <script src="script6.js"></script>
-        <link rel="stylesheet" href="styles4.css">
-        <script src="script8.js"></script>
-        <link rel="stylesheet" href="styles5.css">
-        <link rel="stylesheet" href="styles6.css">
-        <script src="script9.js"></script>
-        <script src="script10.js"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -63,7 +52,6 @@
                 width: 65%;
             }
 
-
             input[type="submit"] {
                 width: 100%;
                 padding: 15px;
@@ -86,39 +74,18 @@
 
             .back-button {
                 display: inline-block;
-                /* 使按钮与文本并排显示 */
                 padding: 5px 10px;
-                /* 减少内边距以节省空间 */
                 color: #5cb85c;
-                /* 与登录按钮的颜色相同 */
                 text-decoration: none;
-                /* 去除下划线 */
                 font-size: 16px;
-                /* 与表单标签的字体大小相同 */
                 cursor: pointer;
-                /* 鼠标指针变为手形 */
                 background-color: #f7f7f7;
-                /* 添加背景颜色，与表单背景颜色相似 */
                 border: 1px solid #ddd;
-                /* 添加边框 */
                 border-radius: 20px;
-                /* 添加圆角 */
             }
 
             .back-button:hover {
                 background-color: #e7e7e7;
-            }
-
-            @keyframes slideUp {
-                from {
-                    transform: translateY(100%);
-                    opacity: 0;
-                }
-
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
             }
 
             /* 发送验证码按钮样式 */
@@ -133,85 +100,32 @@
                 font-size: 14px;
             }
 
-            /* 应用动画到登录容器 */
+            .verification-code-button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
             .container {
-                /* 初始状态为下方隐藏，动画完成后不保留动画状态 */
                 opacity: 1;
                 transform: translateY(0%);
                 animation: slideUp 0.8s ease-out forwards;
             }
-
-            body.dark-mode {
-                background-color: #1a1a1a;
-                color: #ffffff;
-            }
-
-            /* 深色模式下登录容器样式 */
-            body.dark-mode .container {
-                background-color: #272727;
-                box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
-            }
-
-            /* 深色模式下文本和按钮样式 */
-            body.dark-mode .container h2,
-            body.dark-mode .form-group label {
-                color: #ffffff;
-            }
-
-            /* 深色模式下输入框的背景色调整 */
-            .dark-mode .input {
-                background-color: #333;
-                /* 深灰色背景，比周围环境稍微亮一点 */
-                border-color: #444;
-                /* 边框颜色，与背景色形成对比 */
-                color: #fff;
-                /* 文本颜色为白色 */
-            }
-
-            body.dark-mode .form-group button {
-                background-color: #4caf50;
-                color: white;
-            }
-
-            body.dark-mode .form-group button:hover {
-                background-color: #45a049;
-            }
-
-            /* 深色模式下错误消息样式 */
-            body.dark-mode .error {
-                color: #ff5555;
-            }
-
-            .back-button:hover {
-                color: #4cae4c;
-                background-color: #e7e7e7;
-                border-color: #ccc;
-            }
-
-            /* 深色模式下返回按钮的样式 */
-            body.dark-mode .back-button {
-                color: #4caf50;
-                background-color: #333333;
-                border-color: #555555;
-            }
-
-            body.dark-mode .back-button:hover {
-                color: #45a049;
-                background-color: #303030;
-                border-color: #3c3c3c;
-            }
-
-            body.dark-mode input[type="text"],
-            body.dark-mode input[type="email"],
-            body.dark-mode input[type="password"],
-            body.dark-mode select {
-                background-color: #333;
-                border-color: #444;
-                color: #ccc;
-            }
         </style>
         <script>
             let lastSendTime = 0; // 上次发送验证码的时间
+            let countdown = 60; // 倒计时时间
 
             function validateForm(event) {
                 var password = document.getElementById("password").value;
@@ -231,6 +145,9 @@
             }
 
             function sendVerificationCode() {
+                const sendButton = document.getElementById("send_code_button");
+                sendButton.disabled = true;
+                sendButton.innerText = "正在发送...";
                 var email = document.getElementById("email").value;
                 const currentTime = Date.now();
 
@@ -256,11 +173,29 @@
                     .then(data => {
                         alert('验证码发送成功，请查收您的邮箱。');
                         lastSendTime = Date.now(); // 更新发送时间
+                        disableSendButton();
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         alert('验证码发送失败，请检查你的邮箱地址，或稍后重试。');
                     });
+            }
+
+            function disableSendButton() {
+                const sendButton = document.getElementById("send_code_button");
+                sendButton.disabled = true;
+                sendButton.innerText = "剩余 " + countdown + " 秒";
+
+                const intervalId = setInterval(() => {
+                    countdown--;
+                    sendButton.innerText = "剩余 " + countdown + " 秒";
+                    if (countdown === 0) {
+                        clearInterval(intervalId);
+                        sendButton.innerText = "发送验证码";
+                        countdown = 60; // 倒计时时间
+                        sendButton.disabled = false;
+                    }
+                }, 1000);
             }
 
             function verifyCode() {
@@ -309,7 +244,8 @@
 
                 <label for="verification_code">验证码:</label>
                 <input type="verification_code" id="verification_code" name="verification_code" required>
-                <button type="button" class="verification-code-button" onclick="sendVerificationCode()">发送验证码</button>
+                <button type="button" id="send_code_button" class="verification-code-button"
+                    onclick="sendVerificationCode()">发送验证码</button>
 
                 <label for="password">密码:</label>
                 <input type="password" id="password" name="password" required>
