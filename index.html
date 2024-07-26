@@ -603,8 +603,9 @@
                     logoutButton.style.display = 'block';
                 }
                 if (isLoggedIn) {
+                    var user = localStorage.getItem('username')
                     // 如果已经登录，显示“已登录”状态并添加退出登录按钮的点击事件
-                    loginStatusElement.querySelector('.login-status').textContent = '已登录';
+                    loginStatusElement.querySelector('.login-status').textContent = user;
                     loginStatusElement.style.cursor = 'default';
                     loginStatusElement.onclick = null;
 

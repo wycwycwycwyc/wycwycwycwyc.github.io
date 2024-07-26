@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>用户注册</title>
+        <script src="script4.js"></script>
+        <script src="script3.js"></script>
+        <link rel="stylesheet" href="styles3.css">
+        <script src="script5.js"></script>
+        <script src="script6.js"></script>
+        <link rel="stylesheet" href="styles4.css">
+        <script src="script8.js"></script>
+        <link rel="stylesheet" href="styles5.css">
+        <link rel="stylesheet" href="styles6.css">
+        <script src="script9.js"></script>
+        <script src="script10.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f7f7f7;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                /* 隐藏滚动条 */
+            }
+
+            .container {
+                width: 400px;
+                margin: 50px auto;
+                padding: 30px;
+                background-color: #fff;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+                border-radius: 20px;
+                position: relative;
+                /* 添加相对定位 */
+            }
+
+            h2 {
+                text-align: center;
+                color: #333;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            select,
+            input[type="submit"] {
+                width: calc(100% - 22px);
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            input[type="submit"] {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 20px;
+                background-color: #5cb85c;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #4cae4c;
+            }
+
+            .error {
+                color: red;
+                margin-bottom: 10px;
+            }
+
+            .back-button {
+                display: inline-block;
+                /* 使按钮与文本并排显示 */
+                padding: 5px 10px;
+                /* 减少内边距以节省空间 */
+                color: #5cb85c;
+                /* 与登录按钮的颜色相同 */
+                text-decoration: none;
+                /* 去除下划线 */
+                font-size: 16px;
+                /* 与表单标签的字体大小相同 */
+                cursor: pointer;
+                /* 鼠标指针变为手形 */
+                background-color: #f7f7f7;
+                /* 添加背景颜色，与表单背景颜色相似 */
+                border: 1px solid #ddd;
+                /* 添加边框 */
+                border-radius: 20px;
+                /* 添加圆角 */
+            }
+
+            .back-button:hover {
+                background-color: #e7e7e7;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            /* 应用动画到登录容器 */
+            .container {
+                /* 初始状态为下方隐藏，动画完成后不保留动画状态 */
+                opacity: 1;
+                transform: translateY(0%);
+                animation: slideUp 0.8s ease-out forwards;
+            }
+
+            body.dark-mode {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+
+            /* 深色模式下登录容器样式 */
+            body.dark-mode .container {
+                background-color: #272727;
+                box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            }
+
+            /* 深色模式下文本和按钮样式 */
+            body.dark-mode .container h2,
+            body.dark-mode .form-group label {
+                color: #ffffff;
+            }
+
+            /* 深色模式下输入框的背景色调整 */
+            .dark-mode .input {
+                background-color: #333;
+                /* 深灰色背景，比周围环境稍微亮一点 */
+                border-color: #444;
+                /* 边框颜色，与背景色形成对比 */
+                color: #fff;
+                /* 文本颜色为白色 */
+            }
+
+            body.dark-mode .form-group button {
+                background-color: #4caf50;
+                color: white;
+            }
+
+            body.dark-mode .form-group button:hover {
+                background-color: #45a049;
+            }
+
+            /* 深色模式下错误消息样式 */
+            body.dark-mode .error {
+                color: #ff5555;
+            }
+
+            .back-button:hover {
+                color: #4cae4c;
+                background-color: #e7e7e7;
+                border-color: #ccc;
+            }
+
+            /* 深色模式下返回按钮的样式 */
+            body.dark-mode .back-button {
+                color: #4caf50;
+                background-color: #333333;
+                border-color: #555555;
+            }
+
+            body.dark-mode .back-button:hover {
+                color: #45a049;
+                background-color: #303030;
+                border-color: #3c3c3c;
+            }
+
+            body.dark-mode input[type="text"],
+            body.dark-mode input[type="email"],
+            body.dark-mode input[type="password"],
+            body.dark-mode select {
+                background-color: #333;
+                border-color: #444;
+                color: #ccc;
+            }
+        </style>
+        <script>
+            function validateForm() {
+                var password = document.getElementById("password").value;
+                var confirmPassword = document.getElementById("confirm_password").value;
+
+                if (password != confirmPassword) {
+                    document.getElementById("error_message").innerText = "密码和确认密码不一致！";
+                    return false;
+                } else {
+                    document.getElementById("error_message").innerText = "";
+                    return true;
+                }
+            }
+
+        </script>
+    </head>
+
+    <body>
+        <div class="container">
+            <a href="login.html" class="back-button">返回</a>
+            <h2>用户注册</h2>
+            <form action="https://jbcfz.serveo.net/register" method="post" onsubmit="return validateForm()">
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="email">邮箱:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="confirm_password">确认密码:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+
+                <div id="error_message" class="error"></div>
+
+                <label for="type">用户类型:</label>
+                <select id="type" name="type" required>
+                    <option value="user">普通用户</option>
+                    <option value="admin" style="display: none;">管理员</option>
+                </select>
+
+                <input type="submit" value="注册">
+            </form>
+        </div>
+    </body>
+
+</html>
