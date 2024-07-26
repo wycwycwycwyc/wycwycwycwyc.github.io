@@ -115,6 +115,18 @@
                 }
             }
 
+            /* 发送验证码按钮样式 */
+            .verification-code-button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                margin-left: 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
             /* 应用动画到登录容器 */
             .container {
                 /* 初始状态为下方隐藏，动画完成后不保留动画状态 */
@@ -193,19 +205,87 @@
             }
         </style>
         <script>
-            function validateForm() {
+            let lastSendTime = 0; // 上次发送验证码的时间
+
+            function validateForm(event) {
                 var password = document.getElementById("password").value;
                 var confirmPassword = document.getElementById("confirm_password").value;
+                var verificationCode = document.getElementById("verification_code").value;
 
                 if (password != confirmPassword) {
                     document.getElementById("error_message").innerText = "密码和确认密码不一致！";
                     return false;
-                } else {
-                    document.getElementById("error_message").innerText = "";
-                    return true;
+                } else if (!verificationCode) {
+                    document.getElementById("error_message").innerText = "验证码不能为空！";
+                    return false;
                 }
+
+                event.preventDefault(); // 阻止表单提交
+                verifyCode();
             }
 
+            function sendVerificationCode() {
+                var email = document.getElementById("email").value;
+                const currentTime = Date.now();
+
+                // 检查是否超过1分钟
+                if (currentTime - lastSendTime < 60000) {
+                    alert("请1分钟后再尝试发送验证码。");
+                    return;
+                }
+
+                fetch('https://jbcfz.serveo.net/send-verification-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        alert('验证码发送成功，请查收您的邮箱。');
+                        lastSendTime = Date.now(); // 更新发送时间
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('验证码发送失败，请稍后重试。');
+                    });
+            }
+
+            function verifyCode() {
+                var email = document.getElementById("email").value;
+                var code = document.getElementById("verification_code").value;
+
+                fetch('https://jbcfz.serveo.net/verify-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email, code: code })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        if (data === '验证码验证成功。') {
+                            document.getElementById("registration_form").submit(); // 提交表单
+                        } else {
+                            document.getElementById("error_message").innerText = "验证码错误。";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById("error_message").innerText = "验证码错误";
+                    });
+            }
         </script>
     </head>
 
@@ -213,12 +293,17 @@
         <div class="container">
             <a href="Login.html" class="back-button">返回</a>
             <h2>用户注册</h2>
-            <form action="https://jbcfz.serveo.net/register" method="post" onsubmit="return validateForm()">
+            <form id="registration_form" action="https://jbcfz.serveo.net/register" method="post"
+                onsubmit="return validateForm(event)">
                 <label for="username">用户名:</label>
                 <input type="text" id="username" name="username" required>
 
                 <label for="email">邮箱:</label>
                 <input type="email" id="email" name="email" required>
+
+                <label for="verification_code">验证码:</label>
+                <input type="text" id="verification_code" name="verification_code" required>
+                <button type="button" class="verification-code-button" onclick="sendVerificationCode()">发送验证码</button>
 
                 <label for="password">密码:</label>
                 <input type="password" id="password" name="password" required>
