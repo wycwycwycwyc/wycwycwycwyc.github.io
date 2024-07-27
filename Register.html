@@ -4,6 +4,16 @@
     <head>
         <meta charset="UTF-8">
         <title>用户注册</title>
+        <script src="script4.js"></script>
+        <script src="script3.js"></script>
+        <link rel="stylesheet" href="styles3.css">
+        <script src="script5.js"></script>
+        <link rel="stylesheet" href="styles4.css">
+        <script src="script8.js"></script>
+        <link rel="stylesheet" href="styles5.css">
+        <link rel="stylesheet" href="styles6.css">
+        <script src="script9.js"></script>
+        <script src="script10.js"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -147,7 +157,7 @@
             function sendVerificationCode() {
                 const sendButton = document.getElementById("send_code_button");
                 sendButton.disabled = true;
-                sendButton.innerText = "正在发送...";
+                sendButton.innerText = "正在发送";
                 var email = document.getElementById("email").value;
                 const currentTime = Date.now();
 
