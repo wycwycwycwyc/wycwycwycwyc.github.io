@@ -647,8 +647,8 @@
                         <br>
                         <div id="passwordLink" class="password-link"></div>
                         <br>
-                        <button id="loginButton" class="login-btn custom-button">登录</button>
                         <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
+                        <button id="loginButton" class="login-btn custom-button">登录</button>
                     </div>
                     <!-- 深色模式设置说明 -->
                     <div id="section">
@@ -873,6 +873,7 @@
                                 } else {
                                     usernameElement.style.display = 'none';
                                     passwordLink.style.display = 'none';
+                                    resetPasswordLink.style.display = 'none';
                                 }
 
                                 // 如果用户已登录，显示退出登录按钮
@@ -890,6 +891,9 @@
                                         }
                                     };
                                 } else {
+                                    usernameElement.style.display = 'none';
+                                    passwordLink.style.display = 'none';
+                                    logoutButton.style.display = 'none';
                                     // 如果未登录，设置点击事件以跳转到登录页面
                                     loginButton.onclick = function () {
                                         var loginUrl = 'Login.html'; // 替换为您的登录页面URL
