@@ -272,11 +272,6 @@
                 xhr.send(JSON.stringify({ username: username, password: password }));
             });
 
-            function goBackOrHome() {
-                window.history.length > 1 ?
-                    window.history.back() :
-                    window.location = '/';
-            }
         </script>
     </body>
 
