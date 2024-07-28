@@ -101,6 +101,9 @@
                 const oldUsername = localStorage.getItem('username');
                 const newUsername = document.getElementById('newUsername').value;
                 const isLoggedIn = localStorage.getItem("isLoggedIn") === 'true';
+                const message = document.getElementById('message');
+                message.textContent = '正在更改用户名...';
+                message.style.display = 'block';
                 if (!isLoggedIn) {
                     alert('你还没登录！');
                     window.location.href = 'Login.html';
@@ -117,16 +120,29 @@
                     .then(response => {
                         if (response.ok) {
                             localStorage.setItem('username', newUsername);
-                            alert('用户名更新成功！');
-                            window.location.href = 'index.html';
+                            message.textContent = '用户名更新成功！';
+                            setTimeout(() => {
+                                message.style.display = 'none';
+                                window.location.href = 'index.html';
+                            }, 2000);
                         } else {
-                            alert("用户名更换失败，请换一个用户名，或稍后再试");
+                            message.textContent = "用户名更换失败，请换一个用户名，或稍后再试";
+                            setTimeout(() => {
+                                message.style.display = 'none';
+                            }, 2000);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('请求失败，请稍后重试。');
+                        message.textContent = '请求失败，请稍后重试。';
+                        setTimeout(() => {
+                            message.style.display = 'none';
+                        }, 2000);
                     });
+            }
+
+            function goBackOrHome() {
+                window.history.length > 1 ? window.history.back() : window.location.href = 'index.html';
             }
         </script>
     </head>
@@ -141,6 +157,7 @@
                 <br><br>
                 <button type="submit">更改用户名</button>
             </form>
+            <p id="message" style="display: none;"></p>
         </div>
 
         <script>
