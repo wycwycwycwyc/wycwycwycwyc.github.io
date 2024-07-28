@@ -485,8 +485,15 @@
 
             .username .user-name-text {
                 font-weight: bold;
+                color: #000000;
+                text-decoration: none;
+                /* 移除下划线 */
+                font-weight: bold;
+                /* 加粗文本 */
+                transition: color 0.3s;
                 /* 将用户名文本设置为粗体 */
             }
+
 
             .password-link a {
                 color: #337ab7;
@@ -860,7 +867,7 @@
                                 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
                                 if (username || isLoggedIn) {
-                                    usernameElement.innerHTML = '用户名: <span class="user-name-text">' + username + '</span>';
+                                    usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + username + '</span></a>';
                                     usernameElement.style.display = 'block';
 
                                     // 添加更改密码的链接
