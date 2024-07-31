@@ -585,45 +585,86 @@
         <div id="loginStatus" class="login-icon-container">
             <span class="login-status">登录</span>
         </div>
-        <button id="logoutButton" class="logout-btn">退出登录</button>
+        <button id="logoutButton" class="logout-btn" style="display: none;">退出登录</button>
 
         <script>
-            // 检查localStorage中的登录状态
             document.addEventListener('DOMContentLoaded', function () {
                 var loginStatusElement = document.getElementById('loginStatus');
                 var logoutButton = document.getElementById('logoutButton');
                 var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-                // 如果用户未登录，隐藏退出登录按钮
+
                 if (!isLoggedIn) {
                     logoutButton.style.display = 'none';
-                }
-
-                // 如果用户已登录，显示退出登录按钮
-                if (isLoggedIn) {
-                    logoutButton.style.display = 'block';
-                }
-                if (isLoggedIn) {
-                    var user = localStorage.getItem('username')
-                    // 如果已经登录，显示“已登录”状态并添加退出登录按钮的点击事件
-                    loginStatusElement.querySelector('.login-status').textContent = user;
-                    loginStatusElement.style.cursor = 'default';
-                    loginStatusElement.onclick = null;
-
-                    // 添加退出登录按钮的点击事件
-                    logoutButton.onclick = function () {
-                        if (confirm('您确定要退出登录吗？')) {
-                            // 清除本地存储中的登录状态
-                            localStorage.removeItem('isLoggedIn');
-                            // 重定向到登录页面
-                            window.location.reload();
-                        }
-                    };
-                } else {
-                    // 如果未登录，设置点击事件以跳转到登录页面
                     loginStatusElement.onclick = function () {
                         var loginUrl = 'Login.html'; // 替换为您的登录页面URL
                         openPage(loginUrl); // 使用openPage函数进行跳转
                     };
+                } else {
+                    // 显示用户名
+                    var user = localStorage.getItem('username');
+                    loginStatusElement.querySelector('.login-status').textContent = user;
+
+                    // 添加点击事件以显示菜单
+                    loginStatusElement.onclick = function (event) {
+                        event.stopPropagation(); // 阻止事件冒泡
+                        showMenu(this, [
+                            { text: '账户设置', action: function () { openPage('settings.html#account'); } },
+                            { text: '退出登录', action: function () { logout(); } }
+                        ]);
+                    };
+
+                    // 点击页面其他位置隐藏菜单
+                    document.addEventListener('click', function () {
+                        hideMenu();
+                    });
+                }
+
+                // 退出登录函数
+                function logout() {
+                    if (confirm('您确定要退出登录吗？')) {
+                        localStorage.removeItem('isLoggedIn');
+                        window.location.reload();
+                    }
+                }
+
+                // 显示菜单函数
+                function showMenu(element, menuItems) {
+                    // 清除现有菜单
+                    hideMenu();
+
+                    // 创建并显示菜单
+                    var menu = document.createElement('ul');
+                    menu.style.position = 'absolute';
+                    menu.style.listStyle = 'none';
+                    menu.style.padding = '10px';
+                    menu.style.width = '200px';
+                    menu.style.height = 'auto';
+                    menu.style.backgroundColor = 'white'; // 确保背景色不是透明的
+                    menu.style.color = 'black'; // 设置文字颜色
+                    menu.style.border = '1px solid #ccc';
+                    menu.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.3)';
+                    menu.style.zIndex = '1000'; // 确保菜单在其他元素之上
+                    menu.style.top = '100%'; // 根据需要调整
+                    menu.style.left = '0'; // 根据需要调整
+                    element.appendChild(menu);
+
+                    menuItems.forEach(function (item) {
+                        var menuItem = document.createElement('li');
+                        menuItem.textContent = item.text;
+                        menuItem.onclick = function () {
+                            item.action();
+                            hideMenu();
+                        };
+                        menu.appendChild(menuItem);
+                    });
+                }
+
+                // 隐藏菜单函数
+                function hideMenu() {
+                    var menu = document.querySelector('ul');
+                    if (menu) {
+                        menu.parentNode.removeChild(menu);
+                    }
                 }
             });
         </script>
