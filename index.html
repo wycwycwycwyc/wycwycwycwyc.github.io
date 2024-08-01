@@ -470,6 +470,35 @@
                 .bottom-bar {
                     padding: 0px;
                 }
+
+                /* 菜单项悬停效果 */
+                .menu-item:hover {
+                    background-color: #f0f0f0;
+                    /* 浅色模式下悬停颜色 */
+                    color: #333;
+                    /* 浅色模式下文字颜色 */
+                }
+
+                /* 暗色模式下悬停效果 */
+                .dark-mode .menu-item:hover {
+                    background-color: #333;
+                    /* 暗色模式下悬停颜色 */
+                    color: #f0f0f0;
+                    /* 暗色模式下文字颜色 */
+                }
+
+                /* 分隔线样式 */
+                .menu-separator {
+                    border-bottom: 1px solid #ccc;
+                    /* 浅色模式下的分隔线颜色 */
+                    margin: 5px 0;
+                }
+
+                /* 暗色模式下的分隔线颜色 */
+                .dark-mode .menu-separator {
+                    border-bottom: 1px solid #666;
+                    /* 暗色模式下的分隔线颜色 */
+                }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -574,6 +603,7 @@
                     }
                 });
             }
+
         </script>
     </head>
 
@@ -592,34 +622,30 @@
                 var loginStatusElement = document.getElementById('loginStatus');
                 var logoutButton = document.getElementById('logoutButton');
                 var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+                var menuVisible = false;
 
                 if (!isLoggedIn) {
                     logoutButton.style.display = 'none';
                     loginStatusElement.onclick = function () {
                         var loginUrl = 'Login.html'; // 替换为您的登录页面URL
-                        openPage(loginUrl); // 使用openPage函数进行跳转
+                        window.location.href = loginUrl;
                     };
                 } else {
-                    // 显示用户名
                     var user = localStorage.getItem('username');
                     loginStatusElement.querySelector('.login-status').textContent = user;
 
-                    // 添加点击事件以显示菜单
                     loginStatusElement.onclick = function (event) {
                         event.stopPropagation(); // 阻止事件冒泡
-                        showMenu(this, [
-                            { text: '账户设置', action: function () { openPage('settings.html#account'); } },
-                            { text: '退出登录', action: function () { logout(); } }
-                        ]);
+                        toggleMenu();
                     };
 
-                    // 点击页面其他位置隐藏菜单
                     document.addEventListener('click', function () {
+                        if (!menuVisible) return;
                         hideMenu();
                     });
                 }
 
-                // 退出登录函数
                 function logout() {
                     if (confirm('您确定要退出登录吗？')) {
                         localStorage.removeItem('isLoggedIn');
@@ -627,29 +653,46 @@
                     }
                 }
 
-                // 显示菜单函数
-                function showMenu(element, menuItems) {
-                    // 清除现有菜单
-                    hideMenu();
+                function toggleMenu() {
+                    if (menuVisible) {
+                        hideMenu();
+                    } else {
+                        showMenu();
+                    }
+                }
 
-                    // 创建并显示菜单
+                function showMenu() {
                     var menu = document.createElement('ul');
                     menu.style.position = 'absolute';
-                    menu.style.listStyle = 'none';
+                    menu.style.listStyle = '1px';
                     menu.style.padding = '10px';
                     menu.style.width = '200px';
                     menu.style.height = 'auto';
-                    menu.style.backgroundColor = 'white'; // 确保背景色不是透明的
-                    menu.style.color = 'black'; // 设置文字颜色
+                    menu.style.backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+                    menu.style.color = isDarkMode ? 'white' : 'black';
                     menu.style.border = '1px solid #ccc';
-                    menu.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.3)';
-                    menu.style.zIndex = '1000'; // 确保菜单在其他元素之上
-                    menu.style.top = '100%'; // 根据需要调整
-                    menu.style.left = '0'; // 根据需要调整
-                    element.appendChild(menu);
+                    menu.style.boxShadow = '2px 2px 5px rgba(0, 0, 0, 0.3)';
+                    menu.style.zIndex = '1000';
+                    menu.style.top = '100%';
+                    menu.style.left = '0';
+                    menu.style.opacity = '0';
+                    menu.style.transform = 'translateY(-20px)';
+                    menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
 
-                    menuItems.forEach(function (item) {
+                    var menuItems = [
+                        { text: '账户设置', action: function () { window.location.href = 'settings.html#account'; } },
+                        { text: '退出登录', action: function () { logout(); } }
+                    ];
+
+                    menuItems.forEach(function (item, index) {
+                        if (index > 0) {
+                            var separator = document.createElement('li');
+                            separator.className = 'menu-separator';
+                            menu.appendChild(separator);
+                        }
+
                         var menuItem = document.createElement('li');
+                        menuItem.className = 'menu-item';
                         menuItem.textContent = item.text;
                         menuItem.onclick = function () {
                             item.action();
@@ -657,13 +700,25 @@
                         };
                         menu.appendChild(menuItem);
                     });
-                }
 
-                // 隐藏菜单函数
+                    loginStatusElement.appendChild(menu);
+                    setTimeout(function () {
+                        menu.style.opacity = '1';
+                        menu.style.transform = 'translateY(0)';
+                        menuVisible = true;
+                    }, 10);
+                }
                 function hideMenu() {
-                    var menu = document.querySelector('ul');
+                    var menu = loginStatusElement.querySelector('ul');
                     if (menu) {
-                        menu.parentNode.removeChild(menu);
+                        menu.style.opacity = '0';
+                        menu.style.transform = 'translateY(-20px)';
+                        setTimeout(function () {
+                            if (menu.parentNode) { // 确保menu仍然有父节点
+                                loginStatusElement.removeChild(menu);
+                                menuVisible = false;
+                            }
+                        }, 500);
                     }
                 }
             });
