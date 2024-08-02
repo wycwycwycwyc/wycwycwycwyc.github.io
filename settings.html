@@ -505,11 +505,6 @@
                 transition: color 0.3s;
                 /* 颜色变化过渡效果 */
             }
-
-            .password-link a:hover {
-                color: #23527c;
-                /* 鼠标悬停时的链接颜色 */
-            }
         </style>
     </head>
 
@@ -658,6 +653,10 @@
                         text-decoration: none;
                         font-weight: bold;
                         transition: color 0.3s;" href="forgotPassword.html">忘记密码</a></p>
+                        <a style="color: #337ab7;
+                        text-decoration: none;
+                        font-weight: bold;
+                        transition: color 0.3s;" onclick="sa()">切换账号</a></p>
                         <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
                         <button id="loginButton" class="login-btn custom-button">登录</button>
                     </div>
@@ -1020,7 +1019,12 @@
                                     });
                                 });
                             });
-
+                            function sa() {
+                                if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
+                                    localStorage.removeItem('isLoggedIn');
+                                    window.location.href = 'Login.html';
+                                }
+                            }
                         </script>
                     </div>
     </body>

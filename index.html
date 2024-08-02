@@ -653,6 +653,13 @@
                     }
                 }
 
+                function sa() {
+                    if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
+                        localStorage.removeItem('isLoggedIn');
+                        window.location.href = 'Login.html';
+                    }
+                }
+
                 function toggleMenu() {
                     if (menuVisible) {
                         hideMenu();
@@ -681,6 +688,7 @@
 
                     var menuItems = [
                         { text: '账户设置', action: function () { window.location.href = 'settings.html#account'; } },
+                        { text: '切换账号', action: function () { sa(); } },
                         { text: '退出登录', action: function () { logout(); } }
                     ];
 
