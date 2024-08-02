@@ -653,7 +653,7 @@
                         text-decoration: none;
                         font-weight: bold;
                         transition: color 0.3s;" href="forgotPassword.html">忘记密码</a></p>
-                        <a style="color: #337ab7;
+                        <a id="sa" style="color: #337ab7;
                         text-decoration: none;
                         font-weight: bold;
                         transition: color 0.3s;" onclick="sa()">切换账号</a></p>
@@ -867,6 +867,7 @@
                                 const usernameElement = document.getElementById('username');
                                 const loginButton = document.getElementById('loginButton');
                                 const logoutButton = document.getElementById('logoutButton');
+                                const sa = document.getElementById('sa');
                                 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
                                 if (username || isLoggedIn) {
@@ -884,6 +885,7 @@
                                     usernameElement.style.display = 'none';
                                     passwordLink.style.display = 'none';
                                     resetPasswordLink.style.display = 'none';
+                                    sa.style.display = 'none';
                                 }
 
                                 // 如果用户已登录，显示退出登录按钮
@@ -904,6 +906,7 @@
                                     usernameElement.style.display = 'none';
                                     passwordLink.style.display = 'none';
                                     logoutButton.style.display = 'none';
+                                    sa.style.display = 'none';
                                     // 如果未登录，设置点击事件以跳转到登录页面
                                     loginButton.onclick = function () {
                                         var loginUrl = 'Login.html'; // 替换为您的登录页面URL
