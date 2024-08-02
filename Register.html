@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="styles6.css">
         <script src="script9.js"></script>
         <script src="script10.js"></script>
+        <script src="https://hcaptcha.com/1/api.js" async defer></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -137,20 +138,37 @@
             let lastSendTime = 0; // 上次发送验证码的时间
             let countdown = 60; // 倒计时时间
 
+            // 初始化 hCaptcha
+            hcaptcha.render('.h-captcha');
+
+            // 表单提交时的验证函数
             function validateForm(event) {
                 var password = document.getElementById("password").value;
                 var confirmPassword = document.getElementById("confirm_password").value;
                 var verificationCode = document.getElementById("verification_code").value;
 
-                if (password != confirmPassword) {
+                // 检查密码是否一致
+                if (password !== confirmPassword) {
                     document.getElementById("error_message").innerText = "密码和确认密码不一致！";
                     return false;
-                } else if (!verificationCode) {
+                }
+                // 检查验证码是否为空
+                else if (!verificationCode) {
                     document.getElementById("error_message").innerText = "验证码不能为空！";
                     return false;
                 }
 
-                event.preventDefault(); // 阻止表单提交
+                // 检查 hCaptcha 验证是否通过
+                var captchaResponse = hcaptcha.getResponse();
+                if (!captchaResponse) {
+                    document.getElementById("error_message").innerText = "请完成人机验证。";
+                    return false;
+                }
+
+                // 阻止表单默认提交行为
+                event.preventDefault();
+
+                // 进行验证码验证
                 verifyCode();
             }
 
@@ -240,6 +258,17 @@
                         document.getElementById("error_message").innerText = "验证码错误";
                     });
             }
+            // hCaptcha 验证结果回调
+            hcaptcha.on('verify', function (token) {
+                // 可以在这里添加额外的逻辑，例如提交表单
+                document.getElementById("registration_form").submit();
+            });
+
+            // hCaptcha 验证过期回调
+            hcaptcha.on('expire', function () {
+                document.getElementById("error_message").innerText = "人机验证已过期，请重新验证。";
+            });
+
         </script>
     </head>
 
@@ -273,7 +302,7 @@
                     <option value="user">普通用户</option>
                     <option value="admin" style="display: none;">管理员</option>
                 </select>
-
+                <div class="h-captcha" data-sitekey="646c3294-ce44-4d5a-a04a-e1603366ea8c"></div>
                 <input type="submit" value="注册">
             </form>
         </div>
