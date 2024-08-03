@@ -505,6 +505,35 @@
                 transition: color 0.3s;
                 /* 颜色变化过渡效果 */
             }
+
+            #developer-link {
+                color: #000;
+                text-decoration: none;
+                transition: background-color 0.5s, color 0.5s;
+            }
+
+            body.dark-mode #developer-link {
+                color: #f4f4f4;
+                text-decoration: none;
+            }
+
+            #userTableContainer table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            #userTableContainer th,
+            #userTableContainer td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            #userTableContainer th {
+                background-color: #007BFF;
+                color: white;
+            }
         </style>
     </head>
 
@@ -516,6 +545,7 @@
             <a href="#settingsData">设置数据</a>
             <a href="#account">账户</a>
             <a href="#section">功能说明</a>
+            <a id="developers" style="display: none;" href="#developer">开发者选项</a>
             <a href="#about">关于</a>
         </div>
 
@@ -736,11 +766,22 @@
                             </div>
                         </div>
                     </div>
+                    <div id="developer" style="display: none;" class="section">
+                        <h1>开发者选项</h1>
+                        <h2>用户列表</h2>
+                        <div id="userTableContainer">
+                            <!-- 表格将在这里被JavaScript动态创建 -->
+                        </div>
+                        <br>
+                        <button class="custom-button"
+                            onclick="script:if(confirm('确定要退出开发者模式吗？')){localStorage.removeItem('developerOptionsEnabled');location.reload()}">退出开发者模式</button>
+                    </div>
                     <div id="about" class="section">
                         <h1>关于</h1>
                         <div class="intro-box">
                             <h1>脚本存放站简介</h1>
-                            <p>在当今信息技术飞速发展的时代，编程语言和脚本的应用变得越来越广泛。为了满足广大编程爱好者和开发者的需求，我们推出了一个功能丰富、用户友好的脚本存放站。这个平台于2023年1月18日13时20分13秒创建的，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。
+                            <p>在当今信息技术飞速发展的时代，编程语言和脚本的应用变得越来越广泛。为了满足广大编程爱好者和<a id="developer-link"
+                                    onclick="handleButtonClick()">开发者</a>的需求，我们推出了一个功能丰富、用户友好的脚本存放站。这个平台于2023年1月18日13时20分13秒创建的，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。
                             </p>
 
                             <h2>多种脚本存放</h2>
@@ -1027,6 +1068,88 @@
                                     localStorage.removeItem('isLoggedIn');
                                     window.location.href = 'Login.html';
                                 }
+                            }
+
+                            // 定义一个全局变量来跟踪点击次数
+                            let clickCount = 0; // 确保全局变量在脚本开始时就已定义
+
+                            // 检查localStorage中是否有启用开发者选项的状态
+                            function checkDeveloperOptions() {
+                                const developerLink = document.getElementById('developer-link');
+                                if (localStorage.getItem('developerOptionsEnabled') === 'true') {
+                                    document.getElementById('developers').style.display = 'block';
+                                    document.getElementById('developer').style.display = 'block';
+                                    developerLink.style.pointerEvents = 'none'; // 设置链接不可点击
+                                }
+                            }
+
+                            // 处理按钮点击事件
+                            function handleButtonClick() {
+                                clickCount++; // 增加点击次数
+                                if (clickCount === 10) {
+                                    clickCount = 0; // 重置点击次数
+                                    localStorage.setItem('developerOptionsEnabled', 'true'); // 启用开发者选项
+                                    const developerLink = document.getElementById('developer-link');
+                                    developerLink.removeEventListener('click', handleButtonClick); // 移除点击事件
+                                    developerLink.style.pointerEvents = 'none'; // 设置链接不可点击
+                                    document.getElementById('developers').style.display = 'block';
+                                    document.getElementById('developer').style.display = 'block';
+                                    alert('已启用开发者选项');
+                                }
+                            }
+
+                            // 页面加载完成后添加事件监听器
+                            document.addEventListener('DOMContentLoaded', (event) => {
+                                const developerLink = document.getElementById('developer-link');
+                                if (developerLink) {
+                                    developerLink.addEventListener('click', handleButtonClick);
+                                }
+                                checkDeveloperOptions(); // 检查是否启用开发者选项
+                            });
+                            document.addEventListener('DOMContentLoaded', function () {
+                                fetch('https://jbcfz.serveo.net/users') // 假设后端接口是/users
+                                    .then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                        throw new Error('Network response was not ok.');
+                                    })
+                                    .then(data => createTable(data.data))
+                                    .catch(error => {
+                                        console.error('There has been a problem with your fetch operation:', error);
+                                    });
+                            });
+
+                            function createTable(users) {
+                                const container = document.getElementById('userTableContainer');
+                                const table = document.createElement('table');
+
+                                // 创建表头
+                                const thead = document.createElement('thead');
+                                const headerRow = document.createElement('tr');
+                                ['用户名', '密码', '邮箱', '用户类型', '用户ID'].forEach(headerText => {
+                                    const header = document.createElement('th');
+                                    header.textContent = headerText;
+                                    headerRow.appendChild(header);
+                                });
+                                thead.appendChild(headerRow);
+                                table.appendChild(thead);
+
+                                // 创建表体
+                                const tbody = document.createElement('tbody');
+                                users.forEach(user => {
+                                    const row = document.createElement('tr');
+                                    Object.values(user).forEach(text => {
+                                        const cell = document.createElement('td');
+                                        cell.textContent = text;
+                                        row.appendChild(cell);
+                                    });
+                                    tbody.appendChild(row);
+                                });
+                                table.appendChild(tbody);
+
+                                // 将表格添加到容器中
+                                container.appendChild(table);
                             }
                         </script>
                     </div>
