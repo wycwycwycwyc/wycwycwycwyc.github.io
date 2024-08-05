@@ -165,7 +165,37 @@
             if (!isLoggedIn) {
                 document.getElementById('currentUsername').textContent = '未登录';
             } else {
-                document.getElementById('currentUsername').textContent = localStorage.getItem('username') || '未登录';
+                document.getElementById('currentUsername').textContent = '正在加载'
+                let userId = localStorage.getItem('userid');
+
+                // 使用fetch发送POST请求到后端接口
+                fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: userId })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // 显示用户名
+                            console.log('用户名:', data.data.username);
+                            localStorage.setItem('username', data.data.username);
+                            document.getElementById('currentUsername').textContent = localStorage.getItem('username') || '未登录';
+                        } else {
+                            // 显示错误信息
+                            console.error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                    });
             }
         </script>
     </body>

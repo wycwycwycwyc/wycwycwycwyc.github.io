@@ -632,8 +632,42 @@
                         window.location.href = loginUrl;
                     };
                 } else {
+                    loginStatusElement.querySelector('.login-status').textContent = '正在加载';
                     var user = localStorage.getItem('username');
-                    loginStatusElement.querySelector('.login-status').textContent = user;
+                    // 假设有一个按钮或其他元素，用户点击后触发获取用户名的操作
+                    // 假设用户ID存储在某个变量中
+                    let userId = localStorage.getItem('userid');
+
+                    // 使用fetch发送POST请求到后端接口
+                    fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id: userId })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // 显示用户名
+                                console.log('用户名:', data.data.username);
+                                localStorage.setItem('username', data.data.username);
+                                loginStatusElement.querySelector('.login-status').textContent = user;
+                            } else {
+                                // 显示错误信息
+                                console.error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                        });
+
+
 
                     loginStatusElement.onclick = function (event) {
                         event.stopPropagation(); // 阻止事件冒泡
@@ -649,6 +683,12 @@
                 function logout() {
                     if (confirm('您确定要退出登录吗？')) {
                         localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('usertype');
+                        localStorage.removeItem('userid');
+                        localStorage.removeItem('developerOptionsEnabled');
+
                         window.location.reload();
                     }
                 }
@@ -656,7 +696,11 @@
                 function sa() {
                     if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
                         localStorage.removeItem('isLoggedIn');
-                        window.location.href = 'Login.html';
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('usertype');
+                        localStorage.removeItem('userid');
+                        localStorage.removeItem('developerOptionsEnabled');
                     }
                 }
 

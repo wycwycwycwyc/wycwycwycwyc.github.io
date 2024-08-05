@@ -252,7 +252,7 @@
 
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) { // 请求完成
-                        verifyingElement.style.display = 'none'; // 隐藏正在验证的提示
+                        verifyingElement.textContent = '正在更新你的用户信息...'
 
                         if (xhr.status === 200) {
                             // 登录成功
@@ -261,7 +261,40 @@
                             localStorage.setItem('username', username);
                             localStorage.setItem('isLoggedIn', 'true');
                             alert("登录成功！");
-                            window.location.href = 'index.html'; // 示例：跳转到成功页面
+                            fetch('https://jbcfz.serveo.net/get-user-id-by-username', {
+                                method: 'POST', // 指定请求方法
+                                headers: {
+                                    'Content-Type': 'application/json' // 设置请求头
+                                },
+                                body: JSON.stringify({ username: username }) // 请求体
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json(); // 解析JSON数据
+                                })
+                                .then(data => {
+                                    // 处理返回的数据
+                                    if (data.success) {
+                                        // 假设data.data中包含userId
+                                        const userId = data.data.userId;
+                                        console.log('用户ID:', userId);
+                                        // 将用户ID显示在页面上
+                                        // 将用户ID存储在变量中
+                                        var receivedUserId = userId;
+                                        localStorage.setItem('userid', userId);
+                                        window.location.href = 'index.html';
+                                    } else {
+                                        // 显示错误信息
+                                        console.log(data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    // 处理请求过程中的错误
+                                    console.error('Fetch error:', error);
+                                });
+                            // 示例：跳转到成功页面
                         } else {
                             // 处理登录失败情况
                             var errorMessage = '登录失败';

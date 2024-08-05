@@ -555,11 +555,10 @@
                 /* 字体大小 */
                 box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
                 /* 轻微的阴影效果 */
-                transition: box-shadow 0.3s ease, transform 0.3s ease;
+                transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.5s, color 0.5s;
                 /* 平滑过渡效果 */
                 outline: none;
                 /* 点击时不显示轮廓 */
-                transition: background-color 0.5s, color 0.5s;
             }
 
             .input_info:hover {
@@ -973,7 +972,39 @@
                                 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
                                 if (username || isLoggedIn) {
-                                    usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + username + '</span></a>';
+                                    usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
+                                    let userId = localStorage.getItem('userid');
+
+                                    // 使用fetch发送POST请求到后端接口
+                                    fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ id: userId })
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                // 显示用户名
+                                                console.log('用户名:', data.data.username);
+                                                localStorage.setItem('username', data.data.username);
+                                                usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + username + '</span></a>';
+                                            } else {
+                                                // 显示错误信息
+                                                console.error(data.message);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Fetch error:', error);
+                                        });
+
+
                                     usernameElement.style.display = 'block';
 
                                     // 添加更改密码的链接
@@ -1085,6 +1116,10 @@
                             function clearLoginInfo() {
                                 if (confirm('确定要清除登录信息吗？')) {
                                     localStorage.removeItem('isLoggedIn');
+                                    localStorage.removeItem('username');
+                                    localStorage.removeItem('usertype');
+                                    localStorage.removeItem('userid');
+                                    localStorage.removeItem('developerOptionsEnabled');
                                     alert('登录信息已清除');
                                     location.reload();
                                 }
@@ -1129,6 +1164,11 @@
                             function sa() {
                                 if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
                                     localStorage.removeItem('isLoggedIn');
+                                    localStorage.removeItem('isLoggedIn');
+                                    localStorage.removeItem('username');
+                                    localStorage.removeItem('usertype');
+                                    localStorage.removeItem('userid');
+                                    localStorage.removeItem('developerOptionsEnabled');
                                     window.location.href = 'Login.html';
                                 }
                             }
@@ -1139,7 +1179,7 @@
                             // 检查localStorage中是否有启用开发者选项的状态
                             function checkDeveloperOptions() {
                                 const developerLink = document.getElementById('developer-link');
-                                if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn) {
+                                if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
                                     document.getElementById('developers').style.display = 'block';
                                     document.getElementById('developer').style.display = 'block';
                                     developerLink.style.pointerEvents = 'none'; // 设置链接不可点击
@@ -1149,7 +1189,7 @@
                             // 处理按钮点击事件
                             function handleButtonClick() {
                                 clickCount++; // 增加点击次数
-                                if (clickCount === 10 && isLoggedIn) {
+                                if (clickCount === 10 && isLoggedIn && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
                                     clickCount = 0; // 重置点击次数
                                     localStorage.setItem('developerOptionsEnabled', 'true'); // 启用开发者选项
                                     const developerLink = document.getElementById('developer-link');
@@ -1168,53 +1208,83 @@
                             // 页面加载完成后添加事件监听器
                             document.addEventListener('DOMContentLoaded', (event) => {
                                 const developerLink = document.getElementById('developer-link');
-                                if (localStorage.getItem('developerOptionsEnabled') === 'true') {
+                                if (localStorage.getItem('developerOptionsEnabled') === 'true' && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
                                     developerLink.addEventListener('click', handleButtonClick);
                                 }
                                 checkDeveloperOptions(); // 检查是否启用开发者选项
                             });
 
                             document.addEventListener('DOMContentLoaded', function () {
-                                const username = localStorage.getItem('username');
                                 var userType;
                                 // 检查用户名是否已存储
                                 if (!username) {
                                     alert('用户名未找到，请先登录或存储用户名。');
                                     return;
                                 }
+                                let userId = localStorage.getItem('userid');
 
-                                // 创建包含用户名的JSON对象
-                                const userData = {
-                                    username: username
-                                };
-
-                                // 使用fetch发送POST请求
-                                fetch('https://jbcfz.serveo.net/get-user-type', {
-                                    method: 'POST', // 指定请求方法为POST
+                                // 使用fetch发送POST请求到后端接口
+                                fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                                    method: 'POST',
                                     headers: {
-                                        'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                        'Content-Type': 'application/json'
                                     },
-                                    body: JSON.stringify(userData) // 将userData对象转换为JSON字符串作为请求体
+                                    body: JSON.stringify({ id: userId })
                                 })
                                     .then(response => {
                                         if (!response.ok) {
-                                            throw new Error('网络响应错误');
+                                            throw new Error('Network response was not ok');
                                         }
                                         return response.json();
                                     })
                                     .then(data => {
-                                        // 检查请求是否成功，并显示用户类型
                                         if (data.success) {
-                                            usertype = data.data.userType;
-                                            localStorage.setItem('usertype', usertype)
+                                            // 显示用户名
+                                            console.log('用户名:', data.data.username);
+                                            localStorage.setItem('username', data.data.username);
+                                            username = localStorage.getItem('username');
+                                            // 创建包含用户名的JSON对象
+                                            const userData = {
+                                                username: username
+                                            };
+
+                                            // 使用fetch发送POST请求
+                                            fetch('https://jbcfz.serveo.net/get-user-type', {
+                                                method: 'POST', // 指定请求方法为POST
+                                                headers: {
+                                                    'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                                },
+                                                body: JSON.stringify(userData) // 将userData对象转换为JSON字符串作为请求体
+                                            })
+                                                .then(response => {
+                                                    if (!response.ok) {
+                                                        throw new Error('网络响应错误');
+                                                    }
+                                                    return response.json();
+                                                })
+                                                .then(data => {
+                                                    // 检查请求是否成功，并显示用户类型
+                                                    if (data.success) {
+                                                        usertype = data.data.userType;
+                                                        localStorage.setItem('usertype', usertype)
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    // 网络或JSON解析错误
+                                                    console.error('获取用户类型失败:', error);
+                                                    alert('获取用户类型失败，请稍后重试。');
+                                                });
+                                        } else {
+                                            // 显示错误信息
+                                            console.error(data.message);
                                         }
                                     })
                                     .catch(error => {
-                                        // 网络或JSON解析错误
-                                        console.error('获取用户类型失败:', error);
-                                        alert('获取用户类型失败，请稍后重试。');
+                                        console.error('Fetch error:', error);
                                     });
-                                if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn && localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin') {
+
+
+                                if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
                                     fetch('https://jbcfz.serveo.net/users') // 假设后端接口是/users
                                         .then(response => {
                                             if (response.ok) {
@@ -1285,6 +1355,24 @@
                                         input.className = 'input_info';
                                         cell.innerHTML = '';
                                         cell.appendChild(input);
+                                        if (i == 3) {
+                                            // 监听输入框的输入事件
+                                            input.addEventListener('input', function () {
+                                                let value = this.value.toLowerCase();
+                                                // 替换掉所有不是'u'或'a'的字符，同时确保最终结果是'user'或'admin'
+                                                this.value = value.replace(/[^ua]/g, '');
+                                                // 检查当前值是否是'user'或'admin'，如果不是，则替换为'user'
+                                                if (this.value !== '' && this.value !== '') {
+                                                    // 如果当前值是'u'或'a'，自动填充为'user'或'admin'
+                                                    if (this.value === 'u' || this.value === 'a') {
+                                                        this.value = this.value === 'u' ? 'user' : 'admin';
+                                                    } else {
+                                                        // 如果当前值不是'u'或'a'，且不是空字符串，则替换为'user'
+                                                        this.value = 'user';
+                                                    }
+                                                }
+                                            });
+                                        }
                                         if (i === 4) {
                                             cell.style.pointerEvents = 'none'; // 使单元格不可点击
                                         }
@@ -1292,7 +1380,7 @@
                                 });
                                 const editButton = row.querySelector('button');
                                 editButton.textContent = '提交';
-                                editButton.onclick = function () { submitChanges(index, users); };
+                                editButton.onclick = function () { if (confirm('确定要更改此用户信息吗')) { submitChanges(index, users); } };
                             }
                             function submitChanges(index, users) {
                                 const tbody = document.querySelector('tbody');
