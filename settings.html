@@ -1372,6 +1372,7 @@
                                                     }
                                                 }
                                             });
+                                            input.select();
                                         }
                                         if (i === 4) {
                                             cell.style.pointerEvents = 'none'; // 使单元格不可点击
@@ -1390,9 +1391,19 @@
 
                                 inputs.forEach((input, i) => {
                                     const key = Object.keys(users[index])[i];
-                                    // 根据字段类型，可能需要对输入值进行处理，例如密码可能需要加密
-                                    updatedUserInfo[key] = input.value;
+                                    const value = input.value.trim(); // 去除输入值的前后空格
+
+                                    // 检查输入值是否为空字符串或null，如果是，则不包括在更新数据中
+                                    if (value) {
+                                        updatedUserInfo[key] = value;
+                                    }
                                 });
+
+                                // 在发送请求之前检查updatedUserInfo是否包含null值
+                                if (Object.values(updatedUserInfo).some(value => value === null)) {
+                                    alert('更新失败：请确保所有字段都已填写。');
+                                    return; // 如果有null值，终止函数执行
+                                }
 
                                 // 将 updatedUserInfo 转换为JSON字符串
                                 const userData = JSON.stringify(updatedUserInfo);
