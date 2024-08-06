@@ -1460,6 +1460,10 @@
                                     };
                                 } else {
                                     customLink.className = 'custom-link';
+                                    const currentType = localStorage.getItem('usertype'); // 获取当前用户类型
+                                    const newType = user.type; // 这里替换为实际的要更改的用户类型
+
+                                    // 将当前用户类型和要更改的用户类型添加到 updatedUserInfo 对象中
                                     customLink.onclick = function () {
                                         if (confirm('确定要删除该用户吗？')) {
                                             // 这里替换为您指定的函数
@@ -1469,7 +1473,7 @@
                                                 headers: {
                                                     'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
                                                 },
-                                                body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
+                                                body: JSON.stringify({ id: userId, currentType: currentType, newType: newType }) // 请求体，包含要删除的用户ID
                                             })
                                                 .then(response => {
                                                     if (!response.ok) {
@@ -1558,7 +1562,7 @@
                                 const row = tbody.children[index];
                                 const inputs = row.querySelectorAll('input');
                                 const updatedUserInfo = {};
-
+                                const user = users[index];
                                 inputs.forEach((input, i) => {
                                     const key = Object.keys(users[index])[i];
                                     const value = input.value.trim(); // 去除输入值的前后空格
@@ -1568,6 +1572,13 @@
                                         updatedUserInfo[key] = value;
                                     }
                                 });
+                                const currentType = localStorage.getItem('usertype'); // 获取当前用户类型
+                                const newType = user.type; // 这里替换为实际的要更改的用户类型
+
+                                // 将当前用户类型和要更改的用户类型添加到 updatedUserInfo 对象中
+                                updatedUserInfo['currentType'] = currentType;
+                                updatedUserInfo['newType'] = newType;
+
 
                                 // 在发送请求之前检查updatedUserInfo是否包含null值
                                 if (Object.values(updatedUserInfo).some(value => value === null)) {
@@ -1595,18 +1606,23 @@
                                     })
                                     .then(data => {
                                         console.log('Success:', data);
-                                        const editButton = document.getElementById('editButton');
-                                        editButton.textContent = '编辑';
-                                        editButton.onclick = function () { editUser(index, users); };
-                                        alert('用户数据更新成功');
-                                        window.location.reload();
+                                        if (data.error === '用户名已被占用') {
+                                            alert('用户数据更新失败:用户名已被占用');
+                                        } else if (data.error === '邮箱已被占用') {
+                                            alert('用户数据更新失败:邮箱已被占用');
+                                        } else {
+                                            const editButton = document.getElementById('editButton');
+                                            editButton.textContent = '编辑';
+                                            editButton.onclick = function () { editUser(index, users); };
+                                            alert('用户数据更新成功');
+                                            window.location.reload();
+                                        }
                                         // 这里可以添加代码来处理成功的响应，例如更新表格或显示消息
                                         // 例如，可以在这里重新加载用户列表或更新表格的特定行
                                         // 例如：updateTableRow(row, data.data);
                                     })
-                                    .catch((error) => {
+                                    .catch(error => {
                                         alert('用户数据更新失败', error);
-                                        console.error('Error:', error);
                                         // 处理错误情况，例如显示错误消息
                                     });
                             }
