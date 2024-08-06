@@ -1327,61 +1327,91 @@
 
                             function createRow(user, index, users) {
                                 const tr = document.createElement('tr');
-                                Object.values(user).forEach(text => {
+                                const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin';
+                                let isSuperAdmin = user.type === 'superadmin'; // 检查用户是否是 superadmin
+
+                                Object.values(user).forEach((text, i) => {
                                     const td = document.createElement('td');
-                                    td.textContent = text;
+                                    if (isCurrentUserAdmin && isSuperAdmin && i !== 0) {
+                                        // 如果当前用户是 admin 且用户是 superadmin，则隐藏信息（除了用户名）
+                                        td.textContent = i === 0 || i === 3 ? text : '**********';
+                                        td.style.pointerEvents = 'none'; // 使单元格不可点击
+                                    } else {
+                                        td.textContent = text;
+                                    }
                                     tr.appendChild(td);
                                 });
+
                                 const editTd = document.createElement('td');
                                 const editButton = document.createElement('button');
-                                editButton.textContent = '编辑';
-                                editButton.className = 'custom-button';
-                                editButton.setAttribute('id', 'editButton');
-                                editButton.onclick = function () { editUser(index, users); };
+                                if (isCurrentUserAdmin && isSuperAdmin) {
+                                    // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则禁用编辑按钮
+                                    editButton.disabled = true;
+                                    editButton.textContent = '不可编辑';
+                                } else {
+                                    editButton.textContent = '编辑';
+                                    editButton.className = 'custom-button';
+                                    editButton.setAttribute('id', 'editButton');
+                                    editButton.onclick = function () { editUser(index, users); };
+                                }
                                 editTd.appendChild(editButton);
                                 tr.appendChild(editTd);
                                 return tr;
                             }
 
                             function editUser(index, users) {
+                                const user = users[index];
+                                const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin'; // 假设用户的角色信息存储在 role 属性中
+                                const isSuperAdmin = user.type === 'superadmin'; // 检查是否是 superadmin
                                 const tbody = document.querySelector('tbody');
                                 const row = tbody.children[index];
                                 const cells = row.querySelectorAll('td');
+
                                 cells.forEach((cell, i) => {
                                     if (i < cells.length - 1) { // 排除最后一个单元格，即操作按钮的单元格
-                                        const input = document.createElement('input');
-                                        input.type = 'text';
-                                        input.value = cell.textContent;
-                                        input.className = 'input_info';
-                                        cell.innerHTML = '';
-                                        cell.appendChild(input);
-                                        if (i == 3) {
-                                            // 监听输入框的输入事件
-                                            input.addEventListener('input', function () {
-                                                let value = this.value.toLowerCase();
-                                                // 替换掉所有不是'u'或'a'的字符，同时确保最终结果是'user'或'admin'
-                                                this.value = value.replace(/[^ua]/g, '');
-                                                // 检查当前值是否是'user'或'admin'，如果不是，则替换为'user'
-                                                if (this.value !== '' && this.value !== '') {
-                                                    // 如果当前值是'u'或'a'，自动填充为'user'或'admin'
-                                                    if (this.value === 'u' || this.value === 'a') {
-                                                        this.value = this.value === 'u' ? 'user' : 'admin';
-                                                    } else {
-                                                        // 如果当前值不是'u'或'a'，且不是空字符串，则替换为'user'
-                                                        this.value = 'user';
-                                                    }
-                                                }
-                                            });
-                                            input.select();
-                                        }
-                                        if (i === 4) {
+                                        if (isCurrentUserAdmin && isSuperAdmin && i !== 0 && i !== 3) {
+                                            // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则隐藏信息
+                                            cell.innerHTML = '***';
                                             cell.style.pointerEvents = 'none'; // 使单元格不可点击
+                                        } else {
+                                            const input = document.createElement('input');
+                                            input.type = 'text';
+                                            input.value = cell.textContent;
+                                            input.className = 'input_info';
+                                            cell.innerHTML = '';
+                                            cell.appendChild(input);
+                                            if (i === 3) {
+                                                // 监听输入框的输入事件
+                                                input.addEventListener('input', function () {
+                                                    let value = this.value.toLowerCase();
+                                                    // 替换掉所有不是'u'或'a'的字符，同时确保最终结果是'user'或'admin'
+                                                    this.value = value.replace(/[^ua]/g, '');
+                                                    if (this.value === 'u') {
+                                                        this.value = 'user';
+                                                    } else if (this.value === 'a') {
+                                                        this.value = 'admin';
+                                                    }
+                                                });
+                                                input.select();
+                                            }
                                         }
                                     }
                                 });
+
                                 const editButton = row.querySelector('button');
-                                editButton.textContent = '提交';
-                                editButton.onclick = function () { if (confirm('确定要更改此用户信息吗')) { submitChanges(index, users); } };
+                                editButton.className = 'custom-button';
+                                if (isCurrentUserAdmin && isSuperAdmin) {
+                                    // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则禁用编辑按钮
+                                    editButton.disabled = true;
+                                    editButton.textContent = '不可编辑';
+                                } else {
+                                    editButton.textContent = '提交';
+                                    editButton.onclick = function () {
+                                        if (confirm('确定要更改此用户信息吗')) {
+                                            submitChanges(index, users);
+                                        }
+                                    };
+                                }
                             }
                             function submitChanges(index, users) {
                                 const tbody = document.querySelector('tbody');
