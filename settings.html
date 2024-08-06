@@ -748,6 +748,11 @@
                         text-decoration: none;
                         font-weight: bold;
                         transition: color 0.3s;" onclick="sa()">切换账号</a></p>
+                        <a id="logout" style="color: #337ab7;
+                        text-decoration: none;
+                        font-weight: bold;
+                        transition: color 0.3s;"
+                            onclick="script:if(confirm('确定要注销此用户吗？这将永久删除此用户在服务器和本地的所有记录。')){logout()}">注销用户</a></p>
                         <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
                         <button id="loginButton" class="login-btn custom-button">登录</button>
                     </div>
@@ -970,8 +975,9 @@
                                 const logoutButton = document.getElementById('logoutButton');
                                 const sa = document.getElementById('sa');
                                 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
-                                if (username || isLoggedIn) {
+                                const logout = document.getElementById('logout');
+                                const resetPasswordLink = document.createElement('a');
+                                if (isLoggedIn) {
                                     usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
                                     let userId = localStorage.getItem('userid');
 
@@ -998,10 +1004,32 @@
                                             } else {
                                                 // 显示错误信息
                                                 console.error(data.message);
+                                                if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                    localStorage.removeItem('isLoggedIn');
+                                                    localStorage.removeItem('username');
+                                                    localStorage.removeItem('usertype');
+                                                    localStorage.removeItem('userid');
+                                                    localStorage.removeItem('developerOptionsEnabled');
+                                                    window.location.href = 'Login.html';
+                                                }
+                                                else {
+                                                    window.location.reload();
+                                                }
                                             }
                                         })
                                         .catch(error => {
                                             console.error('Fetch error:', error);
+                                            if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                localStorage.removeItem('isLoggedIn');
+                                                localStorage.removeItem('username');
+                                                localStorage.removeItem('usertype');
+                                                localStorage.removeItem('userid');
+                                                localStorage.removeItem('developerOptionsEnabled');
+                                                window.location.href = 'Login.html';
+                                            }
+                                            else {
+                                                window.location.reload();
+                                            }
                                         });
 
 
@@ -1019,6 +1047,7 @@
                                     passwordLink.style.display = 'none';
                                     resetPasswordLink.style.display = 'none';
                                     sa.style.display = 'none';
+                                    logout.style.display = 'none';
                                 }
 
                                 // 如果用户已登录，显示退出登录按钮
@@ -1040,6 +1069,7 @@
                                     passwordLink.style.display = 'none';
                                     logoutButton.style.display = 'none';
                                     sa.style.display = 'none';
+                                    logout.style.display = 'none';
                                     // 如果未登录，设置点击事件以跳转到登录页面
                                     loginButton.onclick = function () {
                                         var loginUrl = 'Login.html'; // 替换为您的登录页面URL
@@ -1136,6 +1166,40 @@
                             document.addEventListener('DOMContentLoaded', function () {
                                 // 这里可以添加其他DOM加载完成后的初始化代码
                             });
+                            function logout() {
+                                userId = localStorage.getItem('userid');
+                                fetch('https://jbcfz.serveo.net/delete-user', {
+                                    method: 'POST', // 指定请求方法为POST
+                                    headers: {
+                                        'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                    },
+                                    body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        return response.json(); // 解析JSON响应体
+                                    })
+                                    .then(data => {
+                                        if (data.success) {
+                                            localStorage.removeItem('isLoggedIn');
+                                            localStorage.removeItem('username');
+                                            localStorage.removeItem('usertype');
+                                            localStorage.removeItem('userid');
+                                            localStorage.removeItem('developerOptionsEnabled');
+                                            window.location.reload();
+                                            alert('用户删除成功');
+
+                                        } else {
+                                            alert('删除失败: ' + data.message);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        alert('删除用户时发生错误，请稍后重试。');
+                                    });
+                            }
                             // 假设这是你的openPage函数
                             function openPage(url) {
                                 // 获取当前页面的深色模式状态
@@ -1163,7 +1227,6 @@
 
                             function sa() {
                                 if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
-                                    localStorage.removeItem('isLoggedIn');
                                     localStorage.removeItem('isLoggedIn');
                                     localStorage.removeItem('username');
                                     localStorage.removeItem('usertype');
@@ -1222,67 +1285,89 @@
                                     return;
                                 }
                                 let userId = localStorage.getItem('userid');
-
-                                // 使用fetch发送POST请求到后端接口
-                                fetch('https://jbcfz.serveo.net/get-username-by-id', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ id: userId })
-                                })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            throw new Error('Network response was not ok');
-                                        }
-                                        return response.json();
+                                if (isLoggedIn) {
+                                    // 使用fetch发送POST请求到后端接口
+                                    fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ id: userId })
                                     })
-                                    .then(data => {
-                                        if (data.success) {
-                                            // 显示用户名
-                                            console.log('用户名:', data.data.username);
-                                            localStorage.setItem('username', data.data.username);
-                                            username = localStorage.getItem('username');
-                                            // 创建包含用户名的JSON对象
-                                            const userData = {
-                                                username: username
-                                            };
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                // 显示用户名
+                                                console.log('用户名:', data.data.username);
+                                                localStorage.setItem('username', data.data.username);
+                                                username = localStorage.getItem('username');
+                                                // 创建包含用户名的JSON对象
+                                                const userData = {
+                                                    username: username
+                                                };
 
-                                            // 使用fetch发送POST请求
-                                            fetch('https://jbcfz.serveo.net/get-user-type', {
-                                                method: 'POST', // 指定请求方法为POST
-                                                headers: {
-                                                    'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
-                                                },
-                                                body: JSON.stringify(userData) // 将userData对象转换为JSON字符串作为请求体
-                                            })
-                                                .then(response => {
-                                                    if (!response.ok) {
-                                                        throw new Error('网络响应错误');
-                                                    }
-                                                    return response.json();
+                                                // 使用fetch发送POST请求
+                                                fetch('https://jbcfz.serveo.net/get-user-type', {
+                                                    method: 'POST', // 指定请求方法为POST
+                                                    headers: {
+                                                        'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                                    },
+                                                    body: JSON.stringify(userData) // 将userData对象转换为JSON字符串作为请求体
                                                 })
-                                                .then(data => {
-                                                    // 检查请求是否成功，并显示用户类型
-                                                    if (data.success) {
-                                                        usertype = data.data.userType;
-                                                        localStorage.setItem('usertype', usertype)
-                                                    }
-                                                })
-                                                .catch(error => {
-                                                    // 网络或JSON解析错误
-                                                    console.error('获取用户类型失败:', error);
-                                                    alert('获取用户类型失败，请稍后重试。');
-                                                });
-                                        } else {
-                                            // 显示错误信息
-                                            console.error(data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Fetch error:', error);
-                                    });
-
+                                                    .then(response => {
+                                                        if (!response.ok) {
+                                                            throw new Error('网络响应错误');
+                                                        }
+                                                        return response.json();
+                                                    })
+                                                    .then(data => {
+                                                        // 检查请求是否成功，并显示用户类型
+                                                        if (data.success) {
+                                                            usertype = data.data.userType;
+                                                            localStorage.setItem('usertype', usertype)
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        // 网络或JSON解析错误
+                                                        console.error('获取用户类型失败:', error);
+                                                        alert('获取用户类型失败，请稍后重试。');
+                                                    });
+                                            } else {
+                                                // 显示错误信息
+                                                console.error(data.message);
+                                                if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                    localStorage.removeItem('isLoggedIn');
+                                                    localStorage.removeItem('username');
+                                                    localStorage.removeItem('usertype');
+                                                    localStorage.removeItem('userid');
+                                                    localStorage.removeItem('developerOptionsEnabled');
+                                                    window.location.href = 'Login.html';
+                                                }
+                                                else {
+                                                    window.location.reload();
+                                                }
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Fetch error:', error);
+                                            if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                localStorage.removeItem('isLoggedIn');
+                                                localStorage.removeItem('username');
+                                                localStorage.removeItem('usertype');
+                                                localStorage.removeItem('userid');
+                                                localStorage.removeItem('developerOptionsEnabled');
+                                                window.location.href = 'Login.html';
+                                            }
+                                            else {
+                                                window.location.reload();
+                                            }
+                                        });
+                                }
 
                                 if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
                                     fetch('https://jbcfz.serveo.net/users') // 假设后端接口是/users
@@ -1327,14 +1412,15 @@
 
                             function createRow(user, index, users) {
                                 const tr = document.createElement('tr');
-                                const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin';
+                                const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin' || localStorage.getItem('usertype') === 'user';
                                 let isSuperAdmin = user.type === 'superadmin'; // 检查用户是否是 superadmin
 
                                 Object.values(user).forEach((text, i) => {
                                     const td = document.createElement('td');
                                     if (isCurrentUserAdmin && isSuperAdmin && i !== 0) {
                                         // 如果当前用户是 admin 且用户是 superadmin，则隐藏信息（除了用户名）
-                                        td.textContent = i === 0 || i === 3 ? text : '**********';
+                                        td.textContent = i === 0 || i === 3 ? text : '错误:拒绝访问';
+                                        td.style.color = i === 0 || i === 3 ? null : 'red';
                                         td.style.pointerEvents = 'none'; // 使单元格不可点击
                                     } else {
                                         td.textContent = text;
@@ -1342,6 +1428,7 @@
                                     tr.appendChild(td);
                                 });
 
+                                // 添加编辑按钮和链接
                                 const editTd = document.createElement('td');
                                 const editButton = document.createElement('button');
                                 if (isCurrentUserAdmin && isSuperAdmin) {
@@ -1355,6 +1442,59 @@
                                     editButton.onclick = function () { editUser(index, users); };
                                 }
                                 editTd.appendChild(editButton);
+
+                                // 创建链接
+                                const customLink = document.createElement('a');
+                                customLink.href = '#';
+                                customLink.textContent = '×';
+                                customLink.style.color = 'red';
+                                customLink.style.fontSize = '30px';
+                                customLink.style.marginLeft = '10px'; // 设置右边距为10像素
+                                customLink.style.textDecoration = 'none'; // 去掉下划线
+                                if (isCurrentUserAdmin && isSuperAdmin) {
+                                    // 如果当前用户是 admin 且正在操作的用户是 superadmin，则禁用链接
+                                    customLink.style.color = 'grey';
+                                    customLink.onclick = function (event) {
+                                        event.preventDefault(); // 阻止链接的默认行为
+                                        alert('错误:拒绝访问');
+                                    };
+                                } else {
+                                    customLink.className = 'custom-link';
+                                    customLink.onclick = function () {
+                                        if (confirm('确定要删除该用户吗？')) {
+                                            // 这里替换为您指定的函数
+                                            userId = user.id;
+                                            fetch('https://jbcfz.serveo.net/delete-user', {
+                                                method: 'POST', // 指定请求方法为POST
+                                                headers: {
+                                                    'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                                },
+                                                body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
+                                            })
+                                                .then(response => {
+                                                    if (!response.ok) {
+                                                        throw new Error('Network response was not ok');
+                                                    }
+                                                    return response.json(); // 解析JSON响应体
+                                                })
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        window.location.reload();
+                                                        alert('用户删除成功');
+
+                                                    } else {
+                                                        alert('删除失败: ' + data.message);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    alert('删除用户时发生错误，请稍后重试。');
+                                                });
+                                        }
+                                    };
+                                }
+                                editTd.appendChild(customLink);
+
                                 tr.appendChild(editTd);
                                 return tr;
                             }
@@ -1371,7 +1511,7 @@
                                     if (i < cells.length - 1) { // 排除最后一个单元格，即操作按钮的单元格
                                         if (isCurrentUserAdmin && isSuperAdmin && i !== 0 && i !== 3) {
                                             // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则隐藏信息
-                                            cell.innerHTML = '***';
+                                            cell.innerHTML = '';
                                             cell.style.pointerEvents = 'none'; // 使单元格不可点击
                                         } else {
                                             const input = document.createElement('input');

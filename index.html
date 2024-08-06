@@ -661,10 +661,32 @@
                             } else {
                                 // 显示错误信息
                                 console.error(data.message);
+                                if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                    localStorage.removeItem('isLoggedIn');
+                                    localStorage.removeItem('username');
+                                    localStorage.removeItem('usertype');
+                                    localStorage.removeItem('userid');
+                                    localStorage.removeItem('developerOptionsEnabled');
+                                    window.location.href = 'Login.html';
+                                }
+                                else {
+                                    window.location.reload();
+                                }
                             }
                         })
                         .catch(error => {
                             console.error('Fetch error:', error);
+                            if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                localStorage.removeItem('isLoggedIn');
+                                localStorage.removeItem('username');
+                                localStorage.removeItem('usertype');
+                                localStorage.removeItem('userid');
+                                localStorage.removeItem('developerOptionsEnabled');
+                                window.location.href = 'Login.html';
+                            }
+                            else {
+                                window.location.reload();
+                            }
                         });
 
 
