@@ -18,6 +18,8 @@
         <script src="script9.js"></script>
         <script src="script10.js"></script>
         <script src="script11.js"></script>
+        <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -751,8 +753,7 @@
                         <a id="logout" style="color: #337ab7;
                         text-decoration: none;
                         font-weight: bold;
-                        transition: color 0.3s;"
-                            onclick="script:if(confirm('确定要注销此用户吗？这将永久删除此用户在服务器和本地的所有记录。')){logout()}">注销用户</a></p>
+                        transition: color 0.3s;" onclick="logout()">注销用户</a></p>
                         <button id="logoutButton" class="logout-btn custom-button">退出登录</button>
                         <button id="loginButton" class="login-btn custom-button">登录</button>
                     </div>
@@ -839,8 +840,7 @@
                             <!-- 表格将在这里被JavaScript动态创建 -->
                         </div>
                         <br>
-                        <button class="custom-button"
-                            onclick="script:if(confirm('确定要退出开发者模式吗？')){localStorage.removeItem('developerOptionsEnabled');location.reload()}">退出开发者模式</button>
+                        <button class="custom-button" onclick="exitdev()">退出开发者模式</button>
                     </div>
                     <div id="about" class="section">
                         <h1>关于</h1>
@@ -1004,32 +1004,56 @@
                                             } else {
                                                 // 显示错误信息
                                                 console.error(data.message);
-                                                if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                swal({
+                                                    title: "找不到该用户，是否尝试重新登录？",
+                                                    text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+                                                    type: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#DD6B55",
+                                                    confirmButtonText: "是",
+                                                    cancelButtonText: "否",
+                                                    closeOnConfirm: false,
+                                                    closeOnCancel: false
+                                                }, function (isConfirm) {
+                                                    if (isConfirm) {
+                                                        swal("正在跳转!", "正在跳转");
+                                                        localStorage.removeItem('isLoggedIn');
+                                                        localStorage.removeItem('username');
+                                                        localStorage.removeItem('usertype');
+                                                        localStorage.removeItem('userid');
+                                                        localStorage.removeItem('developerOptionsEnabled');
+                                                        window.location.href = 'Login.html';
+                                                    } else {
+                                                        window.location.reload();
+                                                    }
+                                                })
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Fetch error:', error);
+                                            swal({
+                                                title: "找不到该用户，是否尝试重新登录？",
+                                                text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+                                                type: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonColor: "#DD6B55",
+                                                confirmButtonText: "是",
+                                                cancelButtonText: "否",
+                                                closeOnConfirm: false,
+                                                closeOnCancel: false
+                                            }, function (isConfirm) {
+                                                if (isConfirm) {
+                                                    swal("正在跳转!", "正在跳转");
                                                     localStorage.removeItem('isLoggedIn');
                                                     localStorage.removeItem('username');
                                                     localStorage.removeItem('usertype');
                                                     localStorage.removeItem('userid');
                                                     localStorage.removeItem('developerOptionsEnabled');
                                                     window.location.href = 'Login.html';
-                                                }
-                                                else {
+                                                } else {
                                                     window.location.reload();
                                                 }
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Fetch error:', error);
-                                            if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
-                                                localStorage.removeItem('isLoggedIn');
-                                                localStorage.removeItem('username');
-                                                localStorage.removeItem('usertype');
-                                                localStorage.removeItem('userid');
-                                                localStorage.removeItem('developerOptionsEnabled');
-                                                window.location.href = 'Login.html';
-                                            }
-                                            else {
-                                                window.location.reload();
-                                            }
+                                            })
                                         });
 
 
@@ -1057,12 +1081,36 @@
 
                                     // 添加退出登录按钮的点击事件
                                     logoutButton.onclick = function () {
-                                        if (confirm('您确定要退出登录吗？')) {
-                                            // 清除本地存储中的登录状态
-                                            localStorage.removeItem('isLoggedIn');
-                                            // 重定向到登录页面
-                                            window.location.reload();
-                                        }
+                                        swal({
+                                            title: "您确定要退出登录吗？",
+                                            text: "这将清除你本地的登录信息",
+                                            type: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#DD6B55",
+                                            confirmButtonText: "是",
+                                            cancelButtonText: "否",
+                                            closeOnConfirm: false,
+                                            closeOnCancel: false
+                                        }, function (isConfirm) {
+                                            if (isConfirm) {
+                                                localStorage.removeItem('isLoggedIn');
+                                                localStorage.removeItem('username');
+                                                localStorage.removeItem('usertype');
+                                                localStorage.removeItem('userid');
+                                                localStorage.removeItem('developerOptionsEnabled');
+                                                // 重定向到登录页面
+                                                swal("退出成功成功！", "已退出登录", "success");
+                                                location.reload();
+                                            }
+                                            else {
+                                                swal({
+                                                    title: "正在取消",
+                                                    text: "正在取消",
+                                                    timer: 0,
+                                                    showConfirmButton: false
+                                                })
+                                            }
+                                        })
                                     };
                                 } else {
                                     usernameElement.style.display = 'none';
@@ -1079,126 +1127,349 @@
                             });
 
                             function clearDarkMode() {
-                                if (confirm('确定要清除深色模式设置吗？')) {
-                                    localStorage.removeItem('darkMode');
-                                    localStorage.removeItem('backgroundImage');
-                                    alert('深色模式设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除深色模式设置吗？",
+                                    text: "确定要清除深色模式设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('darkMode');
+                                        localStorage.removeItem('backgroundImage');
+                                        swal("清除成功！", "深色模式设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearAnimation() {
-                                if (confirm('确定要清除动画设置吗？')) {
-                                    localStorage.removeItem('animation');
-                                    alert('动画设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除动画设置吗？",
+                                    text: "确定要清除动画设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('animation');
+                                        swal("清除成功！", "动画设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearglowToggle() {
-                                if (confirm('确定要清除泛光设置吗？')) {
-                                    localStorage.removeItem('glowEnabled');
-                                    alert('泛光设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除泛光设置吗？",
+                                    text: "确定要清除泛光设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('glowEnabled');
+                                        swal("清除成功！", "泛光设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+
                             }
 
                             function clearcode() {
-                                if (confirm('确定要清除更好的代码显示设置吗？')) {
-                                    localStorage.removeItem('isCodeVisible');
-                                    alert('更好的代码显示设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除更好的代码显示设置吗？",
+                                    text: "确定要清除更好的代码显示设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('isCodeVisible');
+                                        swal("清除成功！", "更好的代码显示设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearVisibility() {
-                                if (confirm('确定要清除可见度设置吗？')) {
-                                    localStorage.removeItem('opacity');
-                                    alert('可见度设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除可见度设置吗？",
+                                    text: "确定要清除可见度设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('opacity');
+                                        swal("清除成功！", "可见度设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+
                             }
 
                             function clearFontSize() {
-                                if (confirm('确定要清除字体大小设置吗？')) {
-                                    localStorage.removeItem('fontSize');
-                                    alert('字体大小设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除字体大小设置吗？",
+                                    text: "确定要清除字体大小设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('fontSize');
+                                        swal("清除成功！", "字体大小设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearEyeCare() {
-                                if (confirm('确定要清除护眼模式设置吗？')) {
-                                    localStorage.removeItem('eyeCareMode');
-                                    alert('护眼模式设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除护眼模式设置吗？",
+                                    text: "确定要清除护眼模式设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('eyeCareMode');
+                                        swal("清除成功！", "护眼模式设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearBrightness() {
-                                if (confirm('确定要清除亮度设置吗？')) {
-                                    localStorage.removeItem('brightness');
-                                    alert('亮度设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除亮度设置吗？",
+                                    text: "确定要清除亮度设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('brightness');
+                                        swal("清除成功！", "亮度设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearLoginInfo() {
-                                if (confirm('确定要清除登录信息吗？')) {
-                                    localStorage.removeItem('isLoggedIn');
-                                    localStorage.removeItem('username');
-                                    localStorage.removeItem('usertype');
-                                    localStorage.removeItem('userid');
-                                    localStorage.removeItem('developerOptionsEnabled');
-                                    alert('登录信息已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除登录信息吗？",
+                                    text: "确定要清除登录信息吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('isLoggedIn');
+                                        localStorage.removeItem('username');
+                                        localStorage.removeItem('usertype');
+                                        localStorage.removeItem('userid');
+                                        localStorage.removeItem('developerOptionsEnabled');
+                                        swal("清除成功！", "登录信息已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             function clearAllSettings() {
-                                if (confirm('确定要清除所有设置吗？')) {
-                                    localStorage.clear();
-                                    alert('所有设置已清除');
-                                    location.reload();
-                                }
+                                swal({
+                                    title: "确定要清除所有设置吗？",
+                                    text: "确定要清除所有设置吗？",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.clear();
+                                        swal("清除成功！", "所有设置已清除", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
 
                             document.addEventListener('DOMContentLoaded', function () {
                                 // 这里可以添加其他DOM加载完成后的初始化代码
                             });
                             function logout() {
-                                userId = localStorage.getItem('userid');
-                                fetch('https://jbcfz.serveo.net/delete-user', {
-                                    method: 'POST', // 指定请求方法为POST
-                                    headers: {
-                                        'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
-                                    },
-                                    body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
-                                })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            throw new Error('Network response was not ok');
-                                        }
-                                        return response.json(); // 解析JSON响应体
-                                    })
-                                    .then(data => {
-                                        if (data.success) {
-                                            localStorage.removeItem('isLoggedIn');
-                                            localStorage.removeItem('username');
-                                            localStorage.removeItem('usertype');
-                                            localStorage.removeItem('userid');
-                                            localStorage.removeItem('developerOptionsEnabled');
-                                            window.location.reload();
-                                            alert('用户删除成功');
+                                swal({
+                                    title: "确定要注销此用户吗？",
+                                    text: "这将永久删除此用户在服务器和本地的所有记录。",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        userId = localStorage.getItem('userid');
+                                        fetch('https://jbcfz.serveo.net/delete-user', {
+                                            method: 'POST', // 指定请求方法为POST
+                                            headers: {
+                                                'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                            },
+                                            body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('Network response was not ok');
+                                                }
+                                                return response.json(); // 解析JSON响应体
+                                            })
+                                            .then(data => {
+                                                if (data.success) {
+                                                    localStorage.removeItem('username');
+                                                    localStorage.removeItem('usertype');
+                                                    localStorage.removeItem('userid');
+                                                    localStorage.removeItem('developerOptionsEnabled');
+                                                    window.location.reload();
+                                                    swal("用户删除成功", "此用户将不能登录", "success");
 
-                                        } else {
-                                            alert('删除失败: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('删除用户时发生错误，请稍后重试。');
-                                    });
+                                                } else {
+                                                    swal("用户删除失败", data.message, "error");
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                                swal("用户删除失败", "删除用户时发生错误，请稍后重试。", "error");
+                                            });
+                                    } else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+
                             }
                             // 假设这是你的openPage函数
                             function openPage(url) {
@@ -1226,16 +1497,62 @@
                             });
 
                             function sa() {
-                                if (confirm('您确定要切换账号吗,这将清除你现在的登录信息。')) {
-                                    localStorage.removeItem('isLoggedIn');
-                                    localStorage.removeItem('username');
-                                    localStorage.removeItem('usertype');
-                                    localStorage.removeItem('userid');
-                                    localStorage.removeItem('developerOptionsEnabled');
-                                    window.location.href = 'Login.html';
-                                }
+                                swal({
+                                    title: "您确定要切换账号吗",
+                                    text: "这将清除你现在的登录信息",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('isLoggedIn');
+                                        localStorage.removeItem('username');
+                                        localStorage.removeItem('usertype');
+                                        localStorage.removeItem('userid');
+                                        localStorage.removeItem('developerOptionsEnabled');
+                                        window.location.href = 'Login.html';
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
                             }
-
+                            function exitdev() {
+                                swal({
+                                    title: "您确定要退出开发者模式吗",
+                                    text: "这将关闭你的开发者操作",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        localStorage.removeItem('developerOptionsEnabled');
+                                        swal("退出成功！", "您已退出开发者模式", "success");
+                                        location.reload();
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+                            }
                             // 定义一个全局变量来跟踪点击次数
                             let clickCount = 0; // 确保全局变量在脚本开始时就已定义
                             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -1261,9 +1578,9 @@
                                     document.getElementById('developers').style.display = 'block';
                                     document.getElementById('developer').style.display = 'block';
                                     location.reload();
-                                    alert('已启用开发者选项');
+                                    swal("已启用开发者模式", "你将解锁开发者操作", "success");
                                 } else if (clickCount === 10 && !isLoggedIn) {
-                                    alert("你还没登录！");
+                                    swal("你还没登录！", "不能进行此操作", "warning");
                                     window.location.href = 'Login.html';
                                 }
                             }
@@ -1281,7 +1598,7 @@
                                 var userType;
                                 // 检查用户名是否已存储
                                 if (!username) {
-                                    alert('用户名未找到，请先登录或存储用户名。');
+                                    swal("用户名未找到，请先登录或存储用户名。", "用户名未找到，请先登录或存储用户名。", "error");
                                     return;
                                 }
                                 let userId = localStorage.getItem('userid');
@@ -1335,37 +1652,61 @@
                                                     .catch(error => {
                                                         // 网络或JSON解析错误
                                                         console.error('获取用户类型失败:', error);
-                                                        alert('获取用户类型失败，请稍后重试。');
+                                                        swal("获取用户类型失败，请稍后重试。", "获取用户类型失败，请稍后重试。", "error");
                                                     });
                                             } else {
                                                 // 显示错误信息
                                                 console.error(data.message);
-                                                if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
+                                                swal({
+                                                    title: "找不到该用户，是否尝试重新登录？",
+                                                    text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+                                                    type: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#DD6B55",
+                                                    confirmButtonText: "是",
+                                                    cancelButtonText: "否",
+                                                    closeOnConfirm: false,
+                                                    closeOnCancel: false
+                                                }, function (isConfirm) {
+                                                    if (isConfirm) {
+                                                        swal("正在跳转!", "正在跳转");
+                                                        localStorage.removeItem('isLoggedIn');
+                                                        localStorage.removeItem('username');
+                                                        localStorage.removeItem('usertype');
+                                                        localStorage.removeItem('userid');
+                                                        localStorage.removeItem('developerOptionsEnabled');
+                                                        window.location.href = 'Login.html';
+                                                    } else {
+                                                        window.location.reload();
+                                                    }
+                                                })
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Fetch error:', error);
+                                            swal({
+                                                title: "找不到该用户，是否尝试重新登录？",
+                                                text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+                                                type: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonColor: "#DD6B55",
+                                                confirmButtonText: "是",
+                                                cancelButtonText: "否",
+                                                closeOnConfirm: false,
+                                                closeOnCancel: false
+                                            }, function (isConfirm) {
+                                                if (isConfirm) {
+                                                    swal("正在跳转!", "正在跳转");
                                                     localStorage.removeItem('isLoggedIn');
                                                     localStorage.removeItem('username');
                                                     localStorage.removeItem('usertype');
                                                     localStorage.removeItem('userid');
                                                     localStorage.removeItem('developerOptionsEnabled');
                                                     window.location.href = 'Login.html';
-                                                }
-                                                else {
+                                                } else {
                                                     window.location.reload();
                                                 }
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Fetch error:', error);
-                                            if (confirm('找不到该用户，是否尝试重新登录？\n注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可')) {
-                                                localStorage.removeItem('isLoggedIn');
-                                                localStorage.removeItem('username');
-                                                localStorage.removeItem('usertype');
-                                                localStorage.removeItem('userid');
-                                                localStorage.removeItem('developerOptionsEnabled');
-                                                window.location.href = 'Login.html';
-                                            }
-                                            else {
-                                                window.location.reload();
-                                            }
+                                            })
                                         });
                                 }
 
@@ -1383,8 +1724,10 @@
                                         });
                                 }
                             });
+                            document.getElementById('addUserButton').addEventListener('click', addUser);
 
                             function createTable(users) {
+                                localStorage.setItem('users', users);
                                 const container = document.getElementById('userTableContainer');
                                 const table = document.createElement('table');
                                 const thead = createTableHead();
@@ -1456,7 +1799,7 @@
                                     customLink.style.color = 'grey';
                                     customLink.onclick = function (event) {
                                         event.preventDefault(); // 阻止链接的默认行为
-                                        alert('错误:拒绝访问');
+                                        swal("错误:拒绝访问", "错误:拒绝访问", "error");
                                     };
                                 } else {
                                     customLink.className = 'custom-link';
@@ -1465,36 +1808,56 @@
 
                                     // 将当前用户类型和要更改的用户类型添加到 updatedUserInfo 对象中
                                     customLink.onclick = function () {
-                                        if (confirm('确定要删除该用户吗？')) {
-                                            // 这里替换为您指定的函数
-                                            userId = user.id;
-                                            fetch('https://jbcfz.serveo.net/delete-user', {
-                                                method: 'POST', // 指定请求方法为POST
-                                                headers: {
-                                                    'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
-                                                },
-                                                body: JSON.stringify({ id: userId, currentType: currentType, newType: newType }) // 请求体，包含要删除的用户ID
-                                            })
-                                                .then(response => {
-                                                    if (!response.ok) {
-                                                        throw new Error('Network response was not ok');
-                                                    }
-                                                    return response.json(); // 解析JSON响应体
-                                                })
-                                                .then(data => {
-                                                    if (data.success) {
-                                                        window.location.reload();
-                                                        alert('用户删除成功');
 
-                                                    } else {
-                                                        alert('删除失败: ' + data.message);
-                                                    }
+                                        swal({
+                                            title: "确定要删除该用户吗？",
+                                            text: "这个用户将无法登录",
+                                            type: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#DD6B55",
+                                            confirmButtonText: "是",
+                                            cancelButtonText: "否",
+                                            closeOnConfirm: false,
+                                            closeOnCancel: false
+                                        }, function (isConfirm) {
+                                            if (isConfirm) {
+                                                userId = user.id;
+                                                fetch('https://jbcfz.serveo.net/delete-user', {
+                                                    method: 'POST', // 指定请求方法为POST
+                                                    headers: {
+                                                        'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                                                    },
+                                                    body: JSON.stringify({ id: userId, currentType: currentType, newType: newType }) // 请求体，包含要删除的用户ID
                                                 })
-                                                .catch(error => {
-                                                    console.error('Error:', error);
-                                                    alert('删除用户时发生错误，请稍后重试。');
-                                                });
-                                        }
+                                                    .then(response => {
+                                                        if (!response.ok) {
+                                                            throw new Error('Network response was not ok');
+                                                        }
+                                                        return response.json(); // 解析JSON响应体
+                                                    })
+                                                    .then(data => {
+                                                        if (data.success) {
+                                                            window.location.reload();
+                                                            swal("用户删除成功", "此用户将不能登录", "success");
+
+                                                        } else {
+                                                            swal("用户删除失败:", data.message, "error");
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error:', error);
+                                                        swal("删除用户时发生错误，请稍后重试。", "删除用户时发生错误，请稍后重试。", "error");
+                                                    });
+                                            }
+                                            else {
+                                                swal({
+                                                    title: "正在取消",
+                                                    text: "正在取消",
+                                                    timer: 0,
+                                                    showConfirmButton: false
+                                                })
+                                            }
+                                        })
                                     };
                                 }
                                 editTd.appendChild(customLink);
@@ -1551,12 +1914,33 @@
                                 } else {
                                     editButton.textContent = '提交';
                                     editButton.onclick = function () {
-                                        if (confirm('确定要更改此用户信息吗')) {
-                                            submitChanges(index, users);
-                                        }
+                                        swal({
+                                            title: "确定要更改此用户信息吗",
+                                            text: "确定要更改此用户信息吗",
+                                            type: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#DD6B55",
+                                            confirmButtonText: "是",
+                                            cancelButtonText: "否",
+                                            closeOnConfirm: false,
+                                            closeOnCancel: false
+                                        }, function (isConfirm) {
+                                            if (isConfirm) {
+                                                submitChanges(index, users);
+                                            }
+                                            else {
+                                                swal({
+                                                    title: "正在取消",
+                                                    text: "正在取消",
+                                                    timer: 0,
+                                                    showConfirmButton: false
+                                                })
+                                            }
+                                        })
                                     };
                                 }
                             }
+
                             function submitChanges(index, users) {
                                 const tbody = document.querySelector('tbody');
                                 const row = tbody.children[index];
@@ -1582,7 +1966,7 @@
 
                                 // 在发送请求之前检查updatedUserInfo是否包含null值
                                 if (Object.values(updatedUserInfo).some(value => value === null)) {
-                                    alert('更新失败：请确保所有字段都已填写。');
+                                    swal("更新失败：请确保所有字段都已填写。", "更新失败：请确保所有字段都已填写。", "error");
                                     return; // 如果有null值，终止函数执行
                                 }
 
@@ -1607,14 +1991,14 @@
                                     .then(data => {
                                         console.log('Success:', data);
                                         if (data.error === '用户名已被占用') {
-                                            alert('用户数据更新失败:用户名已被占用');
+                                            swal("更改失败", "用户名已被占用", "error");
                                         } else if (data.error === '邮箱已被占用') {
-                                            alert('用户数据更新失败:邮箱已被占用');
+                                            swal("更改失败", "邮箱已被占用", "error");
                                         } else {
                                             const editButton = document.getElementById('editButton');
                                             editButton.textContent = '编辑';
                                             editButton.onclick = function () { editUser(index, users); };
-                                            alert('用户数据更新成功');
+                                            swal("用户数据更新成功", "用户数据更新成功", "success");
                                             window.location.reload();
                                         }
                                         // 这里可以添加代码来处理成功的响应，例如更新表格或显示消息
@@ -1622,7 +2006,7 @@
                                         // 例如：updateTableRow(row, data.data);
                                     })
                                     .catch(error => {
-                                        alert('用户数据更新失败', error);
+                                        swal("更改失败", error, "error");
                                         // 处理错误情况，例如显示错误消息
                                     });
                             }

@@ -15,6 +15,8 @@
         <link rel="stylesheet" href="styles6.css">
         <script src="script9.js"></script>
         <script src="script10.js"></script>
+        <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -105,7 +107,7 @@
                 message.textContent = '正在更改用户名...';
                 message.style.display = 'block';
                 if (!isLoggedIn) {
-                    alert('你还没登录！');
+                    swal('你还没登录!', '登录后可更改', 'error');
                     window.location.href = 'Login.html';
                     return;
                 }
@@ -121,23 +123,19 @@
                         if (response.ok) {
                             localStorage.setItem('username', newUsername);
                             message.textContent = '用户名更新成功！';
-                            setTimeout(() => {
-                                message.style.display = 'none';
-                                window.location.href = 'index.html';
-                            }, 2000);
+                            swal('用户名更新成功！', '下次使用新用户名登录', 'success');
+                            window.location.href = 'index.html';
                         } else {
                             message.textContent = "用户名更换失败，请换一个用户名，或稍后再试";
-                            setTimeout(() => {
-                                message.style.display = 'none';
-                            }, 2000);
+                            swal('用户名更换失败，请换一个用户名，或稍后再试', '用户名更换失败，请换一个用户名，或稍后再试', 'error');
+                            message.style.display = 'none';
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         message.textContent = '请求失败，请稍后重试。';
-                        setTimeout(() => {
-                            message.style.display = 'none';
-                        }, 2000);
+                        swal('请求失败，请稍后重试。', '请求失败，请稍后重试。', 'error');
+                        message.style.display = 'none';
                     });
             }
 
