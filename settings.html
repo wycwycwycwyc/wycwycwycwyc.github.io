@@ -1934,7 +1934,7 @@
                             // 密码确认函数
                             function confirmPassword(targetUserId, username) {
                                 swal({
-                                    title: "输入" + username + "密码以继续",
+                                    title: "输入" + username + "的密码以继续",
                                     text: "请输入" + username + "的密码:",
                                     type: "input",
                                     showCancelButton: true,
@@ -1959,9 +1959,6 @@
                                         })
                                     })
                                         .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error('Network response was not ok');
-                                            }
                                             return response.text(); // 这里使用text()，因为我们预期服务器返回的是HTML文本
                                         })
                                         .then(data => {
@@ -1969,11 +1966,12 @@
                                                 localStorage.setItem('userid', targetUserId);
                                                 swal("密码正确，用户已更新", "当前用户已更新为: " + username, "success");
                                                 location.reload();
-                                            } else if (data.includes('<h1>登录失败</h1>')) {
-                                                swal.showInputError("密码错误，请输入正确的密码");
+                                            } else if (data.includes('登录失败')) {
+                                                swal("密码错误", '请输入正确的密码', 'error');
                                             }
                                         })
                                         .catch(error => {
+                                            alert(error);
                                             swal("请求失败", "请稍后重试", "error");
                                         });
                                 });
