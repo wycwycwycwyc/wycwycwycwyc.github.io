@@ -1724,8 +1724,6 @@
                                         });
                                 }
                             });
-                            document.getElementById('addUserButton').addEventListener('click', addUser);
-
                             function createTable(users) {
                                 localStorage.setItem('users', users);
                                 const container = document.getElementById('userTableContainer');
@@ -1744,7 +1742,7 @@
                             function createTableHead() {
                                 const thead = document.createElement('thead');
                                 const headerRow = document.createElement('tr');
-                                ['用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)', '操作'].forEach(text => {
+                                ['用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)', '操作', '切换'].forEach(text => {
                                     const th = document.createElement('th');
                                     th.textContent = text;
                                     headerRow.appendChild(th);
@@ -1770,7 +1768,14 @@
                                     }
                                     tr.appendChild(td);
                                 });
-
+                                const switchUserIdTd = document.createElement('td');
+                                const switchUserIdButton = document.createElement('button');
+                                switchUserIdButton.textContent = '切换';
+                                switchUserIdButton.className = 'custom-button';
+                                switchUserIdButton.onclick = function () {
+                                    storeUserId(index, users, user);
+                                };
+                                switchUserIdTd.appendChild(switchUserIdButton);
                                 // 添加编辑按钮和链接
                                 const editTd = document.createElement('td');
                                 const editButton = document.createElement('button');
@@ -1863,7 +1868,115 @@
                                 editTd.appendChild(customLink);
 
                                 tr.appendChild(editTd);
+                                tr.appendChild(switchUserIdTd);
                                 return tr;
+
+                            }
+                            function storeUserId(index, users, currentUser) {
+                                const currentUserType = localStorage.getItem('usertype');
+                                const targetUserId = users[index].id;
+                                const targetUserType = users[index].type;
+                                const username = users[index].username;
+                                swal({
+                                    title: "确定切换到" + username + "吗？",
+                                    text: "可能会导致一些不可预测的问题",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        // 如果当前用户是superadmin，则直接切换
+                                        if (currentUserType === 'superadmin') {
+                                            localStorage.setItem('userid', targetUserId);
+                                            swal("用户已更新", "当前用户已更新为: " + username, "success");
+                                            location.reload();
+                                        }
+                                        // 如果当前用户是admin，需要进一步检查
+                                        else if (currentUserType === 'admin') {
+                                            // 如果目标用户是superadmin，则需要输入密码
+                                            if (targetUserType === 'superadmin') {
+                                                confirmPassword(targetUserId, username);
+                                            } else {
+                                                // 如果目标用户是user，则直接切换
+                                                localStorage.setItem('userid', targetUserId);
+                                                swal("用户ID已更新", "当前用户ID已更新为: " + targetUserId, "success");
+                                            }
+                                        } else if (currentUserType === 'user') {
+                                            if (targetUserType === 'superadmin' || targetUserType === 'admin') {
+                                                confirmPassword(targetUserI, username);
+                                            } else {
+                                                // 如果目标用户是user，则直接切换
+                                                localStorage.setItem('userid', targetUserId);
+                                                swal("用户已更新", "当前用户已更新为: " + username, "success");
+                                            }
+
+                                        }
+                                        else {
+                                            swal("权限不足", "您没有权限执行此操作", "error");
+                                        }
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+
+                            }
+
+                            // 密码确认函数
+                            function confirmPassword(targetUserId, username) {
+                                swal({
+                                    title: "输入" + username + "密码以继续",
+                                    text: "请输入" + username + "的密码:",
+                                    type: "input",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    animation: "slide-from-top",
+                                    inputPlaceholder: "请输入密码"
+                                }, function (inputValue) {
+                                    if (!inputValue) {
+                                        swal.showInputError("密码不能为空");
+                                        return false;
+                                    }
+
+                                    // 发送密码到后端API进行验证
+                                    fetch('https://jbcfz.serveo.net/login', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            username: username,
+                                            password: inputValue
+                                        })
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            return response.text(); // 这里使用text()，因为我们预期服务器返回的是HTML文本
+                                        })
+                                        .then(data => {
+                                            if (data.includes('<h1>登录成功</h1>')) {
+                                                localStorage.setItem('userid', targetUserId);
+                                                swal("密码正确，用户已更新", "当前用户已更新为: " + username, "success");
+                                                location.reload();
+                                            } else if (data.includes('<h1>登录失败</h1>')) {
+                                                swal.showInputError("密码错误，请输入正确的密码");
+                                            }
+                                        })
+                                        .catch(error => {
+                                            swal("请求失败", "请稍后重试", "error");
+                                        });
+                                });
                             }
 
                             function editUser(index, users) {
