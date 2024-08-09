@@ -527,6 +527,7 @@
                 width: 100%;
                 border-collapse: collapse;
                 margin-top: 10px;
+
             }
 
             #userTableContainer th,
@@ -534,6 +535,7 @@
                 border: 1px solid #ddd;
                 padding: 8px;
                 text-align: left;
+
             }
 
             #userTableContainer th {
@@ -594,6 +596,13 @@
             .dark-mode .input_info:focus {
                 box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4);
                 /* 聚焦时更明显的白色阴影 */
+            }
+
+            .newuser {
+                width: 100%;
+                background-color: #007BFF;
+                color: #ffffff;
+                border: none;
             }
         </style>
     </head>
@@ -839,6 +848,8 @@
                         <div id="userTableContainer">
                             <!-- 表格将在这里被JavaScript动态创建 -->
                         </div>
+                        <button id='registerButton' class="newuser">新建用户</button>
+                        <br>
                         <br>
                         <button class="custom-button" onclick="exitdev()">退出开发者模式</button>
                     </div>
@@ -1449,7 +1460,7 @@
                                                     localStorage.removeItem('usertype');
                                                     localStorage.removeItem('userid');
                                                     localStorage.removeItem('developerOptionsEnabled');
-                                                    window.location.reload();
+                                                    newtable();
                                                     swal("用户删除成功", "此用户将不能登录", "success");
 
                                                 } else {
@@ -1541,7 +1552,8 @@
                                     if (isConfirm) {
                                         localStorage.removeItem('developerOptionsEnabled');
                                         swal("退出成功！", "您已退出开发者模式", "success");
-                                        location.reload();
+                                        document.getElementById('developers').style.display = 'none';
+                                        document.getElementById('developer').style.display = 'none';
                                     }
                                     else {
                                         swal({
@@ -1577,7 +1589,7 @@
                                     developerLink.style.pointerEvents = 'none'; // 设置链接不可点击
                                     document.getElementById('developers').style.display = 'block';
                                     document.getElementById('developer').style.display = 'block';
-                                    location.reload();
+                                    newtable();
                                     swal("已启用开发者模式", "你将解锁开发者操作", "success");
                                 } else if (clickCount === 10 && !isLoggedIn) {
                                     swal("你还没登录！", "不能进行此操作", "warning");
@@ -1724,6 +1736,23 @@
                                         });
                                 }
                             });
+                            function newtable() {
+                                fetch('https://jbcfz.serveo.net/users') // 假设后端接口是/users
+                                    .then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                        throw new Error('Network response was not ok.');
+                                    })
+                                    .then(data => {
+                                        var userTableContainer = document.getElementById('userTableContainer');
+                                        userTableContainer.innerHTML = '';
+                                        createTable(data.data);
+                                    })
+                                    .catch(error => {
+                                        console.error('There has been a problem with your fetch operation:', error);
+                                    });
+                            }
                             function createTable(users) {
                                 localStorage.setItem('users', users);
                                 const container = document.getElementById('userTableContainer');
@@ -1793,7 +1822,6 @@
 
                                 // 创建链接
                                 const customLink = document.createElement('a');
-                                customLink.href = '#';
                                 customLink.textContent = '×';
                                 customLink.style.color = 'red';
                                 customLink.style.fontSize = '30px';
@@ -1826,6 +1854,7 @@
                                             closeOnCancel: false
                                         }, function (isConfirm) {
                                             if (isConfirm) {
+                                                swal('正在删除');
                                                 userId = user.id;
                                                 fetch('https://jbcfz.serveo.net/delete-user', {
                                                     method: 'POST', // 指定请求方法为POST
@@ -1842,7 +1871,7 @@
                                                     })
                                                     .then(data => {
                                                         if (data.success) {
-                                                            window.location.reload();
+                                                            newtable();
                                                             swal("用户删除成功", "此用户将不能登录", "success");
 
                                                         } else {
@@ -1986,7 +2015,7 @@
                                 const cells = row.querySelectorAll('td');
 
                                 cells.forEach((cell, i) => {
-                                    if (i < cells.length - 1) { // 排除最后一个单元格，即操作按钮的单元格
+                                    if (i < cells.length - 2) { // 排除最后一个单元格，即操作按钮的单元格
                                         if (isCurrentUserAdmin && isSuperAdmin && i !== 0 && i !== 3) {
                                             // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则隐藏信息
                                             cell.innerHTML = '';
@@ -2037,6 +2066,7 @@
                                             closeOnCancel: false
                                         }, function (isConfirm) {
                                             if (isConfirm) {
+                                                swal('正在更新');
                                                 submitChanges(index, users);
                                             }
                                             else {
@@ -2110,7 +2140,7 @@
                                             editButton.textContent = '编辑';
                                             editButton.onclick = function () { editUser(index, users); };
                                             swal("用户数据更新成功", "用户数据更新成功", "success");
-                                            window.location.reload();
+                                            newtable();
                                         }
                                         // 这里可以添加代码来处理成功的响应，例如更新表格或显示消息
                                         // 例如，可以在这里重新加载用户列表或更新表格的特定行
@@ -2121,6 +2151,96 @@
                                         // 处理错误情况，例如显示错误消息
                                     });
                             }
+                            document.getElementById('registerButton').addEventListener('click', function () {
+                                var steps = [
+                                    {
+                                        title: "创建新用户",
+                                        placeholder: "输入用户名",
+                                        type: "input"
+                                    },
+                                    {
+                                        title: "邮箱",
+                                        placeholder: "输入邮箱",
+                                        type: "input"
+                                    },
+                                    {
+                                        title: "密码",
+                                        placeholder: "输入密码",
+                                        type: "input"
+                                    },
+                                    {
+                                        title: "用户类型",
+                                        placeholder: "输入用户类型（user 或 admin）",
+                                        type: "input"
+                                    }
+                                ];
+
+                                var currentStep = 0;
+                                var inputs = [];
+
+                                function showStep() {
+                                    var step = steps[currentStep];
+                                    swal({
+                                        title: step.title,
+                                        type: step.type,
+                                        inputPlaceholder: step.placeholder,
+                                        showCancelButton: true,
+                                        closeOnConfirm: false,
+                                        confirmButtonText: currentStep === steps.length - 1 ? "注册" : "继续",
+                                        cancelButtonText: currentStep > 0 ? "上一步" : "取消"
+                                    }, function (inputValue) {
+                                        if (inputValue === false) {
+                                            return false;
+                                        }
+                                        if (inputValue === "") {
+                                            swal.showInputError(step.placeholder + "不能为空！");
+                                            return false;
+                                        }
+                                        inputs.push(inputValue);
+                                        if (currentStep < steps.length - 1) {
+                                            currentStep++;
+                                            showStep();
+                                        } else {
+                                            swal("正在创建");
+                                            registerUser();
+                                        }
+                                    });
+                                }
+
+                                function registerUser() {
+                                    var username = inputs[0];
+                                    var email = inputs[1];
+                                    var password = inputs[2];
+                                    var type = inputs[3] || "user"; // 默认用户类型
+
+                                    // 使用 AJAX 发送数据到服务器
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open("POST", "https://jbcfz.serveo.net/register", true);
+                                    xhr.setRequestHeader("Content-type", "application/json");
+                                    xhr.onreadystatechange = function () {
+                                        if (xhr.readyState === 4) {
+                                            var status = xhr.status;
+                                            if (status === 201) {
+                                                swal({
+                                                    title: "新建成功！",
+                                                    text: "成功新建" + username + "用户",
+                                                    type: "success"
+                                                });
+                                                newtable();
+                                            } else if (status === 409) {
+                                                swal("注册失败", "用户名已存在", "error");
+                                            } else if (status === 408) {
+                                                swal("注册失败", "邮箱已被注册", "error");
+                                            } else {
+                                                swal("注册失败", "请重试", "error");
+                                            }
+                                        }
+                                    };
+                                    xhr.send(JSON.stringify({ username: username, email: email, password: password, type: type }));
+                                }
+
+                                showStep();
+                            });
                         </script>
                     </div>
     </body>
