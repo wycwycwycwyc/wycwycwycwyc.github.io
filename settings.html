@@ -2155,22 +2155,22 @@
                                 var steps = [
                                     {
                                         title: "创建新用户",
-                                        placeholder: "输入用户名",
+                                        placeholder: "用户名",
                                         type: "input"
                                     },
                                     {
                                         title: "邮箱",
-                                        placeholder: "输入邮箱",
+                                        placeholder: "邮箱",
                                         type: "input"
                                     },
                                     {
                                         title: "密码",
-                                        placeholder: "输入密码",
+                                        placeholder: "密码",
                                         type: "input"
                                     },
                                     {
                                         title: "用户类型",
-                                        placeholder: "输入用户类型（user 或 admin）",
+                                        placeholder: "用户类型（user 或 admin）",
                                         type: "input"
                                     }
                                 ];
@@ -2211,7 +2211,11 @@
                                     var username = inputs[0];
                                     var email = inputs[1];
                                     var password = inputs[2];
-                                    var type = inputs[3] || "user"; // 默认用户类型
+                                    var type = inputs[3]; // 默认用户类型
+                                    if (type !== ('user' || 'admin')) {
+                                        swal("用户类型只能为user", '由于JavaScript玄学问题,你不能创建其他用户类型，敬请谅解', 'error');
+                                        return false;
+                                    }
 
                                     // 使用 AJAX 发送数据到服务器
                                     var xhr = new XMLHttpRequest();
