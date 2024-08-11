@@ -1,43 +1,47 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-    <title>抢车票（普通版）</title>  
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>  
-    <script src="script1.js"></script>  
-    <script src="script4.js"></script>  
-    <link rel="stylesheet" href="styles3.css">
-    <script src="script5.js"></script>
-    <script src="script6.js"></script>
-    <link rel="stylesheet" href="styles4.css">
-    <script src="script8.js"></script>
-    <link rel="stylesheet" href="styles5.css">
-    <link rel="stylesheet" href="styles6.css">
-    <script src="script9.js"></script>
-    <script src="script10.js"></script>
-    <script src="script11.js"></script>
-    <script src="script12.js"></script>
-    <style>  
-    </style>
-<!-- 引入样式文件 -->
-<link rel="stylesheet" href="styles2.css">
-<!-- 引入JavaScript文件 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
- <script src="script2.js"></script>   
- <script src="script3.js"></script>
-</head>
-<script>
-</script> 
-</head>  
-<body>  
-    <h1 class="title">抢车票（普通版）</h1>  
-<button class="custom-button" onclick="goBackOrHome()">返回</button>
-    <br>  
-    <br>  
-    <br>  
-    <div class="subtitle">源代码</div>  
-    <div class="content">  
-        <pre id="sourceCode"><code class="language-python custom-variable">
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>抢车票（普通版）</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="script.js"></script>
+        <script src="script1.js"></script>
+        <script src="script4.js"></script>
+        <link rel="stylesheet" href="styles3.css">
+        <script src="script5.js"></script>
+        <script src="script6.js"></script>
+        <link rel="stylesheet" href="styles4.css">
+        <script src="script8.js"></script>
+        <link rel="stylesheet" href="styles5.css">
+        <link rel="stylesheet" href="styles6.css">
+        <script src="script9.js"></script>
+        <script src="script10.js"></script>
+        <script src="script11.js"></script>
+        <script src="script12.js"></script>
+        <style>
+        </style>
+        <!-- 引入样式文件 -->
+        <link rel="stylesheet" href="styles2.css">
+        <!-- 引入JavaScript文件 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+        <script src="script2.js"></script>
+        <script src="script3.js"></script>
+        <link href="https://qmsg.refrain.xyz/message.min.css" rel="stylesheet" />
+        <script src="https://qmsg.refrain.xyz/message.min.js"></script>
+    </head>
+    <script>
+    </script>
+    </head>
+
+    <body>
+        <h1 class="title">抢车票（普通版）</h1>
+        <button class="custom-button" onclick="goBackOrHome()">返回</button>
+        <br>
+        <br>
+        <br>
+        <div class="subtitle">源代码</div>
+        <div class="content">
+            <pre id="sourceCode"><code class="language-python custom-variable">
 # 等待一段时间，以便操作系统可以处理终止的进程    
 from selenium import webdriver  
 from selenium.webdriver.common.keys import Keys  
@@ -82,17 +86,18 @@ while True:
         print("抢票成功")
         break
     except:
-        continue</code></pre>  
-        <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()" style="position: absolute; top: 10px; right: 10px;">复制源代码</button>  <!-- 这里是修改的地方 -->    
-    </div>  
-    <div class="footer">
-        <br>  
-    <button class="custom-button" id="downloadSourceCodeBtn">下载源代码</button>  
-    </div> <!-- 这里是修复的地方 -->
-    <div id="tips">
-        <span id="lightanddark">提示:切换白天黑夜请到主页<span>
-    </div> 
-    <script src="FileSaver.min.js"></script>
-</body>  
-</html>
+        continue</code></pre>
+            <button id="copyCodeBtn" class="custom-button" onclick="copySourceCode()"
+                style="position: absolute; top: 10px; right: 10px;">复制源代码</button> <!-- 这里是修改的地方 -->
+        </div>
+        <div class="footer">
+            <br>
+            <button class="custom-button" id="downloadSourceCodeBtn">下载源代码</button>
+        </div> <!-- 这里是修复的地方 -->
+        <div id="tips">
+            <span id="lightanddark">提示:切换白天黑夜请到主页<span>
+        </div>
+        <script src="FileSaver.min.js"></script>
+    </body>
 
+</html>

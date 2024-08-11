@@ -1,318 +1,392 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XLS转XLSX转换器(基础数据转换)</title>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLS转XLSX转换器(基础数据转换)</title>
     <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="styles4.css">
-<script src="script.js"></script>
-<script src="script3.js"></script>
-<script src="script4.js"></script>  
-<link rel="stylesheet" href="styles3.css">
-<script src="script5.js"></script>
-<script src="script6.js"></script>
+    <link rel="stylesheet" href="styles4.css">
+    <script src="script.js"></script>
+    <script src="script3.js"></script>
+    <script src="script4.js"></script>
+    <link rel="stylesheet" href="styles3.css">
+    <script src="script5.js"></script>
+    <script src="script6.js"></script>
     <link rel="stylesheet" href="styles4.css">
     <script src="script8.js"></script>
     <link rel="stylesheet" href="styles5.css">
     <link rel="stylesheet" href="styles6.css">
     <script src="script9.js"></script>
     <script src="script10.js"></script>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f7f7f7;
-  }
-  header {
-    width: 100%;
-    background-color: #f7f7f7;
-    color: black;
-    text-align: center;
-    padding: 5px;
-  }
-  #dropZone {
-    border: 2px dashed #ccc;
-    padding: 20px;
-    text-align: center;
-    margin: 50px auto;
-    width: 1000px;
-    height: 600px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 15px; /* 添加圆角样式 */
-}
+    <link href="https://qmsg.refrain.xyz/message.min.css" rel="stylesheet" />
+    <script src="https://qmsg.refrain.xyz/message.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f7f7f7;
+      }
 
-.download-table {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-  border-radius: 10px; /* 添加圆角样式 */
-}
+      header {
+        width: 100%;
+        background-color: #f7f7f7;
+        color: black;
+        text-align: center;
+        padding: 5px;
+      }
 
-  .download-table td, .download-table th {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  .download-table th {
-    background-color: #f2f2f2;
-  }
-  .download-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-#downloadAllButton {
-  display: block; /* 将按钮设置为块级元素，以便应用 margin 属性 */
-  margin: 0 auto; /* 这会使按钮在水平方向上居中 */
-  margin-top: 20px; /* 保持原有的顶部外边距 */
-}
-  /* 添加CSS动画 */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+      #dropZone {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin: 50px auto;
+        width: 1000px;
+        height: 600px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        /* 添加圆角样式 */
+      }
 
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f7f7f7;
-    animation: fadeIn 1s ease-in-out; /* 页面加载时的淡入效果 */
-  }
+      .download-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        border-radius: 10px;
+        /* 添加圆角样式 */
+      }
 
-  /* ... 其他样式保持不变 ... */
+      .download-table td,
+      .download-table th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
 
-  /* 应用动画到表格和按钮 */
-  .download-table, #downloadAllButton {
-    animation: fadeIn 1s ease-in-out;
-  }
-/* 基础样式保持不变 */
+      .download-table th {
+        background-color: #f2f2f2;
+      }
 
-/* 深色模式样式 */
-body.dark-mode {
-    background-color: #121212; /* 深色背景 */
-    color: #ffffff; /* 浅色文字 */
-}
+      .download-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
 
-body.dark-mode header {
-    background-color: #333; /* 深色头部背景 */
-    color: #ffffff; /* 浅色文字 */
-}
+      #downloadAllButton {
+        display: block;
+        /* 将按钮设置为块级元素，以便应用 margin 属性 */
+        margin: 0 auto;
+        /* 这会使按钮在水平方向上居中 */
+        margin-top: 20px;
+        /* 保持原有的顶部外边距 */
+      }
 
-body.dark-mode #dropZone {
-    border: 2px dashed #555; /* 深色模式下边框颜色 */
-    background-color: #222; /* 深色背景 */
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* 深色模式下的盒阴影 */
-}
+      /* 添加CSS动画 */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
 
-body.dark-mode .download-table {
-    color: #ffffff; /* 浅色文本 */
-}
-
-body.dark-mode .download-table td, body.dark-mode .download-table th {
-    border: 1px solid #444; /* 深色表格边框 */
-}
-
-body.dark-mode .download-table th {
-    background-color: #333; /* 深色表头背景 */
-}
-
-body.dark-mode .download-table tr:nth-child(even) {
-    background-color: #333; /* 深色偶数行背景 */
-}
-
-/* 深色模式下淡入动画 */
-body.dark-mode {
-    animation: fadeIn 1s ease-in-out;
-}
-#loadingAnimation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-  z-index: 10000; /* 确保遮罩层在页面其他内容之上 */
-  backdrop-filter: blur(5px); /* 添加模糊效果 */
-}
-
-  .spinner {
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    margin-bottom: 20px; /* 增加与文本的距离 */
-    animation: spin 2s linear infinite;
-  }
-
-#loadingAnimation .spinner {
-  border: 5px solid #f3f3f3; /* 静态部分 */
-  border-top: 5px solid #3498db; /* 动态旋转部分 */
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s infinite;
-  /* 使用自定义贝塞尔曲线 */
-  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-#loadingAnimation {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column; /* 使文本垂直居中显示 */
-  font-size: 24px; /* 增大字体大小 */
-  text-align: center; /* 文本水平居中 */
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* 其他深色模式下动画样式保持不变 */
-</style>
-</head>
-<body>
-<div id="loadingAnimation" class="hidden">
-  <div class="spinner"></div>
-<div class="loadingText">正在加载</div>
-  </div>
-<header>
-    <h1>XLS转XLSX转换器(基础数据转换)</h1>
-<button class="custom-button" onclick="goBackOrHome()">返回</button>
-  </header>
-  <div id="dropZone">
-    <button class="file-upload-button custom-button" id="fileUploadButton">选择文件</button>
-    <input type="file" id="fileInput" accept=".xls" multiple style="display:none;">
-    <div>或者将XLS文件拖拽到这里转换为XLSX</div>
-  </div>
-  <table id="downloadLinks" class="download-table hidden">
-    <thead>
-      <tr>
-        <th>文件名</th>
-        <th>下载</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- 下载链接将在这里动态生成 -->
-    </tbody>
-  </table>
-  <button id="downloadAllButton" class=" custom-button">一键下载所有文件</button>
-  <script>
-function scriptLoaded() {
-  // 这个函数将在脚本加载完成后执行
-  // 获取加载动画元素
-  var loadingAnimation = document.getElementById('loadingAnimation');
-  loadingAnimation.style.display = 'none';
-}
-  </script>
-  <!-- JavaScript代码保持不变 -->
-  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>  
-  <script>
-    const dropZone = document.getElementById('dropZone');
-    const downloadLinksTable = document.getElementById('downloadLinks');
-    const downloadAllButton = document.getElementById('downloadAllButton');
-    const fileInput = document.getElementById('fileInput');
-
-    // 设置拖拽事件监听器
-    dropZone.addEventListener('dragover', handleDragOver, false);
-    dropZone.addEventListener('drop', handleDrop, false);
-
-    function handleDragOver(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      dropZone.style.border = '2px dashed #000';
-    }
-
-    function handleDrop(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      dropZone.style.border = '2px dashed #ccc';
-
-      const files = event.dataTransfer.files;
-      processFiles(files, () => {
-        downloadLinksTable.classList.remove('hidden');
-        downloadAllButton.disabled = false;
-      });
-    }
-
-    function processFiles(files, callback) {
-      let linksCreated = 0;
-      const tbody = downloadLinksTable.getElementsByTagName('tbody')[0];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.type === 'application/vnd.ms-excel') {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const data = e.target.result;
-            const workbook = XLSX.read(data, { type: 'binary' });
-            const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.name.replace('.xls', '.xlsx');
-            a.textContent = file.name.replace('.xls', '.xlsx');
-            const row = document.createElement('tr');
-            const filenameCell = document.createElement('td');
-            const downloadCell = document.createElement('td');
-            filenameCell.textContent = file.name.replace('.xls', '.xlsx');
-            downloadCell.appendChild(a);
-            row.appendChild(filenameCell);
-            row.appendChild(downloadCell);
-            tbody.appendChild(row);
-            linksCreated++;
-            if (linksCreated === files.length) {
-              callback();
-            }
-          };
-          reader.readAsBinaryString(file);
-        } else {
-          alert('请只拖拽XLS文件。');
+        to {
+          opacity: 1;
         }
       }
-    }
 
-    // 新增一键下载所有文件的功能
-    downloadAllButton.addEventListener('click', function() {
-      const links = downloadLinksTable.getElementsByTagName('a');
-      for (let i = 0; i < links.length; i++) {
-        links[i].click(); // 触发每个下载链接的点击事件
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f7f7f7;
+        animation: fadeIn 1s ease-in-out;
+        /* 页面加载时的淡入效果 */
       }
-    });
 
-    // 添加文件选择按钮的事件监听器
-    document.getElementById('fileUploadButton').addEventListener('click', function() {
-      fileInput.click();
-    });
+      /* ... 其他样式保持不变 ... */
 
-    // 监听文件选择事件
-    fileInput.addEventListener('change', function(event) {
-      processFiles(event.target.files, () => {
-        downloadLinksTable.classList.remove('hidden');
-        downloadAllButton.disabled = false;
+      /* 应用动画到表格和按钮 */
+      .download-table,
+      #downloadAllButton {
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      /* 基础样式保持不变 */
+
+      /* 深色模式样式 */
+      body.dark-mode {
+        background-color: #121212;
+        /* 深色背景 */
+        color: #ffffff;
+        /* 浅色文字 */
+      }
+
+      body.dark-mode header {
+        background-color: #333;
+        /* 深色头部背景 */
+        color: #ffffff;
+        /* 浅色文字 */
+      }
+
+      body.dark-mode #dropZone {
+        border: 2px dashed #555;
+        /* 深色模式下边框颜色 */
+        background-color: #222;
+        /* 深色背景 */
+        box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+        /* 深色模式下的盒阴影 */
+      }
+
+      body.dark-mode .download-table {
+        color: #ffffff;
+        /* 浅色文本 */
+      }
+
+      body.dark-mode .download-table td,
+      body.dark-mode .download-table th {
+        border: 1px solid #444;
+        /* 深色表格边框 */
+      }
+
+      body.dark-mode .download-table th {
+        background-color: #333;
+        /* 深色表头背景 */
+      }
+
+      body.dark-mode .download-table tr:nth-child(even) {
+        background-color: #333;
+        /* 深色偶数行背景 */
+      }
+
+      /* 深色模式下淡入动画 */
+      body.dark-mode {
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      #loadingAnimation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* 半透明背景 */
+        z-index: 10000;
+        /* 确保遮罩层在页面其他内容之上 */
+        backdrop-filter: blur(5px);
+        /* 添加模糊效果 */
+      }
+
+      .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        margin-bottom: 20px;
+        /* 增加与文本的距离 */
+        animation: spin 2s linear infinite;
+      }
+
+      #loadingAnimation .spinner {
+        border: 5px solid #f3f3f3;
+        /* 静态部分 */
+        border-top: 5px solid #3498db;
+        /* 动态旋转部分 */
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 2s infinite;
+        /* 使用自定义贝塞尔曲线 */
+        animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      #loadingAnimation {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        /* 使文本垂直居中显示 */
+        font-size: 24px;
+        /* 增大字体大小 */
+        text-align: center;
+        /* 文本水平居中 */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 其他深色模式下动画样式保持不变 */
+    </style>
+  </head>
+
+  <body>
+    <div id="loadingAnimation" class="hidden">
+      <div class="spinner"></div>
+      <div class="loadingText">正在加载</div>
+    </div>
+    <header>
+      <h1>XLS转XLSX转换器(基础数据转换)</h1>
+      <button class="custom-button" onclick="goBackOrHome()">返回</button>
+    </header>
+    <div id="dropZone">
+      <button class="file-upload-button custom-button" id="fileUploadButton">选择文件</button>
+      <input type="file" id="fileInput" accept=".xls" multiple style="display:none;">
+      <div>或者将XLS文件拖拽到这里转换为XLSX</div>
+    </div>
+    <table id="downloadLinks" class="download-table hidden">
+      <thead>
+        <tr>
+          <th>文件名</th>
+          <th>下载</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 下载链接将在这里动态生成 -->
+      </tbody>
+    </table>
+    <button id="downloadAllButton" class=" custom-button">一键下载所有文件</button>
+    <script>
+      function scriptLoaded() {
+        // 这个函数将在脚本加载完成后执行
+        // 获取加载动画元素
+        var loadingAnimation = document.getElementById('loadingAnimation');
+        loadingAnimation.style.display = 'none';
+      }
+    </script>
+    <!-- JavaScript代码保持不变 -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>
+    <script>
+      const dropZone = document.getElementById('dropZone');
+      const downloadLinksTable = document.getElementById('downloadLinks');
+      const downloadAllButton = document.getElementById('downloadAllButton');
+      const fileInput = document.getElementById('fileInput');
+
+      // 设置拖拽事件监听器
+      dropZone.addEventListener('dragover', handleDragOver, false);
+      dropZone.addEventListener('drop', handleDrop, false);
+
+      function handleDragOver(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        dropZone.style.border = '2px dashed #000';
+      }
+
+      function handleDrop(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        dropZone.style.border = '2px dashed #ccc';
+
+        const files = event.dataTransfer.files;
+        processFiles(files, () => {
+          downloadLinksTable.classList.remove('hidden');
+          downloadAllButton.disabled = false;
+        });
+      }
+
+      function processFiles(files, callback) {
+        let linksCreated = 0;
+        const tbody = downloadLinksTable.getElementsByTagName('tbody')[0];
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          if (file.type === 'application/vnd.ms-excel') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const data = e.target.result;
+              const workbook = XLSX.read(data, { type: 'binary' });
+              const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+              const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = file.name.replace('.xls', '.xlsx');
+              a.textContent = file.name.replace('.xls', '.xlsx');
+              const row = document.createElement('tr');
+              const filenameCell = document.createElement('td');
+              const downloadCell = document.createElement('td');
+              filenameCell.textContent = file.name.replace('.xls', '.xlsx');
+              downloadCell.appendChild(a);
+              row.appendChild(filenameCell);
+              row.appendChild(downloadCell);
+              tbody.appendChild(row);
+              linksCreated++;
+              if (linksCreated === files.length) {
+                callback();
+              }
+            };
+            reader.readAsBinaryString(file);
+          } else {
+            alert('请只拖拽XLS文件。');
+          }
+        }
+      }
+
+      // 新增一键下载所有文件的功能
+      downloadAllButton.addEventListener('click', function () {
+        const links = downloadLinksTable.getElementsByTagName('a');
+        const zip = new JSZip();
+
+        let filesProcessed = 0;
+
+        function downloadAndAddToZip(link, fileName) {
+          Qmsg.success("已开启下载");
+          fetch(link.href)
+            .then(response => response.blob())
+            .then(blob => {
+              // 将文件添加到zip中
+              zip.file(fileName, blob);
+              filesProcessed++;
+              if (filesProcessed === links.length) {
+                // 所有文件处理完毕，触发zip下载
+                zip.generateAsync({ type: "blob" }).then(function (content) {
+                  saveAs(content, "你的xlsx文件.zip");
+                });
+              }
+            })
+            .catch(error => console.error('下载失败:', error));
+        }
+
+        for (let i = 0; i < links.length; i++) {
+          const link = links[i];
+          const fileName = link.download || 'filename.xlsx'; // 假设默认文件名
+          downloadAndAddToZip(link, fileName);
+        }
       });
-    });
-  </script>
+      // 添加文件选择按钮的事件监听器
+      document.getElementById('fileUploadButton').addEventListener('click', function () {
+        fileInput.click();
+      });
+
+      // 监听文件选择事件
+      fileInput.addEventListener('change', function (event) {
+        processFiles(event.target.files, () => {
+          downloadLinksTable.classList.remove('hidden');
+          downloadAllButton.disabled = false;
+        });
+      });
+    </script>
