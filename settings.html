@@ -147,7 +147,6 @@
                 width: 100%;
                 padding: 8px;
                 box-sizing: border-box;
-                display: none;
             }
 
             .styled-select {
@@ -419,6 +418,19 @@
                 box-sizing: border-box;
             }
 
+            .input-group input {
+                width: 100%;
+                transition: background-color 0.5s, color 0.5s;
+            }
+
+            body.dark-mode .input-group input {
+                background-color: #333333;
+                /* 输入框背景颜色 */
+                color: #ffffff;
+                /* 输入框文字颜色 */
+                border: 1px solid #444444;
+            }
+
             .input-group1 input,
             .input-group1 select {
                 width: 60px;
@@ -526,11 +538,44 @@
                 text-decoration: none;
             }
 
+            @-webkit-keyframes rotate-top {
+                0% {
+                    -webkit-transform: rotate(0);
+                    transform: rotate(0);
+                    -webkit-transform-origin: top;
+                    transform-origin: top
+                }
+
+                100% {
+                    -webkit-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                    -webkit-transform-origin: top;
+                    transform-origin: top
+                }
+            }
+
+            @keyframes rotate-top {
+                0% {
+                    -webkit-transform: rotate(0);
+                    transform: rotate(0);
+                    -webkit-transform-origin: top;
+                    transform-origin: top
+                }
+
+                100% {
+                    -webkit-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                    -webkit-transform-origin: top;
+                    transform-origin: top
+                }
+            }
+
             #userTableContainer table {
                 width: 100%;
                 border-collapse: collapse;
                 margin-top: 10px;
-
+                -webkit-animation: rotate-top .5s cubic-bezier(.455, .03, .515, .955) both;
+                animation: rotate-top .5s cubic-bezier(.455, .03, .515, .955) both
             }
 
             #userTableContainer th,
@@ -684,18 +729,14 @@
                     <input type="number" id="opacityNumber" min="0" max="100" step="1" <p>%
                     <p>
                 </div>
+                <h2>主页背景</h2>
                 <div class="input-group">
-                    <input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL">
+                    浅色模式背景图片URL<input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL(留空默认)">
                 </div>
                 <div class="input-group">
-                    <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
+                    深色模式背景图片URL<input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL(留空默认)">
                 </div>
-                <div class="input-group">
-                    <input type="text" id="lightModeBgUrl" placeholder="输入浅色模式背景图片URL">
-                </div>
-                <div class="input-group">
-                    <input type="text" id="darkModeBgUrl" placeholder="输入深色模式背景图片URL">
-                </div>
+                <button id="isDarkModeimg" class="custom-button">应用</button>
             </div>
             <div id="display" class="section">
                 <h1>显示</h1>
@@ -949,22 +990,48 @@
                                 // 初始化设置
                                 darkModeToggle.checked = isDarkMode;
                                 animationToggle.checked = isAnimationEnabled;
-                                lightModeBgUrlInput.value = lightModeBgUrl;
-                                darkModeBgUrlInput.value = darkModeBgUrl;
+                                lightModeBgUrlInput.value = localStorage.getItem('lightModeBgUrl1');
+                                darkModeBgUrlInput.value = localStorage.getItem('darkModeBgUrl1');
                                 document.body.classList.toggle('dark-mode', isDarkMode);
                                 document.body.classList.toggle('no-animation', !isAnimationEnabled);
-
                                 darkModeToggle.addEventListener('change', function () {
                                     isDarkMode = darkModeToggle.checked;
                                     localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-                                    if (!isDarkMode) {
-                                        localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
-                                    } else {
-                                        localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
+                                    if (true) {
+                                        localStorage.setItem('backgroundImage', "url('" + lightModeBgUrlInput.value + "')");
+                                        localStorage.setItem('lightModeBgUrl1', lightModeBgUrlInput.value);
+                                        localStorage.setItem('lightModeBgUrl', "url('" + lightModeBgUrlInput.value + "')");
+                                        localStorage.setItem('backgroundImage', "url('" + darkModeBgUrlInput.value + "')");
+                                        localStorage.setItem('darkModeBgUrl1', darkModeBgUrlInput.value);
+                                        localStorage.setItem('darkModeBgUrl', "url('" + darkModeBgUrlInput.value + "')")
                                     }
                                     document.body.classList.toggle('dark-mode', isDarkMode);
                                 });
-
+                                var isDarkModeimg = document.getElementById('isDarkModeimg');
+                                isDarkModeimg.addEventListener('click', function isDarkModeimg() {
+                                    isDarkMode = darkModeToggle.checked;
+                                    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+                                    if (lightModeBgUrlInput.value == '' || darkModeBgUrlInput.value == '') {
+                                        lightModeBgUrlInput.value = 'https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark';
+                                        localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
+                                        localStorage.setItem('lightModeBgUrl1', "https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark");
+                                        localStorage.setItem('lightModeBgUrl', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
+                                        darkModeBgUrlInput.value = 'https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg';
+                                        localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
+                                        localStorage.setItem('darkModeBgUrl1', "https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg");
+                                    }
+                                    else {
+                                        if (true) {
+                                            localStorage.setItem('backgroundImage', "url('" + lightModeBgUrlInput.value + "')");
+                                            localStorage.setItem('lightModeBgUrl1', lightModeBgUrlInput.value);
+                                            localStorage.setItem('lightModeBgUrl', "url('" + lightModeBgUrlInput.value + "')");
+                                            localStorage.setItem('backgroundImage', "url('" + darkModeBgUrlInput.value + "')");
+                                            localStorage.setItem('darkModeBgUrl1', darkModeBgUrlInput.value);
+                                            localStorage.setItem('darkModeBgUrl', "url('" + darkModeBgUrlInput.value + "')")
+                                        }
+                                    }
+                                    Qmsg.success("应用成功！");
+                                })
                                 // 切换动画
                                 animationToggle.addEventListener('change', function () {
                                     isAnimationEnabled = animationToggle.checked;

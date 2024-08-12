@@ -285,6 +285,7 @@
             body.dark-mode {
                 background-color: #1a1a1a;
                 color: #f4f4f4;
+                background-image: url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg');
             }
 
             .dark-mode th {
@@ -514,13 +515,11 @@
                 var darkModeLogoSrc = 'logo_dark.svg';
 
                 // 背景图片路径
-                var lightModeBackground = "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')";
-                var darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
-
+                var lightModeBackground = localStorage.getItem('lightModeBgUrl');
+                var darkModeBackground = localStorage.getItem('darkModeBgUrl');;
                 // 从localStorage中获取深色模式的状态和背景图片设置
                 var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-                var storedBackgroundImage = localStorage.getItem('backgroundImage') || (isDarkMode ? darkModeBackground : lightModeBackground);
-
+                var storedBackgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
                 // 从 localStorage 中获取透明度设置
                 var selectedOpacity = localStorage.getItem('opacity') || '0.8';
 
