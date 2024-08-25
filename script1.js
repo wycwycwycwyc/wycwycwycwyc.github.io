@@ -13,11 +13,11 @@ function copySourceCode() {
   navigator.clipboard.writeText(sourceCodeElement.textContent)  
     .then(() => {  
       // 提示复制成功  
-      alert('源代码已复制到剪贴板！');  
+      Qmsg.success("复制成功");
     })  
     .catch(err => {  
       // 提示复制失败  
-      alert('无法复制源代码！');  
+      Qmsg.error("复制失败"); 
     });  
     
   // 移除 <pre> 元素  
