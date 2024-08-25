@@ -31,7 +31,6 @@
                 background-color: #f4f4f4;
                 transition: background-color 0.5s, color 0.5s;
                 /* 添加过渡效果 */
-                animation: fadeIn 1s ease-in-out;
             }
 
             @keyframes fadeIn {
@@ -570,12 +569,18 @@
                 }
             }
 
+            #userTableContainer {
+                width: 100%;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
             #userTableContainer table {
                 width: 100%;
                 border-collapse: collapse;
                 margin-top: 10px;
                 -webkit-animation: rotate-top .5s cubic-bezier(.455, .03, .515, .955) both;
-                animation: rotate-top .5s cubic-bezier(.455, .03, .515, .955) both
+                animation: rotate-top .5s cubic-bezier(.455, .03, .515, .955) both;
             }
 
             #userTableContainer th,
@@ -589,8 +594,9 @@
             #userTableContainer th {
                 background-color: #007BFF;
                 color: white;
-
                 border: none;
+                position: sticky;
+                top: 0;
             }
 
             .input_info {
@@ -676,6 +682,41 @@
                 border-radius: 5px 5px 5px 5px;
                 transform: translate(-20px, -30px);
                 /* 向上移动20px */
+            }
+
+            @-webkit-keyframes tilt-in-fwd-tr {
+                0% {
+                    -webkit-transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
+                    transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
+                    opacity: 0;
+                }
+
+                100% {
+                    -webkit-transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
+                    transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes tilt-in-fwd-tr {
+                0% {
+                    -webkit-transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
+                    transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
+                    filter:blur(10px);
+                    opacity: 0;
+                }
+
+                100% {
+                    -webkit-transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
+                    transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
+                    filter:blur(0px);
+                    opacity: 1;
+                }
+            }
+
+            body {
+                -webkit-animation: tilt-in-fwd-tr 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) none;
+                animation: tilt-in-fwd-tr 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) none;
             }
         </style>
     </head>
@@ -2032,6 +2073,8 @@
                                         // 如果当前用户是superadmin，则直接切换
                                         if (currentUserType === 'superadmin') {
                                             localStorage.setItem('userid', targetUserId);
+                                            localStorage.setItem('username', username);
+                                            newtable();
                                             swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             location.reload();
                                         }
@@ -2043,7 +2086,9 @@
                                             } else {
                                                 // 如果目标用户是user，则直接切换
                                                 localStorage.setItem('userid', targetUserId);
-                                                swal("用户ID已更新", "当前用户ID已更新为: " + targetUserId, "success");
+                                                localStorage.setItem('username', username);
+                                                newtable();
+                                                swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             }
                                         } else if (currentUserType === 'user') {
                                             if (targetUserType === 'superadmin' || targetUserType === 'admin') {
@@ -2051,6 +2096,8 @@
                                             } else {
                                                 // 如果目标用户是user，则直接切换
                                                 localStorage.setItem('userid', targetUserId);
+                                                localStorage.setItem('username', username);
+                                                newtable();
                                                 swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             }
 
@@ -2104,6 +2151,8 @@
                                         .then(data => {
                                             if (data.includes('<h1>登录成功</h1>')) {
                                                 localStorage.setItem('userid', targetUserId);
+                                                localStorage.setItem('username', username);
+                                                newtable();
                                                 swal("密码正确，用户已更新", "当前用户已更新为: " + username, "success");
                                                 location.reload();
                                             } else if (data.includes('登录失败')) {
