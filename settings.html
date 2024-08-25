@@ -24,6 +24,10 @@
         <script src="message.min.js"></script>
 
         <style>
+            html {
+                scroll-behavior: smooth;
+            }
+
             body {
                 font-family: Arial, sans-serif;
                 margin: 0;
@@ -702,14 +706,14 @@
                 0% {
                     -webkit-transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
                     transform: rotateY(20deg) rotateX(35deg) translate(300px, -300px) skew(-35deg, 10deg);
-                    filter:blur(10px);
+                    filter: blur(10px);
                     opacity: 0;
                 }
 
                 100% {
                     -webkit-transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
                     transform: rotateY(0) rotateX(0deg) translate(0, 0) skew(0deg, 0deg);
-                    filter:blur(0px);
+                    filter: blur(0px);
                     opacity: 1;
                 }
             }
