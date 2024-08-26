@@ -966,6 +966,18 @@
                         <button id='registerButton' class="newuser">新建用户</button>
                         <br>
                         <br>
+                        <div id="server" style="display: none;">
+                            <h2>服务器操作</h2>
+                            <button class="custom-button" style="background-color: red;"
+                                id="restartSystemBtn">重启服务器</button>
+                            <br>
+                            <br>
+                            <input class="input_info" style="width: 50%;" type="text" id="commandInput"
+                                placeholder="输入服务器系统命令">
+                            <button class="custom-button" onclick="executeCommand()">执行</button>
+                            <br>
+                            <br>
+                        </div>
                         <button class="custom-button" onclick="exitdev()">退出开发者模式</button>
                     </div>
                     <div id="about" class="section">
@@ -2078,6 +2090,7 @@
                                         if (currentUserType === 'superadmin') {
                                             localStorage.setItem('userid', targetUserId);
                                             localStorage.setItem('username', username);
+                                            localStorage.setItem('usertype', targetUserType);
                                             newtable();
                                             swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             location.reload();
@@ -2086,21 +2099,23 @@
                                         else if (currentUserType === 'admin') {
                                             // 如果目标用户是superadmin，则需要输入密码
                                             if (targetUserType === 'superadmin') {
-                                                confirmPassword(targetUserId, username);
+                                                confirmPassword(targetUserId, username, targetUserType);
                                             } else {
                                                 // 如果目标用户是user，则直接切换
                                                 localStorage.setItem('userid', targetUserId);
                                                 localStorage.setItem('username', username);
+                                                localStorage.setItem('usertype', targetUserType);
                                                 newtable();
                                                 swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             }
                                         } else if (currentUserType === 'user') {
                                             if (targetUserType === 'superadmin' || targetUserType === 'admin') {
-                                                confirmPassword(targetUserI, username);
+                                                confirmPassword(targetUserI, username, targetUserType);
                                             } else {
                                                 // 如果目标用户是user，则直接切换
                                                 localStorage.setItem('userid', targetUserId);
                                                 localStorage.setItem('username', username);
+                                                localStorage.setItem('usertype', targetUserType);
                                                 newtable();
                                                 swal("用户已更新", "当前用户已更新为: " + username, "success");
                                             }
@@ -2123,7 +2138,7 @@
                             }
 
                             // 密码确认函数
-                            function confirmPassword(targetUserId, username) {
+                            function confirmPassword(targetUserId, username, targetUserType) {
                                 swal({
                                     title: "输入" + username + "的密码以继续",
                                     text: "请输入" + username + "的密码:",
@@ -2156,6 +2171,7 @@
                                             if (data.includes('<h1>登录成功</h1>')) {
                                                 localStorage.setItem('userid', targetUserId);
                                                 localStorage.setItem('username', username);
+                                                localStorage.setItem('usertype', targetUserType);
                                                 newtable();
                                                 swal("密码正确，用户已更新", "当前用户已更新为: " + username, "success");
                                                 location.reload();
@@ -2409,6 +2425,84 @@
 
                                 showStep();
                             });
+
+                            document.getElementById('restartSystemBtn').addEventListener('click', function () {
+                                swal({
+                                    title: "确定要重启服务器吗？",
+                                    text: "这将关闭服务器上所有正在运行的程序。",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "是",
+                                    cancelButtonText: "否",
+                                    closeOnConfirm: false,
+                                    closeOnCancel: false
+                                }, function (isConfirm) {
+                                    if (isConfirm) {
+                                        swal('正在执行');
+                                        fetch('https://jbcfz.serveo.net/restart-server', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({ operation: 'restart_system' })
+                                        })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    swal('已发送重启指令', '服务器将重启', "success");
+                                                } else {
+                                                    swal('操作失败: ' + data.message, "error");
+                                                }
+                                            })
+                                            .catch(error => {
+                                                swal('请求失败: ', "error");
+                                            });
+                                    }
+                                    else {
+                                        swal({
+                                            title: "正在取消",
+                                            text: "正在取消",
+                                            timer: 0,
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                })
+                            });
+                            function executeCommand() {
+                                // 获取用户输入的命令
+                                const command = document.getElementById('commandInput').value;
+                                swal('正在执行');
+                                // 使用fetch发送POST请求到后端
+                                fetch('https://jbcfz.serveo.net/execute-command', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ command: command })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            // 如果命令执行成功，显示输出结果
+                                            swal("执行成功", data.output, 'success');
+                                        } else {
+                                            // 如果命令执行失败，显示错误信息
+                                            swal('执行失败:', data.error, 'error');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        // 网络或其他错误处理
+                                        swal('An error occurred: ', error, 'error');
+                                    });
+                            }
+                            server = document.getElementById('server');;
+                            if (localStorage.getItem('usertype') === 'superadmin') {
+                                server.style.display = 'block';
+                            }
+                            else {
+                                server.remove();
+                            }
                         </script>
                     </div>
     </body>
