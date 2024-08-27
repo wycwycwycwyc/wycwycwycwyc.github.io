@@ -726,6 +726,7 @@
                 -webkit-animation: tilt-in-fwd-tr 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) none;
                 animation: tilt-in-fwd-tr 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) none;
             }
+            
         </style>
     </head>
 
@@ -747,7 +748,7 @@
                 <div style="position: static; top: 0; right: 0; width: 40%; height: 100%;" id="Previewsection">
                     <h3 style="position: absolute; right: 20%; top: 10px;display: inline;" id="PreviewTitle">预览</h3>
                     <button class="custom-button" style="position: absolute; right: 10px; top: 20px;"
-                        onclick="document.getElementById('Preview').contentWindow.location.reload();">更新预览</button>
+                        onclick="document.getElementById('Preview').contentWindow.location.reload();Qmsg.success('更新成功')">更新预览</button>
                     <iframe src="index.html" id="Preview"
                         style="position: absolute; right: 10px; top: 70px;width: 40%;height: 300px;border-radius: 10px 10px 10px 10px;pointer-events: none;">
                         <p>你的浏览器不支持预览</p>
