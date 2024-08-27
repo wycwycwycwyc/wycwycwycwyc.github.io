@@ -322,6 +322,10 @@
                     margin-top: -80px;
                     /* 向上移动20像素 */
                 }
+
+                #Previewsection h3 {
+                    right: 30%!important;
+                }
             }
 
             /* 深色模式样式 */
@@ -740,6 +744,15 @@
         <div class="content">
             <div id="appearance" class="section">
                 <h1>外观</h1>
+                <div style="position: static; top: 0; right: 0; width: 40%; height: 100%;" id="Previewsection">
+                    <h3 style="position: absolute; right: 20%; top: 10px;display: inline;" id="PreviewTitle">预览</h3>
+                    <button class="custom-button" style="position: absolute; right: 10px; top: 20px;"
+                        onclick="document.getElementById('Preview').contentWindow.location.reload();">更新预览</button>
+                    <iframe src="index.html" id="Preview"
+                        style="position: absolute; right: 10px; top: 70px;width: 40%;height: 300px;border-radius: 10px 10px 10px 10px;pointer-events: none;">
+                        <p>你的浏览器不支持预览</p>
+                    </iframe>
+                </div>
                 <div class="input-group">
                     <label for="darkModeToggle">深色模式</label>
                     <label class="toggle-switch">
