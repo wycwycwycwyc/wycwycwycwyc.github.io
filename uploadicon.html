@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>图片上传表单</title>
+        <script src="script4.js"></script>
+        <script src="script3.js"></script>
+        <link rel="stylesheet" href="styles3.css">
+        <script src="script5.js"></script>
+        <link rel="stylesheet" href="styles4.css">
+        <script src="script8.js"></script>
+        <link rel="stylesheet" href="styles5.css">
+        <link rel="stylesheet" href="styles6.css">
+        <script src="script9.js"></script>
+        <script src="script10.js"></script>
+        <script src="https://hcaptcha.com/1/api.js" async defer></script>
+        <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
+        <link href="message.min.css" rel="stylesheet" />
+        <script src="message.min.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .form-container {
+                width: 400px;
+                margin: 50px auto;
+                padding: 30px;
+                background-color: #fff;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+                border-radius: 20px;
+                text-align: center;
+            }
+
+            input[type="file"] {
+                display: none;
+                /* 隐藏文件输入框 */
+            }
+
+            img.upload-preview {
+                display: inline-block;
+                max-width: 40%;
+                height: auto;
+                margin-top: 10px;
+                border: 1px solid #ddd;
+                padding: 5px;
+                background-color: #fff;
+            }
+
+            .upload-preview {
+                display: inline-block;
+                /* 让图片预览元素水平排列 */
+                margin-right: 10px;
+                /* 两个图片之间的间距 */
+            }
+
+            button {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 20px;
+                background-color: #5cb85c;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            progress {
+                width: 100%;
+                margin-top: 5px;
+            }
+
+            .progress-info {
+                font-size: 0.8em;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="form-container">
+            <form id="uploadForm">
+                <h1>上传头像</h1>
+                <button type="button" class="btn" onclick="document.getElementById('avatar').click();">选择图片</button>
+                <input type="file" id="avatar" accept="image/png, image/jpeg" required onchange="previewImage(this)">
+                <br>
+                <img id="previewold" class="upload-preview" src="#" alt="图片预览">
+                <img id="preview" class="upload-preview" src="#">
+                <progress id="uploadProgress" value="0" max="100">0%</progress>
+                <div class="progress-info" id="progressInfo"></div>
+                <button type="button" onclick="uploadImage()">开始上传</button>
+            </form>
+        </div>
+
+        <script>
+            const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+            document.getElementById('previewold').src = imageUrl;
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var preview = document.getElementById('preview');
+                        preview.src = e.target.result;
+                        preview.style.display = 'inline';
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function uploadImage() {
+                var fileInput = document.getElementById('avatar');
+                var userId = localStorage.getItem('userid');
+                if (!fileInput.files[0]) {
+                    Qmsg.error('请先选择文件');
+                }
+                var file = fileInput.files[0];
+                var uploadProgress = document.getElementById('uploadProgress');
+                var progressInfo = document.getElementById('progressInfo');
+
+                if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 1 * 1024 * 1024) {
+                    Qmsg.error('只能上传不超过1MB的图片,格式为png或jpg');
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('userId', userId);
+                formData.append('avatar', file);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://jbcfz.serveo.net/upload-image', true);
+
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        var percentComplete = Math.round((event.loaded / event.total) * 100);
+                        uploadProgress.value = percentComplete;
+                        progressInfo.textContent = '上传进度: ' + percentComplete + '%';
+                    }
+                };
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        swal('图片上传成功', '你的账号头像已更新', 'success');
+                        location.href = 'settings.html';
+                    } else {
+                        swal('图片上传失败: ', xhr.statusText, 'error');
+                    }
+                    uploadProgress.value = 0; // 重置进度条
+                    progressInfo.textContent = '';
+                };
+
+                xhr.send(formData);
+            }
+        </script>
+    </body>
+
+</html>
