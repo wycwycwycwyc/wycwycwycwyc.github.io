@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>更换邮箱</title>
+        <script src="script4.js"></script>
+        <script src="script3.js"></script>
+        <link rel="stylesheet" href="styles3.css">
+        <script src="script5.js"></script>
+        <link rel="stylesheet" href="styles4.css">
+        <script src="script8.js"></script>
+        <link rel="stylesheet" href="styles5.css">
+        <link rel="stylesheet" href="styles6.css">
+        <script src="script9.js"></script>
+        <script src="script10.js"></script>
+        <script src="https://hcaptcha.com/1/api.js" async defer></script>
+        <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
+        <style>
+            .container {
+                width: 400px;
+                margin: 50px auto;
+                padding: 30px;
+                background-color: #fff;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+                border-radius: 20px;
+                position: relative;
+                /* 添加相对定位 */
+            }
+
+            h2 {
+                text-align: center;
+                color: #333;
+            }
+
+            label {
+                display: block;
+                margin-top: 10px;
+            }
+
+            input[type="password"],
+            input[type="email"],
+            input[type="text"] {
+                width: calc(100% - 22px);
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            button {
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                margin-left: 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            #sendCodeBtn:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .container {
+                opacity: 1;
+                transform: translateY(0%);
+                animation: slideUp 0.8s ease-out forwards;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h2>更换邮箱</h2>
+            <div>
+                <label for="password">用户密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <label for="email">新邮箱:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="verificationCode">验证码:</label>
+                <input type="text" id="verificationCode" name="verificationCode" style="width: 65%;">
+                <button type="button" id="sendCodeBtn" style="margin-top: 10px;">发送验证码</button>
+            </div>
+            <br>
+            <div>
+                <button type="submit" style="width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 20px;
+                background-color: #5cb85c;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;">更新邮箱</button>
+            </div>
+        </div>
+
+        <script>
+            function disableSendButton() {
+                countdown = 60;
+                const sendButton = document.getElementById("sendCodeBtn");
+                sendButton.disabled = true;
+                sendButton.innerText = "剩余 " + countdown + " 秒";
+
+                const intervalId = setInterval(() => {
+                    countdown--;
+                    sendButton.innerText = "剩余 " + countdown + " 秒";
+                    if (countdown === 0) {
+                        clearInterval(intervalId);
+                        sendButton.innerText = "发送验证码";
+                        countdown = 60; // 倒计时时间
+                        sendButton.disabled = false;
+                    }
+                }, 1000);
+            }
+
+            document.getElementById('sendCodeBtn').onclick = async function () {
+                const sendButton = document.getElementById("sendCodeBtn");
+                sendButton.disabled = true;
+                sendButton.innerText = "正在发送";
+                const email = document.getElementById('email').value;
+
+                const sendCodeResponse = await fetch('https://jbcfz.serveo.net/send-verification-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                const sendCodeText = await sendCodeResponse.text();
+
+                if (sendCodeResponse.ok) {
+                    disableSendButton();
+                    swal(sendCodeText, '请查看你的新邮箱的验证码邮件', 'success'); // 直接显示文本响应
+                } else {
+                    sendButton.innerText = "发送验证码";
+                    countdown = 60; // 倒计时时间
+                    sendButton.disabled = false;
+                    swal('验证码发送失败：', sendCodeText, 'error');
+                }
+            };
+
+            document.querySelector('.container button[type="submit"]').onclick = async function (event) {
+                event.preventDefault();
+
+                const username = localStorage.getItem('username');
+                const password = document.getElementById('password').value;
+                const email = document.getElementById('email').value;
+                const verificationCode = document.getElementById('verificationCode').value;
+
+                // 调用登录接口
+                const loginResponse = await fetch('https://jbcfz.serveo.net/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                const loginHtml = await loginResponse.text();
+
+                if (loginResponse.ok) {
+                    swal('正在验证密码');
+                    // 登录成功，验证验证码
+                    const verifyCodeResponse = await fetch('https://jbcfz.serveo.net/verify-code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email, code: verificationCode })
+
+                    });
+                    const verifyCodeData = await verifyCodeResponse.text();
+
+                    if (verifyCodeResponse.ok) {
+                        // 验证码验证成功，更新邮箱
+                        swal('正在更新邮箱');
+                        const updateEmailResponse = await fetch('https://jbcfz.serveo.net/update-email', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ userId: localStorage.getItem('userid'), newEmail: email })
+                        });
+                        const updateEmailData = await updateEmailResponse.json();
+
+                        if (updateEmailData.success) {
+                            swal('邮箱更新成功！', '你的账户将使用新的邮箱', 'success');
+                            location.href = 'settings.html';
+                        } else {
+                            swal('邮箱更新失败：', updateEmailData.message, 'error');
+                        }
+                    } else {
+                        swal('验证码错误', '', 'error');
+                    }
+                } else {
+                    swal('密码错误', '', 'error');
+                }
+            };
+        </script>
+    </body>
+
+</html>

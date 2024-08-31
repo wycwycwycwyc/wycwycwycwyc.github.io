@@ -512,7 +512,7 @@
                 /* 浅色阴影，增加层次感 */
             }
 
-            .username .user-name-text {
+            .user-name-text {
                 font-weight: bold;
                 color: #000000;
                 text-decoration: none;
@@ -879,12 +879,15 @@
                             10px; background-size: cover; /* 确保背景图片覆盖整个元素 */ background-repeat: no-repeat; /* 防止背景图片重复
                             */ background-position: center center;transform: translateX(10px);">
                         </button>
-                        <div style="width: 90%;display: flex;flex-wrap: wrap;transform: translate(120px, -50px);">
+                        <div style="width: 90%;display: flex;flex-wrap: wrap;transform: translate(110px, -70px);overflow-x: auto;">
                             <!-- 紧跟按钮的div元素 -->
                             <div id="username" class="username"
                                 style="display: block; vertical-align: middle;margin-bottom: 20px;">
                             </div>
-
+                            <div style="flex-basis: 100%"></div>
+                            <div id="email" class="email"
+                                style="display: block; vertical-align: middle;margin-bottom: 20px;">
+                            </div>
                             <div style="flex-basis: 100%"></div>
                             <div id="passwordLink" class="password-link"></div>
                             <br>
@@ -904,7 +907,7 @@
                         transition: color 0.3s;margin-left: 30px;" onclick="logout()">注销用户</a></p>
                         </div>
                         <button id="logoutButton" class="logout-btn custom-button"
-                            style="transform: translateY(-100px);">退出登录</button>
+                            style="transform: translateY(-120px);">退出登录</button>
                         <button id="loginButton" class="login-btn custom-button"
                             style="transform: translateY(-110px);">登录</button>
                     </div>
@@ -1171,8 +1174,10 @@
                                 const logout = document.getElementById('logout');
                                 const resetPasswordLink = document.createElement('a');
                                 const loginStatus = document.createElement('loginStatus');
+                                const email = document.getElementById('email');
                                 if (isLoggedIn) {
                                     usernameElement.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
+                                    email.innerHTML = '用户名: <a href="UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
                                     let userId = localStorage.getItem('userid');
                                     const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
                                     document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
@@ -1250,6 +1255,21 @@
                                                 }
                                             })
                                         });
+                                    fetch('https://jbcfz.serveo.net/get-email-by-userid', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ userId: localStorage.getItem('userid') })
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                email.innerHTML = '邮箱: <a href="UpdateEmail.html" class="user-name-text"><span>' + data.data.email + '</span></a>';
+                                            }
+                                        })
+                                        .catch(error => {
+                                        });
 
 
                                     usernameElement.style.display = 'block';
@@ -1269,6 +1289,7 @@
                                     sa.style.display = 'none';
                                     logout.style.display = 'none';
                                     document.getElementById('loginStatus').remove();
+                                    document.getElementById('email').remove();
                                 }
 
                                 // 如果用户已登录，显示退出登录按钮
