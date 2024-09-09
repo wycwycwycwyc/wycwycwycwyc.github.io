@@ -167,6 +167,24 @@
                 overflow-y: auto;
             }
 
+            /* 为所有表格设置滚动条样式 */
+            table::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            table::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            table::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 1px;
+            }
+
+            table::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
             thead {
                 background-color: rgba(242, 242, 242, 0.8);
                 position: sticky;
@@ -363,7 +381,7 @@
                 height: 70px;
                 border-radius: 50%;
                 background-color: #007bff;
-                
+
                 background-size: cover;
                 /* 确保背景图片覆盖整个元素 */
                 background-repeat: no-repeat;
@@ -513,8 +531,10 @@
                 /* 暗色模式下的分隔线颜色 */
                 .dark-mode .menu-separator {
                     border-bottom: 1px solid #666;
-                    /* 暗色模式下的分隔线颜色 */
+                    /* 暗
+                    色模式下的分隔线颜色 */
                 }
+
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {

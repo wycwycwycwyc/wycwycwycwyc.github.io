@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setElementsOpacity(opacity, isDarkMode) {
-    var elements = document.querySelectorAll('th, td, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
 
     if (elements.length === 0) {
         return;
