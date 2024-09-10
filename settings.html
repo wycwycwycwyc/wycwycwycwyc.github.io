@@ -879,7 +879,8 @@
                             10px; background-size: cover; /* 确保背景图片覆盖整个元素 */ background-repeat: no-repeat; /* 防止背景图片重复
                             */ background-position: center center;transform: translateX(10px);">
                         </button>
-                        <div style="width: 90%;display: flex;flex-wrap: wrap;transform: translate(110px, -70px);overflow-x: auto;">
+                        <div
+                            style="width: 90%;display: flex;flex-wrap: wrap;transform: translate(110px, -70px);overflow-x: auto;">
                             <!-- 紧跟按钮的div元素 -->
                             <div id="username" class="username"
                                 style="display: block; vertical-align: middle;margin-bottom: 20px;">
@@ -991,6 +992,9 @@
                         <h1>开发者选项</h1>
                         <h2>用户列表</h2>
                         <button class="reloadtable" onclick="newtable(1)">刷新用户列表</button>
+                        <img id="preview" class="upload-preview" style="display: none;" src="#">
+                        <input type="file" id="avatar" style="display: none;" accept="image/png, image/jpeg" required
+                            onchange="previewImagebebefore(this)">
                         <div id="userTableContainer">
                             <!-- 表格将在这里被JavaScript动态创建 -->
                         </div>
@@ -1062,7 +1066,7 @@
                         </div>
                         <br> © 制作人：<a href="https://github.com/wycwycwycwyc" target="_blank">wyc</a>，保留所有权利。
                         <script>
-
+                            var usertabletext;
                             document.addEventListener('DOMContentLoaded', function () {
                                 var darkModeToggle = document.getElementById('darkModeToggle');
                                 var animationToggle = document.getElementById('animationToggle');
@@ -1773,6 +1777,7 @@
                                     }
                                 })
                             }
+
                             // 定义一个全局变量来跟踪点击次数
                             let clickCount = 0; // 确保全局变量在脚本开始时就已定义
                             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -1969,7 +1974,7 @@
                                         console.error('There has been a problem with your fetch operation:', error);
                                     });
                             }
-                            function createTable(users) {
+                            function createTable(users, isicon, input) {
                                 localStorage.setItem('users', users);
                                 const container = document.getElementById('userTableContainer');
                                 const table = document.createElement('table');
@@ -1977,6 +1982,12 @@
                                 table.appendChild(thead);
                                 const tbody = document.createElement('tbody');
                                 users.forEach((user, index) => {
+
+                                    if (isicon === 1) {
+                                        alert(isicon === 1);
+                                        createRow(user, index, users, 1, input);
+                                        return;
+                                    }
                                     const row = createRow(user, index, users);
                                     tbody.appendChild(row);
                                 });
@@ -1987,12 +1998,12 @@
                             function createTableHead() {
                                 const thead = document.createElement('thead');
                                 const headerRow = document.createElement('tr');
-                                ['用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)', '操作', '切换'].forEach((text, i) => {
+                                ['头像', '用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)', '操作', '切换'].forEach((text, i) => {
                                     const th = document.createElement('th');
                                     th.textContent = text;
                                     if (i === 0) {
                                         th.style.borderRadius = '10px 0 0 0';
-                                    } if (i === 6) {
+                                    } if (i === 7) {
                                         th.style.borderRadius = '0 10px 0 0';
                                     }
 
@@ -2002,8 +2013,47 @@
                                 return thead;
                             }
 
-                            function createRow(user, index, users) {
+                            function createRow(user, index, users, isicon, input) {
+                                var userbefore = user;
+                                if (isicon === 1) {
+                                    previewImagebefore(input, userbefore);
+                                    return;
+                                }
                                 const tr = document.createElement('tr');
+                                const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${user.id}`;
+                                // 创建圆形按钮
+                                const buttonTd = document.createElement('td');
+                                const circleButton = document.createElement('button');
+                                circleButton.style.width = '50px';
+                                circleButton.style.height = '50px';
+                                circleButton.style.borderRadius = '50%';
+                                circleButton.style.backgroundColor = '#3498db';
+                                circleButton.style.display = 'flex';
+                                circleButton.style.justifyContent = 'center';
+                                circleButton.style.alignItems = 'center';
+                                circleButton.style.cursor = 'none';
+                                circleButton.style.fontSize = '16px';
+                                circleButton.style.border = 'none';
+                                circleButton.style.outline = 'none';
+                                circleButton.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+                                circleButton.style.backgroundSize = 'cover';
+                                circleButton.style.backgroundRepeat = 'no-repeat;'
+                                circleButton.style.backgroundImage = `url(${imageUrl})`;
+                                /* circleButton.onclick = function () {
+                                     const clickEvent = new MouseEvent('click', {
+                                         bubbles: true,
+                                         cancelable: true
+                                     });
+ 
+                                     // 模拟点击事件
+                                     document.getElementById('avatar').dispatchEvent(clickEvent);
+ 
+                                 };
+                                 */
+                                buttonTd.appendChild(circleButton);
+
+                                // 将圆形按钮单元格添加到行的开头
+                                tr.appendChild(buttonTd);
                                 const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin' || localStorage.getItem('usertype') === 'user';
                                 let isSuperAdmin = user.type === 'superadmin'; // 检查用户是否是 superadmin
 
@@ -2022,6 +2072,7 @@
                                 const switchUserIdTd = document.createElement('td');
                                 const switchUserIdButton = document.createElement('button');
                                 switchUserIdButton.textContent = '切换';
+                                switchUserIdButton.style.width = 'auto';
                                 switchUserIdButton.className = 'custom-button';
                                 switchUserIdButton.onclick = function () {
                                     storeUserId(index, users, user);
@@ -2036,6 +2087,7 @@
                                     editButton.textContent = '不可编辑';
                                 } else {
                                     editButton.textContent = '编辑';
+                                    editButton.style.width = 'auto';
                                     editButton.className = 'custom-button';
                                     editButton.setAttribute('id', 'editButton');
                                     editButton.onclick = function () { editUser(index, users); };
@@ -2045,6 +2097,7 @@
                                 // 创建链接
                                 const customLink = document.createElement('a');
                                 customLink.textContent = '×';
+                                customLink.display = 'inline';
                                 customLink.style.color = 'red';
                                 customLink.style.fontSize = '30px';
                                 customLink.style.marginLeft = '10px'; // 设置右边距为10像素
@@ -2121,7 +2174,123 @@
                                 tr.appendChild(editTd);
                                 tr.appendChild(switchUserIdTd);
                                 return tr;
+                                return;
+                            }
+                            function previewImagebebefore(input) {
+                                fetch('https://jbcfz.serveo.net/users') // 假设后端接口是/users
+                                    .then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                        throw new Error('Network response was not ok.');
+                                    })
+                                    .then(data => { document.getElementById('userTableContainer').innerHTML = ''; createTable(data.data, 1, input) })
+                                    .catch(error => {
+                                        console.error('There has been a problem with your fetch operation:', error);
+                                    });
+                                return;
+                            }
+                            function previewImagebefore(input, user) {
+                                previewImage(input, user);
+                                return;
+                            }
+                            function previewImage(input, user) {
+                                if (input.files && input.files[0]) {
+                                    var reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        var img = new Image();
+                                        img.onload = function () {
+                                            // 创建canvas元素
+                                            var canvas = document.createElement('canvas');
+                                            var ctx = canvas.getContext('2d');
 
+                                            // 原始图片的宽高比
+                                            var aspectRatio = img.width / img.height;
+
+                                            // 根据宽高比确定压缩后的尺寸
+                                            var targetWidth, targetHeight;
+                                            if (aspectRatio > 1) {
+                                                // 宽度大于高度，按照宽度压缩
+                                                targetWidth = 200;
+                                                targetHeight = 200;
+                                            } else if (aspectRatio < 1) {
+                                                // 高度大于宽度，按照高度压缩
+                                                targetHeight = 200;
+                                                targetWidth = 200;
+                                            } else {
+                                                // 正方形图片，直接压缩
+                                                targetWidth = 200;
+                                                targetHeight = 200;
+                                            }
+
+                                            // 绘制压缩后的图片
+                                            canvas.width = 200;
+                                            canvas.height = 200;
+                                            ctx.drawImage(img, (200 - targetWidth) / 2, (200 - targetHeight) / 2, targetWidth, targetHeight);
+                                            var preview = document.getElementById('preview');
+                                            preview.src = canvas.toDataURL('image/png');
+                                            preview.style.display = 'inline';
+                                            // 将canvas转换为DataURL并设置为预览图片的源
+                                        };
+                                        img.src = e.target.result;
+                                    };
+                                    reader.readAsDataURL(input.files[0]);
+                                    function sleep(ms) {
+                                        return new Promise(resolve => setTimeout(resolve, ms));
+                                    }
+                                    sleep(1000).then(() => {
+                                        uploadImage(user);
+                                    });
+                                }
+                                return;
+                            }
+
+                            function uploadImage(user) {
+                                var userId = user.id;
+                                var preview = document.getElementById('preview');
+                                if (!preview.src) {
+                                    Qmsg.error('请先选择文件');
+                                    return;
+                                }
+
+                                // 将DataURL转换为Blob
+                                fetch(preview.src)
+                                    .then(res => res.blob())
+                                    .then(blob => {
+                                        if (!['image/jpeg', 'image/png'].includes(blob.type)) {
+                                            Qmsg.error('只能上传不超过1MB的图片,格式为png或jpg');
+                                            return;
+                                        }
+
+                                        var formData = new FormData();
+                                        formData.append('userId', userId);
+
+                                        formData.append('avatar', blob);
+
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open('POST', 'https://jbcfz.serveo.net/upload-image', true);
+
+                                        xhr.upload.onprogress = function (event) {
+                                            if (event.lengthComputable) {
+                                            }
+                                        };
+
+                                        xhr.onload = function () {
+                                            if (xhr.status === 200) {
+                                                swal('图片上传成功', '你的账号头像已更新', 'success');
+                                                newtable();
+                                            } else {
+                                                swal('图片上传失败: ', xhr.statusText, 'error');
+                                            }
+                                        };
+
+                                        xhr.send(formData);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error converting image to blob', error);
+                                        Qmsg.error('无法转换图片');
+                                    });
+                                return;
                             }
                             function storeUserId(index, users, currentUser) {
                                 const currentUserType = localStorage.getItem('usertype');
@@ -2249,7 +2418,7 @@
                                 const cells = row.querySelectorAll('td');
 
                                 cells.forEach((cell, i) => {
-                                    if (i < cells.length - 2) { // 排除最后一个单元格，即操作按钮的单元格
+                                    if (i < cells.length - 2&&i !== 0) { // 排除最后一个单元格，即操作按钮的单元格
                                         if (isCurrentUserAdmin && isSuperAdmin && i !== 0 && i !== 3) {
                                             // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则隐藏信息
                                             cell.innerHTML = '';
@@ -2275,12 +2444,16 @@
                                                 });
                                                 input.select();
                                             }
+                                            if(i === 5){
+                                                input.style.pointerEvents = 'none';
+                                            }
                                         }
                                     }
                                 });
 
-                                const editButton = row.querySelector('button');
+                                const editButton = document.getElementById('editButton');
                                 editButton.className = 'custom-button';
+                                editButton.style.width = 'auto';
                                 if (isCurrentUserAdmin && isSuperAdmin) {
                                     // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则禁用编辑按钮
                                     editButton.disabled = true;
