@@ -1,5 +1,1 @@
-body {  
-    background-image: url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark');  /* 替换为你的图片路径 */  
-    background-repeat: no-repeat;  
-    background-size: cover;  /* 使背景图片覆盖整个页面 */  
-}
+body{background-image:url(https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark);background-repeat:no-repeat;background-size:cover}

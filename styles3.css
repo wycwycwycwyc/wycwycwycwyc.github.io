@@ -1,13 +1,1 @@
-/* styles.css */
-
-/* 动画关闭样式 */
-body.no-animation * {
-    transition: none !important;
-    animation: none !important;
-}
-
-body.no-animation *:before,
-body.no-animation *:after {
-    transition: none !important;
-    animation: none !important;
-}
+body.no-animation *{transition:none!important;animation:none!important}body.no-animation *:before,body.no-animation *:after{transition:none!important;animation:none!important}
