@@ -1,0 +1,769 @@
+<!doctype html><title>电脑锁定系统</title><link rel=stylesheet href=styles.css><script src=script.js></script><script src=script1.js></script><script src=script4.js></script><link rel=stylesheet href=styles3.css><script src=script5.js></script><script src=script6.js></script><link rel=stylesheet href=styles4.css><script src=script8.js></script><link rel=stylesheet href=styles5.css><link rel=stylesheet href=styles6.css><script src=script9.js></script><script src=script10.js></script><script src=script11.js></script><script src=script12.js></script><style></style><link rel=stylesheet href=styles2.css><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js></script><script src=script2.js></script><script src=script3.js></script><link href=message.min.css rel=stylesheet><script src=message.min.js></script><script></script><h1 class=title>电脑锁定系统</h1><button class=custom-button onclick=goBackOrHome()>返回</button><br><br><br><a href=unlockpc.html>点击前往动态密码生成器</a><div class=subtitle>源代码</div><div class=content><pre id=sourceCode><code class="language-python custom-variable">import tkinter as tk
+from tkinter import messagebox, ttk
+import os
+import time
+import hashlib
+import winreg
+import sys
+import ctypes
+import shutil
+import socket
+import struct
+import datetime
+import json
+import threading
+
+class CustomMessageBox:
+    @staticmethod
+    def show(title, message, style='info'):
+        """自定义美化消息框"""
+        root = tk.Toplevel()
+        root.title(title)
+        root.resizable(False, False)
+        root.configure(bg='#333333')
+        
+        # 设置窗口大小和位置
+        root.geometry("400x200")
+        root.update_idletasks()
+        width = root.winfo_width()
+        height = root.winfo_height()
+        x = (root.winfo_screenwidth() // 2) - (width // 2)
+        y = (root.winfo_screenheight() // 2) - (height // 2)
+        root.geometry(f'+{x}+{y}')
+        
+        # 消息内容
+        msg_label = tk.Label(
+            root, 
+            text=message, 
+            font=('Microsoft YaHei', 12), 
+            bg='#333333', 
+            fg='white',
+            wraplength=380
+        )
+        msg_label.pack(pady=(40, 20))
+        
+        # 按钮
+        button_frame = tk.Frame(root, bg='#333333')
+        button_frame.pack(pady=10)
+        
+        if style == 'info':
+            btn_color = '#4CAF50'
+        elif style == 'warning':
+            btn_color = '#FF9800'
+        elif style == 'error':
+            btn_color = '#F44336'
+        else:
+            btn_color = '#2196F3'
+        
+        ok_btn = tk.Button(
+            button_frame,
+            text="确定",
+            command=root.destroy,
+            font=('Microsoft YaHei', 12),
+            bg=btn_color,
+            fg='white',
+            activebackground=btn_color,
+            bd=0,
+            width=10,
+            height=1
+        )
+        ok_btn.pack(pady=10)
+        
+        root.transient(root.master)
+        root.grab_set()
+        root.wait_window(root)
+
+    @staticmethod
+    def askyesno(title, message):
+        """自定义是/否对话框"""
+        result = []
+        
+        root = tk.Toplevel()
+        root.title(title)
+        root.resizable(False, False)
+        root.configure(bg='#333333')
+        
+        root.geometry("400x200")
+        root.update_idletasks()
+        width = root.winfo_width()
+        height = root.winfo_height()
+        x = (root.winfo_screenwidth() // 2) - (width // 2)
+        y = (root.winfo_screenheight() // 2) - (height // 2)
+        root.geometry(f'+{x}+{y}')
+        
+        msg_label = tk.Label(
+            root, 
+            text=message, 
+            font=('Microsoft YaHei', 12), 
+            bg='#333333', 
+            fg='white',
+            wraplength=380
+        )
+        msg_label.pack(pady=(40, 20))
+        
+        button_frame = tk.Frame(root, bg='#333333')
+        button_frame.pack(pady=10)
+        
+        def set_result(value):
+            result.append(value)
+            root.destroy()
+        
+        yes_btn = tk.Button(
+            button_frame,
+            text="是",
+            command=lambda: set_result(True),
+            font=('Microsoft YaHei', 12),
+            bg='#4CAF50',
+            fg='white',
+            activebackground='#45a049',
+            bd=0,
+            width=10,
+            height=1
+        )
+        yes_btn.pack(side=tk.LEFT, padx=10)
+        
+        no_btn = tk.Button(
+            button_frame,
+            text="否",
+            command=lambda: set_result(False),
+            font=('Microsoft YaHei', 12),
+            bg='#F44336',
+            fg='white',
+            activebackground='#d32f2f',
+            bd=0,
+            width=10,
+            height=1
+        )
+        no_btn.pack(side=tk.RIGHT, padx=10)
+        
+        root.transient(root.master)
+        root.grab_set()
+        root.wait_window(root)
+        
+        return result[0] if result else False
+
+class NTPTime:
+    @staticmethod
+    def get_ntp_time(server='ntp.ntsc.ac.cn', port=123, timeout=3):
+        """从NTP服务器获取时间"""
+        try:
+            address = (socket.gethostbyname(server), port)
+            
+            # 构建NTP协议数据包
+            data = b'\x1b' + 47 * b'\0'
+            
+            # 发送请求
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                client.settimeout(timeout)
+                client.sendto(data, address)
+                data, _ = client.recvfrom(1024)
+                
+                if data:
+                    # 解析NTP响应
+                    t = struct.unpack('!12I', data)[10]
+                    t -= 2208988800  # 从1900年转换为1970年
+                    return datetime.datetime.fromtimestamp(t)
+        except Exception as e:
+            print(f"获取NTP时间失败: {e}")
+            return None
+
+class EnhancedDesktopLocker:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("电脑锁定系统")
+        self.root.attributes("-fullscreen", True)
+        self.root.configure(bg='black')
+        
+        # 配置文件路径
+        self.config_file = "C:\\lock_config.json"
+        self.lock_exe_path = "C:\\lock.exe"
+        
+        # 初始化时间警告标签
+        self.time_warning_label = tk.Label(
+            self.root,
+            text="",
+            font=('Microsoft YaHei', 12),
+            fg='red',
+            bg='black'
+        )
+        self.time_warning_label.place(relx=1.0, rely=1.0, anchor='se', x=-10, y=-10)
+        
+        # 网络时间状态
+        self.network_time = None
+        self.time_warning = False
+        self.last_ntp_update = None
+        
+        # 检查是否是第一次运行
+        if not os.path.exists(self.config_file):
+            self.first_run_setup()
+        else:
+            self.lock_computer()
+        
+        # 创建主容器使内容居中
+        self.main_frame = tk.Frame(self.root, bg='black')
+        self.main_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        
+        # 初始化UI
+        self.setup_ui()
+        
+        # 初始化密码
+        self.correct_password = self.generate_password()
+        print(f"[DEBUG] 当前密码: {self.correct_password}")
+        
+        # 启动NTP时间获取
+        self.get_network_time()
+        
+        # 更新时间显示
+        self.update_time()
+        
+        # 启动锁定状态检查
+        self.check_lock_status()
+
+    def get_network_time(self):
+        """获取网络时间"""
+        def fetch_time():
+            try:
+                ntp_server = 'ntp.ntsc.ac.cn'
+                address = (socket.gethostbyname(ntp_server), 123)
+                data = b'\x1b' + 47 * b'\0'
+                
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                    client.settimeout(3)
+                    client.sendto(data, address)
+                    data, _ = client.recvfrom(1024)
+                    
+                    if data:
+                        t = struct.unpack('!12I', data)[10]
+                        t -= 2208988800
+                        self.network_time = datetime.datetime.fromtimestamp(t)
+                        self.last_ntp_update = datetime.datetime.now()
+            except Exception as e:
+                print(f"获取NTP时间失败: {e}")
+                self.network_time = None
+            
+            # 在主线程中更新UI
+            self.root.after(0, self.update_time_warning)
+            # 每5分钟重新获取一次
+            self.root.after(300000, self.get_network_time)
+        
+        # 启动后台线程获取时间
+        threading.Thread(target=fetch_time, daemon=True).start()
+
+    def update_time_warning(self):
+        """更新时间警告状态"""
+        if self.network_time is None:
+            self.time_warning = True
+            self.time_warning_label.config(text="未获取到真实时间，锁定有风险")
+        else:
+            self.time_warning = False
+            self.time_warning_label.config(text="")
+
+    def check_lock_status(self):
+        """定期检查锁定状态"""
+        config = self.load_config()
+        
+        if config.get("lock_until"):
+            try:
+                lock_until = datetime.datetime.fromisoformat(config["lock_until"])
+                current_time = self.get_current_time()
+                
+                if current_time >= lock_until:
+                    # 锁定时间已过，重置状态
+                    config["wrong_attempts"] = 0
+                    config["lock_until"] = None
+                    self.save_config(config)
+            except ValueError as e:
+                print(f"解析锁定时间失败: {e}")
+                config["lock_until"] = None
+                self.save_config(config)
+        
+        # 每秒检查一次
+        self.root.after(1000, self.check_lock_status)
+
+    def first_run_setup(self):
+        """第一次运行时的设置"""
+        response = CustomMessageBox.askyesno("初始设置", "这是第一次运行，是否要锁定电脑？")
+        if response:
+            try:
+                # 创建初始配置文件
+                config = {
+                    "locked": True,
+                    "wrong_attempts": 0,
+                    "lock_until": None,
+                    "first_run": False
+                }
+                self.save_config(config)
+                
+                # 将当前程序复制到C盘
+                if not os.path.exists(self.lock_exe_path):
+                    current_exe = sys.executable
+                    shutil.copy2(current_exe, self.lock_exe_path)
+                
+                # 设置注册表映像劫持
+                self.set_explorer_hijack(True)
+                
+                # 结束explorer进程
+                self.kill_explorer()
+                
+                CustomMessageBox.show("提示", "电脑已锁定！", 'info')
+            except Exception as e:
+                CustomMessageBox.show("错误", f"初始化失败: {str(e)}", 'error')
+                sys.exit(1)
+        else:
+            CustomMessageBox.show("提示", "程序将退出", 'info')
+            sys.exit(0)
+
+    def setup_ui(self):
+        """设置居中UI界面"""
+        # 显示锁定信息（放大字体）
+        self.lock_label = tk.Label(
+            self.main_frame,
+            text="该电脑已锁定，请输入密码解锁",
+            font=('Microsoft YaHei', 24),
+            fg='white',
+            bg='black'
+        )
+        self.lock_label.pack(pady=20)
+
+        # 时间显示（放大字体）
+        self.time_label = tk.Label(
+            self.main_frame,
+            font=('Microsoft YaHei', 48),
+            fg='white',
+            bg='black'
+        )
+        self.time_label.pack(pady=20)
+        
+        # 显示当前日期
+        self.date_label = tk.Label(
+            self.main_frame,
+            font=('Microsoft YaHei', 18),
+            fg='white',
+            bg='black'
+        )
+        self.date_label.pack(pady=10)
+        
+        self.update_time()
+
+        # 密码输入按钮（保持始终可用）
+        self.unlock_btn = tk.Button(
+            self.main_frame,
+            text="输入密码解锁",
+            command=self.check_password,
+            font=('Microsoft YaHei', 18),
+            bg='green',
+            fg='white',
+            height=2,
+            width=15,
+            state=tk.NORMAL  # 始终保持可用
+        )
+        self.unlock_btn.pack(pady=20)
+
+        # 控制按钮框架
+        self.button_frame = tk.Frame(self.main_frame, bg='black')
+        self.button_frame.pack(pady=20)
+        
+        # 控制按钮（放大）
+        buttons = [
+            ("关机", self.shutdown, 'red'),
+            ("重启", self.reboot, 'orange'),
+            ("注销", self.logout, 'blue')
+        ]
+        
+        for text, command, color in buttons:
+            btn = tk.Button(
+                self.button_frame,
+                text=text,
+                command=command,
+                font=('Microsoft YaHei', 18),
+                width=10,
+                height=2,
+                bg=color,
+                fg='white'
+            )
+            btn.pack(side=tk.LEFT, padx=10)
+
+        # 应急应用栏（放大）
+        self.app_frame = tk.Frame(self.main_frame, bg='black')
+        self.app_frame.pack(pady=20)
+        
+        app_buttons = [
+            ("Foxmail", self.open_foxmail, '#FF9900'),
+            ("微信", self.open_wechat, '#07C160'),
+            ("画图", self.open_mspaint, '#00A2E8'),
+            ("Word", self.open_word, '#2B579A'),
+            ("Excel", self.open_excel, '#217346'),
+            ("PPT", self.open_powerpoint, '#D24726'),
+            ("浏览器", self.open_browser, '#4285F4')
+        ]
+        
+        for text, command, color in app_buttons:
+            btn = tk.Button(
+                self.app_frame,
+                text=text,
+                command=command,
+                font=('Microsoft YaHei', 12),
+                width=10,
+                height=2,
+                bg=color,
+                fg='white'
+            )
+            btn.pack(side=tk.LEFT, padx=5)
+
+    def update_time(self):
+        """更新时间显示"""
+        current_time = time.strftime("%H:%M:%S")
+        current_date = datetime.datetime.now().strftime("%Y年%m月%d日")
+        self.time_label.config(text=current_time)
+        self.date_label.config(text=current_date)
+        self.root.after(1000, self.update_time)
+
+    def generate_password(self):
+        """生成基于时间的10位动态密码"""
+        current_time = self.get_current_time()
+        current_time_min = current_time.strftime("%Y%m%d%H%M")  # 年月日时分
+        hash_obj = hashlib.sha256(current_time_min.encode())
+        hex_digest = hash_obj.hexdigest()
+        digits = [c for c in hex_digest if c.isdigit()]
+        password = ''.join(digits[:10]).ljust(10, '0')
+        return password
+
+    def get_current_time(self):
+        """获取当前时间（优先使用网络时间）"""
+        # 如果网络时间可用且最近更新过(1分钟内)，使用网络时间
+        if (not self.time_warning and self.network_time and 
+            self.last_ntp_update and 
+            (datetime.datetime.now() - self.last_ntp_update).total_seconds() < 60):
+            return self.network_time
+        return datetime.datetime.now()
+
+    def load_config(self):
+        """加载配置文件"""
+        default_config = {
+            "locked": True,
+            "wrong_attempts": 0,
+            "lock_until": None,
+            "first_run": False
+        }
+        
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r') as f:
+                    config = json.load(f)
+                    # 合并配置，确保所有必要字段都存在
+                    for key in default_config:
+                        if key not in config:
+                            config[key] = default_config[key]
+                    return config
+        except Exception as e:
+            print(f"加载配置文件失败: {e}")
+        
+        return default_config
+
+    def save_config(self, config):
+        """保存配置文件"""
+        try:
+            with open(self.config_file, 'w') as f:
+                json.dump(config, f, indent=4)
+        except Exception as e:
+            print(f"保存配置文件失败: {e}")
+
+    def check_password(self):
+        """创建密码输入对话框"""
+        config = self.load_config()
+        
+        # 检查锁定状态
+        if config.get("lock_until"):
+            try:
+                lock_until = datetime.datetime.fromisoformat(config["lock_until"])
+                current_time = self.get_current_time()
+                
+                if current_time < lock_until:
+                    # 计算剩余时间
+                    remaining = lock_until - current_time
+                    minutes = int(remaining.total_seconds() // 60)
+                    seconds = int(remaining.total_seconds() % 60)
+                    
+                    CustomMessageBox.show(
+                        "错误", 
+                        f"密码错误次数过多，请等待 {minutes}分{seconds}秒 后再试", 
+                        'error'
+                    )
+                    return
+            except ValueError as e:
+                print(f"解析锁定时间失败: {e}")
+                config["lock_until"] = None
+                self.save_config(config)
+        
+        # 创建自定义对话框
+        dialog = tk.Toplevel(self.root)
+        dialog.title("密码验证")
+        dialog.geometry("500x300")
+        dialog.configure(bg='#333333')
+        dialog.resizable(False, False)
+        
+        # 使对话框居中
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        x = (dialog.winfo_screenwidth() // 2) - (width // 2)
+        y = (dialog.winfo_screenheight() // 2) - (height // 2)
+        dialog.geometry(f'+{x}+{y}')
+        
+        # 添加标签
+        label = tk.Label(
+            dialog,
+            text="请输入10位动态密码：",
+            font=('Microsoft YaHei', 20, 'bold'),
+            fg='white',
+            bg='#333333'
+        )
+        label.pack(pady=(40, 20))
+        
+        # 添加密码输入框（放大）
+        entry = tk.Entry(
+            dialog,
+            font=('Microsoft YaHei', 24),
+            width=15,
+            show="*",
+            bd=5,
+            relief=tk.FLAT
+        )
+        entry.pack(pady=20)
+        entry.focus_set()
+        
+        # 添加按钮框架
+        button_frame = tk.Frame(dialog, bg='#333333')
+        button_frame.pack(pady=20)
+        
+        # 确定按钮（美化）
+        ok_btn = tk.Button(
+            button_frame,
+            text="确定",
+            command=lambda: self.verify_password(dialog, entry.get()),
+            font=('Microsoft YaHei', 16),
+            width=10,
+            height=1,
+            bg='#4CAF50',
+            fg='white',
+            activebackground='#45a049',
+            bd=0
+        )
+        ok_btn.pack(side=tk.LEFT, padx=10)
+        
+        # 取消按钮（美化）
+        cancel_btn = tk.Button(
+            button_frame,
+            text="取消",
+            command=dialog.destroy,
+            font=('Microsoft YaHei', 16),
+            width=10,
+            height=1,
+            bg='#f44336',
+            fg='white',
+            activebackground='#d32f2f',
+            bd=0
+        )
+        cancel_btn.pack(side=tk.RIGHT, padx=10)
+        
+        # 绑定回车键
+        dialog.bind('<return>', lambda e: self.verify_password(dialog, entry.get()))
+    
+    def verify_password(self, dialog, user_input):
+        """验证密码"""
+        config = self.load_config()
+        
+        if user_input == self.generate_password():  # 密码正确
+            config["wrong_attempts"] = 0
+            config["lock_until"] = None
+            self.save_config(config)
+            dialog.destroy()
+            self.unlock_computer()
+        else:  # 密码错误
+            config["wrong_attempts"] = config.get("wrong_attempts", 0) + 1
+            remaining_attempts = 5 - config["wrong_attempts"]
+            
+            if config["wrong_attempts"] >= 5:
+                # 锁定1分钟
+                lock_until = self.get_current_time() + datetime.timedelta(minutes=1)
+                config["lock_until"] = lock_until.isoformat()
+                self.save_config(config)
+                
+                CustomMessageBox.show(
+                    "错误", 
+                    "密码错误次数过多，系统将锁定1分钟", 
+                    'error'
+                )
+                dialog.destroy()
+            else:
+                CustomMessageBox.show(
+                    "错误", 
+                    f"密码错误！剩余尝试次数: {remaining_attempts}", 
+                    'error'
+                )
+                self.save_config(config)
+                entry = dialog.winfo_children()[1]  # 获取输入框
+                entry.delete(0, tk.END)  # 清空输入框
+                entry.focus_set()  # 重新聚焦
+
+    def set_explorer_hijack(self, enable):
+        """设置或取消explorer.exe的映像劫持"""
+        try:
+            key_path = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\explorer.exe"
+            
+            if enable:
+                key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+                winreg.SetValueEx(key, "Debugger", 0, winreg.REG_SZ, self.lock_exe_path)
+            else:
+                try:
+                    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path, 0, winreg.KEY_WRITE)
+                    winreg.DeleteValue(key, "Debugger")
+                except FileNotFoundError:
+                    pass
+                except WindowsError as e:
+                    print(f"删除注册表值失败: {e}")
+            
+            if 'key' in locals():
+                winreg.CloseKey(key)
+        except Exception as e:
+            print(f"操作注册表失败: {e}")
+            CustomMessageBox.show("错误", f"操作注册表失败: {str(e)}", 'error')
+
+    def kill_explorer(self):
+        """结束explorer.exe进程"""
+        try:
+            os.system("taskkill /f /im explorer.exe >nul 2>&1")
+        except Exception as e:
+            print(f"结束explorer.exe失败: {e}")
+
+    def start_explorer(self):
+        """启动explorer.exe进程"""
+        try:
+            os.system("start explorer.exe >nul 2>&1")
+        except Exception as e:
+            print(f"启动explorer.exe失败: {e}")
+
+    def lock_computer(self):
+        """锁定电脑"""
+        self.kill_explorer()
+
+    def unlock_computer(self):
+        """解锁电脑"""
+        try:
+            # 删除配置文件
+            if os.path.exists(self.config_file):
+                os.remove(self.config_file)
+            
+            # 取消映像劫持
+            self.set_explorer_hijack(False)
+            
+            # 启动explorer
+            self.start_explorer()
+            
+            # 关闭程序
+            self.root.destroy()
+            
+        except Exception as e:
+            CustomMessageBox.show("错误", f"解锁失败: {str(e)}", 'error')
+
+    def shutdown(self):
+        """关机"""
+        if CustomMessageBox.askyesno("确认", "确定要关机吗？"):
+            os.system("shutdown /s /t 1")
+
+    def reboot(self):
+        """重启"""
+        if CustomMessageBox.askyesno("确认", "确定要重启吗？"):
+            os.system("shutdown /r /t 1")
+
+    def logout(self):
+        """注销"""
+        if CustomMessageBox.askyesno("确认", "确定要注销吗？"):
+            os.system("shutdown /l")
+
+    # 应急应用功能
+    def open_foxmail(self):
+        """打开Foxmail"""
+        paths = [
+            r"D:\Program Files\Foxmail 7.2\Foxmail.exe",
+            r"C:\Program Files (x86)\Foxmail 7.2\Foxmail.exe",
+            r"C:\Program Files\Foxmail\Foxmail.exe"
+        ]
+        
+        for path in paths:
+            if os.path.exists(path):
+                try:
+                    os.startfile(path)
+                    return
+                except Exception as e:
+                    print(f"打开Foxmail失败: {e}")
+        
+        CustomMessageBox.show("错误", "未找到Foxmail程序", 'error')
+
+    def open_wechat(self):
+        """打开微信"""
+        paths = [
+            r"E:\weixin\Weixin\Weixin.exe",
+            r"C:\Program Files (x86)\Tencent\WeChat\WeChat.exe",
+            r"D:\Program Files\Tencent\WeChat\WeChat.exe"
+        ]
+        
+        for path in paths:
+            if os.path.exists(path):
+                try:
+                    os.startfile(path)
+                    return
+                except Exception as e:
+                    print(f"打开微信失败: {e}")
+        
+        CustomMessageBox.show("错误", "未找到微信程序", 'error')
+
+    def open_mspaint(self):
+        """打开画图"""
+        try:
+            os.system('start mspaint')
+        except Exception as e:
+            CustomMessageBox.show("错误", f"打开画图程序失败: {str(e)}", 'error')
+
+    def open_word(self):
+        """打开Word"""
+        try:
+            os.system('start winword')
+        except Exception as e:
+            CustomMessageBox.show("错误", f"打开Word失败: {str(e)}", 'error')
+
+    def open_excel(self):
+        """打开Excel"""
+        try:
+            os.system('start excel')
+        except Exception as e:
+            CustomMessageBox.show("错误", f"打开Excel失败: {str(e)}", 'error')
+
+    def open_powerpoint(self):
+        """打开PowerPoint"""
+        try:
+            os.system('start powerpnt')
+        except Exception as e:
+            CustomMessageBox.show("错误", f"打开PowerPoint失败: {str(e)}", 'error')
+
+    def open_browser(self):
+        """打开浏览器"""
+        try:
+            os.system('start https://www.baidu.com')
+        except Exception as e:
+            CustomMessageBox.show("错误", f"打开浏览器失败: {str(e)}", 'error')
+
+if __name__ == "__main__":
+    # 检查管理员权限
+    if not ctypes.windll.shell32.IsUserAnAdmin():
+        # 请求管理员权限
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        sys.exit(0)
+    
+    # 创建主窗口
+    root = tk.Tk()
+    
+    # 运行应用
+    app = EnhancedDesktopLocker(root)
+    root.mainloop()
+</code></pre><button id=copyCodeBtn class=custom-button onclick=copySourceCode() style=position:absolute;top:10px;right:10px>复制源代码</button></div><div class=footer><br><button class=custom-button id=downloadSourceCodeBtn>下载源代码</button></div><div id=tips><span id=lightanddark>提示:切换白天黑夜请到主页<span></div><script src=FileSaver.min.js></script>
