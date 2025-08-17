@@ -1,1 +1,1 @@
-document.addEventListener("DOMContentLoaded",function(){var t,n=new URLSearchParams(window.location.search),e=n.get("theme");e==="dark"?document.body.classList.add("dark-mode"):e==="light"&&document.body.classList.remove("dark-mode"),t=document.body.classList.contains("dark-mode"),t})
+document.addEventListener('DOMContentLoaded',function(){var isDarkMode=localStorage.getItem('darkMode')==='enabled';if(isDarkMode){document.body.classList.add('dark-mode');}else{document.body.classList.remove('dark-mode');}});

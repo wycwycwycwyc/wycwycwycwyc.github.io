@@ -1,1 +1,1 @@
-function goBackOrHome(){var n=window.location.href,t=document.referrer,e="index.html";n===e?window.location.href=e:t&&t.includes(e)?window.history.back():window.location.href=e}
+function goBackOrHome(){var currentPageUrl=window.location.href;var referrer=document.referrer;var mainPageUrl='index.html';if(currentPageUrl===mainPageUrl){window.location.href=mainPageUrl;}else if(referrer&&referrer.includes(mainPageUrl)){window.history.back();}else{window.location.href=mainPageUrl;}}
