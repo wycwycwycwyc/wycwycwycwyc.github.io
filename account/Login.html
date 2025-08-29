@@ -284,7 +284,7 @@ var redirectUrl = getRedirectUrl()||'';
             verifyingElement.style.display = 'block';
 
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'http://localhost:3000/login', true);
+            xhr.open('POST', 'https://jbcfz.serveo.net/login', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
 
             xhr.onreadystatechange = function () {
@@ -299,7 +299,7 @@ var redirectUrl = getRedirectUrl()||'';
                         swal("登录成功！", "你将解锁更多新功能", "success");
 
                         if (!isStrictEmail(username)) {
-                            fetch('http://localhost:3000/get-user-id-by-username', {
+                            fetch('https://jbcfz.serveo.net/get-user-id-by-username', {
                                 method: 'POST', // 指定请求方法
                                 headers: {
                                     'Content-Type': 'application/json' // 设置请求头
@@ -336,7 +336,7 @@ var redirectUrl = getRedirectUrl()||'';
                                     console.error('Fetch error:', error);
                                 });
                         } else {
-                            fetch('http://localhost:3000/get-user-id-or-username-by-email', {
+                            fetch('https://jbcfz.serveo.net/get-user-id-or-username-by-email', {
                                 method: 'POST', // 指定请求方法
                                 headers: {
                                     'Content-Type': 'application/json' // 设置请求头
