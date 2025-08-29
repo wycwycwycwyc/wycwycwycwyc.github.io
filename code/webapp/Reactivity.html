@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极限反应力测试</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-out, glow 2s infinite alternate;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            animation: slideUp 1s ease-out;
+        }
+        
+        .instructions p {
+            margin: 15px 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin: 25px 0;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 120px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 25px 0;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .countdown {
+            font-size: 10rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            animation: countdownPop 1s forwards;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+        
+        .test-area {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+        
+        .color-screen {
+            width: 100%;
+            height: 100%;
+            transition: background-color 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 4rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .message {
+            font-size: 3.5rem;
+            margin-top: 2rem;
+            animation: messagePulse 0.5s infinite alternate;
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: zoomIn 0.5s ease-out;
+            z-index: 200;
+            position: relative;
+        }
+        
+        .results h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        
+        .result-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .result-list li {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            animation: fadeIn 0.5s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        .result-list li:nth-child(1) { animation-delay: 0.1s; }
+        .result-list li:nth-child(2) { animation-delay: 0.2s; }
+        .result-list li:nth-child(3) { animation-delay: 0.3s; }
+        .result-list li:nth-child(4) { animation-delay: 0.4s; }
+        .result-list li:nth-child(5) { animation-delay: 0.5s; }
+        
+        .average {
+            font-size: 1.5rem;
+            color: #4caf50;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 5px;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6); }
+        }
+        
+        @keyframes countdownPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        }
+        
+        @keyframes messagePulse {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.1); opacity: 1; }
+        }
+        
+        @keyframes flash {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .instructions {
+                padding: 15px;
+            }
+            
+            .instructions p {
+                font-size: 1rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-box {
+                margin: 10px 0;
+                width: 80%;
+            }
+            
+            button {
+                padding: 15px 30px;
+                font-size: 1.2rem;
+            }
+            
+            .color-screen {
+                font-size: 2.5rem;
+            }
+            
+            .message {
+                font-size: 2rem;
+            }
+            
+            .countdown {
+                font-size: 8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>极限反应力测试</h1>
+        
+        <div class="instructions">
+            <p><i class="fas fa-bolt"></i> 当屏幕从红色变为绿色时，尽快点击或触摸屏幕！</p>
+            <p><i class="fas fa-stopwatch"></i> 测试将进行5次，每次间隔5秒</p>
+            <p><i class="fas fa-dice"></i> 红色变为绿色的等待时间是随机的（3-8秒）</p>
+            <p><i class="fas fa-trophy"></i> 准备好后点击下方按钮开始测试</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div>当前测试</div>
+                <div class="stat-value" id="current-test">0/5</div>
+            </div>
+            <div class="stat-box">
+                <div>最快反应</div>
+                <div class="stat-value" id="fastest">0 ms</div>
+            </div>
+            <div class="stat-box">
+                <div>平均反应</div>
+                <div class="stat-value" id="average">0 ms</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <button id="start-btn"><i class="fas fa-play"></i> 开始测试</button>
+    </div>
+    
+    <div class="test-area" id="test-area">
+        <div class="color-screen" id="color-screen"></div>
+    </div>
+    
+    <div class="results" id="results">
+        <h2><i class="fas fa-chart-line"></i> 测试结果</h2>
+        <ul class="result-list" id="result-list"></ul>
+        <div class="average" id="average-result">平均反应时间: 0 ms</div>
+        <button id="restart-btn"><i class="fas fa-redo"></i> 再次测试</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('start-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const testArea = document.getElementById('test-area');
+            const colorScreen = document.getElementById('color-screen');
+            const results = document.getElementById('results');
+            const resultList = document.getElementById('result-list');
+            const averageResult = document.getElementById('average-result');
+            const currentTestEl = document.getElementById('current-test');
+            const fastestEl = document.getElementById('fastest');
+            const averageEl = document.getElementById('average');
+            const progressEl = document.getElementById('progress');
+            
+            let testCount = 0;
+            let reactionTimes = [];
+            let startTime = 0;
+            let timeoutId = null;
+            let testStartTime = 0;
+            let countdownInterval = null;
+            
+            // 开始测试
+            startBtn.addEventListener('click', startTest);
+            restartBtn.addEventListener('click', startTest);
+            
+            // 点击测试区域（使用mousedown/touchstart实现更快的响应）
+            colorScreen.addEventListener('mousedown', handleReaction);
+            colorScreen.addEventListener('touchstart', handleReaction, {passive: true});
+            
+            function handleReaction() {
+                if (colorScreen.style.backgroundColor === 'green') {
+                    const reactionTime = Date.now() - startTime;
+                    reactionTimes.push(reactionTime);
+                    
+                    // 更新统计数据
+                    updateStats();
+                    
+                    // 显示本次反应时间
+                    colorScreen.style.backgroundColor = 'blue';
+                    colorScreen.innerHTML = `
+                        <div style="font-size: 5rem; color: white; animation: zoomIn 0.5s;">${reactionTime} ms</div>
+                        <div class="message">点击有效！</div>
+                    `;
+                    
+                    // 准备下一次测试
+                    testCount++;
+                    currentTestEl.textContent = `${testCount}/5`;
+                    progressEl.style.width = `${(testCount/5)*100}%`;
+                    
+                    if (testCount < 5) {
+                        // 显示5秒倒计时
+                        showCountdown(5, startColorChange);
+                    } else {
+                        setTimeout(showResults, 2000);
+                    }
+                } else if (colorScreen.style.backgroundColor !== 'red') {
+                    // 在非红色状态下点击（非测试状态）
+                    colorScreen.style.backgroundColor = 'red';
+                    colorScreen.innerHTML = '';
+                    setTimeout(() => {
+                        colorScreen.style.backgroundColor = '';
+                        colorScreen.innerHTML = '<div style="font-size: 2rem; color: white; animation: flash 0.5s;">过早点击！</div>';
+                    }, 1000);
+                }
+            }
+            
+            function startTest() {
+                testCount = 0;
+                reactionTimes = [];
+                updateStats();
+                currentTestEl.textContent = '0/5';
+                progressEl.style.width = '0%';
+                
+                // 隐藏其他元素，显示测试区域
+                document.querySelector('.container').style.display = 'none';
+                results.style.display = 'none';
+                testArea.style.display = 'flex';
+                
+                // 开始第一次测试
+                showCountdown(3, startColorChange);
+            }
+            
+            function showCountdown(seconds, callback) {
+                let count = seconds;
+                const countdownEl = document.createElement('div');
+                countdownEl.className = 'countdown';
+                countdownEl.textContent = count;
+                document.body.appendChild(countdownEl);
+                
+                countdownInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.textContent = count;
+                        countdownEl.style.animation = 'none';
+                        void countdownEl.offsetWidth; // 触发重绘
+                        countdownEl.style.animation = 'countdownPop 1s forwards';
+                    } else {
+                        clearInterval(countdownInterval);
+                        document.body.removeChild(countdownEl);
+                        callback();
+                    }
+                }, 1000);
+            }
+            
+            function startColorChange() {
+                // 清除可能存在的之前的时间out
+                if (timeoutId) clearTimeout(timeoutId);
+                
+                // 设置红色背景
+                colorScreen.style.backgroundColor = 'red';
+                colorScreen.innerHTML = '<div class="message">准备...</div>';
+                
+                // 随机等待时间（3-8秒）
+                const waitTime = Math.floor(Math.random() * 5000) + 3000;
+                
+                // 设置超时，变为绿色
+                timeoutId = setTimeout(() => {
+                    colorScreen.style.backgroundColor = 'green';
+                    colorScreen.innerHTML = '<div class="message" style="animation: flash 0.3s infinite;">就是现在！</div>';
+                    startTime = Date.now();
+                }, waitTime);
+            }
+            
+            function updateStats() {
+                if (reactionTimes.length > 0) {
+                    const fastest = Math.min(...reactionTimes);
+                    const average = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length;
+                    
+                    fastestEl.textContent = `${fastest} ms`;
+                    averageEl.textContent = `${Math.round(average)} ms`;
+                }
+            }
+            
+            function showResults() {
+                testArea.style.display = 'none';
+                results.style.display = 'block';
+                
+                // 清空结果列表
+                resultList.innerHTML = '';
+                
+                // 添加每次测试结果
+                reactionTimes.forEach((time, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>测试 #${index + 1}</span><span>${time} ms</span>`;
+                    resultList.appendChild(li);
+                });
+                
+                // 计算并显示平均时间
+                const average = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length;
+                averageResult.textContent = `平均反应时间: ${Math.round(average)} ms`;
+                
+                // 显示祝贺信息
+                let message = "";
+                if (average < 200) {
+                    message = "超凡的反应速度！";
+                } else if (average < 300) {
+                    message = "非常出色的反应力！";
+                } else if (average < 400) {
+                    message = "不错的反应速度！";
+                } else {
+                    message = "继续练习会更好！";
+                }
+                
+                averageResult.innerHTML += `<div style="margin-top: 10px; color: #ffcc00;">${message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

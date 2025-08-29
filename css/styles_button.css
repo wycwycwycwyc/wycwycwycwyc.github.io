@@ -1,0 +1,29 @@
+/* 居中标题 */  
+#main-title {  
+    text-align: center;  
+    animation: color-animation 2s ease-in-out infinite; /* 添加无限循环动画 */  
+}  
+  
+/* 自定义按钮样式 */  
+.custom-button {  
+    display: inline-block;  
+    padding: 10px 20px;  
+    background-color: #3498db;  
+    color: #fff;  
+    border: none;  
+    cursor: pointer;  
+    border-radius: 5px; /* 添加圆角 */  
+    transition: border-radius 0.5s ease; /* 定义动画时长 */  
+}  
+  
+/* 悬停点击时的动画效果 */  
+.custom-button:hover {  
+    border-radius: 20px; /* 放大圆角 */  
+}  
+  
+/* 标题颜色变化动画 */  
+@keyframes color-animation {  
+    0% { color: red; } /* 起始颜色为红色 */  
+    50% { color: blue; } /* 中间颜色为蓝色 */  
+    100% { color: green; } /* 结束颜色为绿色 */  
+}

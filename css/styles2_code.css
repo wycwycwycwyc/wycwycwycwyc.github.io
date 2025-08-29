@@ -1,0 +1,442 @@
+        pre {
+            white-space: pre; /* 保持预格式化文本的原始格式，不换行 */
+            word-wrap: normal; /* 取消单词在边界处的换行 */
+            overflow-x: auto; /* 水平方向超出时显示滚动条 */
+            max-width: 100%; /* 设置最大宽度，防止溢出 */
+           max-height: 1000px; /* 设置最大高度，防止内容过长 */
+        }
+#themeToggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+        body {  
+            font-family: Arial, sans-serif;  
+        }  
+        .title {  
+            text-align: center;  
+            font-size: 24px;  
+            margin-bottom: 20px;  
+        }  
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-indent: 1em; /* 这里设置为3em，相当于3倍的字体大小，你可以根据需要调整这个值 */
+        }
+        .content {  
+            background-color: #f2f2f2;  
+            padding: 20px;  
+            position: relative;  
+            border-radius: 20px; /* 这里可以根据需要调整圆角的大小 */
+        }
+        .footer {  
+            text-align: center;  
+        }  
+        #tips {
+            position: fixed;
+            bottom: 0; /* 紧贴底部 */
+            right: 0; /* 紧贴右侧 */
+            color: black ;
+            background-color:rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            font-size: 14px;
+            text-align: right; /* 文本靠右对齐 */
+            /* 添加圆角，这里设置为10px，您可以根据需要调整大小 */
+            border-top-left-radius: 10px;
+            }
+@keyframes fadeInBlur {
+    0% {
+        opacity: 0;
+        filter: blur(20px);
+        transform: translateY(50px); /* 开始时代码框在下方 */
+    }
+    50% {
+        opacity: 1;
+        filter: blur(0);
+    }
+    100% {
+        transform: translateY(0); /* 结束时代码框回到原位 */
+    }
+}
+/* 应用动画到源代码框 */
+#sourceCode {
+    animation: fadeInBlur 1s ease-in-out forwards; /* 动画持续时间、缓动函数和填充模式 */
+}  
+/* 自定义Python函数的样式 */
+/* 这里是你的自定义样式 */
+/* 定义代码高亮的明亮颜色 */
+/* 定义代码高亮的明亮颜色 */
+/* 定义代码高亮的明亮颜色 */
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    font-weight: bold;
+    font-family: 'Consolas', monospace;
+            /* 使用 Consolas 字体 */
+            /* 使字体加粗 */
+}
+code {
+/* 定义注释的颜色 */
+.hljs-comment,
+.hljs-quote {
+    color: #408080;
+    font-style: italic;
+}
+
+/* 定义变量、模板变量等的颜色 */
+.hljs-variable,
+.hljs-template-variable {
+    color: #008080;
+}
+
+/* 定义字符串、关键字、选择器标签、添加内容的颜色 */
+.hljs-string,
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-addition {
+    color: #080;
+}
+
+/* 定义子字符串、删除内容的颜色 */
+.hljs-subst,
+.hljs-deletion {
+    color: #bc6060;
+}
+
+/* 定义运算符、属性的颜色 */
+.hljs-operator,
+.hljs-property {
+    color: #a2f;
+}
+
+/* 定义函数、内置名称、类、数字、布尔值、常量等的颜色 */
+.hljs-function,
+.hljs-builtin-name,
+.hljs-class .hljs-title,
+.hljs-number,
+.hljs-boolean,
+.hljs-constant {
+    color: #06b;
+}
+
+/* 定义属性值、参数、URL的颜色 */
+.hljs-attribute,
+.hljs-parameter,
+.hljs-at_rule,
+.hljs-attr_selector,
+.hljs-value {
+    color: #186;
+}
+
+/* 定义重要、特殊、警告、提示、注释、文档注释、类名、类型、修饰符等的颜色 */
+.hljs-important,
+.hljs-special,
+.hljs-keyword,
+.hljs-rules .hljs-keyword,
+.hljs-doctag,
+.hljs-class,
+.hljs-type,
+.hljs-modifier,
+.hljs-variable.language_ {
+    color: #e40;
+}
+
+/* 定义异常、标记、装饰器、属性访问、语言变量等的颜色 */
+.hljs-exception,
+.hljs-decorator,
+.hljs-builtin-name.class,
+.hljs-access,
+.hljs-attribute .hljs-variable {
+    color: #c00;
+}
+
+/* 定义链接、引用的颜色 */
+.hljs-link,
+.hljs-literal {
+    color: #219;
+}
+
+/* 定义标题、名称、参数等的颜色 */
+.hljs-title,
+.hljs-name,
+.hljs-section,
+.hljs-keyword .hljs-title {
+    color: #900;
+}
+
+/* 定义生成内容、模板标签、模板变量、子模板标签、子模板变量等的颜色 */
+.hljs-built_in,
+.hljs-builtin-name {
+    color: #0086b3;
+}
+
+/* 定义代码、标记、装饰器等的颜色 */
+.hljs-code,
+.hljs-formula,
+.hljs-markup .hljs-keyword {
+    color: #f8f;
+}
+
+/* 定义行号的颜色 */
+.hljs-lineno {
+    color: #ccc;
+    display: inline-block;
+    padding: 0 5px;
+    border-right: 1px solid #ddd;
+}
+
+/* 定义不同括号的颜色 */
+.hljs-brace {
+    color: #606;
+}
+
+.hljs-paren {
+    color: #f00;
+}
+
+.hljs-bracket {
+    color: #00f;
+}
+/* 暗模式下的样式 */
+
+
+.dark-mode .hljs-comment,
+.dark-mode .hljs-quote {
+    color: #777;
+    font-style: italic;
+}
+
+.dark-mode .hljs-variable,
+.dark-mode .hljs-template-variable {
+    color: #ade5fc;
+}
+
+.dark-mode .hljs-string,
+.dark-mode .hljs-keyword,
+.dark-mode .hljs-selector-tag,
+.dark-mode .hljs-addition {
+    color: #9ccc65;
+}
+
+.dark-mode .hljs-subst,
+.dark-mode .hljs-deletion {
+    color: #f44747;
+}
+
+.dark-mode .hljs-operator,
+.dark-mode .hljs-property {
+    color: #f07178;
+}
+
+.dark-mode .hljs-function,
+.dark-mode .hljs-builtin-name,
+.dark-mode .hljs-class .hljs-title,
+.dark-mode .hljs-number,
+.dark-mode .hljs-boolean,
+.dark-mode .hljs-constant {
+    color: #82aaff;
+}
+
+.dark-mode .hljs-attribute,
+.dark-mode .hljs-parameter,
+.dark-mode .hljs-at_rule,
+.dark-mode .hljs-attr_selector,
+.dark-mode .hljs-value {
+    color: #ffcb6b;
+}
+
+.dark-mode .hljs-important,
+.dark-mode .hljs-special,
+.dark-mode .hljs-keyword,
+.dark-mode .hljs-rules .hljs-keyword,
+.dark-mode .hljs-doctag,
+.dark-mode .hljs-class,
+.dark-mode .hljs-type,
+.dark-mode .hljs-modifier,
+.dark-mode .hljs-variable.language_ {
+    color: #c792ea;
+}
+
+.dark-mode .hljs-exception,
+.dark-mode .hljs-decorator,
+.dark-mode .hljs-builtin-name.class,
+.dark-mode .hljs-access,
+.dark-mode .hljs-attribute .hljs-variable {
+    color: #f44747;
+}
+
+.dark-mode .hljs-link,
+.dark-mode .hljs-literal {
+    color: #79c0ff;
+}
+
+.dark-mode .hljs-title,
+.dark-mode .hljs-name,
+.dark-mode .hljs-section,
+.dark-mode .hljs-keyword .hljs-title {
+    color: #e53935;
+}
+
+.dark-mode .hljs-built_in,
+.dark-mode .hljs-builtin-name {
+    color: #89ddff;
+}
+
+.dark-mode .hljs-code,
+.dark-mode .hljs-formula,
+.dark-mode .hljs-markup .hljs-keyword {
+    color: #f8f8f2;
+}
+
+.dark-mode .hljs-lineno {
+    color: #888;
+    display: inline-block;
+    padding: 0 5px;
+    border-right: 1px solid #555;
+}
+
+.dark-mode .hljs-brace {
+    color: #ade5fc;
+}
+
+.dark-mode .hljs-paren {
+    color: #e53935;
+}
+
+.dark-mode .hljs-bracket {
+    color: #89ddff;
+}
+}
+pre, code {
+    font-size: 17px; /* 设置字体大小为14像素 */
+}
+/* 为每个代码颜色添加泛光效果 */
+.glow-effect.hljs-comment,
+.glow-effect.hljs-quote {
+    text-shadow: 0 0 5px #408080, 0 0 5px #408080, 0 0 10px #408080;
+}
+
+.glow-effect.hljs-variable,
+.glow-effect.hljs-template-variable {
+    text-shadow: 0 0 5px #008080, 0 0 5px #008080, 0 0 10px #008080;
+}
+
+.glow-effect.hljs-string,
+.glow-effect.hljs-keyword,
+.glow-effect.hljs-selector-tag,
+.glow-effect.hljs-addition {
+    text-shadow: 0 0 5px #080, 0 0 5px #080, 0 0 10px #080;
+}
+
+.glow-effect.hljs-subst,
+.glow-effect.hljs-deletion {
+    text-shadow: 0 0 5px #bc6060, 0 0 5px #bc6060, 0 0 10px #bc6060;
+}
+
+.glow-effect.hljs-operator,
+.glow-effect.hljs-property {
+    text-shadow: 0 0 5px #a2f, 0 0 5px #a2f, 0 0 10px #a2f;
+}
+
+.glow-effect.hljs-function,
+.glow-effect.hljs-builtin-name,
+.glow-effect.hljs-class .hljs-title,
+.glow-effect.hljs-number,
+.glow-effect.hljs-boolean,
+.glow-effect.hljs-constant {
+    text-shadow: 0 0 5px #06b, 0 0 5px #06b, 0 0 10px #06b;
+}
+
+.glow-effect.hljs-attribute,
+.glow-effect.hljs-parameter,
+.glow-effect.hljs-at_rule,
+.glow-effect.hljs-attr_selector,
+.glow-effect.hljs-value {
+    text-shadow: 0 0 5px #186, 0 0 5px #186, 0 0 10px #186;
+}
+
+.glow-effect.hljs-important,
+.glow-effect.hljs-special,
+.glow-effect.hljs-keyword,
+.glow-effect.hljs-rules .hljs-keyword,
+.glow-effect.hljs-doctag,
+.glow-effect.hljs-class,
+.glow-effect.hljs-type,
+.glow-effect.hljs-modifier,
+.glow-effect.hljs-variable.language_ {
+    text-shadow: 0 0 5px #e40, 0 0 5px #e40, 0 0 10px #e40;
+}
+
+.glow-effect.hljs-exception,
+.glow-effect.hljs-decorator,
+.glow-effect.hljs-builtin-name.class,
+.glow-effect.hljs-access,
+.glow-effect.hljs-attribute .hljs-variable {
+    text-shadow: 0 0 5px #c00, 0 0 5px #c00, 0 0 10px #c00;
+}
+
+.glow-effect.hljs-link,
+.glow-effect.hljs-literal {
+    text-shadow: 0 0 5px #219, 0 0 5px #219, 0 0 10px #219;
+}
+
+.glow-effect.hljs-title,
+.glow-effect.hljs-name,
+.glow-effect.hljs-section,
+.glow-effect.hljs-keyword .hljs-title {
+    text-shadow: 0 0 5px #900, 0 0 5px #900, 0 0 10px #900;
+}
+
+.glow-effect.hljs-built_in,
+.glow-effect.hljs-builtin-name {
+    text-shadow: 0 0 5px #0086b3, 0 0 5px #0086b3, 0 0 10px #0086b3;
+}
+
+.glow-effect.hljs-code,
+.glow-effect.hljs-formula,
+.glow-effect.hljs-markup .hljs-keyword {
+    text-shadow: 0 0 5px #f8f, 0 0 5px #f8f, 0 0 10px #f8f;
+}
+/* 深色模式的全局样式 */
+/* 深色模式的全局样式 */
+body.dark-mode {
+    background-color: #1a1a1a; /* 深色背景 */
+    color: #f4f4f4; /* 白色文本 */
+}
+
+/* 深色模式下的标题样式 */
+body.dark-mode .title {
+    color: #f4f4f4; /* 白色标题 */
+}
+
+/* 深色模式下的副标题样式 */
+body.dark-mode .subtitle {
+    color: #999; /* 较浅的灰色副标题 */
+}
+
+/* 深色模式下的内容区域样式 */
+body.dark-mode .content {
+    background-color: #3a3f4b; /* 深色背景 */
+    border: 1px solid #3a3f4b; /* 深色边框 */
+}
+
+/* 深色模式下的页脚样式 */
+body.dark-mode .footer {
+    color: #f4f4f4; /* 白色页脚文本 */
+}
+
+/* 深色模式下的代码框样式 */
+body.dark-mode pre {
+    background-color: #3a3f4b; /* 深色背景 */
+    border-color: #3a3f4b; /* 深色边框 */
+}
+
+/* 深色模式下的代码样式 */
+body.dark-mode code {
+    color: #f4f4f4; /* 白色代码文本 */
+}
+.dark-mode #tips {
+    background-color: rgba(18, 18, 18, 0.6);
+    color: #f4f4f4;
+}

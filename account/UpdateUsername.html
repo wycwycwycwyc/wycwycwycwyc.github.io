@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>更改用户名</title>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script3_darkMode.js"></script>
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <script src="/js/script5_setAnimations.js"></script>
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <script src="/js/script8_setEyeCare.js"></script>
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            width: 96%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: #5cb85c;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            width: auto;
+            padding: 5px 10px;
+            color: #5cb85c;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+
+        .back-btn:hover {
+            color: #4cae4c;
+            background-color: #e7e7e7;
+            border-color: #ccc;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            opacity: 1;
+            transform: translateY(0%);
+            animation: slideUp 0.8s ease-out forwards;
+        }
+        /* ===== 深色模式基础样式 ===== */
+body.dark-mode {
+    background-color: #121212; /* 更深的背景，减少视觉疲劳 */
+    color: #e0e0e0; /* 柔和的浅灰色文字 */
+}
+
+/* ===== 深色模式下的容器 ===== */
+body.dark-mode .container {
+    background-color: #1e1e1e; /* 比 body 稍亮，保持层次感 */
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.05); /* 浅色阴影，避免刺眼 */
+    border: 1px solid #333; /* 添加边框增强轮廓 */
+}
+
+/* ===== 深色模式下的标题 ===== */
+body.dark-mode h2 {
+    color: #ffffff; /* 纯白标题，提高可读性 */
+}
+
+/* ===== 深色模式下的输入框 ===== */
+body.dark-mode input[type="text"] {
+    background-color: #2d2d2d; /* 深灰背景 */
+    border-color: #444; /* 深色边框 */
+    color: #ffffff; /* 白色文字 */
+}
+
+body.dark-mode input[type="text"]:focus {
+    border-color: #5cb85c; /* 保持品牌绿色 */
+    outline: none; /* 移除默认高亮 */
+}
+
+/* ===== 深色模式下的按钮 ===== */
+body.dark-mode button {
+    background-color: #5cb85c; /* 保持品牌绿色 */
+    color: white;
+}
+
+body.dark-mode button:hover {
+    background-color: #4cae4c; /* 深一点的绿色 */
+}
+
+/* ===== 深色模式下的返回按钮 ===== */
+body.dark-mode .back-btn {
+    background-color: #2d2d2d; /* 和输入框一致 */
+    border-color: #444; /* 深色边框 */
+    color: #5cb85c; /* 品牌绿色文字 */
+}
+
+body.dark-mode .back-btn:hover {
+    background-color: #333; /* 悬停时稍亮 */
+    border-color: #555;
+    color: #4cae4c; /* 深一点的绿色 */
+}
+
+/* ===== 其他细节优化 ===== */
+body.dark-mode ::placeholder {
+    color: #888; /* 占位符文字变暗 */
+}
+    </style>
+    <script>
+        function updateUsername() {
+            const oldUsername = localStorage.getItem('username');
+            const newUsername = document.getElementById('newUsername').value;
+            const isLoggedIn = localStorage.getItem("isLoggedIn") === 'true';
+            const message = document.getElementById('message');
+            const usernameRegex = /^[\u4E00-\u9FA5A-Za-z0-9]+$/;
+            if (newUsername.length > 10) {
+                swal('用户名长度不能超过10个字符！', '', 'error');
+                return;
+            }
+
+            if (!usernameRegex.test(newUsername)) {
+                swal('用户名只能包含汉字、英文和数字！', '', 'error');
+                return;
+            }
+            message.textContent = '正在更改用户名...';
+            message.style.display = 'block';
+            if (!isLoggedIn) {
+                swal('你还没登录!', '登录后可更改', 'error');
+                window.location.href = '/account/Login.html';
+                return;
+            }
+
+            fetch('https://jbcfz.serveo.net/update-username', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ oldUsername, newUsername })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        localStorage.setItem('username', newUsername);
+                        message.textContent = '用户名更新成功！';
+                        swal('用户名更新成功！', '下次使用新用户名登录', 'success');
+                        window.location.href = '';
+                    } else {
+                        message.textContent = "用户名更换失败，请换一个用户名，或稍后再试";
+                        swal('用户名更换失败，请换一个用户名，或稍后再试', '用户名更换失败，请换一个用户名，或稍后再试', 'error');
+                        message.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    message.textContent = '请求失败，请稍后重试。';
+                    swal('请求失败，请稍后重试。', '请求失败，请稍后重试。', 'error');
+                    message.style.display = 'none';
+                });
+        }
+
+        function goBackOrHome() {
+            window.history.length > 1 ? window.history.back() : window.location.href = '';
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="goBackOrHome()">返回</button>
+        <h2>更改用户名</h2>
+        <p>当前用户名: <span id="currentUsername"></span></p>
+        <form id="usernameForm" onsubmit="event.preventDefault(); updateUsername();">
+            <input type="text" id="newUsername" placeholder="输入新用户名" required maxlength="10">
+            <br><br>
+            <button type="submit">更改用户名</button>
+        </form>
+        <p id="message" style="display: none;"></p>
+    </div>
+
+    <script>
+        isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        if (!isLoggedIn) {
+            document.getElementById('currentUsername').textContent = '未登录';
+        } else {
+            document.getElementById('currentUsername').textContent = '正在加载'
+            let userId = localStorage.getItem('userid');
+
+            // 使用fetch发送POST请求到后端接口
+            fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: userId })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // 显示用户名
+                        console.log('用户名:', data.data.username);
+                        localStorage.setItem('username', data.data.username);
+                        document.getElementById('currentUsername').textContent = localStorage.getItem('username') || '未登录';
+                    } else {
+                        // 显示错误信息
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
