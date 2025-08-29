@@ -1,1 +1,0 @@
-document.addEventListener('DOMContentLoaded',function(){var isDarkMode=localStorage.getItem('darkMode')==='enabled';if(isDarkMode){document.body.classList.add('dark-mode');}else{document.body.classList.remove('dark-mode');}});

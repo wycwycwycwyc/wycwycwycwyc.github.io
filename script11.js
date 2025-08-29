@@ -1,4 +1,0 @@
-document.addEventListener('DOMContentLoaded',function(){const checkbox=document.getElementById('settingscode');const codeElement=document.querySelector('code');const isCodeVisible=localStorage.getItem('isCodeVisible')===null?'true':localStorage.getItem('isCodeVisible');if(checkbox){if(isCodeVisible==='true'){checkbox.checked=true;if(codeElement){codeElement.removeAttribute('style');}}else if(isCodeVisible==='false'){checkbox.checked=false;if(codeElement){codeElement.setAttribute('style','all: unset;');}}
-checkbox.addEventListener('change',function(){if(this.checked){if(codeElement){codeElement.removeAttribute('style');}
-localStorage.setItem('isCodeVisible','true');}else{if(codeElement){codeElement.setAttribute('style','all: unset;');}
-localStorage.setItem('isCodeVisible','false');}});}else{if(isCodeVisible==='false'&&codeElement){codeElement.setAttribute('style','all: unset;');}}});

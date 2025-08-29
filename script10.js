@@ -1,3 +1,0 @@
-document.addEventListener('DOMContentLoaded',function(){var isGlowEnabled=localStorage.getItem('glowEnabled')==='true';var glowToggle=document.getElementById('glowToggle');if(glowToggle){glowToggle.checked=isGlowEnabled;}
-if(isGlowEnabled){document.body.classList.add('glow-effect');}else{document.body.classList.remove('glow-effect');}
-if(glowToggle){glowToggle.addEventListener('change',function(){var isNowEnabled=this.checked;localStorage.setItem('glowEnabled',isNowEnabled);if(isNowEnabled){document.body.classList.add('glow-effect');}else{document.body.classList.remove('glow-effect');}});}});

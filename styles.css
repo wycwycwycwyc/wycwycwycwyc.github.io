@@ -1,1 +1,0 @@
-#main-title{text-align:center;animation:color-animation 2s ease-in-out infinite}.custom-button{display:inline-block;padding:10px 20px;background-color:#3498db;color:#fff;border:none;cursor:pointer;border-radius:5px;transition:border-radius .5s ease}.custom-button:hover{border-radius:20px}@keyframes color-animation{0%{color:red}50%{color:blue}100%{color:green}}

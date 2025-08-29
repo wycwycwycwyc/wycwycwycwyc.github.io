@@ -1,2 +1,0 @@
-document.addEventListener('DOMContentLoaded',function(){var isLoggedIn=localStorage.getItem('isLoggedIn')==='true';function getCurrentPageFileName(){var path=window.location.pathname;var page=path.split("/").pop();return page||'index.html';}
-var currentPage=getCurrentPageFileName();if(!isLoggedIn){swal({title:"你还未登录",text:"请登录后使用",type:"warning",showCancelButton:false,confirmButtonText:"确定",closeOnConfirm:true},function(){location.href=`Login.html?redirect=${currentPage}`;});}});
