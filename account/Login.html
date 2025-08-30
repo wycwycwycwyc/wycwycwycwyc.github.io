@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录页面</title>
+<script src="/js/script14_serverUrl.js"></script>
+
     <script src="/js/script4_goBackOrHome.js"></script>
     <script src="/js/script3_darkMode.js"></script>
     <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -284,7 +286,7 @@ var redirectUrl = getRedirectUrl()||'';
             verifyingElement.style.display = 'block';
 
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://jbcfz.serveo.net/login', true);
+            xhr.open('POST', `${serverurl}/login`, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
 
             xhr.onreadystatechange = function () {
@@ -299,7 +301,7 @@ var redirectUrl = getRedirectUrl()||'';
                         swal("登录成功！", "你将解锁更多新功能", "success");
 
                         if (!isStrictEmail(username)) {
-                            fetch('https://jbcfz.serveo.net/get-user-id-by-username', {
+                            fetch(`${serverurl}/get-user-id-by-username`, {
                                 method: 'POST', // 指定请求方法
                                 headers: {
                                     'Content-Type': 'application/json' // 设置请求头
@@ -336,7 +338,7 @@ var redirectUrl = getRedirectUrl()||'';
                                     console.error('Fetch error:', error);
                                 });
                         } else {
-                            fetch('https://jbcfz.serveo.net/get-user-id-or-username-by-email', {
+                            fetch(`${serverurl}/get-user-id-or-username-by-email`, {
                                 method: 'POST', // 指定请求方法
                                 headers: {
                                     'Content-Type': 'application/json' // 设置请求头

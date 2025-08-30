@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>炫酷贪吃蛇</title>
+<script src="/js/script14_serverUrl.js"></script>
+
     <link rel="stylesheet" href="/css/styles_button.css">
     <link rel="stylesheet" href="/css/styles3_animation.css">
     <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
@@ -512,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkAndPromptUpload() {
     const localHighScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 
-        fetch('https://jbcfz.serveo.net/get-all-custom-data')
+        fetch(`${serverurl}/get-all-custom-data`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -682,7 +684,7 @@ document.querySelector('.close').addEventListener('click', function() {
 
 // 更新排行榜函数
 function updateLeaderboard() {
-    fetch('https://jbcfz.serveo.net/get-all-custom-data')
+    fetch(`${serverurl}/get-all-custom-data`)
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -1151,7 +1153,7 @@ function updateLeaderboard() {
     
     const localHighScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 
-        fetch('https://jbcfz.serveo.net/get-all-custom-data')
+        fetch(`${serverurl}/get-all-custom-data`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -1200,7 +1202,7 @@ function uploadScore(score) {
     
     const customData = `gamesnack_maxscore:${score}`;
     
-    fetch('https://jbcfz.serveo.net/update-custom-data', {
+    fetch(`${serverurl}/update-custom-data`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

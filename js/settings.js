@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
         document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
         // 使用fetch发送POST请求到后端接口
-        fetch('https://jbcfz.serveo.net/get-username-by-id', {
+        fetch(`${serverurl}/get-username-by-id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             localStorage.removeItem('usertype');
                             localStorage.removeItem('userid');
                             localStorage.removeItem('developerOptionsEnabled');
-                            window.location.href = '/account/Login.html?redirect=settings.html';
+                            window.location.href = '/account/Login.html?redirect=/settings.html';
                         } else {
                             window.location.reload();
                         }
@@ -318,13 +318,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         localStorage.removeItem('usertype');
                         localStorage.removeItem('userid');
                         localStorage.removeItem('developerOptionsEnabled');
-                        window.location.href = '/account/Login.html?redirect=settings.html';
+                        window.location.href = '/account/Login.html?redirect=/settings.html';
                     } else {
                         window.location.reload();
                     }
                 })
             });
-        fetch('https://jbcfz.serveo.net/get-email-by-userid', {
+        fetch(`${serverurl}/get-email-by-userid`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
         logout.style.display = 'none';
         // 如果未登录，设置点击事件以跳转到登录页面
         loginButton.onclick = function () {
-            var loginUrl = '/account/Login.html?redirect=settings.html#account'; // 替换为您的登录页面URL
+            var loginUrl = '/account/Login.html?redirect=/settings.html#account'; // 替换为您的登录页面URL
             openPage(loginUrl); // 使用openPage函数进行跳转
         };
     }
@@ -717,7 +717,7 @@ function logout() {
     }, function (isConfirm) {
         if (isConfirm) {
             userId = localStorage.getItem('userid');
-            fetch('https://jbcfz.serveo.net/delete-user', {
+            fetch(`${serverurl}/delete-user`, {
                 method: 'POST', // 指定请求方法为POST
                 headers: {
                     'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
@@ -793,7 +793,7 @@ function sa() {
             localStorage.removeItem('usertype');
             localStorage.removeItem('userid');
             localStorage.removeItem('developerOptionsEnabled');
-            window.location.href = '/account/Login.html?redirect=settings.html#account';
+            window.location.href = '/account/Login.html?redirect=/settings.html#account';
         }
         else {
             swal({
@@ -887,7 +887,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let userId = localStorage.getItem('userid');
     if (isLoggedIn) {
         // 使用fetch发送POST请求到后端接口
-        fetch('https://jbcfz.serveo.net/get-username-by-id', {
+        fetch(`${serverurl}/get-username-by-id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     };
 
                     // 使用fetch发送POST请求
-                    fetch('https://jbcfz.serveo.net/get-user-type', {
+                    fetch(`${serverurl}/get-user-type`, {
                         method: 'POST', // 指定请求方法为POST
                         headers: {
                             'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             localStorage.removeItem('usertype');
                             localStorage.removeItem('userid');
                             localStorage.removeItem('developerOptionsEnabled');
-                            window.location.href = '/account/Login.html?redirect=settings.html';
+                            window.location.href = '/account/Login.html?redirect=/settings.html';
                         } else {
                             window.location.reload();
                         }
@@ -985,7 +985,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         localStorage.removeItem('usertype');
                         localStorage.removeItem('userid');
                         localStorage.removeItem('developerOptionsEnabled');
-                        window.location.href = '/account/Login.html?redirect=settings.html';
+                        window.location.href = '/account/Login.html?redirect=/settings.html';
                     } else {
                         window.location.reload();
                     }
@@ -1202,7 +1202,7 @@ function createRow(user, index, users, isicon, input) {
                 if (isConfirm) {
                     swal('正在删除');
                     userId = user.id;
-                    fetch('https://jbcfz.serveo.net/delete-user', {
+                    fetch(`${serverurl}/delete-user`, {
                         method: 'POST', // 指定请求方法为POST
                         headers: {
                             'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
@@ -1339,7 +1339,7 @@ function uploadImage(user) {
             formData.append('avatar', blob);
 
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://jbcfz.serveo.net/upload-image', true);
+            xhr.open('POST', `${serverurl}/upload-image`, true);
 
             xhr.upload.onprogress = function (event) {
                 if (event.lengthComputable) {
@@ -1448,7 +1448,7 @@ function confirmPassword(targetUserId, username, targetUserType) {
         }
         swal('正在验证');
         // 发送密码到后端API进行验证
-        fetch('https://jbcfz.serveo.net/login', {
+        fetch(`${serverurl}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1600,7 +1600,7 @@ function submitChanges(index, users) {
     const userData = JSON.stringify(updatedUserInfo);
 
     // 发送请求到服务器
-    fetch('https://jbcfz.serveo.net/update-user-by-id', {
+    fetch(`${serverurl}/update-user-by-id`, {
         method: 'POST', // 指定请求方法为POST
         headers: {
             'Content-Type': 'application/json' // 设置请求头，告诉服务器我们发送的是JSON数据
@@ -1704,7 +1704,7 @@ document.getElementById('registerButton').addEventListener('click', function () 
 
         // 使用 AJAX 发送数据到服务器
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://jbcfz.serveo.net/register", true);
+        xhr.open("POST", `${serverurl}/register`, true);
         xhr.setRequestHeader("Content-type", "application/json");
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
@@ -1745,7 +1745,7 @@ document.getElementById('restartSystemBtn').addEventListener('click', function (
     }, function (isConfirm) {
         if (isConfirm) {
             swal('正在执行');
-            fetch('https://jbcfz.serveo.net/restart-server', {
+            fetch(`${serverurl}/restart-server`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1911,7 +1911,7 @@ function executeCommand(command) {
     addTerminalLine('执行中...', 'info');
 
     // 发送命令到服务器
-    fetch('https://jbcfz.serveo.net/execute-command', {
+    fetch(`${serverurl}/execute-command`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

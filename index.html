@@ -5,6 +5,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>脚本存放站</title>
+<script src="/js/script14_serverUrl.js"></script>
+
         <link rel="stylesheet" href="/css/styles_button.css">
         <script src="/js/script_openPage.js"></script>
         <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -704,7 +706,7 @@
                 if (!isLoggedIn) {
                     logoutButton.style.display = 'none';
                     loginStatusElement.onclick = function () {
-                        var loginUrl = '/account/Login.html'; // 替换为您的登录页面URL
+                        var loginUrl = '/account/Login.html?redirect=/index.html'; // 替换为您的登录页面URL
                         window.location.href = loginUrl;
                     };
                 } else {
@@ -717,7 +719,7 @@
                     const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
                     document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
                     // 使用fetch发送POST请求到后端接口
-                    fetch('https://jbcfz.serveo.net/get-username-by-id', {
+                    fetch(`${serverurl}/get-username-by-id`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

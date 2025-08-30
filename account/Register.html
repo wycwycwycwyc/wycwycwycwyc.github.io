@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>用户注册</title>
+<script src="/js/script14_serverUrl.js"></script>
+
     <script src="/js/script4_goBackOrHome.js"></script>
     <script src="/js/script3_darkMode.js"></script>
     <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -282,7 +284,7 @@ body.dark-mode select option {
                 return;
             }
 
-            fetch('https://jbcfz.serveo.net/send-verification-code', {
+            fetch(`${serverurl}/send-verification-code`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -330,7 +332,7 @@ body.dark-mode select option {
             var email = document.getElementById("email").value;
             var code = document.getElementById("verification_code").value;
 
-            fetch('https://jbcfz.serveo.net/verify-code', {
+            fetch(`${serverurl}/verify-code`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -373,7 +375,7 @@ body.dark-mode select option {
     <div class="container">
         <a href="/account/Login.html" class="back-button">返回</a>
         <h2>用户注册</h2>
-        <form id="registration_form" action="https://jbcfz.serveo.net/register" method="post"
+        <form id="registration_form" action=`${serverurl}/register` method="post"
             onsubmit="return validateForm(event)">
             <label for="username">用户名:</label>
             <input type="text" id="username" name="username" required maxlength="10">

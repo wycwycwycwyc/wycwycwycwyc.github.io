@@ -4,6 +4,8 @@
     <head>
         <meta charset="UTF-8">
         <title>图片上传表单</title>
+<script src="/js/script14_serverUrl.js"></script>
+
         <script src="/js/script4_goBackOrHome.js"></script>
         <script src="/js/script3_darkMode.js"></script>
         <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -285,7 +287,7 @@ body.dark-mode .file-upload-label:hover {
                         formData.append('avatar', blob);
 
                         var xhr = new XMLHttpRequest();
-                        xhr.open('POST', 'https://jbcfz.serveo.net/upload-image', true);
+                        xhr.open('POST', `${serverurl}/upload-image`, true);
 
                         xhr.upload.onprogress = function (event) {
                             if (event.lengthComputable) {

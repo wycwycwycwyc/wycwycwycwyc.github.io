@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>双人贪吃蛇大作战</title>
+<script src="/js/script14_serverUrl.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/styles_button.css">
     <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -4099,7 +4101,7 @@ async function uploadGameRecord(player1Wins, player2Wins) {
 // 获取用户自定义数据
 async function getUserCustomData(userId) {
     try {
-        const response = await fetch('https://jbcfz.serveo.net/get-custom-data-by-id', {
+        const response = await fetch(`${serverurl}/get-custom-data-by-id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -4148,7 +4150,7 @@ function updateRecord(currentData, newRecord) {
 // 更新用户自定义数据
 async function updateUserCustomData(userId, customData) {
     try {
-        const response = await fetch('https://jbcfz.serveo.net/update-custom-data', {
+        const response = await fetch(`${serverurl}/update-custom-data`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -4521,7 +4523,7 @@ function loginPlayer2() {
             }
             
             // 发送登录请求
-            fetch('https://jbcfz.serveo.net/login', {
+            fetch(`${serverurl}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -4535,7 +4537,7 @@ function loginPlayer2() {
             .then(data => {
                 if (data.includes('<h1>登录成功</h1>')) {
                     localStorage.setItem('player2_username', username);
-                    fetch('https://jbcfz.serveo.net/get-user-id-by-username', {
+                    fetch(`${serverurl}/get-user-id-by-username`, {
                                 method: 'POST', // 指定请求方法
                                 headers: {
                                     'Content-Type': 'application/json' // 设置请求头
@@ -4742,7 +4744,7 @@ async function showAllRecords() {
         modal.style.display = 'block';
         
         // 获取所有用户数据
-        const response = await fetch('https://jbcfz.serveo.net/get-all-custom-data');
+        const response = await fetch(`${serverurl}/get-all-custom-data`);
         const data = await response.json();
         
         if (!data.success) {

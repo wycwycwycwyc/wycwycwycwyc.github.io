@@ -5,6 +5,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>更换邮箱</title>
+<script src="/js/script14_serverUrl.js"></script>
+
         <script src="/js/script4_goBackOrHome.js"></script>
         <script src="/js/script3_darkMode.js"></script>
         <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -195,7 +197,7 @@ body.dark-mode .back-btn:hover {
                 sendButton.innerText = "正在发送";
                 const email = document.getElementById('email').value;
 
-                const sendCodeResponse = await fetch('https://jbcfz.serveo.net/send-verification-code', {
+                const sendCodeResponse = await fetch(`${serverurl}/send-verification-code`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -224,7 +226,7 @@ body.dark-mode .back-btn:hover {
                 const verificationCode = document.getElementById('verificationCode').value;
 
                 // 调用登录接口
-                const loginResponse = await fetch('https://jbcfz.serveo.net/login', {
+                const loginResponse = await fetch(`${serverurl}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -236,7 +238,7 @@ body.dark-mode .back-btn:hover {
                 if (loginResponse.ok) {
                     swal('正在验证密码');
                     // 登录成功，验证验证码
-                    const verifyCodeResponse = await fetch('https://jbcfz.serveo.net/verify-code', {
+                    const verifyCodeResponse = await fetch(`${serverurl}/verify-code`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -249,7 +251,7 @@ body.dark-mode .back-btn:hover {
                     if (verifyCodeResponse.ok) {
                         // 验证码验证成功，更新邮箱
                         swal('正在更新邮箱');
-                        const updateEmailResponse = await fetch('https://jbcfz.serveo.net/update-email', {
+                        const updateEmailResponse = await fetch(`${serverurl}/update-email`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'

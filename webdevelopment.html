@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
     <title>网站发展历程</title>
+    <script src="/js/script14_serverUrl.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         :root {
             --primary-color: #3498db;
@@ -48,32 +52,33 @@
             font-family: 'Microsoft YaHei', sans-serif;
             transition: background-color 0.5s ease, color 0.3s ease;
         }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
+            position: relative;
         }
-        
+
         header {
             text-align: center;
             margin-bottom: 50px;
             position: relative;
         }
-        
+
         h1 {
             font-size: 2.5rem;
             color: var(--primary-color);
             margin-bottom: 20px;
             animation: fadeInDown 1s ease;
         }
-        
+
         .subtitle {
             font-size: 1.2rem;
             color: var(--footer-text);
@@ -81,13 +86,16 @@
             margin: 0 auto;
             animation: fadeIn 1.5s ease;
         }
-        
+
         .timeline {
             position: relative;
             max-width: 900px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column-reverse;
+            /* 反转时间线顺序 */
         }
-        
+
         .timeline::after {
             content: '';
             position: absolute;
@@ -100,7 +108,7 @@
             border-radius: 2px;
             animation: growVertical 2s ease;
         }
-        
+
         .milestone {
             padding: 20px 40px;
             position: relative;
@@ -108,12 +116,12 @@
             width: 50%;
             opacity: 0;
         }
-        
+
         .milestone.visible {
             opacity: 1;
             animation: fadeInUp 0.8s ease forwards;
         }
-        
+
         .milestone::after {
             content: '';
             position: absolute;
@@ -126,23 +134,23 @@
             z-index: 1;
             animation: pulse 2s infinite;
         }
-        
+
         .left {
             left: 0;
         }
-        
+
         .right {
             left: 50%;
         }
-        
+
         .left::after {
             right: -12px;
         }
-        
+
         .right::after {
             left: -12px;
         }
-        
+
         .content {
             padding: 30px;
             background-color: var(--card-bg);
@@ -152,31 +160,31 @@
             transform: translateY(20px);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .milestone.visible .content {
             transform: translateY(0);
         }
-        
+
         .content:hover {
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             transform: translateY(-5px);
         }
-        
+
         h2 {
             color: var(--primary-color);
             margin-bottom: 15px;
         }
-        
+
         .date {
             font-weight: bold;
             color: var(--secondary-color);
             margin-bottom: 10px;
         }
-        
+
         p {
             margin-bottom: 10px;
         }
-        
+
         .highlight {
             background-color: var(--highlight-color);
             padding: 2px 5px;
@@ -184,7 +192,7 @@
             color: #2c3e50;
             font-weight: bold;
         }
-        
+
         footer {
             text-align: center;
             margin-top: 80px;
@@ -192,80 +200,154 @@
             font-size: 0.9rem;
             animation: fadeIn 2s ease;
         }
-        
+
+        /* 导航按钮 */
+        .nav-buttons {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .nav-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
         /* 动画定义 */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
-        
+
         @keyframes fadeInDown {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(-30px);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes fadeInUp {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-            to { 
+
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes growVertical {
-            from { height: 0; }
-            to { height: 100%; }
+            from {
+                height: 0;
+            }
+
+            to {
+                height: 100%;
+            }
         }
-        
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
-        
+
         @media screen and (max-width: 768px) {
             .timeline::after {
                 left: 31px;
             }
-            
+
             .milestone {
                 width: 100%;
                 padding-left: 70px;
                 padding-right: 25px;
             }
-            
+
             .milestone::after {
                 left: 21px;
             }
-            
-            .left::after, .right::after {
+
+            .left::after,
+            .right::after {
                 left: 21px;
             }
-            
+
             .right {
                 left: 0%;
             }
+
+            .nav-buttons {
+                right: 15px;
+                bottom: 15px;
+            }
+
+            .nav-button {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
+    <!-- 导航按钮 -->
+    <div class="nav-buttons">
+        <div class="nav-button" id="toTopBtn" title="回到开头">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+        <div class="nav-button" id="toBottomBtn" title="回到底部">
+            <i class="fas fa-arrow-down"></i>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>网站发展历程</h1>
             <button class="custom-button" onclick="goBackOrHome()">返回</button>
             <p class="subtitle">记录每一个重要时刻，见证我们的成长轨迹</p>
         </header>
-        
+    
         <div class="timeline">
             <!-- 里程碑1 -->
             <div class="milestone left">
@@ -276,7 +358,7 @@
                     <p>初始版本包含基础架构和核心功能，为未来发展奠定了基础。</p>
                 </div>
             </div>
-            
+    
             <!-- 里程碑2 -->
             <div class="milestone right">
                 <div class="content">
@@ -286,7 +368,7 @@
                     <p>新界面更加现代化、直观，提升了用户体验和视觉吸引力。</p>
                 </div>
             </div>
-            
+    
             <!-- 里程碑3 -->
             <div class="milestone left">
                 <div class="content">
@@ -296,7 +378,7 @@
                     <p>这一功能大大增强了用户对网站体验的控制能力。</p>
                 </div>
             </div>
-            
+    
             <!-- 里程碑4 -->
             <div class="milestone right">
                 <div class="content">
@@ -306,7 +388,7 @@
                     <p>这使得个性化服务和数据同步成为可能，用户数量开始快速增长。</p>
                 </div>
             </div>
-            
+    
             <!-- 里程碑5 -->
             <div class="milestone left">
                 <div class="content">
@@ -319,7 +401,7 @@
                     </ul>
                 </div>
             </div>
-            
+    
             <!-- 里程碑6 -->
             <div class="milestone right">
                 <div class="content">
@@ -336,7 +418,7 @@
                     </ul>
                     <p style="margin-top: 10px;">这次更新标志着网站进入更加成熟的阶段。</p>
                 </div>
-                </div>
+            </div>
             <!-- 里程碑5 -->
             <div class="milestone left">
                 <div class="content">
@@ -353,13 +435,23 @@
                 <div class="content">
                     <div class="date">2025年8月29日</div>
                     <h2>功能持续完善</h2>
-                        <li>修复了一些已知问题</li>
-                        <li>内部架构优化</li>
+                    <li>修复了一些已知问题</li>
+                    <li>内部架构优化</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="milestone left">
+                <div class="content">
+                    <div class="date">2025年8月30日</div>
+                    <h2>功能持续完善</h2>
+                    <li>修复了一些已知问题</li>
+                    <li>更新网站发展历程网页界面</li>
+                    <li>可能是近期最后几次大规模更新</li>
                     </ul>
                 </div>
             </div>
         </div>
-        
+
         <footer>
             <p>© 2023-2025 脚本存放站 版权所有</p>
             <p>我们的旅程仍在继续，期待与您共同创造更多精彩时刻...</p>
@@ -369,7 +461,7 @@
     <script>
         // 滚动动画
         const milestones = document.querySelectorAll('.milestone');
-        
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -380,10 +472,20 @@
         }, {
             threshold: 0.1
         });
-        
+
         milestones.forEach(milestone => {
             observer.observe(milestone);
         });
+
+        // 导航按钮功能
+        document.getElementById('toTopBtn').addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        document.getElementById('toBottomBtn').addEventListener('click', function () {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
     </script>
 </body>
+
 </html>

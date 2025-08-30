@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>更改用户名</title>
+<script src="/js/script14_serverUrl.js"></script>
+
     <script src="/js/script4_goBackOrHome.js"></script>
     <script src="/js/script3_darkMode.js"></script>
     <link rel="stylesheet" href="/css/styles3_animation.css">
@@ -179,7 +181,7 @@ body.dark-mode ::placeholder {
                 return;
             }
 
-            fetch('https://jbcfz.serveo.net/update-username', {
+            fetch(`${serverurl}/update-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -234,7 +236,7 @@ body.dark-mode ::placeholder {
             let userId = localStorage.getItem('userid');
 
             // 使用fetch发送POST请求到后端接口
-            fetch('https://jbcfz.serveo.net/get-username-by-id', {
+            fetch(`${serverurl}/get-username-by-id`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
