@@ -202,7 +202,7 @@ def main():
     choices = input("输入任意文字继续，输入2查看本程序官方网站:")
     if choices.strip() == '2':
         print("官方网站：https://jbcfz.cloudns.be/\n本文件地址：https://jbcfz.cloudns.be/code.html?title=图片裁剪合并专用&file=/code/python/image_process.py")
-        os.system("start https://jbcfz.cloudns.be/code.html?title=图片裁剪合并专用&file=/code/python/image_process.py")  # Windows系统打开网址
+        os.system("start https://jbcfz.cloudns.be/2")  # Windows系统打开网址
         print("=" * 60)
         main()    
     # 步骤1: 裁剪当前目录中的所有图片
