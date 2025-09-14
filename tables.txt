@@ -1,0 +1,9 @@
+python:
+name:table1，introduction:xxxxxxx,remark:xxxxx,link:/code/python/xxx1.py;
+name:table2，introduction:xxxxxxx,remark:xxxxx,link:/code/python/xxx2.py;
+c++:
+name:table1，introduction:xxxxxxx,remark:xxxxx,link:/code/cpp/xxx1.cpp;
+name:table2，introduction:xxxxxxx,remark:xxxxx,link:/code/cpp/xxx1.cpp;
+webapp:
+name:name:table1，introduction:xxxxxxx,remark:xxxxx,link:/code/webapp/xxx1.html;
+name:name:table2，introduction:xxxxxxx,remark:xxxxx,link:/code/webapp/xxx2.html;
