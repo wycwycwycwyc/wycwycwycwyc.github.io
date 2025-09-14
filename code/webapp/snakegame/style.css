@@ -1,0 +1,537 @@
+        body {
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+          font-family: 'Arial', sans-serif;
+          overflow: hidden;
+          touch-action: none;
+        }
+
+        .game-container {
+          position: relative;
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          background-color: rgba(0, 0, 0, 0.7);
+          transform: scale(0.8);
+          opacity: 0;
+          animation: containerEnter 1s forwards 0.5s;
+        }
+
+        @keyframes containerEnter {
+          0% {
+            transform: scale(0.8);
+            opacity: 0;
+          }
+
+          70% {
+            transform: scale(1.05);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        #game-board {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+
+        .snake-segment {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          background: linear-gradient(45deg, #4CAF50, #8BC34A);
+          border-radius: 50%;
+          box-shadow: 0 0 10px #4CAF50;
+          transition: all 0.1s ease-out;
+          z-index: 2;
+        }
+
+        .snake-head {
+          background: linear-gradient(45deg, #FF5722, #FF9800);
+          box-shadow: 0 0 15px #FF5722;
+          transform: scale(1.2);
+          z-index: 3;
+        }
+
+        /* 普通食物样式 */
+        .food {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          background: linear-gradient(45deg, #4CAF50, #8BC34A);
+          border-radius: 50%;
+          box-shadow: 0 0 10px #4CAF50;
+          animation: pulse 1s infinite alternate;
+          z-index: 1;
+        }
+
+        /* 特殊食物样式 */
+        .special-food {
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          z-index: 2;
+          box-shadow: 0 0 15px white;
+        }
+
+        /* 彩虹动画 */
+        @keyframes rainbowPulse {
+          0% {
+            background: linear-gradient(45deg, #FF0000, #FF7F00);
+            box-shadow: 0 0 15px #FF0000;
+          }
+
+          14% {
+            background: linear-gradient(45deg, #FF7F00, #FFFF00);
+            box-shadow: 0 0 15px #FF7F00;
+          }
+
+          28% {
+            background: linear-gradient(45deg, #FFFF00, #00FF00);
+            box-shadow: 0 0 15px #FFFF00;
+          }
+
+          42% {
+            background: linear-gradient(45deg, #00FF00, #0000FF);
+            box-shadow: 0 0 15px #00FF00;
+          }
+
+          57% {
+            background: linear-gradient(45deg, #0000FF, #4B0082);
+            box-shadow: 0 0 15px #0000FF;
+          }
+
+          71% {
+            background: linear-gradient(45deg, #4B0082, #9400D3);
+            box-shadow: 0 0 15px #4B0082;
+          }
+
+          85% {
+            background: linear-gradient(45deg, #9400D3, #FF0000);
+            box-shadow: 0 0 15px #9400D3;
+          }
+
+          100% {
+            background: linear-gradient(45deg, #FF0000, #FF7F00);
+            box-shadow: 0 0 15px #FF0000;
+          }
+        }
+
+        @keyframes rotate {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* 普通食物脉动动画 */
+        @keyframes pulse {
+          from {
+            transform: scale(1);
+          }
+
+          to {
+            transform: scale(1.2);
+          }
+        }
+
+        @keyframes pulse {
+          from {
+            transform: scale(1);
+          }
+
+          to {
+            transform: scale(1.3);
+          }
+        }
+
+        .score-board {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          color: white;
+          font-size: 18px;
+          text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          z-index: 4;
+          transform: translateY(-50px);
+          opacity: 0;
+          animation: scoreEnter 0.5s forwards 1.5s;
+        }
+
+        @keyframes scoreEnter {
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .game-over {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.8);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          font-size: 36px;
+          z-index: 5;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.5s;
+        }
+
+        .game-over.show {
+          opacity: 1;
+          pointer-events: all;
+        }
+
+        .restart-btn {
+          margin-top: 20px;
+          padding: 10px 30px;
+          background: linear-gradient(45deg, #2196F3, #00BCD4);
+          border: none;
+          border-radius: 50px;
+          color: white;
+          font-size: 18px;
+          cursor: pointer;
+          box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+          transition: all 0.3s;
+          transform: scale(0);
+          animation: buttonPop 0.5s forwards 0.3s;
+        }
+
+        .start-btn {
+          /* 确保这些属性存在 */
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: scale(1) !important;
+        }
+
+        @keyframes buttonPop {
+          0% {
+            transform: scale(0);
+          }
+
+          70% {
+            transform: scale(1.1);
+          }
+
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .restart-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 0 25px rgba(33, 150, 243, 0.8);
+        }
+
+        .start-screen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, rgba(26, 42, 108, 0.9), rgba(178, 31, 31, 0.9), rgba(253, 187, 45, 0.9));
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          z-index: 10;
+          transition: all 0.5s;
+        }
+
+        .start-screen.hide {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .game-title {
+          font-size: 48px;
+          margin-bottom: 30px;
+          text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+          animation: titleBounce 2s infinite;
+          transform: translateY(-50px);
+          opacity: 0;
+          animation: titleEnter 1s forwards 0.2s, titleBounce 2s infinite 1.2s;
+        }
+
+        @keyframes titleEnter {
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes titleBounce {
+
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        .start-btn {
+          padding: 15px 40px;
+          background: linear-gradient(45deg, #FF5722, #FF9800);
+          border: none;
+          border-radius: 50px;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          box-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+          transition: all 0.3s;
+          transform: scale(0);
+          opacity: 0;
+          animation: buttonPop 0.5s forwards 0.8s;
+        }
+
+        .start-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 0 30px rgba(255, 87, 34, 0.8);
+        }
+
+        .instructions {
+          margin-top: 30px;
+          font-size: 16px;
+          text-align: center;
+          opacity: 0.8;
+          transform: translateY(50px);
+          opacity: 0;
+          animation: instructionsEnter 0.8s forwards 1s;
+        }
+
+        @keyframes instructionsEnter {
+          to {
+            transform: translateY(0);
+            opacity: 0.8;
+          }
+        }
+
+        .particles {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .particle {
+          position: absolute;
+          width: 5px;
+          height: 5px;
+          background-color: rgba(255, 255, 255, 0.5);
+          border-radius: 50%;
+          animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+          0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+
+          10% {
+            opacity: 1;
+          }
+
+          90% {
+            opacity: 1;
+          }
+
+          100% {
+            transform: translateY(-500px) translateX(100px);
+            opacity: 0;
+          }
+        }
+
+        /* 蛇进入动画 */
+        .snake-enter {
+          animation: snakeEnter 0.8s forwards;
+        }
+
+        @keyframes snakeEnter {
+          0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 0;
+          }
+
+          70% {
+            transform: scale(1.2) rotate(360deg);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(1) rotate(360deg);
+            opacity: 1;
+          }
+        }
+
+        /* 食物进入动画 */
+        .food-enter {
+          animation: foodEnter 0.8s forwards;
+        }
+
+        @keyframes foodEnter {
+          0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 0;
+          }
+
+          70% {
+            transform: scale(1.3) rotate(360deg);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(1) rotate(360deg);
+            opacity: 1;
+          }
+        }
+
+        /* 背景元素动画 */
+        .bg-element {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(10px);
+          opacity: 0.1;
+          z-index: -1;
+          animation: bgFloat 20s infinite linear;
+        }
+
+        @keyframes bgFloat {
+          0% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+
+          50% {
+            transform: translate(50px, 50px) rotate(180deg);
+          }
+
+          100% {
+            transform: translate(0, 0) rotate(360deg);
+          }
+        }
+
+        .special-food {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          box-shadow: 0 0 15px white;
+          animation: rainbowPulse 2s infinite alternate, rotate 5s infinite linear;
+          z-index: 1;
+        }
+
+        @keyframes rainbowPulse {
+          0% {
+            background: linear-gradient(45deg, #FF0000, #FF7F00);
+            box-shadow: 0 0 15px #FF0000;
+          }
+
+          14% {
+            background: linear-gradient(45deg, #FF7F00, #FFFF00);
+            box-shadow: 0 0 15px #FF7F00;
+          }
+
+          28% {
+            background: linear-gradient(45deg, #FFFF00, #00FF00);
+            box-shadow: 0 0 15px #FFFF00;
+          }
+
+          42% {
+            background: linear-gradient(45deg, #00FF00, #0000FF);
+            box-shadow: 0 0 15px #00FF00;
+          }
+
+          57% {
+            background: linear-gradient(45deg, #0000FF, #4B0082);
+            box-shadow: 0 0 15px #0000FF;
+          }
+
+          71% {
+            background: linear-gradient(45deg, #4B0082, #9400D3);
+            box-shadow: 0 0 15px #4B0082;
+          }
+
+          85% {
+            background: linear-gradient(45deg, #9400D3, #FF0000);
+            box-shadow: 0 0 15px #9400D3;
+          }
+
+          100% {
+            background: linear-gradient(45deg, #FF0000, #FF7F00);
+            box-shadow: 0 0 15px #FF0000;
+          }
+        }
+
+        @keyframes rotate {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* 改进的FPS计数器样式 */
+        .fps-counter {
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+          color: white;
+          font-size: 18px;
+          text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          z-index: 4;
+          background-color: rgba(0, 0, 0, 0.5);
+          padding: 5px 10px;
+          border-radius: 5px;
+          font-family: monospace;
+          display: flex;
+          align-items: center;
+        }
+
+        .fps-counter::before {
+          content: "";
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 8px;
+          background-color: #4CAF50;
+        }
+
+        .fps-counter.low {
+          color: #FF5722;
+        }
+
+        .fps-counter.low::before {
+          background-color: #FF5722;
+        }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极限反应力测试</title>
+    <script src="/js/script14_serverUrl.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles_button.css">
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script3_darkMode.js"></script>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script5_setAnimations.js"></script>
+    <script src="/js/script6_setFontSize.js"></script>
+    <script src="/js/script7_setOpacityandBlur.js"></script>
+    <script src="/js/script8_setEyeCare.js"></script>
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="/js/script11_setHighlight.js"></script>
+    <script src="/js/script13_checkIslogin.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link href="/css/message.min.css" rel="stylesheet" />
+    <script src="/js/message.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./Reactivity.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>极限反应力测试</h1>
+        
+        <div class="instructions">
+            <p><i class="fas fa-bolt"></i> 当屏幕从红色变为绿色时，尽快点击或触摸屏幕！</p>
+            <p><i class="fas fa-stopwatch"></i> 测试将进行5次，每次间隔5秒</p>
+            <p><i class="fas fa-dice"></i> 红色变为绿色的等待时间是随机的（3-8秒）</p>
+            <p><i class="fas fa-trophy"></i> 准备好后点击下方按钮开始测试</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div>当前测试</div>
+                <div class="stat-value" id="current-test">0/5</div>
+            </div>
+            <div class="stat-box">
+                <div>最快反应</div>
+                <div class="stat-value" id="fastest">0 ms</div>
+            </div>
+            <div class="stat-box">
+                <div>平均反应</div>
+                <div class="stat-value" id="average">0 ms</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <button id="start-btn"><i class="fas fa-play"></i> 开始测试</button>
+    </div>
+    
+    <div class="test-area" id="test-area">
+        <div class="color-screen" id="color-screen"></div>
+    </div>
+    
+    <div class="results" id="results">
+        <h2><i class="fas fa-chart-line"></i> 测试结果</h2>
+        <ul class="result-list" id="result-list"></ul>
+        <div class="average" id="average-result">平均反应时间: 0 ms</div>
+        <button id="restart-btn"><i class="fas fa-redo"></i> 再次测试</button>
+    </div>
+</body>
+</html>

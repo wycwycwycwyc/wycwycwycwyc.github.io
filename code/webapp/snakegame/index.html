@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷贪吃蛇</title>
+<script src="/js/script14_serverUrl.js"></script>
+
+    <link rel="stylesheet" href="/css/styles_button.css">
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script3_darkMode.js"></script>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script5_setAnimations.js"></script>
+    <script src="/js/script6_setFontSize.js"></script>
+    <script src="/js/script7_setOpacityandBlur.js"></script>
+    <script src="/js/script8_setEyeCare.js"></script>
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="/js/script11_setHighlight.js"></script>
+    <script src="/js/script13_checkIslogin.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link href="/css/message.min.css" rel="stylesheet" />
+    <script src="/js/message.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./snakegame.js"></script>
+<button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;" onclick="goBackOrHome()">返回</button>
+</head>
+<body>
+    <div class="game-container">
+        <div class="start-screen">
+            <h1 class="game-title">🐍 贪吃蛇 🐍</h1>
+            <button class="start-btn">开始游戏</button>
+            <div class="instructions">
+                <p>使用方向键或WASD控制蛇的移动</p>
+                <p>吃到彩色色食物可以增加分数</p>
+                <p>不要撞到墙壁或自己的身体!</p>
+            </div>
+        </div>
+        
+        <div class="particles" id="particles"></div>
+        
+        <div id="game-board"></div>
+    <div class="fps-counter" id="fps-counter">
+        <span id="fps">--</span> FPS
+    </div>
+        <div class="score-board">
+            <div>当前分数: <span id="current-score">0</span></div>
+            <div>最高分数: <span id="high-score">0</span></div>
+            <a onclick="goBackOrHome()">返回</a>
+        </div>
+        
+        <div class="game-over">
+            <h2>游戏结束!</h2>
+            <div>你的分数: <span id="final-score">0</span></div>
+            <button class="restart-btn">再来一局</button>
+        </div>
+    </div>
+</body>
+</html>

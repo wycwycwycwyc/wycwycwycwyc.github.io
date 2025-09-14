@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/styles_button.css">
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script3_darkMode.js"></script>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script5_setAnimations.js"></script>
+    <script src="/js/script6_setFontSize.js"></script>
+    <script src="/js/script7_setOpacityandBlur.js"></script>
+    <script src="/js/script8_setEyeCare.js"></script>
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="/js/script11_setHighlight.js"></script>
+    <script src="/js/script13_checkIslogin.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link href="/css/message.min.css" rel="stylesheet" />
+    <script src="/js/message.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./calculator.js"></script>
+    <title>多功能计算器</title>
+<script src="/js/script14_serverUrl.js"></script>
+
+<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()">返回</button>
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('basic')">普通计算</div>
+            <div class="tab" onclick="switchTab('scientific')">科学运算</div>
+            <div class="tab" onclick="switchTab('graphing')">函数画图</div>
+        </div>
+        
+        <!-- 普通计算器 -->
+        <div id="basic" class="tab-content active">
+            <div class="basic-calculator">
+                <div class="display">
+                    <div class="display-history" id="basic-history"></div>
+                    <div id="basic-display">0</div>
+                </div>
+                <button class="special" onclick="clearDisplay('basic')">AC</button>
+                <button class="special" onclick="toggleSign('basic')">+/-</button>
+                <button class="special" onclick="percentage('basic')">%</button>
+                <button class="operator" onclick="appendOperator('basic', '/')">/</button>
+                
+                <button onclick="appendNumber('basic', '7')">7</button>
+                <button onclick="appendNumber('basic', '8')">8</button>
+                <button onclick="appendNumber('basic', '9')">9</button>
+                <button class="operator" onclick="appendOperator('basic', '*')">×</button>
+                
+                <button onclick="appendNumber('basic', '4')">4</button>
+                <button onclick="appendNumber('basic', '5')">5</button>
+                <button onclick="appendNumber('basic', '6')">6</button>
+                <button class="operator" onclick="appendOperator('basic', '-')">-</button>
+                
+                <button onclick="appendNumber('basic', '1')">1</button>
+                <button onclick="appendNumber('basic', '2')">2</button>
+                <button onclick="appendNumber('basic', '3')">3</button>
+                <button class="operator" onclick="appendOperator('basic', '+')">+</button>
+                
+                <button class="span-2" onclick="appendNumber('basic', '0')">0</button>
+                <button onclick="appendDecimal('basic')">.</button>
+                <button class="operator" onclick="calculate('basic')">=</button>
+            </div>
+        </div>
+        
+        <!-- 科学计算器 -->
+        <div id="scientific" class="tab-content">
+            <div class="scientific-calculator">
+                <div class="display scientific-display">
+                    <div class="display-history" id="scientific-history"></div>
+                    <div id="scientific-display">0</div>
+                </div>
+                
+                <button class="special" onclick="clearDisplay('scientific')">AC</button>
+                <button class="special" onclick="toggleSign('scientific')">+/-</button>
+                <button class="special" onclick="percentage('scientific')">%</button>
+                <button class="operator" onclick="appendOperator('scientific', '/')">/</button>
+                <button class="special" onclick="factorial('scientific')">x!</button>
+                
+                <button onclick="scientificFunction('scientific', 'sin(')">sin</button>
+                <button onclick="appendNumber('scientific', '7')">7</button>
+                <button onclick="appendNumber('scientific', '8')">8</button>
+                <button onclick="appendNumber('scientific', '9')">9</button>
+                <button class="operator" onclick="appendOperator('scientific', '*')">×</button>
+                
+                <button onclick="scientificFunction('scientific', 'cos(')">cos</button>
+                <button onclick="appendNumber('scientific', '4')">4</button>
+                <button onclick="appendNumber('scientific', '5')">5</button>
+                <button onclick="appendNumber('scientific', '6')">6</button>
+                <button class="operator" onclick="appendOperator('scientific', '-')">-</button>
+                
+                <button onclick="scientificFunction('scientific', 'tan(')">tan</button>
+                <button onclick="appendNumber('scientific', '1')">1</button>
+                <button onclick="appendNumber('scientific', '2')">2</button>
+                <button onclick="appendNumber('scientific', '3')">3</button>
+                <button class="operator" onclick="appendOperator('scientific', '+')">+</button>
+                
+                <button onclick="scientificFunction('scientific', 'log(')">log</button>
+                <button onclick="scientificFunction('scientific', 'ln(')">ln</button>
+                <button class="span-2" onclick="appendNumber('scientific', '0')">0</button>
+                <button class="operator" onclick="calculate('scientific')">=</button>
+                
+                <button onclick="scientificFunction('scientific', 'sqrt(')">√</button>
+                <button onclick="scientificFunction('scientific', 'pow(')">x^y</button>
+                <button onclick="appendDecimal('scientific')">.</button>
+                <button onclick="scientificFunction('scientific', 'pi')">π</button>
+                <button onclick="scientificFunction('scientific', 'e')">e</button>
+                
+                <button onclick="scientificFunction('scientific', '(')">(</button>
+                <button onclick="scientificFunction('scientific', ')')">)</button>
+                <button onclick="backspace('scientific')">⌫</button>
+                <button onclick="scientificFunction('scientific', '^2')">x²</button>
+                <button onclick="scientificFunction('scientific', '^3')">x³</button>
+            </div>
+        </div>
+        
+        <!-- 函数画图 -->
+        <div id="graphing" class="tab-content">
+            <div class="graphing-calculator">
+                <div class="graph-controls">
+                    <div class="graph-input">
+                        <input type="text" id="function-input" placeholder="输入函数，如 sin(x) + x^2">
+                        <button onclick="addFunction()">添加函数</button>
+                    </div>
+                    <div class="range-inputs">
+                        <input type="number" id="x-min" placeholder="x最小值" value="-10">
+                        <input type="number" id="x-max" placeholder="x最大值" value="10">
+                        <input type="number" id="y-min" placeholder="y最小值" value="-10">
+                        <input type="number" id="y-max" placeholder="y最大值" value="10">
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <canvas id="graph-canvas"></canvas>
+                </div>
+                
+                <div class="function-list" id="function-list">
+                    <!-- 函数列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
