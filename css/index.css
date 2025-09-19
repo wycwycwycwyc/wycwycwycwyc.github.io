@@ -1,0 +1,623 @@
+            html {
+              scroll-behavior: smooth !important;
+            }
+
+            @keyframes fadeInFromRight {
+              from {
+                opacity: 0;
+                transform: translateX(100%);
+              }
+
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+
+            @keyframes fadeInFromLeft {
+              from {
+                opacity: 0;
+                transform: translateX(-100%);
+              }
+
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+
+            @keyframes fadeInFromBottom {
+              from {
+                opacity: 0;
+                transform: translateY(100%);
+              }
+
+              to {
+                opacity: 1;
+                transform: translateY(0);
+                transform: translateX(-50%);
+              }
+            }
+
+            #busuanzi-container {
+              animation: fadeInFromRight 1.5s ease-out forwards;
+            }
+
+            #tips {
+              animation: fadeInFromLeft 1.5s ease-out forwards;
+            }
+
+            #time {
+              animation: fadeInFromRight 1.5s ease-out forwards;
+            }
+
+            .bottom-bar {
+              animation: fadeInFromBottom 1.5s ease-out forwards;
+            }
+
+            #settingsButton {
+              position: fixed;
+              top: 0;
+              right: 250px;
+              /* 调整位置，使其在时间旁边 */
+              background-color: transparent;
+              border: none;
+              cursor: pointer;
+              padding: 5px;
+              z-index: 1000;
+              transition: transform 0.3s ease;
+              /* 添加过渡效果 */
+            }
+
+            #settingsButton img {
+              width: 40px;
+              height: 40px;
+              transition: transform 0.3s ease;
+              /* 添加过渡效果 */
+            }
+
+            #settingsButton:hover img {
+              transform: rotate(90deg);
+              /* 悬停时旋转180度 */
+            }
+
+            /* 原有的样式保持不变 */
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              background-color: #f4f4f4;
+              overflow: hidden;
+              /* 隐藏溢出的内容和滚动条 */
+              background-image: url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark');
+              /* 替换为你的图片路径 */
+              background-repeat: no-repeat;
+              background-size: cover;
+              scroll-behavior: smooth !important;
+              /* 使背景图片覆盖整个页面 */
+            }
+
+            .centered-title {
+              text-align: center;
+              margin: 20px 0;
+            }
+
+            th,
+            td {
+              border: 1px solid #ddd;
+              padding: 15px;
+              text-align: left;
+              border-radius: 0;
+            }
+
+            th {
+              background-color: rgba(242, 242, 242, 0.8);
+              font-weight: bold;
+              border-top-left-radius: 10px;
+              border-top-right-radius: 10px;
+            }
+
+            td {
+              border-bottom-left-radius: 0;
+              border-bottom-right-radius: 0;
+            }
+
+            *,
+            *:before,
+            *:after {
+              box-sizing: border-box;
+            }
+
+            table {
+              width: 90%;
+              max-width: 1200px;
+              table-layout: fixed;
+              margin: 20px auto;
+              border-collapse: collapse;
+              position: relative;
+              border-spacing: 0;
+              background-color: rgba(255, 255, 255, 0.8);
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              border-radius: 15px;
+              max-height: 500px;
+              display: block;
+              overflow-y: auto;
+            }
+
+            /* 为所有表格设置滚动条样式 */
+            table::-webkit-scrollbar {
+              width: 10px;
+            }
+
+            table::-webkit-scrollbar-track {
+              background: transparent;
+            }
+
+            table::-webkit-scrollbar-thumb {
+              background: #888;
+              border-radius: 1px;
+            }
+
+            table::-webkit-scrollbar-thumb:hover {
+              background: #555;
+            }
+
+            thead {
+              background-color: rgba(242, 242, 242, 0.8);
+              position: sticky;
+              top: 0;
+              z-index: 10;
+            }
+
+            th {
+              position: sticky;
+              top: 0;
+              border-top-left-radius: 10px;
+              border-top-right-radius: 10px;
+              z-index: 20;
+            }
+
+            @keyframes slideUp {
+              0% {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              100% {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            .bottom-bar {
+              width: 60%;
+              background-color: rgba(255, 255, 255, 0.3);
+              padding: 0px;
+              text-align: center;
+              font-size: 16px;
+              position: fixed;
+              bottom: 0;
+              left: 50%;
+              /* 将元素的左边缘定位到页面的中间 */
+              transform: translateX(-50%);
+              /* 将元素向左移动自身宽度的50%，实现居中 */
+              z-index: 1001;
+              box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+              display: flex;
+              justify-content: center;
+              /* 水平居中 */
+              align-items: center;
+              /* 垂直居中 */
+              white-space: normal;
+              /* 允许文本换行 */
+              border-top-left-radius: 10px;
+              border-top-right-radius: 10px;
+            }
+
+            .bottom-bar a {
+              color: #007bff;
+              text-decoration: none;
+              margin: 0 10px;
+            }
+
+            .bottom-bar a:hover {
+              text-decoration: underline;
+            }
+
+            #busuanzi-container {
+              position: fixed;
+              bottom: 0;
+              right: 0;
+              color: black;
+              background-color: rgba(255, 255, 255, 0.3);
+              padding: 5px;
+              font-size: 14px;
+              text-align: left;
+              border-top-left-radius: 10px;
+            }
+
+            #tips {
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              color: black;
+              background-color: rgba(255, 255, 255, 0.3);
+              padding: 5px;
+              font-size: 14px;
+              text-align: left;
+              border-top-right-radius: 10px;
+            }
+
+            #time {
+              position: fixed;
+              top: 0;
+              right: 0;
+              color: black;
+              background-color: rgba(255, 255, 255, 0.3);
+              padding: 5px;
+              font-size: 14px;
+              text-align: left;
+              border-bottom-left-radius: 10px;
+            }
+
+            table {
+              animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
+              animation-delay: 0s;
+            }
+
+            .more-button {
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              cursor: pointer;
+              background-color: transparent;
+              border: none;
+              font-size: 100px;
+              color: #007bff;
+              transition: color 0.3s, left 0.3s;
+              animation: fadeInFromRight 1.5s ease-out forwards;
+            }
+
+            .more-button.left {
+              left: 20px;
+              right: auto;
+            }
+
+            body.dark-mode {
+              background-color: #1a1a1a;
+              color: #f4f4f4;
+              background-image: url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg');
+            }
+
+            .dark-mode th {
+              background-color: #333;
+              border-color: #444;
+            }
+
+            .dark-mode td {
+              border-color: #444;
+            }
+
+            .dark-mode #busuanzi-container,
+            .dark-mode #tips,
+            .dark-mode #time {
+              background-color: rgba(18, 18, 18, 0.6);
+              color: #f4f4f4;
+            }
+
+            body.dark-mode .bottom-bar {
+              background-color: rgba(18, 18, 18, 0.3);
+              color: #f4f4f4;
+              box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.5);
+            }
+
+            body.dark-mode .bottom-bar a {
+              color: #1e90ff;
+            }
+
+            body.dark-mode .bottom-bar a:hover {
+              text-decoration: underline;
+            }
+
+            .dark-mode table {
+              background-color: rgba(18, 18, 18, 0.6);
+            }
+
+            .ripple {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              animation: rippleEffect 1s ease-out forwards;
+            }
+
+            @keyframes rippleEffect {
+              0% {
+                transform: scale(0);
+                opacity: 1;
+              }
+
+              100% {
+                transform: scale(10);
+                opacity: 0;
+              }
+            }
+
+            .login-icon-container {
+              position: fixed;
+              top: 10px;
+              left: 10px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 70px;
+              height: 70px;
+              border-radius: 50%;
+              background-color: #007bff;
+
+              background-size: cover;
+              /* 确保背景图片覆盖整个元素 */
+              background-repeat: no-repeat;
+              /* 防止背景图片重复 */
+              background-position: center center;
+              /* 背景图片居中显示 */
+              color: white;
+              z-index: 1000;
+              transition: background-color 0.3s;
+              animation: fadeInFromLeft 1.5s ease-out forwards;
+            }
+
+            .login-icon-container:hover {
+              background-color: #0056b3;
+            }
+
+            .login-icon {
+              width: 20px;
+              height: 20px;
+            }
+
+            .login-status {
+              margin-left: 2px;
+              font-size: 14px;
+            }
+
+            .logout-btn {
+              position: absolute;
+              top: 60px;
+              right: 10px;
+              background-color: #f44336;
+              color: white;
+              border: none;
+              padding: 5px 15px;
+              border-radius: 5px;
+              cursor: pointer;
+              z-index: 1000;
+            }
+
+            .logout-btn:hover {
+              background-color: #d32f2f;
+            }
+
+            .main-image {
+              width: 100%;
+              max-width: 330px;
+              height: auto;
+              display: block;
+              margin: 20px auto;
+            }
+
+            @keyframes slideInFromRight {
+              from {
+                opacity: 0;
+                transform: translateX(100%);
+              }
+
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+
+            #main-image {
+              animation: slideInFromRight 1.5s ease-out forwards;
+            }
+
+            @media only screen and (max-width: 768px) {
+              body {
+                font-size: 14px;
+                padding: 10px;
+              }
+
+              .centered-title {
+                margin: 10px 0;
+              }
+
+              table {
+                width: 100%;
+                max-width: none;
+                font-size: 12px;
+              }
+
+              th,
+              td {
+                padding: 10px;
+              }
+
+              .main-image {
+                max-width: 50%;
+              }
+
+              .login-icon-container {
+                width: 50px;
+                height: 50px;
+              }
+
+              .logout-btn {
+                top: 50px;
+                right: 5px;
+                padding: 5px 10px;
+              }
+
+              #busuanzi-container,
+              #tips,
+              #time {
+                font-size: 12px;
+                padding: 5px;
+              }
+
+              .more-button {
+                font-size: 40px;
+              }
+
+              .custom-button {
+                padding: 5px 10px;
+                font-size: 14px;
+              }
+
+              .bottom-bar {
+                padding: 0px;
+              }
+
+              /* 菜单项悬停效果 */
+              .menu-item:hover {
+                background-color: #f0f0f0;
+                /* 浅色模式下悬停颜色 */
+                color: #333;
+                /* 浅色模式下文字颜色 */
+              }
+
+              /* 暗色模式下悬停效果 */
+              .dark-mode .menu-item:hover {
+                background-color: #333;
+                /* 暗色模式下悬停颜色 */
+                color: #f0f0f0;
+                /* 暗色模式下文字颜色 */
+              }
+
+              /* 分隔线样式 */
+              .menu-separator {
+                border-bottom: 1px solid #ccc;
+                /* 浅色模式下的分隔线颜色 */
+                margin: 5px 0;
+              }
+
+              /* 暗色模式下的分隔线颜色 */
+              .dark-mode .menu-separator {
+                border-bottom: 1px solid #666;
+                /* 暗
+                    色模式下的分隔线颜色 */
+              }
+            }
+
+            /* 添加涟漪动画的样式 */
+            .ripple-effect {
+              position: fixed;
+              border-radius: 50%;
+              background-color: rgba(255, 255, 255, 0.7);
+              transform: scale(0);
+              pointer-events: none;
+              animation: ripple-animation 0.6s linear;
+            }
+
+            @keyframes ripple-animation {
+              to {
+                transform: scale(4);
+                opacity: 0;
+              }
+            }
+
+            .dark-mode .ripple-effect {
+              background-color: rgba(0, 0, 0, 0.7);
+            }
+
+            .table-selector {
+              margin-left: 10px;
+              padding: 2px 5px;
+              border: 1px solid #ccc;
+              border-radius: 3px;
+              background-color: white;
+              color: #333;
+              font-size: 14px;
+              cursor: pointer;
+            }
+
+            /* 深色模式下的选择器样式 */
+            .dark-mode .table-selector {
+              background-color: #2a2a2a;
+              color: #f4f4f4;
+              border-color: #555;
+            }
+
+            .dark-mode .table-selector option {
+              background-color: #2a2a2a;
+              color: #f4f4f4;
+            }
+
+            /* 选择器悬停效果 */
+            .table-selector:hover {
+              border-color: #007bff;
+            }
+
+            .dark-mode .table-selector:hover {
+              border-color: #1e90ff;
+            }
+
+            /* 选择器聚焦效果 */
+            .table-selector:focus {
+              outline: none;
+              border-color: #007bff;
+              box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+
+            .dark-mode .table-selector:focus {
+              border-color: #1e90ff;
+              box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.25);
+            }
+
+            .table-selector {
+              margin-left: 10px;
+              padding: 2px 5px;
+              border: 1px solid #ccc;
+              border-radius: 3px;
+              background-color: white;
+              color: #333;
+              font-size: 14px;
+              cursor: pointer;
+            }
+
+            /* 深色模式下的选择器样式 */
+            .dark-mode .table-selector {
+              background-color: #2a2a2a;
+              color: #f4f4f4;
+              border-color: #555;
+            }
+
+            .dark-mode .table-selector option {
+              background-color: #2a2a2a;
+              color: #f4f4f4;
+            }
+
+            /* 选择器悬停效果 */
+            .table-selector:hover {
+              border-color: #007bff;
+            }
+
+            .dark-mode .table-selector:hover {
+              border-color: #1e90ff;
+            }
+
+            /* 选择器聚焦效果 */
+            .table-selector:focus {
+              outline: none;
+              border-color: #007bff;
+              box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+
+            .dark-mode .table-selector:focus {
+              border-color: #1e90ff;
+              box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.25);
+            }
