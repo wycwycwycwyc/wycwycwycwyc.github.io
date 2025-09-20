@@ -422,7 +422,7 @@
         let currentTableIndex = 0;
 
         // 从服务器加载tables.json
-        fetch('/tables.json')
+        fetch('/config/tables.json')
             .then(response => response.json())
             .then(data => {
                 // 先收集所有表格名称

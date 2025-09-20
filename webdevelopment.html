@@ -233,6 +233,50 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
+        /* 加载动画 */
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .loader-text {
+            margin-top: 15px;
+            color: var(--text-color);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary-color);
+        }
+
+        .retry-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .retry-button:hover {
+            background-color: var(--secondary-color);
+        }
+
         /* 动画定义 */
         @keyframes fadeIn {
             from {
@@ -292,6 +336,12 @@
             }
         }
 
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         @media screen and (max-width: 768px) {
             .timeline::after {
                 left: 31px;
@@ -347,126 +397,12 @@
             <button class="custom-button" onclick="goBackOrHome()">返回</button>
             <p class="subtitle">记录每一个重要时刻，见证我们的成长轨迹</p>
         </header>
-    
-        <div class="timeline">
-            <!-- 里程碑1 -->
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2023年1月18日 13:20:13</div>
-                    <h2>网站创建</h2>
-                    <p>在这个精确的时刻，我们的网站<span class="highlight">正式诞生</span>。</p>
-                    <p>初始版本包含基础架构和核心功能，为未来发展奠定了基础。</p>
-                </div>
-            </div>
-    
-            <!-- 里程碑2 -->
-            <div class="milestone right">
-                <div class="content">
-                    <div class="date">2023年2月9日</div>
-                    <h2>全新界面发布</h2>
-                    <p>经过精心设计，我们推出了<span class="highlight">完全重新设计的用户界面</span>。</p>
-                    <p>新界面更加现代化、直观，提升了用户体验和视觉吸引力。</p>
-                </div>
-            </div>
-    
-            <!-- 里程碑3 -->
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2024年2月20日</div>
-                    <h2>设置功能上线</h2>
-                    <p>为用户提供了<span class="highlight">个性化设置选项</span>，包括主题偏好、通知设置等。</p>
-                    <p>这一功能大大增强了用户对网站体验的控制能力。</p>
-                </div>
-            </div>
-    
-            <!-- 里程碑4 -->
-            <div class="milestone right">
-                <div class="content">
-                    <div class="date">2024年7月6日</div>
-                    <h2>注册登录系统</h2>
-                    <p>我们推出了<span class="highlight">完整的用户账户系统</span>，支持注册、登录和个人资料管理。</p>
-                    <p>这使得个性化服务和数据同步成为可能，用户数量开始快速增长。</p>
-                </div>
-            </div>
-    
-            <!-- 里程碑5 -->
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2024年8月-2025年7月</div>
-                    <h2>功能持续完善</h2>
-                    <p>这段时间我们专注于<span class="highlight">用户体验优化</span>和功能扩展：</p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>增强的内容管理系统</li>
-                        <li>性能优化和稳定性提升</li>
-                    </ul>
-                </div>
-            </div>
-    
-            <!-- 里程碑6 -->
-            <div class="milestone right">
-                <div class="content">
-                    <div class="date">2025年8月17日</div>
-                    <h2>重大更新</h2>
-                    <p>我们完成了多项重要改进：</p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li><span class="highlight">深色模式</span>完全适配</li>
-                        <li>新增<span class="highlight">模糊度设置</span></li>
-                        <li>内部架构全面优化</li>
-                        <li>修复多个已知问题</li>
-                        <li>新增网站发展历程页面</li>
-                        <li>新增网页小工具栏</li>
-                    </ul>
-                    <p style="margin-top: 10px;">这次更新标志着网站进入更加成熟的阶段。</p>
-                </div>
-            </div>
-            <!-- 里程碑5 -->
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2025年8月18日</div>
-                    <h2>功能持续完善</h2>
-                    <p>新增<span class="highlight">动画速度更改</span></p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>修复了一些已知问题</li>
-                        <li>账户界面微调</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="milestone right">
-                <div class="content">
-                    <div class="date">2025年8月29日</div>
-                    <h2>功能持续完善</h2>
-                    <li>修复了一些已知问题</li>
-                    <li>内部架构优化</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2025年9月30日</div>
-                    <h2>功能持续完善</h2>
-                    <li>修复了一些已知问题</li>
-                    <li>更新网站发展历程网页界面</li>
-                    <li>可能是近期最后几次大规模更新</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="milestone right">
-                <div class="content">
-                    <div class="date">2025年9月14日</div>
-                    <h2>修复与更新</h2>
-                    <li>修复了一些已知问题</li>
-                    <li>更新webapp的架构</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="milestone left">
-                <div class="content">
-                    <div class="date">2025年9月19日</div>
-                    <h2>主界面更新</h2>
-                    <li>新增<span class="highlight">一键切换表格</span>功能</li>
-                    <li>更新了主界面内部结构</li>
-                    </ul>
-                </div>
+
+        <div class="timeline" id="timelineContainer">
+            <!-- 加载状态 -->
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p class="loader-text">正在加载发展历程...</p>
             </div>
         </div>
 
@@ -477,23 +413,121 @@
     </div>
 
     <script>
-        // 滚动动画
-        const milestones = document.querySelectorAll('.milestone');
+        // 从JSON文件加载发展历程数据
+        async function loadTimelineData() {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const loader = document.getElementById('loader');
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
+            try {
+                // 获取JSON数据
+                const response = await fetch('/config/updateinfo.json');
+                if (!response.ok) {
+                    throw new Error('网络响应不正常');
                 }
-            });
-        }, {
-            threshold: 0.1
-        });
 
-        milestones.forEach(milestone => {
-            observer.observe(milestone);
-        });
+                const data = await response.json();
+
+                // 隐藏加载动画
+                loader.style.display = 'none';
+
+                // 检查数据是否有效
+                if (!data || Object.keys(data).length === 0) {
+                    throw new Error('没有可用的发展历程数据');
+                }
+
+                // 生成时间线内容
+                generateTimelineContent(data);
+
+                // 初始化滚动动画
+                initScrollAnimation();
+
+            } catch (error) {
+                console.error('加载发展历程数据失败:', error);
+                showError(error.message);
+            }
+        }
+
+        // 生成时间线内容
+        function generateTimelineContent(data) {
+            const timelineContainer = document.getElementById('timelineContainer');
+
+            // 获取所有更新项的键并排序
+            const updateKeys = Object.keys(data).filter(key => key.startsWith('update'));
+            updateKeys.sort((a, b) => {
+                const numA = parseInt(a.replace('update', ''));
+                const numB = parseInt(b.replace('update', ''));
+                return numA - numB;
+            });
+
+            // 为每个更新项创建HTML
+            updateKeys.forEach((key, index) => {
+                const update = data[key];
+                const isLeft = index % 2 === 0;
+
+                const milestoneDiv = document.createElement('div');
+                milestoneDiv.className = `milestone ${isLeft ? 'left' : 'right'}`;
+
+                // 创建内容HTML
+                let contentHTML = `
+                    <div class="content">
+                        <div class="date">${update.time || '未知日期'}</div>
+                        <h2>${update.title || '未命名更新'}</h2>
+                `;
+
+                // 添加所有文本字段
+                let textIndex = 1;
+                while (update[`text${textIndex}`]) {
+                    const text = update[`text${textIndex}`];
+                    // 处理高亮文本：将<高亮内容>转换为<span class="highlight">高亮内容</span>
+                    const highlightedText = text.replace(/<([^>]+)>/g, '<span class="highlight">$1</span>');
+                    contentHTML += `<p>${highlightedText}</p>`;
+                    textIndex++;
+                }
+
+                contentHTML += `</div>`;
+                milestoneDiv.innerHTML = contentHTML;
+
+                timelineContainer.appendChild(milestoneDiv);
+            });
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const loader = document.getElementById('loader');
+
+            loader.style.display = 'none';
+
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `
+                <h3>加载发展历程失败</h3>
+                <p>${message}</p>
+                <button class="retry-button" onclick="location.reload()">重试</button>
+            `;
+
+            timelineContainer.appendChild(errorDiv);
+        }
+
+        // 初始化滚动动画
+        function initScrollAnimation() {
+            const milestones = document.querySelectorAll('.milestone');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            milestones.forEach(milestone => {
+                observer.observe(milestone);
+            });
+        }
 
         // 导航按钮功能
         document.getElementById('toTopBtn').addEventListener('click', function () {
@@ -503,6 +537,9 @@
         document.getElementById('toBottomBtn').addEventListener('click', function () {
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         });
+
+        // 页面加载完成后获取数据
+        document.addEventListener('DOMContentLoaded', loadTimelineData);
     </script>
 </body>
 
