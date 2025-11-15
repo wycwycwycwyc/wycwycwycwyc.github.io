@@ -94,6 +94,7 @@ if (navigator.userAgent.match(/Mobile/i)) {
     }
 }
 var usertabletext;
+
 document.addEventListener('DOMContentLoaded', function () {
     var darkModeToggle = document.getElementById('darkModeToggle');
     var animationToggle = document.getElementById('animationToggle');
@@ -412,7 +413,141 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 });
+// 跟随系统复选框功能
+document.addEventListener('DOMContentLoaded', function() {
+    const followSystemCheckbox = document.getElementById('followSystemCheckbox');
+    
+    // 初始化复选框状态
+    function initCheckbox() {
+        const followSystem = localStorage.getItem('followSystem');
+        // 如果为空或true，都勾选上
+        if (followSystem === null || followSystem === 'true') {
+            // 同时应用系统当前主题
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.getElementById("darkModediaplay").style.display="none";
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }            
+            followSystemCheckbox.checked = true;
+        } else {
+            followSystemCheckbox.checked = false;
+        }
+    }
+    
+    // 复选框变化事件
+    followSystemCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            localStorage.setItem('followSystem', 'true');
+        } else {
+            localStorage.setItem('followSystem', 'false');
+        }
+        
+        // 触发自定义事件，让主题应用代码响应变化
+        const event = new Event('localStorageChanged');
+        event.key = 'followSystem';
+        event.newValue = this.checked ? 'true': 'false';
+        this.checked ?document.getElementById("darkModediaplay").style.display="none":document.getElementById("darkModediaplay").style.display="block";
+        window.dispatchEvent(event);
+    });
+    
+    // 初始化复选框
+    initCheckbox();
+});
 
+// 主题应用代码（整合版）
+document.addEventListener('DOMContentLoaded', function() {
+    // 应用主题函数
+    function applyTheme() {
+        const followSystem = localStorage.getItem('followSystem');
+        const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        
+        // 如果跟随系统
+        if (followSystem === 'true') {
+            // 检测系统颜色偏好
+            document.getElementById("darkModediaplay").style.display="none"
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        } else {
+            // 不跟随系统，使用用户手动设置
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+    }
+    
+    // 初始化设置
+    if (localStorage.getItem('followSystem') === null) {
+        localStorage.setItem('followSystem', 'true');
+    }
+    
+    // 初始应用主题
+    applyTheme();
+    
+    // 设置系统主题变化监听
+    function setupSystemThemeListener() {
+        if (window.matchMedia) {
+            const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            const systemThemeChangeHandler = function(e) {
+                const currentFollowSystem = localStorage.getItem('followSystem');
+                if (currentFollowSystem === 'true') {
+                    if (e.matches) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                }
+            };
+            
+            // 移除旧的监听器（如果有）
+            systemThemeMedia.removeEventListener('change', systemThemeChangeHandler);
+            // 添加新的监听器
+            systemThemeMedia.addEventListener('change', systemThemeChangeHandler);
+        }
+    }
+    
+    // 监听自定义的localStorage变化事件
+    window.addEventListener('localStorageChanged', function(e) {
+        if (e.key === 'followSystem' || e.key === 'darkMode') {
+            applyTheme();
+            
+            if (e.key === 'followSystem') {
+                if (e.newValue === 'true') {
+                    // 开始跟随系统，设置系统主题监听
+                    setupSystemThemeListener();
+                }
+            }
+        }
+    });
+    
+    // 监听原生storage事件（其他页面修改时）
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'followSystem' || e.key === 'darkMode') {
+            applyTheme();
+            
+            // 如果是followSystem变化，更新复选框状态
+            if (e.key === 'followSystem') {
+                const checkbox = document.getElementById('followSystemCheckbox');
+                if (checkbox) {
+                    checkbox.checked = e.newValue === 'true';
+                }
+                
+                if (e.newValue === 'true') {
+                    setupSystemThemeListener();
+                }
+            }
+        }
+    });
+    
+    // 初始化系统主题监听
+    setupSystemThemeListener();
+});
 function clearDarkMode() {
     swal({
         title: "确定要清除深色模式设置吗？",

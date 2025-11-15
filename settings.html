@@ -52,16 +52,20 @@
                 </iframe>
             </div>
             <div class="input-group">
-                <label for="darkModeToggle">深色模式</label>
+                <h2>深色模式</h2>
+                <div id="darkModediaplay">
+                <label for="darkModeToggle">开关</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="darkModeToggle">
                     <span class="slider"></span>
                 </label>
+                </div>
             </div>
-                    <div class="follow-system">
-                        <input type="checkbox" id="followSystem">
-                        <label for="followSystem">跟随系统</label>
-                    </div>
+        
+            <!-- 复选框 HTML -->
+            <label>
+                <input type="checkbox" id="followSystemCheckbox">跟随系统
+            </label>
             <div class="input-group toggle-with-select">
             <h2>动画</h2>
             <label for="animationToggle" class="toggle-label">开关</label>
@@ -70,7 +74,7 @@
                 <input type="checkbox" id="animationToggle">
                 <span class="slider"></span>
                 </label>
-                <p>速度(仅部分生效)</p>
+                <p>速度</p>
                 <select id="animationSpeed" class="styled-select">
                 <option value="0.5">0.5x</option>
                 <option value="1" selected>1x</option>
@@ -194,7 +198,7 @@
         </div>
         <div id="account" style="height: 200px" class="section">
             <h1>账户</h1>
-            <button id="loginStatus" onclick="openPage('//account/uploadicon.html')" style=" width: 90px; height: 90px; border-radius: 50%; border: none; font-size: 16px;
+            <button id="loginStatus" onclick="openPage('/account/uploadicon.html')" style=" width: 90px; height: 90px; border-radius: 50%; border: none; font-size: 16px;
                                 cursor: pointer; outline: none; display: inline; vertical-align: middle; margin-right:
                                 10px; background-size: cover; /* 确保背景图片覆盖整个元素 */ background-repeat: no-repeat; /* 防止背景图片重复
                                 */ background-position: center center;transform: translate(5px, 15px);">
@@ -344,7 +348,7 @@
             <div class="intro-box">
                 <h1>脚本存放站简介</h1>
                 <p>在当今信息技术飞速发展的时代，编程语言和脚本的应用变得越来越广泛。为了满足广大编程爱好者和<a id="developer-link"
-                        onclick="handleButtonClick()">开发者</a>的需求，我们推出了一个功能丰富、用户友好的脚本存放站。<a href="webdevelopment.html"     style="color: border-left: unset;;">这个平台于2023年1月18日13时20分13秒创建的</a>，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。
+                        onclick="handleButtonClick()">开发者</a>的需求，我们推出了一个功能丰富、用户友好的脚本存放站。<a href="webdevelopment.html">这个平台于2023年1月18日13时20分13秒创建的</a>，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。
                 </p>
 
                 <h2>多种脚本存放</h2>

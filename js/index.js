@@ -1,115 +1,223 @@
-            document.addEventListener('DOMContentLoaded', function () {
-                var body = document.body;
-                var darkModeToggle = document.getElementById('darkModeToggle');
-                var mainImage = document.getElementById('main-image');
-                var opacitySelect = document.getElementById('opacitySelect');
-                var blurSelect = document.getElementById('blurSelect');
-                // Logo图片路径
-                var lightModeLogoSrc = '/icons/logo.svg';
-                var darkModeLogoSrc = '/icons/logo_dark.svg';
+document.addEventListener('DOMContentLoaded', function () {
+    var body = document.body;
+    var darkModeToggle = document.getElementById('darkModeToggle');
+    var mainImage = document.getElementById('main-image');
+    var opacitySelect = document.getElementById('opacitySelect');
+    var blurSelect = document.getElementById('blurSelect');
+    
+    // Logo图片路径
+    var lightModeLogoSrc = '/icons/logo.svg';
+    var darkModeLogoSrc = '/icons/logo_dark.svg';
 
-                // 背景图片路径
-                var lightModeBackground = localStorage.getItem('lightModeBgUrl');
-                var darkModeBackground = localStorage.getItem('darkModeBgUrl');;
-                // 从localStorage中获取深色模式的状态和背景图片设置
-                var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-                var storedBackgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
-                // 从 localStorage 中获取透明度设置
-                var selectedOpacity = localStorage.getItem('opacity') || '0.3';
-                var selectedblur = localStorage.getItem('blur') || '30';
-                // 初始化页面的背景、Logo和深色模式类
-                body.style.backgroundImage = storedBackgroundImage;
-                mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-                body.classList.toggle('dark-mode', isDarkMode);
+    // 背景图片路径
+    var lightModeBackground = localStorage.getItem('lightModeBgUrl');
+    var darkModeBackground = localStorage.getItem('darkModeBgUrl');
+    
+    // 获取设置
+    var followSystem = localStorage.getItem('followSystem');
+    var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+    
+    // 如果followSystem为空，设置为true
+    if (followSystem === null) {
+        localStorage.setItem('followSystem', 'true');
+        followSystem = 'true';
+    }
 
-                // 初始化透明度设置
-                if (opacitySelect) {
-                    opacitySelect.value = selectedOpacity;
-                }
-                if (blurSelect) {
-                    blurSelect.value = selectedblur;
-                }
-                setElementsOpacity(selectedOpacity, isDarkMode);
-                setElementsblur(selectedblur, isDarkMode);
-                // 切换深色模式的函数
-                function toggleDarkMode() {
-                    // 切换深色模式状态
-                    isDarkMode = !isDarkMode;
-
-                    // 切换背景图片和Logo
-                    body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
-                    mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-
-                    // 切换深色模式类
-                    body.classList.toggle('dark-mode', isDarkMode);
-
-                    // 更新localStorage中的状态和背景图片
-                    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-                    localStorage.setItem('backgroundImage', body.style.backgroundImage);
-
-                    // 设置元素的背景颜色
-                    setElementsOpacity(selectedOpacity, isDarkMode);
-
-                    // 创建全屏涟漪效果
-                    var ripple = document.createElement('div');
-                    ripple.classList.add('ripple');
-                    ripple.style.position = 'fixed';
-                    ripple.style.top = '0';
-                    ripple.style.left = '0';
-                    ripple.style.width = '100%';
-                    ripple.style.height = '100%';
-                    ripple.style.opacity = '0.5';
-                    ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
-                    ripple.style.borderRadius = '50%';
-                    ripple.style.animation = 'rippleEffect 1s ease-out forwards';
-                    ripple.style.pointerEvents = 'none';
-
-                    // 将涟漪效果添加到body
-                    document.body.appendChild(ripple);
-
-                    // 动画结束后移除涟漪效果
-                    setTimeout(function () {
-                        ripple.remove();
-                    }, 1000);
-                }
-
-                // 为深色模式切换按钮添加事件监听器
-                darkModeToggle.addEventListener('click', toggleDarkMode);
-
-                // 监听透明度选择的变化
-                if (opacitySelect) {
-                    blurSelect.addEventListener('change', function () {
-                        selectedblur = opacitySelect.value;
-                        localStorage.setItem('opacity', selectedOpacity);
-                        setElementsOpacity(selectedOpacity, isDarkMode);
-                    });
-                }
-                if (blurSelect) {
-                    blurSelect.addEventListener('change', function () {
-                        selectedblur = blurSelect.value;
-                        localStorage.setItem('blur', selectedblur);
-                        setElementsblur(selectedblur, isDarkMode);
-                    });
-                }
-            });
-                
+    // 从 localStorage 中获取透明度设置
+    var selectedOpacity = localStorage.getItem('opacity') || '0.3';
+    var selectedblur = localStorage.getItem('blur') || '30';
+    if(followSystem==='true'){
+        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            localStorage.setItem('darkMode','enabled');
+        } else {
+            localStorage.setItem('darkMode','disabled');
+        };
+    }
+    // 初始化页面主题
+    function initTheme() {
+        // 如果跟随系统
+        if (followSystem === 'true') {
+            // 检测系统颜色偏好
+            var systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            function setElementsOpacity(opacity, isDarkMode) {
-                var elements = document.querySelectorAll('th,table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
-
-                if (elements.length === 0) {
-                    return;
-                }
-
-                elements.forEach(function (element) {
-                    if (isDarkMode) {
-                        element.style.backgroundColor = `rgba(16, 16, 16, ${opacity})`;
-                    } else {
-                        element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
-                    }
-                });
+            // 应用系统主题
+            body.style.backgroundImage = systemIsDark ? darkModeBackground : lightModeBackground;
+            mainImage.src = systemIsDark ? darkModeLogoSrc : lightModeLogoSrc;
+            body.classList.toggle('dark-mode', systemIsDark);
+            
+            // 禁用切换按钮
+            if (darkModeToggle) {
+                darkModeToggle.style.opacity = '0.5';
+                darkModeToggle.title = '跟随系统主题时无法手动切换';
             }
-    function setElementsblur(blur, isDarkMode) {
+        } else {
+            // 不跟随系统，使用用户手动设置
+            var storedBackgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+            
+            // 初始化页面的背景、Logo和深色模式类
+            body.style.backgroundImage = storedBackgroundImage;
+            mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
+            body.classList.toggle('dark-mode', isDarkMode);
+            
+            // 启用切换按钮
+            if (darkModeToggle) {
+                darkModeToggle.style.opacity = '1';
+                darkModeToggle.style.cursor = 'pointer';
+                darkModeToggle.title = '切换深色/浅色模式';
+            }
+        }
+
+        // 初始化透明度设置
+        if (opacitySelect) {
+            opacitySelect.value = selectedOpacity;
+        }
+        if (blurSelect) {
+            blurSelect.value = selectedblur;
+        }
+        
+        // 应用透明度和模糊效果
+        var currentIsDarkMode = followSystem === 'true'|| followSystem === null? 
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : isDarkMode;
+            
+        setElementsOpacity(selectedOpacity, currentIsDarkMode);
+        setElementsblur(selectedblur, currentIsDarkMode);
+    }
+
+    // 切换深色模式的函数
+    function toggleDarkMode() {
+        // 如果跟随系统，不允许手动切换
+        if (followSystem === 'true') {
+            Qmsg.error("当前设置为跟随系统，无法手动切换深色模式");
+            return;
+        }
+
+        // 切换深色模式状态
+        isDarkMode = !isDarkMode;
+
+        // 切换背景图片和Logo
+        body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+        mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
+
+        // 切换深色模式类
+        body.classList.toggle('dark-mode', isDarkMode);
+
+        // 更新localStorage中的状态和背景图片
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        localStorage.setItem('backgroundImage', body.style.backgroundImage);
+
+        // 设置元素的背景颜色
+        setElementsOpacity(selectedOpacity, isDarkMode);
+
+        // 创建全屏涟漪效果
+        var ripple = document.createElement('div');
+        ripple.classList.add('ripple');
+        ripple.style.position = 'fixed';
+        ripple.style.top = '0';
+        ripple.style.left = '0';
+        ripple.style.width = '100%';
+        ripple.style.height = '100%';
+        ripple.style.opacity = '0.5';
+        ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
+        ripple.style.borderRadius = '50%';
+        ripple.style.animation = 'rippleEffect 1s ease-out forwards';
+        ripple.style.pointerEvents = 'none';
+
+        // 将涟漪效果添加到body
+        document.body.appendChild(ripple);
+
+        // 动画结束后移除涟漪效果
+        setTimeout(function () {
+            ripple.remove();
+        }, 1000);
+    }
+
+    // 为深色模式切换按钮添加事件监听器
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    }
+
+    // 监听透明度选择的变化
+    if (opacitySelect) {
+        opacitySelect.addEventListener('change', function () {
+            selectedOpacity = opacitySelect.value;
+            localStorage.setItem('opacity', selectedOpacity);
+            
+            var currentIsDarkMode = followSystem === 'true' ? 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : 
+                isDarkMode;
+                
+            setElementsOpacity(selectedOpacity, currentIsDarkMode);
+        });
+    }
+    
+    if (blurSelect) {
+        blurSelect.addEventListener('change', function () {
+            selectedblur = blurSelect.value;
+            localStorage.setItem('blur', selectedblur);
+            
+            var currentIsDarkMode = followSystem === 'true' ? 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : 
+                isDarkMode;
+                
+            setElementsblur(selectedblur, currentIsDarkMode);
+        });
+    }
+
+    // 设置系统主题变化监听
+    function setupSystemThemeListener() {
+        if (window.matchMedia && followSystem === 'true') {
+            const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            const systemThemeChangeHandler = function(e) {
+                const currentFollowSystem = localStorage.getItem('followSystem');
+                if (currentFollowSystem === 'true') {
+                    
+                    // 更新背景图片和Logo
+                    body.style.backgroundImage = e.matches ? darkModeBackground : lightModeBackground;
+                    mainImage.src = e.matches ? darkModeLogoSrc : lightModeLogoSrc;
+                    
+                    // 切换深色模式类
+                    body.classList.toggle('dark-mode', e.matches);
+                    
+                    // 更新透明度和模糊效果
+                    setElementsOpacity(selectedOpacity, e.matches);
+                    setElementsblur(selectedblur, e.matches);
+                }
+            };
+            
+            systemThemeMedia.addEventListener('change', systemThemeChangeHandler);
+        }
+    }
+
+    // 监听followSystem设置变化
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'followSystem') {
+            location.reload(); // 简单处理：重新加载页面应用新设置
+        }
+    });
+
+    // 初始化主题和监听器
+    initTheme();
+    setupSystemThemeListener();
+});
+
+function setElementsOpacity(opacity, isDarkMode) {
+    var elements = document.querySelectorAll('th,table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+
+    if (elements.length === 0) {
+        return;
+    }
+
+    elements.forEach(function (element) {
+        if (isDarkMode) {
+            element.style.backgroundColor = `rgba(16, 16, 16, ${opacity})`;
+        } else {
+            element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
+        }
+    });
+}
+
+function setElementsblur(blur, isDarkMode) {
     var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
 
     if (elements.length === 0) {
@@ -120,7 +228,6 @@
         // 设置背景模糊（backdrop-filter）
         element.style.backdropFilter = `blur(${blur}px)`;
         element.style.webkitBackdropFilter = `blur(${blur}px)`; // 兼容 Safari
-
     });
 }
             document.addEventListener('DOMContentLoaded', function () {
@@ -415,7 +522,7 @@
         // 获取容器
         const tablesContainer = document.getElementById('tables-container');
         const navigationButtons = document.getElementById('navigation-buttons');
-
+        systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         // 存储所有表格和表格信息
         const tables = [];
         const tableNames = [];
@@ -457,6 +564,9 @@
                 // 创建表格元素
                 const table = document.createElement('table');
                 table.className = 'main-table';
+                if (localStorage.getItem('followSystem') === 'true'|| localStorage.getItem('followSystem') === null) {
+                    systemIsDark ? document.getElementById("tables-container").classList.add('dark-mode') : document.getElementById("tables-container").classList.remove('dark-mode');
+                }
                 table.style.animation = 'slideUp 1.5s forwards, blurIn 1.5s forwards';
 
                 // 创建表头
@@ -599,7 +709,7 @@
         }
 
         // 显示指定索引的表格
-        function showTable(index) {
+        function showTable(index) { 
             if (index < 0) index = 0;
             if (index >= tables.length) index = tables.length - 1;
 
@@ -640,4 +750,5 @@
                 button.style.display = currentTableIndex < tables.length - 1 ? 'block' : 'none';
             });
         }
-    });                                                    
+    });             
+                                            
