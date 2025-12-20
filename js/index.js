@@ -1,3 +1,6 @@
+const urlParams = new URLSearchParams(window.location.search);
+const isPreview = urlParams.has('preview');
+
 document.addEventListener('DOMContentLoaded', function () {
     var body = document.body;
     var darkModeToggle = document.getElementById('darkModeToggle');
@@ -231,6 +234,10 @@ function setElementsblur(blur, isDarkMode) {
     });
 }
             document.addEventListener('DOMContentLoaded', function () {
+                if (isPreview) {
+                    document.getElementById('main-image').style.width = '30%';
+                        return;
+                    }
                 var loginStatusElement = document.getElementById('loginStatus');
                 var logoutButton = document.getElementById('logoutButton');
                 var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';

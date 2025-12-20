@@ -864,3 +864,271 @@
         body.dark-mode .terminal-body {
             color: #f0f0f0;
         }
+        /* ==================== 终端容器样式 ==================== */
+#terminalOutput {
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  color: #fff;
+  background-color: #1e1e1e; /* 深色背景 */
+  padding: 10px;
+  border-radius: 8px;
+  max-height: 500px; /* 你可以调整这个值，决定终端高度 */
+  overflow-y: auto;
+  white-space: pre-wrap; /* 保留换行 */
+  word-wrap: break-word; /* 超长单词换行 */
+}
+
+/* ==================== 终端行样式 ==================== */
+.terminal-line {
+  margin: 5px 0;
+}
+
+.terminal-line pre {
+  margin: 0;
+  padding: 0;
+}
+
+/* ==================== 提示符样式 ==================== */
+.terminal-prompt {
+  color: #00ff00; /* 绿色提示符 */
+  font-weight: bold;
+}
+
+.terminal-echo {
+  color: #99ff99; /* 用户输入的命令 */
+}
+
+/* ==================== 命令输出样式 ==================== */
+.command-output {
+  color: #d4d4d4;
+}
+
+.command-error {
+  color: #ff5555; /* 错误输出为红色 */
+}
+
+.command-info {
+  color: #66ccff; /* 信息输出为蓝色 */
+}
+
+/* ==================== 错误信息样式 ==================== */
+.error {
+  color: #ff5555; /* 错误信息红色 */
+}
+
+/* ==================== 输入框样式 ==================== */
+.terminal-input {
+  background: transparent;
+  color: #fff;
+  border: none;
+  outline: none;
+  width: calc(100% - 150px); /* 留出提示符的宽度 */
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+}
+
+/* ==================== 输入框聚焦样式 ==================== */
+.terminal-input:focus {
+  border: none;
+  outline: none;
+  box-shadow: 0 0 5px 2px rgba(0, 255, 0, 0.5); /* 聚焦时加绿色阴影 */
+}
+
+/* ==================== 输入框提示符样式 ==================== */
+.input-row .terminal-prompt {
+  color: #00ff00;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* ==================== 提示符光标闪烁 ==================== */
+.terminal-cursor {
+  display: inline-block;
+  width: 10px;
+  height: 16px;
+  background-color: #00ff00;
+  animation: blink-caret 1s step-end infinite;
+}
+
+/* 光标闪烁动画 */
+@keyframes blink-caret {
+  50% {
+    background-color: transparent;
+  }
+}
+
+/* ==================== 清屏按钮 ==================== */
+.clear-screen {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.clear-screen:hover {
+  background: #444;
+}
+
+/* ==================== 终端行输入框提示符 ==================== */
+.input-row {
+  display: flex;
+  align-items: center;
+}
+
+.input-row .terminal-prompt {
+  margin-right: 8px;
+}
+
+/* ==================== 终端历史样式 ==================== */
+.cmd-echo {
+  color: #99ff99; /* 命令回显 */
+}
+
+/* ==================== 其他样式 ==================== */
+.terminal-line {
+  display: flex;
+  align-items: center;
+}
+/* ==================== 终端容器样式 ==================== */
+#terminalOutput {
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+    color: #fff;
+    background-color: #1e1e1e;
+    /* 深色背景 */
+    padding: 10px;
+    border-radius: 8px;
+    max-height: 500px;
+    /* 你可以调整这个值，决定终端高度 */
+    overflow-y: auto;
+    white-space: pre-wrap;
+    /* 保留换行 */
+    word-wrap: break-word;
+    /* 超长单词换行 */
+}
+
+/* ==================== 终端行样式 ==================== */
+.terminal-line {
+    margin: 5px 0;
+}
+
+.terminal-line pre {
+    margin: 0;
+    padding: 0;
+}
+
+/* ==================== 提示符样式 ==================== */
+.terminal-prompt {
+    color: #00ff00;
+    /* 绿色提示符 */
+    font-weight: bold;
+}
+
+.terminal-echo {
+    color: #99ff99;
+    /* 用户输入的命令 */
+}
+
+/* ==================== 命令输出样式 ==================== */
+.command-output {
+    color: #d4d4d4;
+}
+
+.command-error {
+    color: #ff5555;
+    /* 错误输出为红色 */
+}
+
+.command-info {
+    color: #66ccff;
+    /* 信息输出为蓝色 */
+}
+
+/* ==================== 错误信息样式 ==================== */
+.error {
+    color: #ff5555;
+    /* 错误信息红色 */
+}
+
+/* ==================== 输入框样式 ==================== */
+.terminal-input {
+    background: transparent;
+    color: #fff;
+    border: none;
+    outline: none;
+    width: calc(100% - 150px);
+    /* 留出提示符的宽度 */
+    font-family: "Courier New", monospace;
+    font-size: 16px;
+}
+
+/* ==================== 输入框聚焦样式 ==================== */
+.terminal-input:focus {
+    border: none;
+    outline: none;
+    box-shadow: 0 0 5px 2px rgba(0, 255, 0, 0.5);
+    /* 聚焦时加绿色阴影 */
+}
+
+/* ==================== 输入框提示符样式 ==================== */
+.input-row .terminal-prompt {
+    color: #00ff00;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* ==================== 提示符光标闪烁 ==================== */
+.terminal-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 16px;
+    background-color: #00ff00;
+    animation: blink-caret 1s step-end infinite;
+}
+
+/* 光标闪烁动画 */
+@keyframes blink-caret {
+    50% {
+        background-color: transparent;
+    }
+}
+
+/* ==================== 清屏按钮 ==================== */
+.clear-screen {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-screen:hover {
+    background: #444;
+}
+
+/* ==================== 终端行输入框提示符 ==================== */
+.input-row {
+    display: flex;
+    align-items: center;
+}
+
+.input-row .terminal-prompt {
+    margin-right: 8px;
+}
+
+/* ==================== 终端历史样式 ==================== */
+.cmd-echo {
+    color: #99ff99;
+    /* 命令回显 */
+}
+
+/* ==================== 其他样式 ==================== */
+.terminal-line {
+    display: flex;
+    align-items: center;
+}

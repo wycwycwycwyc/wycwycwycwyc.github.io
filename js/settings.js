@@ -1867,9 +1867,12 @@ function registerUserBydev() {
 
     showStep();
 };
-
-document.getElementById('restartSystemBtn').addEventListener('click', function () {
-    swal({
+document.addEventListener('DOMContentLoaded', () => {
+  // ====== 重启服务器按钮 ======
+  const restartBtn = document.getElementById('restartSystemBtn');
+  if (restartBtn) {
+    restartBtn.addEventListener('click', () => {
+      swal({
         title: "确定要重启服务器吗？",
         text: "这将关闭服务器上所有正在运行的程序。",
         type: "warning",
@@ -1878,219 +1881,220 @@ document.getElementById('restartSystemBtn').addEventListener('click', function (
         confirmButtonText: "是",
         cancelButtonText: "否",
         closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
-            swal('正在执行');
-            fetch(`${serverurl}/restart-server`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ operation: 'restart_system' })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        swal('已发送重启指令', '服务器将重启', "success");
-                    } else {
-                        swal('操作失败: ' + data.message, "error");
-                    }
-                })
-                .catch(error => {
-                    swal('请求失败: ', "error");
-                });
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
-        }
-    })
-});
-// 终端状态
-let terminalHistory = [];
-let historyIndex = -1;
-let currentCommand = '';
+        closeOnCancel: true
+      }, (isConfirm) => {
+        if (!isConfirm) return;
 
-// 初始化终端
-function initTerminal() {
-    const terminalOutput = document.getElementById('terminalOutput');
+        swal({ title: "正在执行", text: "正在发送重启指令…", type: "info", showConfirmButton: false });
 
-    // 清空终端
-    terminalOutput.innerHTML = '';
+        fetch(`${serverurl}/restart-server`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ operation: 'restart_system' })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              swal('已发送重启指令', '服务器将重启', "success");
+            } else {
+              swal('操作失败', data.message || '未知错误', "error");
+            }
+          })
+          .catch(err => {
+            swal('请求失败', String(err), "error");
+          });
+      });
+    });
+  }
 
-    // 添加欢迎信息
-    addTerminalLine('scripthub服务器终端', 'info');
-    addTerminalLine('输入命令并按Enter执行', 'info');
-    addTerminalLine('--------------------------------', 'info');
-
-    // 添加初始提示符
-    addPrompt();
-
-    // 聚焦终端
-    focusTerminal();
-}
-
-// 添加提示符
-function addPrompt() {
-    const terminalOutput = document.getElementById('terminalOutput');
-    const line = document.createElement('div');
-    line.className = 'terminal-line terminal-input-line';
-
-    line.innerHTML = `
-            <span class="terminal-prompt">superadmin@scripthub:~#</span>
-            <span class="terminal-command" id="terminalCommand"></span>
-            <span class="terminal-cursor"></span>
-        `;
-
-    terminalOutput.appendChild(line);
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-}
-
-// 添加终端行
-function addTerminalLine(text, type = 'output') {
-    const terminalOutput = document.getElementById('terminalOutput');
-    const line = document.createElement('div');
-    line.className = 'terminal-line';
-
-    // 设置样式类
-    let styleClass = 'command-output';
-    if (type === 'error') {
-        styleClass = 'command-error';
-    } else if (type === 'info') {
-        styleClass = 'command-info';
+  // ====== 权限显示 server 区块 ======
+  const server = document.getElementById('server');
+  if (server) {
+    if (localStorage.getItem('usertype') === 'superadmin') {
+      server.style.display = 'block';
+    } else {
+      server.remove();
+      return; // 非 superadmin 不初始化终端
     }
+  }
 
-    line.innerHTML = `
-            <span class="${styleClass}">${text}</span>
-        `;
+  // ====== 终端实现 ======
+  const terminalOutput = document.getElementById('terminalOutput');
+  if (!terminalOutput) return;
 
+  const PROMPT = 'superadmin@scripthub:~#';
+
+  let history = [];
+  let historyIndex = -1; // -1 表示不在历史浏览状态
+  let busy = false;
+
+  function escapeHTML(s) {
+    return String(s)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function scrollToBottom() {
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  }
+
+  function addLine(text, type = 'output') {
+    const line = document.createElement('div');
+    line.className = `terminal-line ${type}`;
+
+    // 用 pre 保留换行/缩进
+    line.innerHTML = `<pre class="terminal-pre">${escapeHTML(text)}</pre>`;
     terminalOutput.appendChild(line);
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-}
+    scrollToBottom();
+    return line;
+  }
 
-// 聚焦终端
-function focusTerminal() {
-    document.addEventListener('keydown', handleTerminalInput);
-}
+  function addCommandEcho(command) {
+    const line = document.createElement('div');
+    line.className = 'terminal-line cmd-echo';
+    line.innerHTML = `
+      <span class="terminal-prompt">${escapeHTML(PROMPT)}</span>
+      <span class="terminal-echo">${escapeHTML(command)}</span>
+    `;
+    terminalOutput.appendChild(line);
+    scrollToBottom();
+  }
 
-// 处理终端输入
-function handleTerminalInput(e) {
-    const terminalCommand = document.getElementById('terminalCommand');
+  function addInputRow() {
+    const row = document.createElement('div');
+    row.className = 'terminal-line input-row';
+    row.innerHTML = `
+      <span class="terminal-prompt">${escapeHTML(PROMPT)}</span>
+      <input class="terminal-input" type="text" spellcheck="false" autocomplete="off" />
+    `;
+    terminalOutput.appendChild(row);
 
-    // 只处理可打印字符和特殊键
-    if (e.key.length === 1 && e.key.charCodeAt(0) >= 32) {
-        currentCommand += e.key;
-        terminalCommand.textContent = currentCommand;
-    } else if (e.key === 'Backspace') {
-        currentCommand = currentCommand.slice(0, -1);
-        terminalCommand.textContent = currentCommand;
-    } else if (e.key === 'Enter') {
-        executeCommand(currentCommand);
-    } else if (e.key === 'ArrowUp') {
-        // 上箭头 - 历史命令
-        if (historyIndex < terminalHistory.length - 1) {
-            historyIndex++;
-            currentCommand = terminalHistory[terminalHistory.length - 1 - historyIndex];
-            terminalCommand.textContent = currentCommand;
-        }
-    } else if (e.key === 'ArrowDown') {
-        // 下箭头 - 历史命令
-        if (historyIndex > 0) {
-            historyIndex--;
-            currentCommand = terminalHistory[terminalHistory.length - 1 - historyIndex];
-            terminalCommand.textContent = currentCommand;
-        } else if (historyIndex === 0) {
-            historyIndex = -1;
-            currentCommand = '';
-            terminalCommand.textContent = '';
-        }
-    }
+    const input = row.querySelector('.terminal-input');
+    input.disabled = busy;
 
-    // 滚动到底部
-    const terminalOutput = document.getElementById('terminalOutput');
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-}
+    // 点击终端任意处聚焦输入
+    terminalOutput.addEventListener('mousedown', () => {
+      if (!busy) input.focus();
+    }, { once: true });
 
-// 执行命令
-function executeCommand(command) {
-    const terminalOutput = document.getElementById('terminalOutput');
-    const commandLine = terminalOutput.lastChild;
-    // 忽略空命令
-    if (!command.trim()) {
-        commandLine.removeChild(commandLine.lastChild);
-        commandLine.innerHTML = `
-            <span class="terminal-prompt">superadmin@scripthub:~#</span>
-            <span class="command-output">${command}</span>
-        `;
-        addPrompt();
-        currentCommand = '';
+    input.focus();
+    scrollToBottom();
+
+    input.addEventListener('keydown', (e) => {
+      if (busy) return;
+
+      // Ctrl+L 清屏
+      if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
+        e.preventDefault();
+        clearScreen();
         return;
+      }
+
+      // ESC 清空当前输入
+      if (e.key === 'Escape') {
+        input.value = '';
+        historyIndex = -1;
+        return;
+      }
+
+      // 历史命令
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (history.length === 0) return;
+        if (historyIndex < history.length - 1) historyIndex++;
+        input.value = history[history.length - 1 - historyIndex];
+        // 光标移到末尾
+        input.setSelectionRange(input.value.length, input.value.length);
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (history.length === 0) return;
+
+        if (historyIndex > 0) {
+          historyIndex--;
+          input.value = history[history.length - 1 - historyIndex];
+        } else {
+          historyIndex = -1;
+          input.value = '';
+        }
+        input.setSelectionRange(input.value.length, input.value.length);
+        return;
+      }
+
+      // Enter 执行
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const cmd = input.value;
+        // 固化本行（把 input 行换成 echo）
+        row.remove();
+        runCommand(cmd);
+      }
+    });
+  }
+
+  function clearScreen() {
+    terminalOutput.innerHTML = '';
+    addLine('scripthub 服务器终端', 'info');
+    addLine('输入命令并按 Enter 执行（Ctrl+L 清屏，↑/↓ 历史，exit退出并结束当前终端）', 'info');
+    addLine('--------------------------------', 'info');
+    addInputRow();
+  }
+
+  async function runCommand(command) {
+    const cmd = String(command ?? '');
+    addCommandEcho(cmd);
+
+    // 空命令：直接给新提示符
+    if (!cmd.trim()) {
+      historyIndex = -1;
+      addInputRow();
+      return;
     }
 
-    // 添加命令到历史
-    terminalHistory.push(command);
+    // 记录历史
+    history.push(cmd);
     historyIndex = -1;
 
-    // 显示命令
+    busy = true;
+    const loadingLine = addLine('执行中...', 'info');
 
-    commandLine.removeChild(commandLine.lastChild); // 移除光标
-    commandLine.innerHTML = `
-            <span class="terminal-prompt">superadmin@scripthub:~#</span>
-            <span class="command-output">${command}</span>
-        `;
-
-    // 显示执行中状态
-    addTerminalLine('执行中...', 'info');
-
-    // 发送命令到服务器
-    fetch(`${serverurl}/execute-command`, {
+    try {
+      const resp = await fetch(`${serverurl}/execute-command`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ command: command })
-    })
-        .then(response => response.json())
-        .then(data => {
-            // 移除"执行中..."提示
-            terminalOutput.removeChild(terminalOutput.lastChild);
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd })
+      });
 
-            if (data.success) {
-                // 添加命令输出
-                addTerminalLine(data.output, 'output');
-            } else {
-                // 添加错误信息
-                addTerminalLine(data.error, 'error');
-            }
+      // 兼容非 200 但返回文本的情况
+      let data;
+      try {
+        data = await resp.json();
+      } catch {
+        const t = await resp.text();
+        throw new Error(`服务器返回非 JSON：${t.slice(0, 200)}`);
+      }
 
-            // 添加新提示符
-            currentCommand = '';
-            addPrompt();
-        })
-        .catch(error => {
-            // 移除"执行中..."提示
-            terminalOutput.removeChild(terminalOutput.lastChild);
+      loadingLine.remove();
 
-            // 添加网络错误信息
-            addTerminalLine(`网络错误: ${error}`, 'error');
+      if (data && data.success) {
+        addLine(data.output ?? '', 'output');
+      } else {
+        addLine(data?.error || data?.message || '执行失败（未知原因）', 'error');
+      }
+    } catch (err) {
+      loadingLine.remove();
+      addLine(`网络/请求错误: ${String(err)}`, 'error');
+    } finally {
+      busy = false;
+      addInputRow();
+    }
+  }
 
-            // 添加新提示符
-            currentCommand = '';
-            addPrompt();
-        });
-}
-
-// 初始化终端
-document.addEventListener('DOMContentLoaded', initTerminal);
-server = document.getElementById('server');;
-if (localStorage.getItem('usertype') === 'superadmin') {
-    server.style.display = 'block';
-}
-else {
-    server.remove();
-}
+  // 初始化
+  clearScreen();
+});
