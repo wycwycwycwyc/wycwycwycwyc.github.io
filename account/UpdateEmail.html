@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>更换邮箱</title>
-<script src="/js/script14_serverUrl.js"></script>
+<script src="/config/serverUrl.js"></script>
 
         <script src="/js/script4_goBackOrHome.js"></script>
         <script src="/js/script3_darkMode.js"></script>
@@ -262,7 +262,7 @@ body.dark-mode .back-btn:hover {
 
                         if (updateEmailData.success) {
                             swal('邮箱更新成功！', '你的账户将使用新的邮箱', 'success');
-                            location.href = 'settings.html';
+                            location.href = '/settings.html';
                         } else {
                             swal('邮箱更新失败：', updateEmailData.message, 'error');
                         }

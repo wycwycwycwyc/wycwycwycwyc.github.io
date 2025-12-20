@@ -1,98 +1,100 @@
 
-if (navigator.userAgent.match(/Mobile/i)) {
-    // 移动设备
-    document.getElementById('developer').style.display = 'none';
-    var menu;
-    document.getElementById('sidebar').style.width = '100%';
-    document.getElementById("content").style.visibility = 'hidden';
-    document.getElementById("content").style.marginLeft = '0';
-    var sidebars = document.getElementById('sidebar');
+document.addEventListener('DOMContentLoaded', function () {
+    if (navigator.userAgent.match(/Mobile/i)) {
+        // 移动设备
+    
+        var menu;
+        document.getElementById('sidebar').style.width = '100%';
+        document.getElementById("content").style.visibility = 'hidden';
+        document.getElementById("content").style.marginLeft = '0';
+        var sidebars = document.getElementById('sidebar');
 
-    for (var i = 0; i < sidebars.children.length; i++) {
-        // 获取子元素的id
-        var childId = sidebars.children[i].id;
-        // 打印子元素的id
-        var button = document.createElement('button');
-        button.innerHTML = '返回'; // 设置按钮文本
-        button.id = 'last'; // 设置按钮ID
-        button.className = 'custom-button';
-        // 设置按钮的样式
-        button.style.cssText = 'position: fixed;left :0;top:-40px';
+        for (var i = 0; i < sidebars.children.length; i++) {
+            // 获取子元素的id
+            var childId = sidebars.children[i].id;
+            // 打印子元素的id
+            var button = document.createElement('button');
+            button.innerHTML = '返回'; // 设置按钮文本
+            button.id = 'last'; // 设置按钮ID
+            button.className = 'custom-button';
+            // 设置按钮的样式
+            button.style.cssText = 'position: fixed;left :0;top:-40px';
+            var urlParams = new URLSearchParams(window.location.search);
+
+            // 获取容器元素
+            var container = document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer'));
+            button.onclick = function () {
+                document.getElementById(menu).style.display = 'none';
+                var type = urlParams.get('type');
+                if (type == null) {
+                    sidebars.classList.remove('hide');
+                    document.getElementById('sidebar').style.display = 'block';
+                }
+            }
+            // 将按钮添加到容器中
+
+            if (childId != '') {
+
+                container.appendChild(button);
+                document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.transform = 'translateY(30px)';
+
+
+                document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'none';
+            }
+        }
+        if (sidebars) {
+            // 获取 sidebar 元素的所有子元素
+            var children = sidebar.children;
+            // 遍历每个子元素
+            sidebar.addEventListener('click', function (event) {
+                // 检查被点击的元素是否是sidebar的子元素
+                if (event.target.id) {
+                    // 获取被点击元素的id
+                    var clickedId = event.target.id;
+                    event.preventDefault();
+                    menu = clickedId.replace(/-si/g, '').replace(/developers/g, 'developer');
+
+                    // 先添加 hide 类来触发过渡效果
+                    sidebars.classList.add('hide');
+
+                    // 监听过渡结束事件
+                    sidebars.addEventListener('transitionend', function handler() {
+                        // 过渡完成后设置 display: none
+
+
+                        // 移除事件监听器，避免重复触发
+                        sidebars.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                    // 显示点击的菜单项
+                    var contentElement = document.getElementById('content');
+
+                    // 定义动画效果
+                    var animationStyle = {
+                        animationName: 'slideInFromRight', // 动画名称
+                        animationDuration: '0.5s', // 动画持续时间
+                        animationTimingFunction: 'ease-out', // 动画速度曲线
+                        animationFillMode: 'forwards', // 动画完成后的状态
+                    };
+
+                    // 将动画效果应用到元素上
+                    Object.assign(contentElement.style, animationStyle);
+                    document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'block';
+                    document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.visibility = 'visible';
+                }
+            });
+        }
         var urlParams = new URLSearchParams(window.location.search);
-
-        // 获取容器元素
-        var container = document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer'));
-        button.onclick = function () {
-            document.getElementById(menu).style.display = 'none';
-            var type = urlParams.get('type');
-            if (type == null) {
-                sidebars.classList.remove('hide');
-                document.getElementById('sidebar').style.display = 'block';
-            }
-        }
-        // 将按钮添加到容器中
-
-        if (childId != '') {
-
-            container.appendChild(button);
-            document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.transform = 'translateY(30px)';
+        var type = urlParams.get('type');
+        if (type != null) {
+            document.getElementById('last').display = 'none';
+            sidebars.style.display = 'none';
+            document.getElementById(type).style.visibility = 'visible';
+            document.getElementById(type).style.display = 'block';
 
 
-            document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'none';
         }
     }
-    if (sidebars) {
-        // 获取 sidebar 元素的所有子元素
-        var children = sidebar.children;
-        // 遍历每个子元素
-        sidebar.addEventListener('click', function (event) {
-            // 检查被点击的元素是否是sidebar的子元素
-            if (event.target.id) {
-                // 获取被点击元素的id
-                var clickedId = event.target.id;
-                event.preventDefault();
-                menu = clickedId.replace(/-si/g, '').replace(/developers/g, 'developer');
-
-                // 先添加 hide 类来触发过渡效果
-                sidebars.classList.add('hide');
-
-                // 监听过渡结束事件
-                sidebars.addEventListener('transitionend', function handler() {
-                    // 过渡完成后设置 display: none
-
-
-                    // 移除事件监听器，避免重复触发
-                    sidebars.removeEventListener('transitionend', handler);
-                }, { once: true });
-                // 显示点击的菜单项
-                var contentElement = document.getElementById('content');
-
-                // 定义动画效果
-                var animationStyle = {
-                    animationName: 'slideInFromRight', // 动画名称
-                    animationDuration: '0.5s', // 动画持续时间
-                    animationTimingFunction: 'ease-out', // 动画速度曲线
-                    animationFillMode: 'forwards', // 动画完成后的状态
-                };
-
-                // 将动画效果应用到元素上
-                Object.assign(contentElement.style, animationStyle);
-                document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'block';
-                document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.visibility = 'visible';
-            }
-        });
-    }
-    var urlParams = new URLSearchParams(window.location.search);
-    var type = urlParams.get('type');
-    if (type != null) {
-        document.getElementById('last').display = 'none';
-        sidebars.style.display = 'none';
-        document.getElementById(type).style.visibility = 'visible';
-        document.getElementById(type).style.display = 'block';
-
-
-    }
-}
+});
 var usertabletext;
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -249,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
         usernameElement.innerHTML = '用户名: <a href="/account/UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
         email.innerHTML = '用户名: <a href="/account/UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
         let userId = localStorage.getItem('userid');
-        const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+        const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
         document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
         // 使用fetch发送POST请求到后端接口
         fetch(`${serverurl}/get-username-by-id`, {
@@ -1129,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (localStorage.getItem('developerOptionsEnabled') === 'true' && isLoggedIn && (localStorage.getItem('usertype') === 'superadmin' || localStorage.getItem('usertype') === 'admin')) {
-        fetch(`https://jbcfz.serveo.net/users?userid=${localStorage.getItem('userid')}`)
+        fetch(`${serverurl}/users?userid=${localStorage.getItem('userid')}`)
             .then(response => {
                 if (response.status === 403) {
 
@@ -1154,7 +1156,7 @@ function newtable(isnewtable) {
     if (isnewtable === 1) {
         loading = Qmsg.loading("正在重新加载用户列表");
     }
-    fetch(`https://jbcfz.serveo.net/users?userid=${localStorage.getItem('userid')}`)
+    fetch(`${serverurl}/users?userid=${localStorage.getItem('userid')}`)
         .then(response => {
             if (response.status === 403) {
 
@@ -1198,12 +1200,12 @@ function createTable(users, isicon, input) {
 function createTableHead() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    ['头像', '用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)', '操作', '切换'].forEach((text, i) => {
+    ['头像', '用户名', '邮箱', '密码', '用户类型', '用户ID(不可更改)',"用户数据", '操作', '切换'].forEach((text, i) => {
         const th = document.createElement('th');
         th.textContent = text;
         if (i === 0) {
             th.style.borderRadius = '10px 0 0 0';
-        } if (i === 7) {
+        } if (i === 8) {
             th.style.borderRadius = '0 10px 0 0';
         }
 
@@ -1220,7 +1222,7 @@ function createRow(user, index, users, isicon, input) {
         return;
     }
     const tr = document.createElement('tr');
-    const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${user.id}`;
+    const imageUrl = `${serverurl}/get-icon-by-id?id=${user.id}`;
     // 创建圆形按钮
     const buttonTd = document.createElement('td');
     const circleButton = document.createElement('button');
@@ -1383,7 +1385,7 @@ function createRow(user, index, users, isicon, input) {
     return;
 }
 function previewImagebebefore(input) {
-    fetch(`https://jbcfz.serveo.net/users${localStorage.getItem('userId')}`) // 假设后端接口是/users
+    fetch(`${serverurl}/users${localStorage.getItem('userId')}`) // 假设后端接口是/users
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -1733,7 +1735,7 @@ function submitChanges(index, users) {
 
     // 将 updatedUserInfo 转换为JSON字符串
     const userData = JSON.stringify(updatedUserInfo);
-
+    
     // 发送请求到服务器
     fetch(`${serverurl}/update-user-by-id`, {
         method: 'POST', // 指定请求方法为POST
@@ -1771,7 +1773,7 @@ function submitChanges(index, users) {
             // 处理错误情况，例如显示错误消息
         });
 }
-document.getElementById('registerButton').addEventListener('click', function () {
+function registerUserBydev() {
     var steps = [
         {
             title: "创建新用户",
@@ -1864,7 +1866,7 @@ document.getElementById('registerButton').addEventListener('click', function () 
     }
 
     showStep();
-});
+};
 
 document.getElementById('restartSystemBtn').addEventListener('click', function () {
     swal({

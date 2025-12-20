@@ -1,0 +1,1 @@
+serverurl = 'https://scripthub.serveousercontent.com';//根据实际情况修改

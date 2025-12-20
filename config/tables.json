@@ -104,7 +104,7 @@
       "name": "贪吃蛇双人版",
       "Introduction": "一个网页版的双人版贪吃蛇",
       "note": "可以在线游玩，无需下载，记录分数",
-      "view": "/code/webapp/snakegamepro"
+      "view": "/code/webapp/snakegamepro/snakegamepro.html"
     }
   }
 }

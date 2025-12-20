@@ -1,1 +1,0 @@
-serverurl = 'https://jbcfz.serveo.net' || 'http://localhost:3000';//根据实际情况修改

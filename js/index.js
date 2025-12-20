@@ -250,7 +250,7 @@ function setElementsblur(blur, isDarkMode) {
                     // 假设有一个按钮或其他元素，用户点击后触发获取用户名的操作
                     // 假设用户ID存储在某个变量中
                     let userId = localStorage.getItem('userid');
-                    const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+                    const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
                     document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
                     // 使用fetch发送POST请求到后端接口
                     fetch(`${serverurl}/get-username-by-id`, {
@@ -430,7 +430,7 @@ function setElementsblur(blur, isDarkMode) {
                     menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
 
                     var menuItems = [
-                        { text: '账户设置', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html?type=account'; }else{window.location.href = 'settings.html#account';} } },
+                        { text: '账户设置', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
                         { text: '切换账号', action: function () { sa(); } },
                         { text: '退出登录', action: function () { logout(); } }
                     ];

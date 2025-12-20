@@ -47,7 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (isTargetElement(node)) {
                             applyStyleToElement(node, selectedOpacity, selectedBlur + 'px', isDarkMode);
                         }
-                        
+                            if (window.location.pathname.includes('settings.html') || 
+                                window.location.href.includes('settings.html')) {
+                                return;
+                            }//避免在设置页面设置表格颜色样式
                         // 检查节点的子元素中是否有需要设置样式的元素
                         const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
                         targetElements.forEach(function(element) {
@@ -67,6 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function isTargetElement(element) {
+        if (window.location.pathname.includes('settings.html') || 
+        window.location.href.includes('settings.html')) {
+        return;
+    }//避免在设置页面设置表格颜色样式
     const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time'];
     return targetSelectors.some(selector => {
         if (selector.startsWith('.') && element.classList.contains(selector.slice(1))) {
@@ -93,6 +100,10 @@ function applyStyleToElement(element, opacity, blur, isDarkMode) {
 }
 
 function setElementsStyle(opacity, blur, isDarkMode) {
+    if (window.location.pathname.includes('settings.html') || 
+        window.location.href.includes('settings.html')) {
+        return;
+    }//避免在设置页面设置表格颜色样式
     var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
 
     if (elements.length === 0) {

@@ -1,4 +1,1635 @@
-document.addEventListener('DOMContentLoaded', function() {
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双人贪吃蛇大作战</title>
+<script src="/config/serverUrl.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles_button.css">
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script13_checkIslogin.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link href="/css/message.min.css" rel="stylesheet" />
+    <script src="/js/message.min.js"></script>
+<button id="back" class="custom-button" style="position: fixed; top: 120px; left: 10px;z-index: 10;" onclick="goBackOrHome()">返回</button>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(0.8);
+            opacity: 0;
+            animation: containerEnter 1s forwards 0.5s;
+        }
+        
+        @keyframes containerEnter {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        #game-board {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .snake-segment {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            transition: all 0.1s ease-out;
+            z-index: 2;
+        }
+        
+        .snake-head {
+            transform: scale(1.2);
+            z-index: 3;
+        }
+        
+    .snake-segment.snake1 {
+        background: linear-gradient(45deg, #FF5722, #FF9800);
+        box-shadow: 0 0 10px #FF5722;
+    }
+    
+    .snake-segment.snake2 {
+        background: linear-gradient(45deg, #2196F3, #00BCD4);
+        box-shadow: 0 0 10px #2196F3;
+    }
+    
+    .snake-segment.snake1.snake-head {
+        background: linear-gradient(45deg, #FF5722, #FF9800);
+        box-shadow: 0 0 15px #FF5722;
+        transform: scale(1.2);
+        z-index: 3;
+    }
+    
+    .snake-segment.snake2.snake-head {
+        background: linear-gradient(45deg, #2196F3, #00BCD4);
+        box-shadow: 0 0 15px #2196F3;
+        transform: scale(1.2);
+        z-index: 3;
+    }
+        .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4CAF50;
+            animation: pulse 1s infinite alternate;
+            z-index: 1;
+        }
+
+        .special-food {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 15px white;
+            animation: rainbowPulse 2s infinite alternate, rotate 5s infinite linear;
+        }
+
+        @keyframes rainbowPulse {
+            0% { background: linear-gradient(45deg, #FF0000, #FF7F00); box-shadow: 0 0 15px #FF0000; }
+            14% { background: linear-gradient(45deg, #FF7F00, #FFFF00); box-shadow: 0 0 15px #FF7F00; }
+            28% { background: linear-gradient(45deg, #FFFF00, #00FF00); box-shadow: 0 0 15px #FFFF00; }
+            42% { background: linear-gradient(45deg, #00FF00, #0000FF); box-shadow: 0 0 15px #00FF00; }
+            57% { background: linear-gradient(45deg, #0000FF, #4B0082); box-shadow: 0 0 15px #0000FF; }
+            71% { background: linear-gradient(45deg, #4B0082, #9400D3); box-shadow: 0 0 15px #4B0082; }
+            85% { background: linear-gradient(45deg, #9400D3, #FF0000); box-shadow: 0 0 15px #9400D3; }
+            100% { background: linear-gradient(45deg, #FF0000, #FF7F00); box-shadow: 0 0 15px #FF0000; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.3); }
+        }
+        
+        .score-board {
+            position: absolute;
+            top: 20px;
+            width: 100%; /* 改为全宽度 */
+            display: flex;
+            justify-content: space-between; /* 两端对齐 */
+            padding: 0 20px; /* 左右内边距 */
+            color: white;
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 4;
+            transform: translateY(-50px);
+            opacity: 0;
+            animation: scoreEnter 0.5s forwards 1.5s;
+            box-sizing: border-box;
+        }
+        
+        /* 移除原来的左右定位 */
+        .player-score {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            min-width: 150px;
+        }
+        
+        .health-bar {
+            width: 100px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .health-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .player-1 .health-fill {
+            background: linear-gradient(to right, #FF5722, #FF9800);
+        }
+        
+        .player-2 .health-fill {
+            background: linear-gradient(to right, #2196F3, #00BCD4);
+        }
+        
+        @keyframes scoreEnter {
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 36px;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .restart-btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+            transition: all 0.3s;
+            transform: scale(0);
+            animation: buttonPop 0.5s forwards 0.3s;
+        }
+        
+        @keyframes buttonPop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .restart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(33, 150, 243, 0.8);
+        }
+        
+        .start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26, 42, 108, 0.9), rgba(178, 31, 31, 0.9), rgba(253, 187, 45, 0.9));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+            transition: all 0.5s;
+        }
+        
+        .start-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .game-title {
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: titleBounce 2s infinite;
+            transform: translateY(-50px);
+            opacity: 0;
+            animation: titleEnter 1s forwards 0.2s, titleBounce 2s infinite 1.2s;
+        }
+        
+        @keyframes titleEnter {
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .start-btn {
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #FF5722, #FF9800);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+            transition: all 0.3s;
+            transform: scale(0);
+            opacity: 0;
+            animation: buttonPop 0.5s forwards 0.8s;
+        }
+        
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 87, 34, 0.8);
+        }
+        .start-btn {
+        /* 确保这些属性存在 */
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: scale(1) !important;
+        }
+        .instructions {
+            margin-top: 30px;
+            font-size: 16px;
+            text-align: center;
+            opacity: 0.8;
+            transform: translateY(50px);
+            opacity: 0;
+            animation: instructionsEnter 0.8s forwards 1s;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+        }
+        
+        .player-instructions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 40px;
+        }
+        
+        .player-instruction {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .player-1-instruction {
+            border: 2px solid #FF5722;
+        }
+        
+        .player-2-instruction {
+            border: 2px solid #2196F3;
+        }
+        
+        .key {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 5px;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+        }
+        
+        @keyframes instructionsEnter {
+            to { transform: translateY(0); opacity: 0.8; }
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-500px) translateX(100px); opacity: 0; }
+        }
+        
+        .snake-enter {
+            animation: snakeEnter 0.8s forwards;
+        }
+        
+        @keyframes snakeEnter {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(360deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        
+        .food-enter {
+            animation: foodEnter 0.8s forwards;
+        }
+        
+        @keyframes foodEnter {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            70% { transform: scale(1.3) rotate(360deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(10px);
+            opacity: 0.1;
+            z-index: -1;
+            animation: bgFloat 20s infinite linear;
+        }
+        
+        @keyframes bgFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(50px, 50px) rotate(180deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        .winner-banner {
+            font-size: 60px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px currentColor;
+            animation: winnerPulse 2s infinite;
+        }
+        
+        @keyframes winnerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .player-1-win {
+            color: #FF5722;
+        }
+        
+        .player-2-win {
+            color: #2196F3;
+        }
+                .player-score {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            min-width: 150px;
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .score-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+                .character-selection {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26, 42, 108, 0.9), rgba(178, 31, 31, 0.9), rgba(253, 187, 45, 0.9));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 9;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+        
+        .character-selection.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .selection-title {
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .player-selections {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+        
+        .player-selection {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            width: 250px;
+        }
+        
+        .player-label {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .snake-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .snake-option {
+            padding: 12px 20px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .snake-option:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .snake-option.selected {
+            border-color: white;
+            box-shadow: 0 0 15px white;
+        }
+        
+        .speed-snake {
+            border-color: #FFD700;
+        }
+        
+        .tough-snake {
+            border-color: #C0C0C0;
+        }
+        
+        .snake-type {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .snake-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .start-game-btn {
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            transition: all 0.3s;
+        }
+        
+        .start-game-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+        }
+        
+        .start-game-btn:disabled {
+            background: linear-gradient(45deg, #9E9E9E, #757575);
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: 0 0 20px rgba(158, 158, 158, 0.5);
+        }
+        
+        /* 特殊物品样式 */
+        .immunity-ball {
+            background: linear-gradient(45deg, #FFFF00, #FFD700) !important;
+            box-shadow: 0 0 15px #FFFF00 !important;
+            animation: pulse 1s infinite alternate !important;
+        }
+        
+        .health-ball {
+            background: linear-gradient(45deg, #FF0000, #e31010) !important;
+            box-shadow: 0 0 15px #FF0000 !important;
+            animation: pulse 1s infinite alternate !important;
+        }
+        
+        .reverse-ball {
+            background: linear-gradient(45deg, #001e80, #7079da) !important;
+            box-shadow: 0 0 15px #002280 !important;
+            animation: pulse 1s infinite alternate !important;
+        }
+        
+        .status-effect {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: white;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        
+        .player-1-effect {
+            top: 50px;
+        }
+        
+        .player-2-effect {
+            top: 80px;
+        }
+                .ball-storage {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 4;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .player-1-storage {
+            left: 20px;
+        }
+        
+        .player-2-storage {
+            right: 20px;
+        }
+        
+        .storage-title {
+            color: white;
+            font-size: 14px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ball-slot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .ball-slot.filled {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            box-shadow: 0 0 10px #4CAF50;
+        }
+        
+        .ball-slot.key-hint {
+            position: absolute;
+            bottom: -20px;
+            font-size: 12px;
+            color: white;
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+        
+        /* 状态效果显示 */
+        .status-effect {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: white;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        
+        .player-1-effect {
+            top: 50px;
+            left: 20px;
+            right: auto;
+        }
+        
+        .player-2-effect {
+            top: 80px;
+            right: 20px;
+        }
+        
+        /* 释放效果动画 */
+        @keyframes releaseEffect {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        .release-effect {
+            position: absolute;
+            border-radius: 50%;
+            animation: releaseEffect 0.5s forwards;
+            z-index: 3;
+        }
+                .ball-storage {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 4;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .player-1-storage {
+            left: 20px;
+        }
+        
+        .player-2-storage {
+            right: 20px;
+        }
+        
+        .storage-title {
+            color: white;
+            font-size: 14px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ball-slot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .ball-slot.filled {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            box-shadow: 0 0 10px #4CAF50;
+        }
+        
+        .ball-slot.key-hint {
+            position: absolute;
+            bottom: -20px;
+            font-size: 12px;
+            color: white;
+            width: 100%;
+            text-align: center;
+            left: 0;
+        }
+        
+        /* 状态效果显示 */
+        .status-effect {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: white;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        
+        .player-1-effect {
+            top: 50px;
+            left: 20px;
+            right: auto;
+        }
+        
+        .player-2-effect {
+            top: 80px;
+            right: 20px;
+        }
+        
+        /* 释放效果动画 */
+        @keyframes releaseEffect {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        .release-effect {
+            position: absolute;
+            border-radius: 50%;
+            animation: releaseEffect 0.5s forwards;
+            z-index: 3;
+        }
+        .magic-snake {
+            border-color: #9C27B0;
+        }
+        .player-score .player-name {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        /* 蛇类详情弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 600px;
+    color: white;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* 蛇类详情内容样式 */
+.snake-type-title {
+    font-size: 24px;
+    margin: 15px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid;
+}
+
+.snake-attribute {
+    margin: 10px 0;
+    display: flex;
+}
+
+.attribute-name {
+    font-weight: bold;
+    width: 120px;
+}
+
+.attribute-value {
+    flex: 1;
+}
+
+/* 图标样式 */
+.speed-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.health-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: linear-gradient(45deg, #FF0000, #FF6B6B);
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.magic-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: linear-gradient(45deg, #9C27B0, #DA70D6);
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.tough-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+/* 星级评分样式 */
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.star {
+    font-size: 16px;
+    margin-right: 2px;
+}
+
+.rating-value {
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.health-rating .star { 
+    color: #FF6B6B;
+}
+
+.speed-rating .star { 
+    color: #FFD700;
+}
+
+.magic-rating .star { 
+    color: #DA70D6;
+}
+
+.health-rating .rating-value { color: #FF6B6B; }
+.speed-rating .rating-value { color: #FFD700; }
+.magic-rating .rating-value { color: #DA70D6; }
+
+/* 角色选择界面样式 */
+.snake-option {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.snake-option:hover {
+    transform: scale(1.05);
+}
+
+.snake-type {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.snake-desc {
+    font-size: 14px;
+    opacity: 0.8;
+}    
+/* 按钮容器样式 */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 上传按钮特殊样式 */
+.upload-btn {
+    background: linear-gradient(45deg, #4CAF50, #8BC34A) !important;
+}
+
+.upload-btn:hover {
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.7) !important;
+}
+/* 战绩查询模态框样式 */
+#records-modal .modal-content {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.search-controls {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.search-controls input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.search-controls button {
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #2196F3, #00BCD4);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+/* 战绩记录样式 */
+.record-item {
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.record-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.record-details {
+    flex: 1;
+}
+
+.record-username {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.record-data {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.record-match {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 5px;
+}
+
+.record-match-opponent {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.record-match-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid white;
+}
+
+.record-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.record-stat {
+    background-color: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+/* 游戏结束界面样式 */
+.game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    backdrop-filter: blur(5px);
+}
+
+.game-over.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.game-over-content {
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    animation: fadeInUp 0.8s;
+}
+
+.winner-container {
+    margin-bottom: 30px;
+}
+
+.trophy-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 1s infinite alternate;
+}
+
+.winner-banner {
+    font-size: 48px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px currentColor;
+    animation: pulse 2s infinite;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    gap: 20px;
+}
+
+.player-stats {
+    flex: 1;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s;
+}
+
+.player-stats:hover {
+    transform: translateY(-5px);
+}
+
+.player-1-stats {
+    border: 2px solid #FF5722;
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.3);
+}
+
+.player-2-stats {
+    border: 2px solid #2196F3;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+}
+
+.player-avatar {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.player-name {
+    font-size: 20px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.win-count {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1s ease-out;
+}
+
+.vs-text {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.restart-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.restart-btn i {
+    font-size: 20px;
+}
+
+.restart-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.upload-btn {
+    background: linear-gradient(45deg, #4CAF50, #8BC34A);
+}
+
+.restart-btn:not(.upload-btn) {
+    background: linear-gradient(45deg, #2196F3, #00BCD4);
+}
+
+/* 庆祝粒子效果 */
+.celebration-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: celebrate linear forwards;
+    z-index: 101;
+}
+
+@keyframes celebrate {
+    to {
+        transform: translate(var(--tx), var(--ty));
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    to {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+/* 游戏结束消息样式 */
+.game-over-message {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    transition: opacity 0.5s;
+}
+
+/* 当前胜利次数提示 */
+.win-count .current-win {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-left: 5px;
+    animation: pulse 1s infinite;
+}
+
+/* 胜利次数样式 */
+.win-count {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-wins {
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+.map-selection {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 42, 108, 0.9), rgba(178, 31, 31, 0.9), rgba(253, 187, 45, 0.9));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 8;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s;
+}
+
+.map-selection.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.map-options {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.map-option {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    width: 250px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.map-option:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.map-option.selected {
+    border: 2px solid white;
+    box-shadow: 0 0 15px white;
+}
+
+.map-preview {
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.map-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.map-desc {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 火山样式 */
+.volcano {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #8B0000, #FF4500);
+    z-index: 1;
+    box-shadow: 0 0 15px #FF4500;
+}
+
+.lava {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #FF4500, #FF8C00);
+    border-radius: 50%;
+    z-index: 1;
+    animation: lavaPulse 1s infinite alternate;
+}
+
+@keyframes lavaPulse {
+    from { opacity: 0.7; transform: scale(1); }
+    to { opacity: 1; transform: scale(1.1); }
+}
+
+.warning-volcano {
+    animation: volcanoWarning 0.5s infinite alternate;
+}
+
+@keyframes volcanoWarning {
+    from { box-shadow: 0 0 15px #FF4500; }
+    to { box-shadow: 0 0 30px #FFFF00; }
+}
+    </style>
+</head>
+<body>
+    <!-- 添加到character-selection div之后 -->
+<div class="map-selection">
+    <h2 class="selection-title">选择地图</h2>
+    <div class="map-options">
+        <div class="map-option" data-map="default">
+            <div class="map-preview" style="background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);"></div>
+            <div class="map-name">默认地图</div>
+            <div class="map-desc">经典双蛇对战地图</div>
+        </div>
+        <div class="map-option" data-map="snow">
+            <div class="map-preview" style="background: linear-gradient(135deg, #1e3c72, #2a5298, #7b4397);"></div>
+            <div class="map-name">雪山地图</div>
+            <div class="map-desc">暴风雪天气挑战</div>
+        </div>
+        <div class="map-option" data-map="volcano">
+            <div class="map-preview" style="background: linear-gradient(135deg, #8B0000, #FF4500, #FF8C00);"></div>
+            <div class="map-name">火山地图</div>
+            <div class="map-desc">火山喷发挑战</div>
+        </div>        
+    </div>
+    <button class="start-game-btn" disabled>开始游戏</button>
+</div>
+    <button id="view-records"style="position: absolute;top: 20px;right: 20px; background: rgba(255,255,255,0.2);border: none;color: white;padding: 5px 10px;border-radius: 5px;cursor: pointer;z-index: 10;">查看战绩</button>
+            <div id="records-modal" class="modal">
+            <div class="modal-content" style="max-width: 800px;">
+                <span class="close-modal">&times;</span>
+                <h2>玩家对战记录</h2>
+                <div class="search-controls">
+                    <input type="text" id="search-username" placeholder="搜索玩家...">
+                    <button id="refresh-records">刷新</button>
+                </div>
+                <div id="records-container"></div>
+            </div>
+        </div>
+    <div class="game-container">
+        <div class="start-screen">
+            <h1 class="game-title">🐍 双人贪吃蛇 🐍</h1>
+            <button class="start-btn">开始游戏</button>
+            <div class="instructions">
+                <p>两条蛇各有10点生命值，撞到对方蛇身会扣血并缩短</p>
+                <p>活到最后的玩家获胜！</p>
+                
+                <div class="player-instructions">
+                    <div class="player-instruction player-1-instruction">
+                        <h3><i class="fas fa-fire"></i> 玩家1 (橙色)</h3>
+                        <p>使用WASD控制</p>
+                        <div>
+                            <div class="key">W</div>
+                            <div class="key">A</div>
+                            <div class="key">S</div>
+                            <div class="key">D</div>
+                        </div>
+                    </div>
+                    
+                    <div class="player-instruction player-2-instruction">
+                        <h3><i class="fas fa-tint"></i> 玩家2 (蓝色)</h3>
+                        <p>使用方向键控制</p>
+                        <div>
+                            <div class="key">↑</div>
+                            <div class="key">←</div>
+                            <div class="key">↓</div>
+                            <div class="key">→</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="particles" id="particles"></div>
+        
+        <div id="game-board"></div>
+        
+        <!-- 状态效果显示 -->
+        <div class="status-effect player-1-effect" id="player1-effect"></div>
+        <div class="status-effect player-2-effect" id="player2-effect"></div>
+        
+    <div class="game-over">
+        <h2 class="winner-banner" id="winner-banner">游戏结束!</h2>
+        <!-- 新增比分显示 -->
+        <div class="score-display">
+            <div id="winner-name">获胜者: <span id="winner-player"></span></div>
+            <div class="final-score" id="final-score">0:0</div>
+        </div>
+        <div class="buttons-container">
+            <button class="restart-btn upload-btn" id="upload-record">上传战绩</button>
+            <button class="restart-btn">再来一局</button>
+        </div>
+    </div>
+    </div>
+        <div class="score-board">
+            <div class="player-score player-1">
+                <div class="score-display">
+                    <span class="player-name" id="player1-name">玩家1: </span>
+                    <span class="score-text" id="score-1">0分</span>
+                </div>
+                <div class="health-display">
+                    <span>生命值: </span>
+                    <div class="health-bar">
+                        <div class="health-fill" id="health-1" style="width: 100%;"></div>
+                    </div>
+                    <span id="health-text-1">10HP</span>
+                </div>
+            </div>
+            <div class="player-score player-2">
+                <div class="score-display">
+                    <span class="player-name" id="player2-name">玩家2: </span>
+                    <span class="score-text" id="score-2">0分</span>
+                </div>
+                <div class="health-display">
+                    <span>生命值: </span>
+                    <div class="health-bar">
+                        <div class="health-fill" id="health-2" style="width: 100%;"></div>
+                    </div>
+                    <span id="health-text-2">10HP</span>
+                </div>
+            </div>
+        </div>
+        <div class="ball-storage player-1-storage">
+            <div id ="storage-title1" class="storage-title">玩家1储存:</div>
+            <div class="ball-slot" id="p1-slot-1"><span class="key-hint">1</span></div>
+            <div class="ball-slot" id="p1-slot-2"><span class="key-hint">2</span></div>
+            <div class="ball-slot" id="p1-slot-3"><span class="key-hint">3</span></div>
+            <div class="ball-slot" id="p1-slot-4"><span class="key-hint">4</span></div>
+            <div class="ball-slot" id="p1-slot-5"><span class="key-hint">5</span></div>
+        </div>
+        
+        <div class="ball-storage player-2-storage">
+            <div id ="storage-title2" class="storage-title">玩家2储存:</div>
+            <div class="ball-slot" id="p2-slot-1"><span class="key-hint">6</span></div>
+            <div class="ball-slot" id="p2-slot-2"><span class="key-hint">7</span></div>
+            <div class="ball-slot" id="p2-slot-3"><span class="key-hint">8</span></div>
+            <div class="ball-slot" id="p2-slot-4"><span class="key-hint">9</span></div>
+            <div class="ball-slot" id="p2-slot-5"><span class="key-hint">0</span></div>
+        </div>       
+        <!-- 角色选择界面 -->
+        <div class="character-selection">
+            <h2 class="selection-title">选择你的蛇</h2>
+            
+            <div class="player-selections">
+<div class="player-selection">
+    <div class="player-label" id="player-label1">玩家1 (橙色)</div>
+    <div class="snake-options">
+        <div class="snake-option speed-snake" data-player="1" data-type="speed">
+            <div class="snake-type" style="color: #FFD700;">
+                速度蛇 <span class="speed-rating">★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="health-rating">生命: ★★☆☆☆</span> | 
+                <span class="magic-rating">魔法: ★☆☆☆☆</span>
+            </div>
+        </div>
+        
+        <div class="snake-option tough-snake" data-player="1" data-type="tough">
+            <div class="snake-type" style="color: #C0C0C0;">
+                坚硬蛇 <span class="health-rating">生命: ★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="speed-rating">速度: ★★☆☆☆</span> | 
+                <span class="magic-rating">魔法: ★☆☆☆☆</span>
+            </div>
+        </div>
+        
+        <div class="snake-option magic-snake" data-player="1" data-type="magic">
+            <div class="snake-type" style="color: #9C27B0;">
+                魔法蛇 <span class="magic-rating">魔法: ★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="health-rating">生命: ★★★☆☆</span> | 
+                <span class="speed-rating">速度: ★★★☆☆</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="player-selection">
+    <div class="player-label" id="player-label2">玩家2 (蓝色)</div>
+    <div class="snake-options">
+        <div class="snake-option speed-snake" data-player="2" data-type="speed">
+            <div class="snake-type" style="color: #FFD700;">
+                速度蛇 <span class="speed-rating">★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="health-rating">生命: ★★☆☆☆</span> | 
+                <span class="magic-rating">魔法: ★☆☆☆☆</span>
+            </div>
+        </div>
+        
+        <div class="snake-option tough-snake" data-player="2" data-type="tough">
+            <div class="snake-type" style="color: #C0C0C0;">
+                坚硬蛇 <span class="health-rating">生命: ★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="speed-rating">速度: ★★☆☆☆</span> | 
+                <span class="magic-rating">魔法: ★☆☆☆☆</span>
+            </div>
+        </div>
+        
+        <div class="snake-option magic-snake" data-player="2" data-type="magic">
+            <div class="snake-type" style="color: #9C27B0;">
+                魔法蛇 <span class="magic-rating">魔法: ★★★★★</span>
+            </div>
+            <div class="snake-desc">
+                <span class="health-rating">生命: ★★★☆☆</span> | 
+                <span class="speed-rating">速度: ★★★☆☆</span>
+            </div>
+        </div>
+    </div>
+</div>  
+            
+            <button class="start-game-btn">开始游戏</button>
+        </div>
+                <!-- 添加到body的末尾 -->
+        <div id="snake-details-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>蛇类特性详情</h2>
+                <div id="snake-details-content"></div>
+            </div>
+        </div>
+        <!-- 添加到body的合适位置 -->
+    
+<script>
 // 游戏变量
 let snakes = {
     snake1: [],
@@ -3221,7 +4852,7 @@ function parseRecords(customData) {
             wins,
             losses,
             winRate,
-            opponentAvatar: `https://jbcfz.serveo.net/get-icon-by-id?username=${encodeURIComponent(opponentName)}`
+            opponentAvatar: `${serverurl}/get-icon-by-id?username=${encodeURIComponent(opponentName)}`
         });
     });
     
@@ -3262,4 +4893,6 @@ window.addEventListener('click', function(event) {
         document.getElementById('records-modal').style.display = 'none';
     }
 });
-});
+</script>
+</body>
+</html>

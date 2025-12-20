@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <title>图片上传表单</title>
-<script src="/js/script14_serverUrl.js"></script>
+<script src="/config/serverUrl.js"></script>
 
         <script src="/js/script4_goBackOrHome.js"></script>
         <script src="/js/script3_darkMode.js"></script>
@@ -215,7 +215,7 @@ body.dark-mode .file-upload-label:hover {
         </div>
 
         <script>
-            const imageUrl = `https://jbcfz.serveo.net/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+            const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
             document.getElementById('previewold').src = imageUrl;
             function previewImage(input) {
                 if (input.files && input.files[0]) {
@@ -300,7 +300,7 @@ body.dark-mode .file-upload-label:hover {
                         xhr.onload = function () {
                             if (xhr.status === 200) {
                                 swal('图片上传成功', '你的账号头像已更新', 'success');
-                                location.href = 'settings.html';
+                                location.href = '/settings.html';
                             } else {
                                 swal('图片上传失败: ', xhr.statusText, 'error');
                             }
