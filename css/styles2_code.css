@@ -76,237 +76,163 @@
             /* 使用 Consolas 字体 */
             /* 使字体加粗 */
 }
-code {
-/* 定义注释的颜色 */
+/* =========================
+   highlight.js - VS Code Light+ (only colors)
+   ========================= */
 .hljs-comment,
-.hljs-quote {
-    color: #408080;
+.hljs-quote,
+.hljs-meta {
+    color: #008000;
     font-style: italic;
 }
 
-/* 定义变量、模板变量等的颜色 */
-.hljs-variable,
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-template-tag,
 .hljs-template-variable {
-    color: #008080;
+    color: #a31515;
 }
 
-/* 定义字符串、关键字、选择器标签、添加内容的颜色 */
-.hljs-string,
+.hljs-number,
+.hljs-literal,
+.hljs-constant {
+    color: #098658;
+}
+
 .hljs-keyword,
 .hljs-selector-tag,
-.hljs-addition {
-    color: #080;
-}
-
-/* 定义子字符串、删除内容的颜色 */
-.hljs-subst,
-.hljs-deletion {
-    color: #bc6060;
-}
-
-/* 定义运算符、属性的颜色 */
-.hljs-operator,
-.hljs-property {
-    color: #a2f;
-}
-
-/* 定义函数、内置名称、类、数字、布尔值、常量等的颜色 */
-.hljs-function,
-.hljs-builtin-name,
-.hljs-class .hljs-title,
-.hljs-number,
-.hljs-boolean,
-.hljs-constant {
-    color: #06b;
-}
-
-/* 定义属性值、参数、URL的颜色 */
-.hljs-attribute,
-.hljs-parameter,
-.hljs-at_rule,
-.hljs-attr_selector,
-.hljs-value {
-    color: #186;
-}
-
-/* 定义重要、特殊、警告、提示、注释、文档注释、类名、类型、修饰符等的颜色 */
-.hljs-important,
-.hljs-special,
-.hljs-keyword,
-.hljs-rules .hljs-keyword,
 .hljs-doctag,
-.hljs-class,
-.hljs-type,
-.hljs-modifier,
-.hljs-variable.language_ {
-    color: #e40;
+.hljs-built_in {
+    color: #0000ff;
 }
 
-/* 定义异常、标记、装饰器、属性访问、语言变量等的颜色 */
-.hljs-exception,
-.hljs-decorator,
-.hljs-builtin-name.class,
-.hljs-access,
-.hljs-attribute .hljs-variable {
-    color: #c00;
-}
-
-/* 定义链接、引用的颜色 */
-.hljs-link,
-.hljs-literal {
-    color: #219;
-}
-
-/* 定义标题、名称、参数等的颜色 */
 .hljs-title,
+.hljs-title.function_,
+.hljs-function .hljs-title {
+    color: #795e26;
+}
+
+.hljs-class .hljs-title,
+.hljs-title.class_,
+.hljs-type {
+    color: #267f99;
+}
+
+.hljs-variable,
 .hljs-name,
-.hljs-section,
-.hljs-keyword .hljs-title {
-    color: #900;
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-params,
+.hljs-parameter {
+    color: #001080;
 }
 
-/* 定义生成内容、模板标签、模板变量、子模板标签、子模板变量等的颜色 */
-.hljs-built_in,
-.hljs-builtin-name {
-    color: #0086b3;
+.hljs-operator,
+.hljs-punctuation {
+    color: #000000;
 }
 
-/* 定义代码、标记、装饰器等的颜色 */
-.hljs-code,
-.hljs-formula,
-.hljs-markup .hljs-keyword {
-    color: #f8f;
+.hljs-regexp {
+    color: #811f3f;
 }
 
-/* 定义行号的颜色 */
-.hljs-lineno {
-    color: #ccc;
-    display: inline-block;
-    padding: 0 5px;
-    border-right: 1px solid #ddd;
+.hljs-tag {
+    color: #800000;
 }
 
-/* 定义不同括号的颜色 */
-.hljs-brace {
-    color: #606;
+.hljs-link {
+    color: #0000ee;
+    text-decoration: underline;
 }
 
-.hljs-paren {
-    color: #f00;
+.hljs-deletion {
+    color: #f44747;
 }
 
-.hljs-bracket {
-    color: #00f;
-}
-/* 暗模式下的样式 */
-
-
-.dark-mode .hljs-comment,
-.dark-mode .hljs-quote {
-    color: #777;
+.hljs-emphasis {
     font-style: italic;
 }
 
-.dark-mode .hljs-variable,
-.dark-mode .hljs-template-variable {
-    color: #ade5fc;
+.hljs-strong {
+    font-weight: bold;
+}
+
+
+/* =========================
+   highlight.js - VS Code Dark+ (only colors)
+   ========================= */
+.dark-mode .hljs-comment,
+.dark-mode .hljs-quote,
+.dark-mode .hljs-meta {
+    color: #6a9955;
 }
 
 .dark-mode .hljs-string,
+.dark-mode .hljs-symbol,
+.dark-mode .hljs-bullet,
+.dark-mode .hljs-addition,
+.dark-mode .hljs-template-tag,
+.dark-mode .hljs-template-variable {
+    color: #ce9178;
+}
+
+.dark-mode .hljs-number,
+.dark-mode .hljs-literal,
+.dark-mode .hljs-constant {
+    color: #b5cea8;
+}
+
 .dark-mode .hljs-keyword,
 .dark-mode .hljs-selector-tag,
-.dark-mode .hljs-addition {
-    color: #9ccc65;
-}
-
-.dark-mode .hljs-subst,
-.dark-mode .hljs-deletion {
-    color: #f44747;
-}
-
-.dark-mode .hljs-operator,
-.dark-mode .hljs-property {
-    color: #f07178;
-}
-
-.dark-mode .hljs-function,
-.dark-mode .hljs-builtin-name,
-.dark-mode .hljs-class .hljs-title,
-.dark-mode .hljs-number,
-.dark-mode .hljs-boolean,
-.dark-mode .hljs-constant {
-    color: #82aaff;
-}
-
-.dark-mode .hljs-attribute,
-.dark-mode .hljs-parameter,
-.dark-mode .hljs-at_rule,
-.dark-mode .hljs-attr_selector,
-.dark-mode .hljs-value {
-    color: #ffcb6b;
-}
-
-.dark-mode .hljs-important,
-.dark-mode .hljs-special,
-.dark-mode .hljs-keyword,
-.dark-mode .hljs-rules .hljs-keyword,
 .dark-mode .hljs-doctag,
-.dark-mode .hljs-class,
-.dark-mode .hljs-type,
-.dark-mode .hljs-modifier,
-.dark-mode .hljs-variable.language_ {
-    color: #c792ea;
-}
-
-.dark-mode .hljs-exception,
-.dark-mode .hljs-decorator,
-.dark-mode .hljs-builtin-name.class,
-.dark-mode .hljs-access,
-.dark-mode .hljs-attribute .hljs-variable {
-    color: #f44747;
-}
-
-.dark-mode .hljs-link,
-.dark-mode .hljs-literal {
-    color: #79c0ff;
+.dark-mode .hljs-built_in {
+    color: #569cd6;
 }
 
 .dark-mode .hljs-title,
+.dark-mode .hljs-title.function_,
+.dark-mode .hljs-function .hljs-title {
+    color: #dcdcaa;
+}
+
+.dark-mode .hljs-class .hljs-title,
+.dark-mode .hljs-title.class_,
+.dark-mode .hljs-type {
+    color: #4ec9b0;
+}
+
+.dark-mode .hljs-variable,
 .dark-mode .hljs-name,
-.dark-mode .hljs-section,
-.dark-mode .hljs-keyword .hljs-title {
-    color: #e53935;
+.dark-mode .hljs-attr,
+.dark-mode .hljs-attribute,
+.dark-mode .hljs-property,
+.dark-mode .hljs-params,
+.dark-mode .hljs-parameter {
+    color: #9cdcfe;
 }
 
-.dark-mode .hljs-built_in,
-.dark-mode .hljs-builtin-name {
-    color: #89ddff;
+.dark-mode .hljs-operator,
+.dark-mode .hljs-punctuation {
+    color: #d4d4d4;
 }
 
-.dark-mode .hljs-code,
-.dark-mode .hljs-formula,
-.dark-mode .hljs-markup .hljs-keyword {
-    color: #f8f8f2;
+.dark-mode .hljs-regexp {
+    color: #d16969;
 }
 
-.dark-mode .hljs-lineno {
-    color: #888;
-    display: inline-block;
-    padding: 0 5px;
-    border-right: 1px solid #555;
+.dark-mode .hljs-tag {
+    color: #569cd6;
 }
 
-.dark-mode .hljs-brace {
-    color: #ade5fc;
+.dark-mode .hljs-link {
+    color: #3794ff;
 }
 
-.dark-mode .hljs-paren {
-    color: #e53935;
-}
-
-.dark-mode .hljs-bracket {
-    color: #89ddff;
-}
+.dark-mode .hljs-deletion {
+    color: #f44747;
 }
 pre, code {
     font-size: 17px; /* 设置字体大小为14像素 */
