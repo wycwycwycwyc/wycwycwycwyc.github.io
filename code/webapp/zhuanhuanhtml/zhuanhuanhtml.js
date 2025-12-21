@@ -1,9 +1,4 @@
-function scriptLoaded() {
-  // 这个函数将在脚本加载完成后执行
-  // 获取加载动画元素
-  var loadingAnimation = document.getElementById('loadingAnimation');
-  loadingAnimation.style.display = 'none';
-}
+document.addEventListener('DOMContentLoaded', function () {
       const dropZone = document.getElementById('dropZone');
       const downloadLinksTable = document.getElementById('downloadLinks');
       const downloadAllButton = document.getElementById('downloadAllButton');
@@ -111,3 +106,4 @@ function scriptLoaded() {
           downloadAllButton.disabled = false;
         });
       });
+    });

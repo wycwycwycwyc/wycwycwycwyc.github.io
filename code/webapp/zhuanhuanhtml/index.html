@@ -5,6 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XLS转XLSX转换器(基础数据转换)</title>
+    <script>
+      function scriptLoaded() {
+        document.addEventListener('DOMContentLoaded', function () {
+          // 这个函数将在脚本加载完成后执行
+          // 获取加载动画元素
+          var loadingAnimation = document.getElementById('loadingAnimation');
+          loadingAnimation.style.display = 'none';
+        });
+        }
+    </script>
 <script src="/config/serverUrl.js"></script>
 
     <link rel="stylesheet" href="/css/styles_button.css">
@@ -24,10 +34,10 @@
     <link href="/css/message.min.css" rel="stylesheet" />
     <script src="/js/message.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5//js/FileSaver.min.js"></script>
-        <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>
-        <link rel="stylesheet" href="./style.css">
-        <script src="./zhuanhuanhtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./zhuanhuanhtml.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>
   </head>
 
   <body>
