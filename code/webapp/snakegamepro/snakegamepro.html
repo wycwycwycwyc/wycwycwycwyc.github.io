@@ -4460,10 +4460,11 @@ document.querySelector('.map-selection .start-game-btn').addEventListener('click
     setTimeout(() => {
         initGame();
     }, 500);
-});
-});
+});});
+
         // 添加玩家2登录功能
 function loginPlayer2() {
+        document.querySelector('.map-selection .start-game-btn').style.display = 'none';
     swal({
         title: "玩家2登录",
         text: "请输入用户名和密码",
@@ -4545,10 +4546,11 @@ function loginPlayer2() {
                                         const userId = data.data.userId;
                                         localStorage.setItem("player2_userid",userId);
                                         document.getElementById('player2-name').textContent = username + ': ';
-                                        document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)"
-                                        document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)"
-                                        document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:"
-                                        document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"                    
+                                        document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)";
+                                        document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)";
+                                        document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:";
+                                        document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:";
+                                        document.querySelector('.map-selection .start-game-btn').style.display = "block";               
                                         swal("登录成功", "玩家2已登录", "success");
                                     } else {
                                         // 显示错误信息

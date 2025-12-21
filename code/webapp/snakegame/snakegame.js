@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <div id="leaderboard-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>贪吃蛇排行榜</h2>
+        <h2 style="font-size: 30px;">贪吃蛇排行榜</h2>
         <div id="leaderboard-status"></div>
         <div id="leaderboard-list"></div>
     </div>
@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
+        
     }
     
     .close:hover {
@@ -186,16 +187,19 @@ document.addEventListener('DOMContentLoaded', function () {
     .leaderboard-rank {
         width: 30px;
         text-align: center;
+        font-size: 25px;
     }
     
     .leaderboard-name {
         flex-grow: 1;
         margin: 0 10px;
+        font-size: 20px;
     }
     
     .leaderboard-score {
         width: 80px;
         text-align: right;
+        font-size: 20px;
     }
     
     #show-leaderboard {
@@ -210,11 +214,11 @@ document.addEventListener('DOMContentLoaded', function () {
         cursor: pointer;
         z-index: 4;
     }
-        .loading-status {
+    .loading-status {
     text-align: center;
     padding: 20px;
     color: rgba(255,255,255,0.7);
-}
+    }
 
 .loading-spinner {
     display: inline-block;
@@ -228,6 +232,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+.leaderboard-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
 }
 
 </style>
@@ -249,70 +260,70 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // 更新排行榜函数
-  function updateLeaderboard() {
-    fetch(`${serverurl}/get-all-custom-data`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const leaderboardList = document.getElementById('leaderboard-list');
-          leaderboardList.innerHTML = '';
-            
-          // 处理数据，提取分数
-          const scores = data.data.map(user => {
-            let score = 0;
-            if (user.customData && user.customData.startsWith('gamesnack_maxscore:')) {
-              score = parseInt(user.customData.split(':')[1]) || 0;
-            }
-            return {
-              username: user.username,
-              score: score,
-              avatar: user.avatarUrl,
-              isMe: user.id === localStorage.getItem('userId')
-            };
-          });
-            
-          // 按分数排序
-          scores.sort((a, b) => b.score - a.score);
-            
-          // 只显示前20名
-          const topScores = scores.slice(0, 20);
-            
-          // 添加本地记录（如果不在前20名中）
-          const localHighScore = localStorage.getItem('snakeHighScore') || 0;
-          const userId = localStorage.getItem('userId');
-          if (localHighScore > 0 && !topScores.some(item => item.isMe)) {
-            topScores.push({
-              username: '我 (本地记录)',
-              score: parseInt(localHighScore),
-              avatar: '',
-              isMe: true
-            });
+function updateLeaderboard() {
+  fetch(`${serverurl}/get-all-custom-data`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const leaderboardList = document.getElementById('leaderboard-list');
+        leaderboardList.innerHTML = '';
+        // 处理数据，提取分数
+        const scores = data.data.map(user => {
+          let score = 0;
+          if (user.customData && user.customData.startsWith('gamesnack_maxscore:')) {
+            score = parseInt(user.customData.split(':')[1]) || 0;
           }
-            
-          // 显示排行榜
-          topScores.forEach((item, index) => {
-            const itemElement = document.createElement('div');
-            itemElement.className = `leaderboard-item ${item.isMe ? 'me' : ''}`;
-            itemElement.innerHTML = `
-                    <div class="leaderboard-rank">${index + 1}</div>
-                    <div class="leaderboard-name">${item.username}</div>
-                    <div class="leaderboard-score">${item.score}分</div>
-                `;
-            leaderboardList.appendChild(itemElement);
+          return {
+            username: user.username,
+            score: score,
+            avatar: user.avatarUrl,
+            isMe: user.id === localStorage.getItem('userId')
+          };
+        });
+
+        // 按分数排序
+        scores.sort((a, b) => b.score - a.score);
+
+        // 只显示前20名
+        const topScores = scores.slice(0, 20);
+
+        // 添加本地记录（如果不在前20名中）
+        const localHighScore = localStorage.getItem('snakeHighScore') || 0;
+        const userId = localStorage.getItem('userId');
+        if (localHighScore > 0 && !topScores.some(item => item.isMe)) {
+          topScores.push({
+            username: '我 (本地记录)',
+            score: parseInt(localHighScore),
+            avatar: '',
+            isMe: true
           });
-            
-          // 如果没有数据，显示提示
-          if (topScores.length === 0) {
-            leaderboardList.innerHTML = '<div style="text-align:center;padding:20px;">暂无排行榜数据</div>';
-          }
-        } else {
-          console.error('获取排行榜数据失败:', data.message);
         }
-      })
-      .catch(error => {
-        console.error('获取排行榜数据出错:', error);
-      });
-  }
+
+        // 显示排行榜
+        topScores.forEach((item, index) => {
+          const itemElement = document.createElement('div');
+          itemElement.className = `leaderboard-item ${item.isMe ? 'me' : ''}`;
+          itemElement.innerHTML = `
+            <div class="leaderboard-rank">${index + 1}</div>
+              <img src="${item.avatar || 'default-avatar-url'}" class="leaderboard-avatar" alt="${item.username}">
+            <div class="leaderboard-name">${item.username}</div>
+            <div class="leaderboard-score">${item.score}分</div>`;
+          leaderboardList.appendChild(itemElement);
+        });
+
+        // 如果没有数据，显示提示
+        if (topScores.length === 0) {
+          leaderboardList.innerHTML = '<div style="text-align:center;padding:20px;">暂无排行榜数据</div>';
+        }
+      } else {
+        console.error('获取排行榜数据失败:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('获取排行榜数据出错:', error);
+    });
+}
+
   function clearBoard() {
     // 清除游戏板上所有子元素
     while (gameBoard.firstChild) {
