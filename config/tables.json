@@ -67,6 +67,18 @@
       "Introduction": "智能排序：一键排序，支持多种算法，文件导入",
       "note": "本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。",
       "view": "/code.html?title=多功能智能排序系统&file=/code/cpp/paixv.cpp"
+    },
+    "script2": {
+      "name": "消息自动发送器",
+      "Introduction": "用于消息自动发送的工具",
+      "note": "可以设置发送次数、间隔和是否添加序号",
+      "view": "/code.html?title=消息自动发送器&file=/code/cpp/MessageSender.cpp"
+    },
+    "script3": {
+      "name": "鼠标连点器",
+      "Introduction": "用于鼠标连点的工具",
+      "note": "可以设置点击间隔和持续时间，支持按键停止",
+      "view": "/code.html?title=鼠标连点器&file=/code/cpp/AutoClicker.cpp"
     }
   },
   "WebApp": {
