@@ -54,6 +54,13 @@
       "note": "本程序的功能为开发者设计，如有需求可自行修改使用",
       "view": "/code.html?title=图片裁剪合并专用&file=/code/python/image_process.py"
     }
+    ,
+    "script9": {
+      "name": "多线程视频帧提取器",
+      "Introduction": "可以对图片提取每一帧",
+      "note": "速度极快，具有选择输出格式，选择线程数等功能，还可以随时暂停",
+      "view": "/code.html?title=多线程视频帧提取器&file=/code/python/FrameExtractor.py"
+    }
   },
   "C++": {
     "row1": {
