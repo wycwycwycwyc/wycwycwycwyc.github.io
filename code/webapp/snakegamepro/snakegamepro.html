@@ -1405,6 +1405,105 @@
     from { box-shadow: 0 0 15px #FF4500; }
     to { box-shadow: 0 0 30px #FFFF00; }
 }
+        /* 家的样式 */
+        .home-base {
+            position: absolute;
+            border: 3px solid;
+            border-radius: 15px;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 3px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .home-base.player1 {
+            border-color: #FF5722;
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.3), rgba(255, 152, 0, 0.2));
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+            left: 20px;
+            top: 20px;
+        }
+        
+        .home-base.player2 {
+            border-color: #2196F3;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.3), rgba(0, 188, 212, 0.2));
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+            right: 20px;
+            bottom: 20px;
+        }
+        
+        .home-health-bar {
+            position: absolute;
+            bottom: -15px;
+            left: 10%;
+            width: 80%;
+            height: 6px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .home-health-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .home1-health-fill {
+            background: linear-gradient(to right, #FF5722, #FF9800);
+        }
+        
+        .home2-health-fill {
+            background: linear-gradient(to right, #2196F3, #00BCD4);
+        }
+        
+        .home-health-text {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: white;
+        }
+        
+        /* 家被攻击效果 */
+        .home-under-attack {
+            animation: homeUnderAttack 0.5s infinite alternate;
+        }
+        
+        @keyframes homeUnderAttack {
+            from { box-shadow: 0 0 20px; }
+            to { box-shadow: 0 0 40px; }
+        }
+        
+        /* 家被摧毁效果 */
+        .home-destroyed {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            box-shadow: none;
+        }
+        
+        /* 在家中的效果 */
+        .in-home-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: radial-gradient(circle, transparent 50%, rgba(255,255,255,0.1) 100%);
+            animation: homeHealing 2s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes homeHealing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -1744,6 +1843,150 @@ let lastMoveTime = {
     snake1: 0,
     snake2: 0
 };
+        // 在游戏变量中添加
+        let homes = {
+            player1: {
+                x: 20,
+                y: 20,
+                width: 100,
+                height: 80,
+                health: 20,
+                maxHealth: 20,
+                destroyed: false,
+                lastHealTime: 0,
+                lastDamageTime: 0
+            },
+            player2: {
+                x: 0, // 将在初始化时计算
+                y: 0, // 将在初始化时计算
+                width: 100,
+                height: 80,
+                health: 20,
+                maxHealth: 20,
+                destroyed: false,
+                lastHealTime: 0,
+                lastDamageTime: 0
+            }
+        };
+        
+        // 修改initGame函数，在生成火山后初始化家
+
+        // 初始化家的位置
+function initHomes() {
+    const boardWidth = gameBoard.clientWidth;
+    const boardHeight = gameBoard.clientHeight;
+    
+    // 增大家的尺寸
+    const homeWidth = 250;
+    const homeHeight = 200;
+    
+    // 玩家1的家在左上角
+    homes.player1 = {
+        x: 20,
+        y: 110, // 避开计分板
+        width: homeWidth,
+        height: homeHeight,
+        health: 20,
+        maxHealth: 20,
+        destroyed: false,
+        lastHealTime: 0,
+        lastDamageTime: 0
+    };
+    
+    // 玩家2的家在右下角
+    homes.player2 = {
+        x: boardWidth - homeWidth - 20,
+        y: boardHeight - homeHeight - 80, // 避开底部UI
+        width: homeWidth,
+        height: homeHeight,
+        health: 20,
+        maxHealth: 20,
+        destroyed: false,
+        lastHealTime: 0,
+        lastDamageTime: 0
+    };
+}
+        // 绘制家
+function drawHomes() {
+    // 移除现有的家元素
+    document.querySelectorAll('.home-base').forEach(el => el.remove());
+    
+    // 绘制玩家1的家
+    if (!homes.player1.destroyed) {
+        const home1 = document.createElement('div');
+        home1.className = `home-base player1 ${homes.player1.health < homes.player1.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
+        home1.style.left = `${homes.player1.x}px`;
+        home1.style.top = `${homes.player1.y}px`;
+        home1.style.width = `${homes.player1.width}px`;
+        home1.style.height = `${homes.player1.height}px`;
+        home1.style.zIndex = '2'; // 确保家在其他元素之上
+        
+        // 添加家的图标和名称
+        const name1 = document.createElement('div');
+        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩家1'}的家`;
+        name1.style.textAlign = 'center';
+        name1.style.marginTop = '15px';
+        name1.style.fontSize = '14px';
+        home1.appendChild(name1);
+        
+        // 添加血条
+        const healthBar1 = document.createElement('div');
+        healthBar1.className = 'home-health-bar';
+        
+        const healthFill1 = document.createElement('div');
+        healthFill1.className = 'home-health-fill home1-health-fill';
+        healthFill1.style.width = `${(homes.player1.health / homes.player1.maxHealth) * 100}%`;
+        
+        const healthText1 = document.createElement('div');
+        healthText1.className = 'home-health-text';
+        healthText1.textContent = `HP: ${homes.player1.health}/${homes.player1.maxHealth}`;
+        healthText1.style.fontSize = '11px';
+        
+        healthBar1.appendChild(healthFill1);
+        home1.appendChild(healthText1);
+        home1.appendChild(healthBar1);
+        
+        gameBoard.appendChild(home1);
+    }
+    
+    // 绘制玩家2的家
+    if (!homes.player2.destroyed) {
+        const home2 = document.createElement('div');
+        home2.className = `home-base player2 ${homes.player2.health < homes.player2.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
+        home2.style.left = `${homes.player2.x}px`;
+        home2.style.top = `${homes.player2.y}px`;
+        home2.style.width = `${homes.player2.width}px`;
+        home2.style.height = `${homes.player2.height}px`;
+        home2.style.zIndex = '2'; // 确保家在其他元素之上
+        
+        // 添加家的图标和名称
+        const name2 = document.createElement('div');
+        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩家2'}的家`;
+        name2.style.textAlign = 'center';
+        name2.style.marginTop = '15px';
+        name2.style.fontSize = '14px';
+        home2.appendChild(name2);
+        
+        // 添加血条
+        const healthBar2 = document.createElement('div');
+        healthBar2.className = 'home-health-bar';
+        
+        const healthFill2 = document.createElement('div');
+        healthFill2.className = 'home-health-fill home2-health-fill';
+        healthFill2.style.width = `${(homes.player2.health / homes.player2.maxHealth) * 100}%`;
+        
+        const healthText2 = document.createElement('div');
+        healthText2.className = 'home-health-text';
+        healthText2.textContent = `HP: ${homes.player2.health}/${homes.player2.maxHealth}`;
+        healthText2.style.fontSize = '11px';
+        
+        healthBar2.appendChild(healthFill2);
+        home2.appendChild(healthText2);
+        home2.appendChild(healthBar2);
+        
+        gameBoard.appendChild(home2);
+    }
+}
 
 // 初始化游戏
 function initGame() {
@@ -1771,12 +2014,40 @@ function initGame() {
         document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
     }
     clearBoard();
-    bullets = [];
+document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
+
+// 2. 完全重置攻击模式状态
+if (attackMode.intervalId1) {
+    clearInterval(attackMode.intervalId1);
+    attackMode.intervalId1 = null;
+}
+if (attackMode.intervalId2) {
+    clearInterval(attackMode.intervalId2);
+    attackMode.intervalId2 = null;
+}
         // 重置速度加成
     speedBoosts = {
         snake1: 0,
         snake2: 0
     };
+// 3. 重置攻击模式的所有状态
+attackMode = {
+    snake1: false,
+    snake2: false,
+    timer1: 0,
+    timer2: 0,
+    lastShot1: 0,
+    lastShot2: 0,
+    intervalId1: null,
+    intervalId2: null
+};
+
+// 4. 重置子弹发射的计时器
+lastMoveTime = {
+    snake1: 0,
+    snake2: 0
+};
+
     // 重置特殊物品
     specialItems = [];
     lastSpecialItemSpawn = 0;
@@ -1784,6 +2055,12 @@ function initGame() {
     // 重置状态效果
     immunity = { snake1: false, snake2: false, timer1: 0, timer2: 0 };
     reversedControls = { snake1: false, snake2: false, timer1: 0, timer2: 0 };
+    
+    // 重置墙碰撞计时
+    lastWallHitTime = {
+        snake1: 0,
+        snake2: 0
+    };
     
     // 初始化球体储存
     ballStorage = {
@@ -1796,32 +2073,51 @@ function initGame() {
     };
     updateStorageDisplay();
     
+    // 初始化家
+    initHomes();
+    
     // 初始化蛇
     snakes.snake1 = [
-        { x: 200, y: 300 },
-        { x: 180, y: 300 },
-        { x: 160, y: 300 }
+        { x: homes.player1.x + 75, y: homes.player1.y + 50 },
+        { x: homes.player1.x + 55, y: homes.player1.y + 50 },
+        { x: homes.player1.x + 35, y: homes.player1.y + 50 }
     ];
     
     snakes.snake2 = [
-        { x: 400, y: 300 },
-        { x: 420, y: 300 },
-        { x: 440, y: 300 }
+        { x: homes.player2.x + 75, y: homes.player2.y + 50 },
+        { x: homes.player2.x + 55, y: homes.player2.y + 50 },
+        { x: homes.player2.x + 35, y: homes.player2.y + 50 }
     ];
     
     // 重置方向和血量
     directions = {
-        snake1: 'left',
-        snake2: 'right'
+        snake1: 'right',
+        snake2: 'left'
     };
     nextDirections = {
-        snake1: 'left',
-        snake2: 'right'
+        snake1: 'right',
+        snake2: 'left'
     };
     health = {
         snake1: 10,
         snake2: 10
     };
+    
+    // 游戏开始时给蛇3秒免疫时间
+    const currentTime = performance.now();
+    immunity.snake1 = true;
+    immunity.timer1 = currentTime + 3000; // 3秒免疫
+    
+    immunity.snake2 = true;
+    immunity.timer2 = currentTime + 3000; // 3秒免疫
+    
+    // 显示免疫提示
+    showNotice('游戏开始! 3秒无敌时间', '#FFFF00', 
+              homes.player1.x + homes.player1.width/2, 
+              homes.player1.y - 20);
+    showNotice('游戏开始! 3秒无敌时间', '#FFFF00', 
+              homes.player2.x + homes.player2.width/2, 
+              homes.player2.y - 20);
     
     // 重置分数
     scores = {
@@ -1829,10 +2125,10 @@ function initGame() {
         snake2: 0
     };
     if (snakeTypes.snake1 === 'tough') {
-        health.snake1 = 15; // 坚硬蛇有15点血
+        health.snake1 = 15;
     }
     if (snakeTypes.snake2 === 'tough') {
-        health.snake2 = 15; // 坚硬蛇有15点血
+        health.snake2 = 15;
     }
     if (attackMode.intervalId1) clearInterval(attackMode.intervalId1);
     if (attackMode.intervalId2) clearInterval(attackMode.intervalId2);
@@ -1892,7 +2188,7 @@ function requestFullscreen() {
 function generateAllWalls() {
     const boardWidth = gameBoard.clientWidth;
     const boardHeight = gameBoard.clientHeight;
-    const gridSize = 20; // 每个墙块的大小
+    const gridSize = 20;
     const cols = Math.floor(boardWidth / gridSize);
     const rows = Math.floor(boardHeight / gridSize);
     
@@ -1945,6 +2241,14 @@ function generateAllWalls() {
             if (validWall) {
                 if (isInSafeZone(x, y, safeZones.snake1) || 
                     isInSafeZone(x, y, safeZones.snake2)) {
+                    validWall = false;
+                }
+            }
+            
+            // 新增：检查是否在家区域内
+            if (validWall) {
+                if (isInHomeArea(x, y, homes.player1) || 
+                    isInHomeArea(x, y, homes.player2)) {
                     validWall = false;
                 }
             }
@@ -2006,6 +2310,14 @@ function generateAllWalls() {
                 }
             }
             
+            // 新增：检查是否在家区域内
+            if (validWall) {
+                if (isInHomeArea(x, y, homes.player1) || 
+                    isInHomeArea(x, y, homes.player2)) {
+                    validWall = false;
+                }
+            }
+            
             if (!validWall) break;
         }
         
@@ -2021,6 +2333,14 @@ function generateAllWalls() {
     }
 }
 
+// 新增：检查是否在家区域内
+function isInHomeArea(x, y, home) {
+    if (home.destroyed) return false;
+    return x >= home.x && 
+           x <= home.x + home.width && 
+           y >= home.y && 
+           y <= home.y + home.height;
+}
 // 获取蛇前方的安全区域
 function getSnakeSafeZone(snakeId, distanceInGrids) {
     const head = snakes[snakeId][0];
@@ -2427,7 +2747,134 @@ function drawFoods(withAnimation = false) {
         gameBoard.appendChild(itemElement);
     });
 }
-
+function handleHomes(timestamp) {
+    for (const snakeId in snakes) {
+        const head = snakes[snakeId][0];
+        const playerNum = snakeId === 'snake1' ? 'player1' : 'player2';
+        const opponentNum = snakeId === 'snake1' ? 'player2' : 'player1';
+        
+        // 检查是否在自己的家中
+        const inOwnHome = isPointInRect(head, homes[playerNum]);
+        const inOpponentHome = isPointInRect(head, homes[opponentNum]);
+        
+        // 检查是否有免疫效果
+        const hasImmunity = (snakeId === 'snake1' && immunity.snake1) || 
+                           (snakeId === 'snake2' && immunity.snake2);
+        
+        if (inOwnHome && !homes[playerNum].destroyed) {
+            // 在自己的家中回血（免疫不影响回血）
+            if (timestamp - homes[playerNum].lastHealTime > 1000) {
+                const maxHealth = snakeTypes[snakeId] === 'tough' ? 15 : 10;
+                if (health[snakeId] < maxHealth) {
+                    health[snakeId] = Math.min(maxHealth, health[snakeId] + 1);
+                    updateHealthBars();
+                    
+                    // 显示回血效果
+                    showNotice('+1HP', '#4CAF50', 
+                             homes[playerNum].x + homes[playerNum].width/2,
+                             homes[playerNum].y + homes[playerNum].height/2);
+                    
+                    createParticles(
+                        homes[playerNum].x + homes[playerNum].width/2,
+                        homes[playerNum].y + homes[playerNum].height/2,
+                        10,
+                        '#4CAF50'
+                    );
+                }
+                homes[playerNum].lastHealTime = timestamp;
+            }
+        } else if (inOpponentHome && !homes[opponentNum].destroyed) {
+            // 在对方家中造成伤害
+            if (timestamp - homes[opponentNum].lastDamageTime > 1000) {
+                
+                if (!hasImmunity) {
+                    // 没有免疫效果：双方都掉血
+                    // 对方家掉血
+                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - 1);
+                    
+                    // 自己掉血
+                    health[snakeId] = Math.max(0, health[snakeId] - 2);
+                    
+                    // 更新显示
+                    updateHealthBars();
+                    
+                    // 显示伤害效果
+                    showNotice('攻击对方家!', '#FF0000',
+                             homes[opponentNum].x + homes[opponentNum].width/2,
+                             homes[opponentNum].y + homes[opponentNum].height/2);
+                    
+                    // 创建攻击效果
+                    createParticles(
+                        homes[opponentNum].x + homes[opponentNum].width/2,
+                        homes[opponentNum].y + homes[opponentNum].height/2,
+                        15,
+                        '#FF0000'
+                    );
+                    
+                    // 检查自己是否死亡
+                    if (health[snakeId] <= 0) {
+                        gameOver();
+                    }
+                } else {
+                    // 有免疫效果：只对对方家造成伤害，自己不受伤
+                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - 1);
+                    
+                    // 显示免疫攻击效果
+                    showNotice('免疫攻击对方家!', '#FFFF00',
+                             homes[opponentNum].x + homes[opponentNum].width/2,
+                             homes[opponentNum].y + homes[opponentNum].height/2);
+                    
+                    // 创建免疫攻击效果
+                    createParticles(
+                        homes[opponentNum].x + homes[opponentNum].width/2,
+                        homes[opponentNum].y + homes[opponentNum].height/2,
+                        15,
+                        '#FFFF00'
+                    );
+                }
+                
+                // 检查家是否被摧毁（无论是否有免疫）
+                if (homes[opponentNum].health <= 0) {
+                    homes[opponentNum].destroyed = true;
+                    const playerName = opponentNum === 'player1' ? 
+                        (localStorage.getItem('username') || '玩家1') : 
+                        (localStorage.getItem('player2_username') || '玩家2');
+                    
+                    showNotice(`${playerName}的家被摧毁了!`, '#FF0000', 
+                             homes[opponentNum].x + homes[opponentNum].width/2, 
+                             homes[opponentNum].y + homes[opponentNum].height/2);
+                    
+                    // 家被摧毁的大爆炸效果
+                    createParticles(
+                        homes[opponentNum].x + homes[opponentNum].width/2,
+                        homes[opponentNum].y + homes[opponentNum].height/2,
+                        30,
+                        opponentNum === 'player1' ? '#FF5722' : '#2196F3'
+                    );
+                }
+                
+                homes[opponentNum].lastDamageTime = timestamp;
+            }
+        }
+    }
+}
+        
+        // 检查点是否在矩形内
+        function isPointInRect(point, rect) {
+            return point.x >= rect.x && 
+                   point.x <= rect.x + rect.width && 
+                   point.y >= rect.y && 
+                   point.y <= rect.y + rect.height;
+        }
+        
+        // 在clearBoard函数中添加清除家元素
+        function clearBoard() {
+            document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
+            document.querySelectorAll('.home-base').forEach(home => home.remove());
+            while (gameBoard.firstChild) {
+                gameBoard.removeChild(gameBoard.firstChild);
+            }
+        }
 // 游戏主循环
 function gameLoop(timestamp) {
     if (!gameStarted) return;
@@ -2438,7 +2885,8 @@ function gameLoop(timestamp) {
         handleVolcanoEruption(timestamp);
     }  
 requestAnimationFrame(gameLoop);
-    
+                // 处理家相关逻辑
+    handleHomes(timestamp);
     // 更新魔法蛇计时器
     updateMagicSnakeTimers(timestamp);
     
@@ -2500,6 +2948,7 @@ requestAnimationFrame(gameLoop);
     drawSpecialItems();
     drawVolcanoes();
     drawSnakes();
+    drawHomes();
     drawFoods();
 }
 // 在CSS中添加
@@ -2764,6 +3213,14 @@ function generateVolcanoes() {
                     }
                 }
             }
+            
+            // 新增：检查是否在家区域内
+            if (validPosition) {
+                if (isInHomeArea(volcanoX, volcanoY, homes.player1) || 
+                    isInHomeArea(volcanoX, volcanoY, homes.player2)) {
+                    validPosition = false;
+                }
+            }
         }
         
         if (validPosition) {
@@ -2775,6 +3232,7 @@ function generateVolcanoes() {
         }
     }
 }
+
 
 // 火山喷发处理
 function handleVolcanoEruption(timestamp) {
@@ -3091,6 +3549,54 @@ function drawBullets() {
         gameBoard.appendChild(bulletElement);
     });
 }
+function checkBulletHitHome(bullet) {
+    // 根据子弹所属玩家确定目标家
+    const targetHome = bullet.player === 'snake1' ? homes.player2 : homes.player1;
+    
+    // 如果目标家已被摧毁，跳过检查
+    if (targetHome.destroyed) return false;
+    
+    // 检查子弹是否在家的范围内
+    if (bullet.x >= targetHome.x && 
+        bullet.x <= targetHome.x + targetHome.width &&
+        bullet.y >= targetHome.y && 
+        bullet.y <= targetHome.y + targetHome.height) {
+        
+        // 子弹对家造成伤害
+        targetHome.health = Math.max(0, targetHome.health - 0.5); // 子弹造成0.5点伤害
+        
+        // 显示伤害效果
+        showNotice('-2HP', bullet.player === 'snake1' ? '#FF5722' : '#2196F3', 
+                 targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
+        
+        // 创建击中效果
+        createParticles(bullet.x, bullet.y, 15, bullet.player === 'snake1' ? '#FF5722' : '#2196F3');
+        
+        // 检查家是否被摧毁
+        if (targetHome.health <= 0) {
+            targetHome.destroyed = true;
+            const playerName = bullet.player === 'snake1' ? 
+                (localStorage.getItem('player2_username') || '玩家2') : 
+                (localStorage.getItem('username') || '玩家1');
+            
+            showNotice(`${playerName}的家被摧毁了!`, '#FF0000', 
+                     targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
+            
+            // 家被摧毁的大爆炸效果
+            createParticles(
+                targetHome.x + targetHome.width/2,
+                targetHome.y + targetHome.height/2,
+                40,
+                bullet.player === 'snake1' ? '#2196F3' : '#FF5722'
+            );
+        }
+        
+        return true; // 子弹已击中目标
+    }
+    
+    return false; // 子弹未击中
+}
+
 // 更新状态效果
 function updateStatusEffects(timestamp) {
     // 更新免疫状态
@@ -3162,7 +3668,7 @@ function fireBullet(snakeId) {
         y: head.y,
         direction: direction,
         player: snakeId,
-        speed: 10, // 每秒移动10个像素
+        speed: 30, // 每秒移动10个像素
         size: 8 // 子弹大小
     };
     
@@ -3189,8 +3695,12 @@ function moveBullets(timestamp) {
             case 'right':
                 bullet.x += bullet.speed;
                 break;
+     
         }
-        
+            if (checkBulletHitHome(bullet)) {
+            bullets.splice(i, 1);
+            continue;
+        } 
         // 检查是否超出边界
         const boardWidth = gameBoard.clientWidth;
         const boardHeight = gameBoard.clientHeight;
@@ -3780,6 +4290,11 @@ function gameOver() {
         intervalId1: null,
         intervalId2: null
     };
+    homes.player1.destroyed = false;
+    homes.player1.health = homes.player1.maxHealth;
+    homes.player2.destroyed = false;
+    homes.player2.health = homes.player2.maxHealth;
+    document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
     document.getElementById("back").style.display = "block";
     viewRecords.style.display = 'block';
     gameOverScreen.classList.remove('show');
