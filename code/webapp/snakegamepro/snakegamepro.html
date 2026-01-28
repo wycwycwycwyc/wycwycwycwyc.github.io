@@ -1405,7 +1405,7 @@
     from { box-shadow: 0 0 15px #FF4500; }
     to { box-shadow: 0 0 30px #FFFF00; }
 }
-        /* 家的样式 */
+        /* 基地的样式 */
         .home-base {
             position: absolute;
             border: 3px solid;
@@ -1472,7 +1472,7 @@
             color: white;
         }
         
-        /* 家被攻击效果 */
+        /* 基地被攻击效果 */
         .home-under-attack {
             animation: homeUnderAttack 0.5s infinite alternate;
         }
@@ -1482,14 +1482,14 @@
             to { box-shadow: 0 0 40px; }
         }
         
-        /* 家被摧毁效果 */
+        /* 基地被摧毁效果 */
         .home-destroyed {
             opacity: 0.3;
             filter: grayscale(100%);
             box-shadow: none;
         }
         
-        /* 在家中的效果 */
+        /* 在基地中的效果 */
         .in-home-effect {
             position: absolute;
             width: 100%;
@@ -1533,9 +1533,9 @@
             <div id="records-modal" class="modal">
             <div class="modal-content" style="max-width: 800px;">
                 <span class="close-modal">&times;</span>
-                <h2>玩家对战记录</h2>
+                <h2>玩基地对战记录</h2>
                 <div class="search-controls">
-                    <input type="text" id="search-username" placeholder="搜索玩家...">
+                    <input type="text" id="search-username" placeholder="搜索玩基地...">
                     <button id="refresh-records">刷新</button>
                 </div>
                 <div id="records-container"></div>
@@ -1547,11 +1547,11 @@
             <button class="start-btn">开始游戏</button>
             <div class="instructions">
                 <p>两条蛇各有10点生命值，撞到对方蛇身会扣血并缩短</p>
-                <p>活到最后的玩家获胜！</p>
+                <p>活到最后的玩基地获胜！</p>
                 
                 <div class="player-instructions">
                     <div class="player-instruction player-1-instruction">
-                        <h3><i class="fas fa-fire"></i> 玩家1 (橙色)</h3>
+                        <h3><i class="fas fa-fire"></i> 玩基地1 (橙色)</h3>
                         <p>使用WASD控制</p>
                         <div>
                             <div class="key">W</div>
@@ -1562,7 +1562,7 @@
                     </div>
                     
                     <div class="player-instruction player-2-instruction">
-                        <h3><i class="fas fa-tint"></i> 玩家2 (蓝色)</h3>
+                        <h3><i class="fas fa-tint"></i> 玩基地2 (蓝色)</h3>
                         <p>使用方向键控制</p>
                         <div>
                             <div class="key">↑</div>
@@ -1599,7 +1599,7 @@
         <div class="score-board">
             <div class="player-score player-1">
                 <div class="score-display">
-                    <span class="player-name" id="player1-name">玩家1: </span>
+                    <span class="player-name" id="player1-name">玩基地1: </span>
                     <span class="score-text" id="score-1">0分</span>
                 </div>
                 <div class="health-display">
@@ -1612,7 +1612,7 @@
             </div>
             <div class="player-score player-2">
                 <div class="score-display">
-                    <span class="player-name" id="player2-name">玩家2: </span>
+                    <span class="player-name" id="player2-name">玩基地2: </span>
                     <span class="score-text" id="score-2">0分</span>
                 </div>
                 <div class="health-display">
@@ -1625,7 +1625,7 @@
             </div>
         </div>
         <div class="ball-storage player-1-storage">
-            <div id ="storage-title1" class="storage-title">玩家1储存:</div>
+            <div id ="storage-title1" class="storage-title">玩基地1储存:</div>
             <div class="ball-slot" id="p1-slot-1"><span class="key-hint">1</span></div>
             <div class="ball-slot" id="p1-slot-2"><span class="key-hint">2</span></div>
             <div class="ball-slot" id="p1-slot-3"><span class="key-hint">3</span></div>
@@ -1634,7 +1634,7 @@
         </div>
         
         <div class="ball-storage player-2-storage">
-            <div id ="storage-title2" class="storage-title">玩家2储存:</div>
+            <div id ="storage-title2" class="storage-title">玩基地2储存:</div>
             <div class="ball-slot" id="p2-slot-1"><span class="key-hint">6</span></div>
             <div class="ball-slot" id="p2-slot-2"><span class="key-hint">7</span></div>
             <div class="ball-slot" id="p2-slot-3"><span class="key-hint">8</span></div>
@@ -1647,7 +1647,7 @@
             
             <div class="player-selections">
 <div class="player-selection">
-    <div class="player-label" id="player-label1">玩家1 (橙色)</div>
+    <div class="player-label" id="player-label1">玩基地1 (橙色)</div>
     <div class="snake-options">
         <div class="snake-option speed-snake" data-player="1" data-type="speed">
             <div class="snake-type" style="color: #FFD700;">
@@ -1682,7 +1682,7 @@
 </div>
 
 <div class="player-selection">
-    <div class="player-label" id="player-label2">玩家2 (蓝色)</div>
+    <div class="player-label" id="player-label2">玩基地2 (蓝色)</div>
     <div class="snake-options">
         <div class="snake-option speed-snake" data-player="2" data-type="speed">
             <div class="snake-type" style="color: #FFD700;">
@@ -1869,18 +1869,18 @@ let lastMoveTime = {
             }
         };
         
-        // 修改initGame函数，在生成火山后初始化家
+        // 修改initGame函数，在生成火山后初始化基地
 
-        // 初始化家的位置
+        // 初始化基地的位置
 function initHomes() {
     const boardWidth = gameBoard.clientWidth;
     const boardHeight = gameBoard.clientHeight;
     
-    // 增大家的尺寸
+    // 增大基地的尺寸
     const homeWidth = 250;
     const homeHeight = 200;
     
-    // 玩家1的家在左上角
+    // 玩基地1的基地在左上角
     homes.player1 = {
         x: 20,
         y: 110, // 避开计分板
@@ -1893,7 +1893,7 @@ function initHomes() {
         lastDamageTime: 0
     };
     
-    // 玩家2的家在右下角
+    // 玩基地2的基地在右下角
     homes.player2 = {
         x: boardWidth - homeWidth - 20,
         y: boardHeight - homeHeight - 80, // 避开底部UI
@@ -1906,12 +1906,12 @@ function initHomes() {
         lastDamageTime: 0
     };
 }
-        // 绘制家
+        // 绘制基地
 function drawHomes() {
-    // 移除现有的家元素
+    // 移除现有的基地元素
     document.querySelectorAll('.home-base').forEach(el => el.remove());
     
-    // 绘制玩家1的家
+    // 绘制玩基地1的基地
     if (!homes.player1.destroyed) {
         const home1 = document.createElement('div');
         home1.className = `home-base player1 ${homes.player1.health < homes.player1.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
@@ -1919,11 +1919,11 @@ function drawHomes() {
         home1.style.top = `${homes.player1.y}px`;
         home1.style.width = `${homes.player1.width}px`;
         home1.style.height = `${homes.player1.height}px`;
-        home1.style.zIndex = '2'; // 确保家在其他元素之上
+        home1.style.zIndex = '2'; // 确保基地在其他元素之上
         
-        // 添加家的图标和名称
+        // 添加基地的图标和名称
         const name1 = document.createElement('div');
-        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩家1'}的家`;
+        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩基地1'}的基地`;
         name1.style.textAlign = 'center';
         name1.style.marginTop = '15px';
         name1.style.fontSize = '14px';
@@ -1949,7 +1949,7 @@ function drawHomes() {
         gameBoard.appendChild(home1);
     }
     
-    // 绘制玩家2的家
+    // 绘制玩基地2的基地
     if (!homes.player2.destroyed) {
         const home2 = document.createElement('div');
         home2.className = `home-base player2 ${homes.player2.health < homes.player2.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
@@ -1957,11 +1957,11 @@ function drawHomes() {
         home2.style.top = `${homes.player2.y}px`;
         home2.style.width = `${homes.player2.width}px`;
         home2.style.height = `${homes.player2.height}px`;
-        home2.style.zIndex = '2'; // 确保家在其他元素之上
+        home2.style.zIndex = '2'; // 确保基地在其他元素之上
         
-        // 添加家的图标和名称
+        // 添加基地的图标和名称
         const name2 = document.createElement('div');
-        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩家2'}的家`;
+        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩基地2'}的基地`;
         name2.style.textAlign = 'center';
         name2.style.marginTop = '15px';
         name2.style.fontSize = '14px';
@@ -1992,16 +1992,16 @@ function drawHomes() {
 function initGame() {
     document.getElementById("back").style.display ="none"
     viewRecords.style.display = 'none';
-    const player1Name = localStorage.getItem('username') || '玩家1';
+    const player1Name = localStorage.getItem('username') || '玩基地1';
     document.getElementById('player1-name').textContent = player1Name + ': ';
             
-    // 如果玩家2已登录，设置其名称
-    const player2Name = localStorage.getItem('player2_username') || '玩家2';
+    // 如果玩基地2已登录，设置其名称
+    const player2Name = localStorage.getItem('player2_username') || '玩基地2';
     document.getElementById('player2-name').textContent = player2Name + ': '; 
-    document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)" || '玩家1'
-    document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)" || '玩家2'
-    document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:" || '玩家1储存:'
-    document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"  || '玩家2储存:'    
+    document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)" || '玩基地1'
+    document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)" || '玩基地2'
+    document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:" || '玩基地1储存:'
+    document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"  || '玩基地2储存:'    
     // 清除现有蛇和食物
     if (currentMap === 'snow') {
         document.body.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298, #7b4397)';
@@ -2073,7 +2073,7 @@ lastMoveTime = {
     };
     updateStorageDisplay();
     
-    // 初始化家
+    // 初始化基地
     initHomes();
     
     // 初始化蛇
@@ -2245,7 +2245,7 @@ function generateAllWalls() {
                 }
             }
             
-            // 新增：检查是否在家区域内
+            // 新增：检查是否在基地区域内
             if (validWall) {
                 if (isInHomeArea(x, y, homes.player1) || 
                     isInHomeArea(x, y, homes.player2)) {
@@ -2310,7 +2310,7 @@ function generateAllWalls() {
                 }
             }
             
-            // 新增：检查是否在家区域内
+            // 新增：检查是否在基地区域内
             if (validWall) {
                 if (isInHomeArea(x, y, homes.player1) || 
                     isInHomeArea(x, y, homes.player2)) {
@@ -2333,7 +2333,7 @@ function generateAllWalls() {
     }
 }
 
-// 新增：检查是否在家区域内
+// 新增：检查是否在基地区域内
 function isInHomeArea(x, y, home) {
     if (home.destroyed) return false;
     return x >= home.x && 
@@ -2383,7 +2383,7 @@ function clearBoard() {
 
 // 添加更新储存显示的函数
 function updateStorageDisplay() {
-    // 更新玩家1的储存显示
+    // 更新玩基地1的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p1-slot-${i+1}`);
         if (i < ballStorage.snake1.length) {
@@ -2418,7 +2418,7 @@ function updateStorageDisplay() {
         }
     }
     
-    // 更新玩家2的储存显示
+    // 更新玩基地2的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p2-slot-${i+1}`);
         if (i < ballStorage.snake2.length) {
@@ -2453,7 +2453,7 @@ function updateStorageDisplay() {
     }
 }
     
-    // 更新玩家2的储存显示
+    // 更新玩基地2的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p2-slot-${i+1}`);
         if (i < ballStorage.snake2.length) {
@@ -2759,7 +2759,7 @@ function handleHomes(timestamp) {
         const playerNum = snakeId === 'snake1' ? 'player1' : 'player2';
         const opponentNum = snakeId === 'snake1' ? 'player2' : 'player1';
         
-        // 检查是否在自己的家中
+        // 检查是否在自己的基地中
         const inOwnHome = isPointInRect(head, homes[playerNum]);
         const inOpponentHome = isPointInRect(head, homes[opponentNum]);
         
@@ -2771,7 +2771,7 @@ function handleHomes(timestamp) {
         const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
         
         if (inOwnHome && !homes[playerNum].destroyed) {
-            // 在自己的家中回血（免疫不影响回血）
+            // 在自己的基地中回血（免疫不影响回血）
             if (timestamp - homes[playerNum].lastHealTime > 1000) {
                 const maxHealth = snakeTypes[snakeId] === 'tough' ? 15 : 10;
                 if (health[snakeId] < maxHealth) {
@@ -2793,10 +2793,10 @@ function handleHomes(timestamp) {
                 homes[playerNum].lastHealTime = timestamp;
             }
         } else if (inOpponentHome && !homes[opponentNum].destroyed) {
-            // 在对方家中造成伤害
+            // 在对方基地中造成伤害
             if (timestamp - homes[opponentNum].lastDamageTime > 1000) {
                 
-                let damageToHome = 1; // 对家的固定伤害
+                let damageToHome = 1; // 对基地的固定伤害
                 let damageToSelf = 2; // 对自己的伤害
                 
                 // 如果是坚硬蛇，自己受到的伤害减半
@@ -2806,7 +2806,7 @@ function handleHomes(timestamp) {
                 
                 if (!hasImmunity) {
                     // 没有免疫效果：双方都掉血
-                    // 对方家掉血（固定1点，不减半）
+                    // 对方基地掉血（固定1点，不减半）
                     homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
                     
                     // 自己掉血（坚硬蛇减半）
@@ -2819,12 +2819,12 @@ function handleHomes(timestamp) {
                     let selfDamageMessage = `-${damageToSelf}HP`;
                     if (isToughSnake) {
                         selfDamageMessage += ' (坚硬减半)';
-                        showNotice(`攻击对方家! ${selfDamageMessage}`, '#FFA500',
+                        showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FFA500',
                                  homes[opponentNum].x + homes[opponentNum].width/2,
                                  homes[opponentNum].y + homes[opponentNum].height/2);
                         createParticles(head.x + 10, head.y + 10, 8, '#C0C0C0'); // 银色粒子
                     } else {
-                        showNotice(`攻击对方家! ${selfDamageMessage}`, '#FF0000',
+                        showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FF0000',
                                  homes[opponentNum].x + homes[opponentNum].width/2,
                                  homes[opponentNum].y + homes[opponentNum].height/2);
                         createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
@@ -2835,11 +2835,11 @@ function handleHomes(timestamp) {
                         gameOver();
                     }
                 } else {
-                    // 有免疫效果：只对对方家造成伤害，自己不受伤
+                    // 有免疫效果：只对对方基地造成伤害，自己不受伤
                     homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
                     
                     // 显示免疫攻击效果
-                    showNotice('免疫攻击对方家!', '#FFFF00',
+                    showNotice('免疫攻击对方基地!', '#FFFF00',
                              homes[opponentNum].x + homes[opponentNum].width/2,
                              homes[opponentNum].y + homes[opponentNum].height/2);
                     
@@ -2852,18 +2852,18 @@ function handleHomes(timestamp) {
                     );
                 }
                 
-                // 检查家是否被摧毁（无论是否有免疫）
+                // 检查基地是否被摧毁（无论是否有免疫）
                 if (homes[opponentNum].health <= 0) {
                     homes[opponentNum].destroyed = true;
                     const playerName = opponentNum === 'player1' ? 
-                        (localStorage.getItem('username') || '玩家1') : 
-                        (localStorage.getItem('player2_username') || '玩家2');
+                        (localStorage.getItem('username') || '玩基地1') : 
+                        (localStorage.getItem('player2_username') || '玩基地2');
                     
-                    showNotice(`${playerName}的家被摧毁了!`, '#FF0000', 
+                    showNotice(`${playerName}的基地被摧毁了!`, '#FF0000', 
                              homes[opponentNum].x + homes[opponentNum].width/2, 
                              homes[opponentNum].y + homes[opponentNum].height/2);
                     
-                    // 家被摧毁的大爆炸效果
+                    // 基地被摧毁的大爆炸效果
                     createParticles(
                         homes[opponentNum].x + homes[opponentNum].width/2,
                         homes[opponentNum].y + homes[opponentNum].height/2,
@@ -2886,7 +2886,7 @@ function handleHomes(timestamp) {
                    point.y <= rect.y + rect.height;
         }
         
-        // 在clearBoard函数中添加清除家元素
+        // 在clearBoard函数中添加清除基地元素
         function clearBoard() {
             document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
             document.querySelectorAll('.home-base').forEach(home => home.remove());
@@ -2904,7 +2904,7 @@ function gameLoop(timestamp) {
         handleVolcanoEruption(timestamp);
     }  
 requestAnimationFrame(gameLoop);
-                // 处理家相关逻辑
+                // 处理基地相关逻辑
     handleHomes(timestamp);
     // 更新魔法蛇计时器
     updateMagicSnakeTimers(timestamp);
@@ -3233,7 +3233,7 @@ function generateVolcanoes() {
                 }
             }
             
-            // 新增：检查是否在家区域内
+            // 新增：检查是否在基地区域内
             if (validPosition) {
                 if (isInHomeArea(volcanoX, volcanoY, homes.player1) || 
                     isInHomeArea(volcanoX, volcanoY, homes.player2)) {
@@ -3484,13 +3484,13 @@ wallStyle.textContent = `
 `;
 document.head.appendChild(wallStyle);
 function updateMagicSnakeTimers(timestamp) {
-    // 检查玩家1是否是魔法蛇
+    // 检查玩基地1是否是魔法蛇
     if (snakeTypes.snake1 === 'magic' && timestamp - magicSnakeTimers.snake1 > 20000) {
         generateMagicBall('snake1');
         magicSnakeTimers.snake1 = timestamp;
     }
     
-    // 检查玩家2是否是魔法蛇
+    // 检查玩基地2是否是魔法蛇
     if (snakeTypes.snake2 === 'magic' && timestamp - magicSnakeTimers.snake2 > 20000) {
         generateMagicBall('snake2');
         magicSnakeTimers.snake2 = timestamp;
@@ -3558,7 +3558,7 @@ function drawBullets() {
         bulletElement.style.left = `${bullet.x}px`;
         bulletElement.style.top = `${bullet.y}px`;
         
-        // 根据玩家设置子弹颜色
+        // 根据玩基地设置子弹颜色
         if (bullet.player === 'snake1') {
             bulletElement.style.background = 'linear-gradient(45deg, #FF5722, #FF9800)';
             bulletElement.style.boxShadow = '0 0 5px #FF5722';
@@ -3571,19 +3571,19 @@ function drawBullets() {
     });
 }
 function checkBulletHitHome(bullet) {
-    // 根据子弹所属玩家确定目标家
+    // 根据子弹所属玩基地确定目标基地
     const targetHome = bullet.player === 'snake1' ? homes.player2 : homes.player1;
     
-    // 如果目标家已被摧毁，跳过检查
+    // 如果目标基地已被摧毁，跳过检查
     if (targetHome.destroyed) return false;
     
-    // 检查子弹是否在家的范围内
+    // 检查子弹是否在基地的范围内
     if (bullet.x >= targetHome.x && 
         bullet.x <= targetHome.x + targetHome.width &&
         bullet.y >= targetHome.y && 
         bullet.y <= targetHome.y + targetHome.height) {
         
-        // 子弹对家造成伤害
+        // 子弹对基地造成伤害
         targetHome.health = Math.max(0, targetHome.health - 0.5); // 子弹造成0.5点伤害
         
         // 显示伤害效果
@@ -3593,17 +3593,17 @@ function checkBulletHitHome(bullet) {
         // 创建击中效果
         createParticles(bullet.x, bullet.y, 15, bullet.player === 'snake1' ? '#FF5722' : '#2196F3');
         
-        // 检查家是否被摧毁
+        // 检查基地是否被摧毁
         if (targetHome.health <= 0) {
             targetHome.destroyed = true;
             const playerName = bullet.player === 'snake1' ? 
-                (localStorage.getItem('player2_username') || '玩家2') : 
-                (localStorage.getItem('username') || '玩家1');
+                (localStorage.getItem('player2_username') || '玩基地2') : 
+                (localStorage.getItem('username') || '玩基地1');
             
-            showNotice(`${playerName}的家被摧毁了!`, '#FF0000', 
+            showNotice(`${playerName}的基地被摧毁了!`, '#FF0000', 
                      targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
             
-            // 家被摧毁的大爆炸效果
+            // 基地被摧毁的大爆炸效果
             createParticles(
                 targetHome.x + targetHome.width/2,
                 targetHome.y + targetHome.height/2,
@@ -4229,7 +4229,7 @@ function triggerBomb(snakeId) {
     // 计算对对方蛇的伤害
     applyBombDamageToSnake(snakeId, otherSnakeId, snakeHead);
     
-    // 计算对家的伤害
+    // 计算对基地的伤害
     applyBombDamageToHomes(snakeId, snakeHead);
     
     // 显示提示
@@ -4367,14 +4367,14 @@ function calculateDistanceToRect(point, rect) {
 }
 
 
-// 新增函数：对家应用炸弹伤害
+// 新增函数：对基地应用炸弹伤害
 function applyBombDamageToHomes(snakeId, explosionCenter) {
     const otherHomeId = snakeId === 'snake1' ? 'player2' : 'player1';
     const otherHome = homes[otherHomeId];
     
     if (otherHome.destroyed) return;
     
-    // 计算爆炸中心到家边框的最短距离
+    // 计算爆炸中心到基地边框的最短距离
     const distance = calculateDistanceToRect(explosionCenter, otherHome);
     const gridDistance = Math.floor(distance / 20);
     
@@ -4395,7 +4395,7 @@ function applyBombDamageToHomes(snakeId, explosionCenter) {
     if (damage > 0) {
         otherHome.health = Math.max(0, otherHome.health - damage);
         
-        // 在家中心显示伤害效果
+        // 在基地中心显示伤害效果
         const homeCenter = {
             x: otherHome.x + otherHome.width / 2,
             y: otherHome.y + otherHome.height / 2
@@ -4405,14 +4405,14 @@ function applyBombDamageToHomes(snakeId, explosionCenter) {
         showNotice(message, '#FF4500', homeCenter.x, homeCenter.y);
         createParticles(homeCenter.x, homeCenter.y, damage * 3, '#FF4500');
         
-        // 检查家是否被摧毁
+        // 检查基地是否被摧毁
         if (otherHome.health <= 0) {
             otherHome.destroyed = true;
             const playerName = otherHomeId === 'player1' ? 
-                (localStorage.getItem('username') || '玩家1') : 
-                (localStorage.getItem('player2_username') || '玩家2');
+                (localStorage.getItem('username') || '玩基地1') : 
+                (localStorage.getItem('player2_username') || '玩基地2');
             
-            showNotice(`${playerName}的家被炸毁了!`, '#FF0000', homeCenter.x, homeCenter.y);
+            showNotice(`${playerName}的基地被炸毁了!`, '#FF0000', homeCenter.x, homeCenter.y);
             
             // 大爆炸效果
             createParticles(homeCenter.x, homeCenter.y, 50, '#FF4500');
@@ -4608,10 +4608,10 @@ function gameOver() {
         winner = 'draw';
     } else if (health.snake1 <= 0) {
         winner = 'snake2';
-        currentWin2 = 1; // 标记玩家2本次获胜
+        currentWin2 = 1; // 标记玩基地2本次获胜
     } else {
         winner = 'snake1';
-        currentWin1 = 1; // 标记玩家1本次获胜
+        currentWin1 = 1; // 标记玩基地1本次获胜
     }
 
     // 获取服务器数据并显示
@@ -4644,7 +4644,7 @@ function gameOver() {
                         <div class="player-avatar">
                             <i class="fas fa-user" style="color: #FF5722;"></i>
                         </div>
-                        <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
+                        <div class="player-name">${localStorage.getItem("username") || "玩基地1"}</div>
                         <div class="win-count">
                             <span class="history-wins">${player1Wins}</span>
                             ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
@@ -4660,7 +4660,7 @@ function gameOver() {
                         <div class="player-avatar">
                             <i class="fas fa-user" style="color: #2196F3;"></i>
                         </div>
-                        <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
+                        <div class="player-name">${localStorage.getItem("player2_username") || "玩基地2"}</div>
                         <div class="win-count">
                             <span class="history-wins">${player2Wins}</span>
                             ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
@@ -5057,7 +5057,7 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     
-    // 玩家2释放球体 (按键6-0)
+    // 玩基地2释放球体 (按键6-0)
     if ((e.key >= '6' && e.key <= '9') || e.key === '0') {
         const slotIndex = e.key === '0' ? 4 : parseInt(e.key) - 6;
         releaseBall('snake2', slotIndex);
@@ -5065,18 +5065,18 @@ document.addEventListener('keydown', (e) => {
     }
     if (e.key === 'z' || e.key === 'Z') {
         pausedSnakes.snake1 = !pausedSnakes.snake1;
-        showNotice(pausedSnakes.snake1 ? '玩家1已暂停' : '玩家1已恢复', 
+        showNotice(pausedSnakes.snake1 ? '玩基地1已暂停' : '玩基地1已恢复', 
                   '#FF5722', snakes.snake1[0].x, snakes.snake1[0].y);
         return;
     }
     
     if (e.key === 'm' || e.key === 'M') {
         pausedSnakes.snake2 = !pausedSnakes.snake2;
-        showNotice(pausedSnakes.snake2 ? '玩家2已暂停' : '玩家2已恢复', 
+        showNotice(pausedSnakes.snake2 ? '玩基地2已暂停' : '玩基地2已恢复', 
                   '#2196F3', snakes.snake2[0].x, snakes.snake2[0].y);
         return;
     }    
-    // 处理玩家1控制 (WASD)
+    // 处理玩基地1控制 (WASD)
     if (reversedControls.snake1) {
         // 反向控制
         switch (e.key) {
@@ -5119,7 +5119,7 @@ document.addEventListener('keydown', (e) => {
         }
     }
     
-    // 处理玩家2控制 (方向键)
+    // 处理玩基地2控制 (方向键)
     if (reversedControls.snake2) {
         // 反向控制
         switch (e.key) {
@@ -5157,7 +5157,7 @@ document.addEventListener('keydown', (e) => {
 
 // 开始游戏按钮
 startBtn.addEventListener('click', () => {
-    const player1Name = localStorage.getItem('username') || '玩家1';
+    const player1Name = localStorage.getItem('username') || '玩基地1';
     document.getElementById('player1-name').textContent = player1Name + ': ';
     player2Name=localStorage.getItem("player2_username");
     if(!player2Name){
@@ -5222,7 +5222,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const player = this.getAttribute('data-player');
             const type = this.getAttribute('data-type');
             
-            // 移除同玩家的其他选择
+            // 移除同玩基地的其他选择
             document.querySelectorAll(`.snake-option[data-player="${player}"]`).forEach(opt => {
                 opt.classList.remove('selected');
             });
@@ -5233,7 +5233,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 保存选择
             snakeTypes[`snake${player}`] = type;
             
-            // 检查是否两位玩家都已选择
+            // 检查是否两位玩基地都已选择
             if (snakeTypes.snake1 && snakeTypes.snake2) {
                 startGameBtn.disabled = false;
             }
@@ -5268,11 +5268,11 @@ document.querySelector('.map-selection .start-game-btn').addEventListener('click
     }, 500);
 });});
 
-        // 添加玩家2登录功能
+        // 添加玩基地2登录功能
 function loginPlayer2() {
         document.querySelector('.map-selection .start-game-btn').style.display = 'none';
     swal({
-        title: "玩家2登录",
+        title: "玩基地2登录",
         text: "请输入用户名和密码",
         type: "input",
         inputType: "text",
@@ -5288,16 +5288,16 @@ function loginPlayer2() {
             return false;
         }
         
-        // 检查是否与玩家1用户名相同
+        // 检查是否与玩基地1用户名相同
         const player1Username = localStorage.getItem('username');
         if (player1Username && username === player1Username) {
-            swal.showInputError("用户名不能与玩家1相同");
+            swal.showInputError("用户名不能与玩基地1相同");
             return false;
         }
         
         // 第二步：询问密码
         swal({
-            title: "玩家2登录",
+            title: "玩基地2登录",
             text: "请输入密码",
             type: "input",
             inputType: "password",
@@ -5357,7 +5357,7 @@ function loginPlayer2() {
                                         document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:";
                                         document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:";
                                         document.querySelector('.map-selection .start-game-btn').style.display = "block";               
-                                        swal("登录成功", "玩家2已登录", "success");
+                                        swal("登录成功", "玩基地2已登录", "success");
                                     } else {
                                         // 显示错误信息
                                         console.log(data.message);
@@ -5406,7 +5406,7 @@ const snakeDetails = {
                 desc: "专注于高速移动，没有其他特殊能力" 
             }
         ],
-        tips: "适合喜欢快节奏、高操作的玩家。利用速度优势快速包围对手。"
+        tips: "适合喜欢快节奏、高操作的玩基地。利用速度优势快速包围对手。"
     },
     tough: {
         title: "坚硬蛇",
@@ -5433,7 +5433,7 @@ const snakeDetails = {
                 desc: "移动速度较慢" 
             }
         ],
-        tips: "适合稳健型玩家。高生命值让你可以承受更多失误，但要注意子弹伤害不减。"
+        tips: "适合稳健型玩基地。高生命值让你可以承受更多失误，但要注意子弹伤害不减。"
     },
     magic: {
         title: "魔法蛇",
@@ -5460,7 +5460,7 @@ const snakeDetails = {
                 desc: "自动获得一个随机特殊球(攻击40%/血球30%/无敌20%/反转10%)" 
             }
         ],
-        tips: "适合策略型玩家。合理规划特殊球使用时机，效果延长让你更有优势。"
+        tips: "适合策略型玩基地。合理规划特殊球使用时机，效果延长让你更有优势。"
     }
 };
 
