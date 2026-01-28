@@ -2767,6 +2767,9 @@ function handleHomes(timestamp) {
         const hasImmunity = (snakeId === 'snake1' && immunity.snake1) || 
                            (snakeId === 'snake2' && immunity.snake2);
         
+        // 检查是否是坚硬蛇
+        const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
+        
         if (inOwnHome && !homes[playerNum].destroyed) {
             // 在自己的家中回血（免疫不影响回血）
             if (timestamp - homes[playerNum].lastHealTime > 1000) {
@@ -2793,29 +2796,39 @@ function handleHomes(timestamp) {
             // 在对方家中造成伤害
             if (timestamp - homes[opponentNum].lastDamageTime > 1000) {
                 
+                let damageToHome = 1; // 对家的固定伤害
+                let damageToSelf = 2; // 对自己的伤害
+                
+                // 如果是坚硬蛇，自己受到的伤害减半
+                if (isToughSnake) {
+                    damageToSelf = Math.ceil(damageToSelf / 2);
+                }
+                
                 if (!hasImmunity) {
                     // 没有免疫效果：双方都掉血
-                    // 对方家掉血
-                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - 1);
+                    // 对方家掉血（固定1点，不减半）
+                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
                     
-                    // 自己掉血
-                    health[snakeId] = Math.max(0, health[snakeId] - 2);
+                    // 自己掉血（坚硬蛇减半）
+                    health[snakeId] = Math.max(0, health[snakeId] - damageToSelf);
                     
                     // 更新显示
                     updateHealthBars();
                     
                     // 显示伤害效果
-                    showNotice('攻击对方家!', '#FF0000',
-                             homes[opponentNum].x + homes[opponentNum].width/2,
-                             homes[opponentNum].y + homes[opponentNum].height/2);
-                    
-                    // 创建攻击效果
-                    createParticles(
-                        homes[opponentNum].x + homes[opponentNum].width/2,
-                        homes[opponentNum].y + homes[opponentNum].height/2,
-                        15,
-                        '#FF0000'
-                    );
+                    let selfDamageMessage = `-${damageToSelf}HP`;
+                    if (isToughSnake) {
+                        selfDamageMessage += ' (坚硬减半)';
+                        showNotice(`攻击对方家! ${selfDamageMessage}`, '#FFA500',
+                                 homes[opponentNum].x + homes[opponentNum].width/2,
+                                 homes[opponentNum].y + homes[opponentNum].height/2);
+                        createParticles(head.x + 10, head.y + 10, 8, '#C0C0C0'); // 银色粒子
+                    } else {
+                        showNotice(`攻击对方家! ${selfDamageMessage}`, '#FF0000',
+                                 homes[opponentNum].x + homes[opponentNum].width/2,
+                                 homes[opponentNum].y + homes[opponentNum].height/2);
+                        createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
+                    }
                     
                     // 检查自己是否死亡
                     if (health[snakeId] <= 0) {
@@ -2823,7 +2836,7 @@ function handleHomes(timestamp) {
                     }
                 } else {
                     // 有免疫效果：只对对方家造成伤害，自己不受伤
-                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - 1);
+                    homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
                     
                     // 显示免疫攻击效果
                     showNotice('免疫攻击对方家!', '#FFFF00',
@@ -3817,6 +3830,17 @@ function updateStatusDisplay() {
     if (attackMode.snake2) {
         effect2.textContent += '攻击模式' + (isMagicSnake2 ? ' (魔法)' : '') + ' ';
     }
+        // 检查是否是坚硬蛇
+    const isToughSnake1 = snakeTypes.snake1 === 'tough';
+    const isToughSnake2 = snakeTypes.snake2 === 'tough';
+    
+    // 显示坚硬蛇状态
+    if (isToughSnake1) {
+        effect1.textContent += '坚硬(伤害减半) ';
+    }
+    if (isToughSnake2) {
+        effect2.textContent += '坚硬(伤害减半) ';
+    }
 }
 
 // 移动蛇
@@ -4260,6 +4284,7 @@ function createBombExplosion(centerX, centerY) {
 function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
     const targetSnake = snakes[targetSnakeId];
     const hasImmunity = targetSnakeId === 'snake1' ? immunity.snake1 : immunity.snake2;
+    const isToughSnake = targetSnakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
     
     let totalDamage = 0;
     let maxSegmentDistance = 0; // 用于记录最远距离的蛇身段
@@ -4274,18 +4299,23 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
         }
     }
     
-    // 根据最近蛇身段计算伤害
+    // 根据最近蛇身段计算基础伤害
     const gridDistance = Math.floor(maxSegmentDistance / 20);
     
     if (gridDistance <= 3) {
-        // 3格内：5点伤害（单次）
+        // 3格内：5点基础伤害
         totalDamage = 5;
     } else if (gridDistance <= 6) {
-        // 3-6格：2点伤害（单次）
+        // 3-6格：2点基础伤害
         totalDamage = 2;
     } else if (gridDistance <= 10) {
-        // 6-10格：1点伤害（单次）
+        // 6-10格：1点基础伤害
         totalDamage = 1;
+    }
+    
+    // 如果是坚硬蛇，伤害减半（向上取整）
+    if (isToughSnake && totalDamage > 0) {
+        totalDamage = Math.floor(totalDamage / 2);
     }
     
     // 应用伤害（如果有伤害并且没有免疫）
@@ -4294,10 +4324,16 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
         
         // 在对方蛇头位置显示伤害
         const targetHead = targetSnake[0];
-        showNotice(`-${totalDamage}HP`, '#FF0000', targetHead.x, targetHead.y);
+        const damageColor = isToughSnake ? '#FFA500' : '#FF0000'; // 橙色表示减伤后的伤害
         
-        // 创建伤害效果
-        createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#FF0000');
+        // 显示伤害提示（如果是坚硬蛇，显示减伤提示）
+        if (isToughSnake) {
+            showNotice(`-${totalDamage}HP (坚硬减半)`, damageColor, targetHead.x, targetHead.y);
+            createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#C0C0C0'); // 银色粒子
+        } else {
+            showNotice(`-${totalDamage}HP`, damageColor, targetHead.x, targetHead.y);
+            createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#FF0000');
+        }
         
         // 更新血条并检查游戏结束
         updateHealthBars();
@@ -4308,8 +4344,14 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
         // 免疫情况下的提示
         const targetHead = targetSnake[0];
         showNotice('免疫炸弹伤害!', '#FFFF00', targetHead.x, targetHead.y);
+        createParticles(targetHead.x + 10, targetHead.y + 10, 10, '#FFFF00');
+    } else if (totalDamage === 0) {
+        // 在安全距离外
+        const targetHead = targetSnake[0];
+        showNotice('安全距离', '#00FF00', targetHead.x, targetHead.y);
     }
 }
+
 function calculateDistanceToRect(point, rect) {
     // 计算点到矩形四条边的最短距离
     const dx = Math.max(rect.x - point.x, 0, point.x - (rect.x + rect.width));
