@@ -2402,11 +2402,14 @@ function updateStorageDisplay() {
                     slot.style.boxShadow = '0 0 10px #800080';
                     break;
                 case 'attack':
-                    slot
-                .style.background = 'linear-gradient(45deg, #00BFFF, #87CEFA)'; // 浅蓝色
-                    slot
-                .style.boxShadow = '0 0 10px #00BFFF';
-    break;
+                    slot.style.background = 'linear-gradient(45deg, #00BFFF, #87CEFA)'; // 浅蓝色
+                    slot.style.boxShadow = '0 0 10px #00BFFF';
+                    break;
+                case 'bomb':
+                    slot.style.background = 'linear-gradient(45deg, #FF4500, #FF8C00)';
+                    slot.style.boxShadow = '0 0 10px #FF4500';
+                    break;
+            
             }
         } else {
             slot.classList.remove('filled');
@@ -2434,10 +2437,13 @@ function updateStorageDisplay() {
                     slot.style.boxShadow = '0 0 10px #800080';
                     break;
                 case 'attack':
-                    slot
-                .style.background = 'linear-gradient(45deg, #00BFFF, #87CEFA)'; // 浅蓝色
-                    slot
-                .style.boxShadow = '0 0 10px #00BFFF';
+                    slot.style.background = 'linear-gradient(45deg, #00BFFF, #87CEFA)'; // 浅蓝色
+                    slot.style.boxShadow = '0 0 10px #00BFFF';
+                    break;
+                 case 'bomb':
+                    slot.style.background = 'linear-gradient(45deg, #FF4500, #FF8C00)';
+                    slot.style.boxShadow = '0 0 10px #FF4500';
+                    break;    
             }
         } else {
             slot.classList.remove('filled');
@@ -3487,14 +3493,16 @@ function generateMagicBall(snakeId) {
     const randomValue = Math.random();
     let ballType;
     
-    if (randomValue < 0.4) { // 40% 攻击球
+    if (randomValue < 0.3) { // 30% 攻击球
         ballType = 'attack';
-    } else if (randomValue < 0.7) { // 30% 血球
+    } else if (randomValue < 0.5) { // 20% 血球
         ballType = 'health';
-    } else if (randomValue < 0.9) { // 20% 无敌球
+    } else if (randomValue < 0.6) { // 10% 无敌球
         ballType = 'immunity';
-    } else { // 10% 反转球
+    } else if (randomValue < 0.7) { // 10% 反转球
         ballType = 'reverse';
+    } else { // 30% 炸弹球
+        ballType = 'bomb';
     }
     
     // 添加到储存
@@ -3951,7 +3959,7 @@ function moveSnake(snakeId) {
                 updateScoreDisplay();
                 
                 // 特殊食物储存为随机特殊球
-                const specialTypes = ['immunity', 'health', 'reverse'];
+                const specialTypes = ['immunity', 'health', 'reverse',"bomb"];
                 const randomType = specialTypes[Math.floor(Math.random() * specialTypes.length)];
                 
                 if (ballStorage[snakeId].length < 5) {
@@ -4016,7 +4024,36 @@ function moveSnake(snakeId) {
         snake.pop();
     }
 }
-
+// 添加CSS样式
+const bombStyle = document.createElement('style');
+bombStyle.textContent = `
+    /* 炸弹爆炸效果 */
+    .bomb-wave {
+        animation: bombWave 1s forwards;
+    }
+    
+    @keyframes bombWave {
+        0% { 
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+        100% { 
+            transform: translate(-50%, -50%) scale(10);
+            opacity: 0;
+        }
+    }
+    
+    /* 炸弹球颜色提示 */
+    .ball-slot.filled[style*="FF4500"] {
+        position: relative;
+    }
+    
+    .ball-slot.filled[style*="FF4500"]::before {
+        content: "💣";
+        font-size: 14px;
+    }
+`;
+document.head.appendChild(bombStyle);
 // 应用特殊物品效果
 function applySpecialItemEffect(snakeId, itemType) {
     const currentTime = performance.now();
@@ -4083,6 +4120,20 @@ function applySpecialItemEffect(snakeId, itemType) {
                     snakeId === 'snake1' ? snakes.snake1[0].y : snakes.snake2[0].y);
             }
             break;
+            case 'bomb':
+            // 炸弹球：存储起来，而不是立即使用
+            if (ballStorage[snakeId].length < 5) {
+                ballStorage[snakeId].push({type: 'bomb'});
+                updateStorageDisplay();
+                showNotice('炸弹球已储存!', '#FF4500', 
+                    snakeId === 'snake1' ? snakes.snake1[0].x : snakes.snake2[0].x, 
+                    snakeId === 'snake1' ? snakes.snake1[0].y : snakes.snake2[0].y);
+            } else {
+                showNotice('储存已满!', '#FF0000', 
+                    snakeId === 'snake1' ? snakes.snake1[0].x : snakes.snake2[0].x, 
+                    snakeId === 'snake1' ? snakes.snake1[0].y : snakes.snake2[0].y);
+            }
+            break;    
     }
 }
 
@@ -4095,7 +4146,10 @@ function releaseBall(snakeId, slotIndex) {
         updateStorageDisplay();
         
         // 如果是攻击球，激活攻击模式
-        if (ball.type === 'attack') {
+        if (ball.type === 'bomb') {
+            triggerBomb(snakeId);
+        }
+        else if (ball.type === 'attack') {
             activateAttackMode(snakeId);
         } else {
             // 其他球立即生效
@@ -4141,6 +4195,201 @@ function releaseBall(snakeId, slotIndex) {
         }, 500);
     }
 }
+function triggerBomb(snakeId) {
+    const snakeHead = snakes[snakeId][0];
+    const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
+    
+    // 创建爆炸视觉效果
+    createBombExplosion(snakeHead.x + 10, snakeHead.y + 10);
+    
+    // 计算对对方蛇的伤害
+    applyBombDamageToSnake(snakeId, otherSnakeId, snakeHead);
+    
+    // 计算对家的伤害
+    applyBombDamageToHomes(snakeId, snakeHead);
+    
+    // 显示提示
+    showNotice('炸弹爆炸!', '#FF4500', snakeHead.x, snakeHead.y);
+}
+
+// 新增函数：创建炸弹爆炸效果
+function createBombExplosion(centerX, centerY) {
+    // 中心爆炸效果
+    createParticles(centerX, centerY, 50, '#FF4500');
+    
+    // 冲击波效果
+    for (let i = 0; i < 5; i++) {
+        const wave = document.createElement('div');
+        wave.className = 'bomb-wave';
+        wave.style.left = `${centerX}px`;
+        wave.style.top = `${centerY}px`;
+        wave.style.width = '0px';
+        wave.style.height = '0px';
+        wave.style.borderRadius = '50%';
+        wave.style.border = '2px solid rgba(255, 69, 0, 0.8)';
+        wave.style.position = 'absolute';
+        wave.style.zIndex = '4';
+        
+        // 动画
+        wave.animate([
+            { 
+                width: '0px', 
+                height: '0px',
+                opacity: 1,
+                transform: 'translate(-50%, -50%)'
+            },
+            { 
+                width: '200px', 
+                height: '200px',
+                opacity: 0,
+                transform: 'translate(-50%, -50%)'
+            }
+        ], {
+            duration: 1000,
+            easing: 'ease-out'
+        });
+        
+        gameBoard.appendChild(wave);
+        
+        // 移除效果元素
+        setTimeout(() => wave.remove(), 1000);
+    }
+}
+
+// 新增函数：对蛇应用炸弹伤害
+function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
+    const targetSnake = snakes[targetSnakeId];
+    const hasImmunity = targetSnakeId === 'snake1' ? immunity.snake1 : immunity.snake2;
+    
+    let totalDamage = 0;
+    let maxSegmentDistance = 0; // 用于记录最远距离的蛇身段
+    
+    // 找到离爆炸中心最近的蛇身段
+    for (let i = 0; i < targetSnake.length; i++) {
+        const segment = targetSnake[i];
+        const distance = calculateDistance(segment, explosionCenter);
+        
+        if (i === 0 || distance < maxSegmentDistance) {
+            maxSegmentDistance = distance;
+        }
+    }
+    
+    // 根据最近蛇身段计算伤害
+    const gridDistance = Math.floor(maxSegmentDistance / 20);
+    
+    if (gridDistance <= 3) {
+        // 3格内：5点伤害（单次）
+        totalDamage = 5;
+    } else if (gridDistance <= 6) {
+        // 3-6格：2点伤害（单次）
+        totalDamage = 2;
+    } else if (gridDistance <= 10) {
+        // 6-10格：1点伤害（单次）
+        totalDamage = 1;
+    }
+    
+    // 应用伤害（如果有伤害并且没有免疫）
+    if (totalDamage > 0 && !hasImmunity) {
+        health[targetSnakeId] -= totalDamage;
+        
+        // 在对方蛇头位置显示伤害
+        const targetHead = targetSnake[0];
+        showNotice(`-${totalDamage}HP`, '#FF0000', targetHead.x, targetHead.y);
+        
+        // 创建伤害效果
+        createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#FF0000');
+        
+        // 更新血条并检查游戏结束
+        updateHealthBars();
+        if (health[targetSnakeId] <= 0) {
+            gameOver();
+        }
+    } else if (totalDamage > 0 && hasImmunity) {
+        // 免疫情况下的提示
+        const targetHead = targetSnake[0];
+        showNotice('免疫炸弹伤害!', '#FFFF00', targetHead.x, targetHead.y);
+    }
+}
+function calculateDistanceToRect(point, rect) {
+    // 计算点到矩形四条边的最短距离
+    const dx = Math.max(rect.x - point.x, 0, point.x - (rect.x + rect.width));
+    const dy = Math.max(rect.y - point.y, 0, point.y - (rect.y + rect.height));
+    
+    // 如果在矩形内，距离为0
+    if (dx === 0 && dy === 0) {
+        return 0;
+    }
+    
+    // 计算欧几里得距离
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+
+// 新增函数：对家应用炸弹伤害
+function applyBombDamageToHomes(snakeId, explosionCenter) {
+    const otherHomeId = snakeId === 'snake1' ? 'player2' : 'player1';
+    const otherHome = homes[otherHomeId];
+    
+    if (otherHome.destroyed) return;
+    
+    // 计算爆炸中心到家边框的最短距离
+    const distance = calculateDistanceToRect(explosionCenter, otherHome);
+    const gridDistance = Math.floor(distance / 20);
+    
+    let damage = 0;
+    let message = '';
+    
+    if (gridDistance <= 3) {
+        damage = 5;
+        message = '炸弹击中! -5HP';
+    } else if (gridDistance <= 6) {
+        damage = 2;
+        message = '炸弹冲击! -2HP';
+    } else if (gridDistance <= 10) {
+        damage = 1;
+        message = '炸弹波及! -1HP';
+    }
+    
+    if (damage > 0) {
+        otherHome.health = Math.max(0, otherHome.health - damage);
+        
+        // 在家中心显示伤害效果
+        const homeCenter = {
+            x: otherHome.x + otherHome.width / 2,
+            y: otherHome.y + otherHome.height / 2
+        };
+        
+        // 显示伤害效果
+        showNotice(message, '#FF4500', homeCenter.x, homeCenter.y);
+        createParticles(homeCenter.x, homeCenter.y, damage * 3, '#FF4500');
+        
+        // 检查家是否被摧毁
+        if (otherHome.health <= 0) {
+            otherHome.destroyed = true;
+            const playerName = otherHomeId === 'player1' ? 
+                (localStorage.getItem('username') || '玩家1') : 
+                (localStorage.getItem('player2_username') || '玩家2');
+            
+            showNotice(`${playerName}的家被炸毁了!`, '#FF0000', homeCenter.x, homeCenter.y);
+            
+            // 大爆炸效果
+            createParticles(homeCenter.x, homeCenter.y, 50, '#FF4500');
+        }
+    }
+}
+function calculateDistance(point1, point2) {
+    // 确保point1和point2都有x和y属性
+    const x1 = point1.x || point1.left || 0;
+    const y1 = point1.y || point1.top || 0;
+    const x2 = point2.x || point2.left || 0;
+    const y2 = point2.y || point2.top || 0;
+    
+    return Math.sqrt(
+        Math.pow(x1 - x2, 2) + 
+        Math.pow(y1 - y2, 2)
+    );
+}
+
 function activateAttackMode(snakeId) {
     const currentTime = performance.now();
     const isMagicSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'magic' : snakeTypes.snake2 === 'magic';
