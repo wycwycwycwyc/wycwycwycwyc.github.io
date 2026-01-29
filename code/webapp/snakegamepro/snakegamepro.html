@@ -2678,10 +2678,13 @@ function isInSafeZone(x, y, safeZone) {
 }
 // 清除游戏板
 function clearBoard() {
+    // 只清除DOM元素，不清除游戏数据数组
     document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
-    while (gameBoard.firstChild) {
-        gameBoard.removeChild(gameBoard.firstChild);
-    }
+    document.querySelectorAll('.home-base').forEach(home => home.remove());
+    document.querySelectorAll('.snake-segment').forEach(segment => segment.remove());
+    document.querySelectorAll('.food').forEach(food => food.remove());
+    document.querySelectorAll('.special-food').forEach(item => item.remove());
+    document.querySelectorAll('.wall-segment').forEach(wall => wall.remove());
 }
 
 // 添加更新储存显示的函数
@@ -3099,8 +3102,8 @@ function handleHomes(timestamp) {
             // 在对方基地中造成伤害
             if (timestamp - homes[opponentNum].lastDamageTime > 1000) {
                 
-                let damageToHome = 1; // 对基地的固定伤害
-                let damageToSelf = 2; // 对自己的伤害
+                let damageToHome = 3; // 对基地的固定伤害
+                let damageToSelf = 1; // 对自己的伤害
                 
                 // 如果是坚硬蛇，自己受到的伤害减半
                 if (isToughSnake) {
@@ -3512,7 +3515,7 @@ function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
             y: point.y,
             angle: angle,
             speed: defense.bulletSpeed,
-            player: 'base_' + playerHomeId,
+            player: 'base_' + playerHomeId, // 确保正确标识基地
             size: 6,
             damage: defense.damage,
             fromSide: point.side || 'unknown'
@@ -3521,7 +3524,8 @@ function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
         bullets.push(bullet);
         
         // 发射特效
-        createParticles(point.x, point.y, 2, playerHomeId === 'player1' ? '#FF5722' : '#2196F3');
+        const particleColor = playerHomeId === 'player1' ? '#FF5722' : '#2196F3';
+        createParticles(point.x, point.y, 3, particleColor);
     });
     
     // 显示基地攻击提示
@@ -3550,6 +3554,61 @@ function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
         }
     }
 }
+// 添加子弹样式到CSS
+const bulletStyles = document.createElement('style');
+bulletStyles.textContent = `
+    /* 子弹样式 */
+    .bullet {
+        transition: transform 0.1s ease-out;
+    }
+    
+    .bullet:hover {
+        transform: scale(1.2);
+    }
+    
+    /* 子弹旋转动画 */
+    @keyframes bulletSpin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    /* 子弹拖尾效果 */
+    .bullet-tail {
+        transition: opacity 0.2s ease-out;
+    }
+    
+    /* 不同玩家子弹的特殊效果 */
+    .bullet[style*="FF5722"] {
+        animation: pulseOrange 0.5s infinite alternate;
+    }
+    
+    .bullet[style*="2196F3"] {
+        animation: pulseBlue 0.5s infinite alternate;
+    }
+    
+    @keyframes pulseOrange {
+        from {
+            box-shadow: 0 0 8px #FF5722;
+        }
+        to {
+            box-shadow: 0 0 15px #FF5722;
+        }
+    }
+    
+    @keyframes pulseBlue {
+        from {
+            box-shadow: 0 0 8px #2196F3;
+        }
+        to {
+            box-shadow: 0 0 15px #2196F3;
+        }
+    }
+`;
+document.head.appendChild(bulletStyles);
 
 // 新增函数：获取基地指定边的发射点
 function getHomeBorderPointsBySide(home, side) {
@@ -4143,7 +4202,7 @@ function checkWallCollisions(timestamp) {
                         
                         // 检查游戏结束（只在非免疫状态下）
                         if (!immunity[snakeId] && health[snakeId] <= 0) {
-                            deathCause[snakeId] = '撞墙致死';
+                            deathCause[snakeId] = '撞墙而死';
                             gameOver();
                         }
                     }
@@ -4274,14 +4333,41 @@ function drawBullets() {
         bulletElement.style.left = `${bullet.x}px`;
         bulletElement.style.top = `${bullet.y}px`;
         
-        // 根据玩家设置子弹颜色
+        // 根据子弹所属玩家设置颜色
         if (bullet.player === 'snake1') {
+            // 玩家1子弹：橙色渐变
             bulletElement.style.background = 'linear-gradient(45deg, #FF5722, #FF9800)';
-            bulletElement.style.boxShadow = '0 0 5px #FF5722';
-        } else {
+            bulletElement.style.boxShadow = '0 0 8px #FF5722, 0 0 12px rgba(255, 87, 34, 0.7)';
+        } else if (bullet.player === 'snake2') {
+            // 玩家2子弹：蓝色渐变
             bulletElement.style.background = 'linear-gradient(45deg, #2196F3, #00BCD4)';
-            bulletElement.style.boxShadow = '0 0 5px #2196F3';
+            bulletElement.style.boxShadow = '0 0 8px #2196F3, 0 0 12px rgba(33, 150, 243, 0.7)';
+        } else if (bullet.player === 'base_player1') {
+            // 玩家1基地子弹：深橙色，更明显
+            bulletElement.style.background = 'radial-gradient(circle, #FF5722, #FF3300)';
+            bulletElement.style.boxShadow = '0 0 10px #FF3300, 0 0 15px rgba(255, 51, 0, 0.8)';
+            // 添加旋转动画
+            bulletElement.style.animation = 'bulletSpin 1s linear infinite';
+        } else if (bullet.player === 'base_player2') {
+            // 玩家2基地子弹：深蓝色，更明显
+            bulletElement.style.background = 'radial-gradient(circle, #2196F3, #0066FF)';
+            bulletElement.style.boxShadow = '0 0 10px #0066FF, 0 0 15px rgba(0, 102, 255, 0.8)';
+            bulletElement.style.animation = 'bulletSpin 1s linear infinite';
         }
+        
+        // 添加拖尾效果
+        const tail = document.createElement('div');
+        tail.className = 'bullet-tail';
+        tail.style.position = 'absolute';
+        tail.style.left = '50%';
+        tail.style.top = '50%';
+        tail.style.width = `${bullet.size * 3}px`;
+        tail.style.height = '2px';
+        tail.style.background = 'inherit';
+        tail.style.transform = 'translate(-50%, -50%) rotate(180deg)';
+        tail.style.opacity = '0.6';
+        tail.style.filter = 'blur(1px)';
+        bulletElement.appendChild(tail);
         
         gameBoard.appendChild(bulletElement);
     });
@@ -4300,7 +4386,7 @@ function checkBulletHitHome(bullet) {
         bullet.y <= targetHome.y + targetHome.height) {
         
         // 子弹对基地造成伤害
-        targetHome.health = Math.max(0, targetHome.health - 0.5); // 子弹造成0.5点伤害
+        targetHome.health = Math.max(0, targetHome.health - 2); // 子弹造成0.5点伤害
         
         // 显示伤害效果
         showNotice('-2HP', bullet.player === 'snake1' ? '#FF5722' : '#2196F3', 
@@ -4401,18 +4487,19 @@ function fireBullet(snakeId) {
     
     // 创建子弹
     const bullet = {
-        x: head.x,
-        y: head.y,
+        x: head.x + 10, // 从蛇头中心发射
+        y: head.y + 10,
         direction: direction,
-        player: snakeId,
-        speed: 30, // 每秒移动10个像素
-        size: 8 // 子弹大小
+        player: snakeId, // 确保正确标识玩家
+        speed: 30,
+        size: 8
     };
     
     bullets.push(bullet);
     
     // 播放发射音效或动画
-    createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
+    const particleColor = snakeId === 'snake1' ? '#FF5722' : '#2196F3';
+    createParticles(head.x + 10, head.y + 10, 10, particleColor);
 }
 function moveBullets(timestamp) {
     for (let i = bullets.length - 1; i >= 0; i--) {
@@ -4634,10 +4721,10 @@ function checkBulletHitHome(bullet, bulletIndex) {
         
         if (!hasImmunity) {
             // 没有免疫效果：子弹对基地造成伤害
-            targetHome.health = Math.max(0, targetHome.health - 2);
+            targetHome.health = Math.max(0, targetHome.health - 1);
             
             // 显示伤害效果
-            showNotice('-2HP', bullet.player === 'snake1' ? '#FF5722' : '#2196F3', 
+            showNotice('-1HP', bullet.player === 'snake1' ? '#FF5722' : '#2196F3', 
                      targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
             
             // 创建击中效果
@@ -5627,6 +5714,31 @@ function gameOver() {
     gameOverScreen.style.display = '';
     gameStarted = false;
     let hasUploaded = false;
+        // 1. 清除所有子弹
+    if (attackMode.intervalId1) {
+        clearInterval(attackMode.intervalId1);
+        attackMode.intervalId1 = null;
+    }
+    if (attackMode.intervalId2) {
+        clearInterval(attackMode.intervalId2);
+        attackMode.intervalId2 = null;
+    }
+    
+    // 清除子弹数组和DOM元素
+    bullets = [];
+    document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
+    
+    // 重置攻击模式状态
+    attackMode = {
+        snake1: false,
+        snake2: false,
+        timer1: 0,
+        timer2: 0,
+        lastShot1: 0,
+        lastShot2: 0,
+        intervalId1: null,
+        intervalId2: null
+    };
     if (attackMode.intervalId1) clearInterval(attackMode.intervalId1);
     if (attackMode.intervalId2) clearInterval(attackMode.intervalId2);
     attackMode = {
@@ -5722,7 +5834,7 @@ function gameOver() {
                         border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
                     ">
                         <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-                            <i class="fas fa-skull-crossbones"></i> 失败原因
+                            <i class="fas fa-skull-crossbones"></i> 原因
                         </div>
                         <div style="font-size: 18px; font-weight: bold; color: white;">
                             ${loserName}${loserCause}
@@ -6175,14 +6287,14 @@ document.addEventListener('keydown', (e) => {
         releaseBall('snake2', slotIndex);
         return;
     }
-    if (e.key === 'z' || e.key === 'Z') {
+    if (e.key === 'q' || e.key === 'Q') {
         pausedSnakes.snake1 = !pausedSnakes.snake1;
         showNotice(pausedSnakes.snake1 ? '玩家1已暂停' : '玩家1已恢复', 
                   '#FF5722', snakes.snake1[0].x, snakes.snake1[0].y);
         return;
     }
     
-    if (e.key === 'm' || e.key === 'M') {
+    if (e.key === '/' || e.key === '?') {
         pausedSnakes.snake2 = !pausedSnakes.snake2;
         showNotice(pausedSnakes.snake2 ? '玩家2已暂停' : '玩家2已恢复', 
                   '#2196F3', snakes.snake2[0].x, snakes.snake2[0].y);
