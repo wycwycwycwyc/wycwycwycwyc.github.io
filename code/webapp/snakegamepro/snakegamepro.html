@@ -1829,7 +1829,26 @@ let speedBoosts = {
     snake1: 0,
     snake2: 0
 };
-
+let baseDefense = {
+    player1: {
+        lastShotTime: 0,
+        bulletSpeed: 1.5, // 稍微降低速度
+        attackRange: 15, // 20格 = 400像素
+        active: false,
+        targetSnake: null,
+        damage: 0.5,
+        shootInterval: 1000 // 2秒间隔
+    },
+    player2: {
+        lastShotTime: 0,
+        bulletSpeed: 1.5,
+        attackRange: 15,
+        active: false,
+        targetSnake: null,
+        damage: 0.5,
+        shootInterval: 1000
+    }
+};
 const gameBoard = document.getElementById('game-board');
 const startBtn = document.querySelector('.start-btn');
 const restartBtn = document.querySelector('.restart-btn');
@@ -1921,27 +1940,123 @@ function drawHomes() {
     // 移除现有的基地元素
     document.querySelectorAll('.home-base').forEach(el => el.remove());
     
-    // 绘制玩家1的基地
+    // 绘制玩家1的基地（左上角）
     if (!homes.player1.destroyed) {
         const home1 = document.createElement('div');
         home1.className = `home-base player1 ${homes.player1.health < homes.player1.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
+        
+        // 如果基地防御激活，添加激活样式
+        if (baseDefense.player1.active && baseDefense.player1.targetSnake) {
+            home1.classList.add('defense-active');
+            
+            const targetHead = snakes[baseDefense.player1.targetSnake][0];
+            const isInside = isPointInRect(targetHead, homes.player1);
+            const firingPoints = calculateFiringPoints(homes.player1, targetHead, isInside);
+            
+            // 计算哪些边在攻击
+            const activeSides = {};
+            firingPoints.forEach(point => {
+                if (point.side) {
+                    activeSides[point.side] = true;
+                }
+            });
+            
+            // 为每个攻击边添加高亮边框
+            Object.keys(activeSides).forEach(side => {
+                const sideHighlighter = document.createElement('div');
+                sideHighlighter.className = 'active-side-highlight';
+                sideHighlighter.style.position = 'absolute';
+                sideHighlighter.style.background = 'linear-gradient(90deg, transparent, rgba(255, 87, 34, 0.7), transparent)';
+                sideHighlighter.style.animation = 'sidePulse 1s infinite alternate';
+                sideHighlighter.style.zIndex = '1';
+                
+                switch(side) {
+                    case 'top':
+                        sideHighlighter.style.top = '-5px';
+                        sideHighlighter.style.left = '0';
+                        sideHighlighter.style.width = '100%';
+                        sideHighlighter.style.height = '10px';
+                        break;
+                    case 'bottom':
+                        sideHighlighter.style.bottom = '-5px';
+                        sideHighlighter.style.left = '0';
+                        sideHighlighter.style.width = '100%';
+                        sideHighlighter.style.height = '10px';
+                        break;
+                    case 'left':
+                        sideHighlighter.style.left = '-5px';
+                        sideHighlighter.style.top = '0';
+                        sideHighlighter.style.width = '10px';
+                        sideHighlighter.style.height = '100%';
+                        break;
+                    case 'right':
+                        sideHighlighter.style.right = '-5px';
+                        sideHighlighter.style.top = '0';
+                        sideHighlighter.style.width = '10px';
+                        sideHighlighter.style.height = '100%';
+                        break;
+                }
+                
+                home1.appendChild(sideHighlighter);
+            });
+            
+            // 为每个发射点添加指示器
+            firingPoints.forEach(point => {
+                const turretIndicator = document.createElement('div');
+                turretIndicator.className = 'base-turret-indicator';
+                turretIndicator.style.position = 'absolute';
+                turretIndicator.style.left = `${point.x - homes.player1.x}px`;
+                turretIndicator.style.top = `${point.y - homes.player1.y}px`;
+                turretIndicator.style.transform = 'translate(-50%, -50%)';
+                
+                turretIndicator.style.width = '8px';
+                turretIndicator.style.height = '8px';
+                turretIndicator.style.background = 'radial-gradient(circle, #FF5722, #FF0000)';
+                turretIndicator.style.borderRadius = '50%';
+                turretIndicator.style.boxShadow = '0 0 8px #FF0000';
+                turretIndicator.style.animation = 'turretPulse 1s infinite alternate';
+                turretIndicator.style.zIndex = '3';
+                
+                home1.appendChild(turretIndicator);
+            });
+            
+            // 添加防御激活文字提示
+            const defenseText = document.createElement('div');
+            defenseText.style.position = 'absolute';
+            defenseText.style.top = '5px';
+            defenseText.style.left = '0';
+            defenseText.style.width = '100%';
+            defenseText.style.textAlign = 'center';
+            defenseText.style.fontSize = '12px';
+            defenseText.style.color = '#FFFF00';
+            defenseText.style.fontWeight = 'bold';
+            defenseText.textContent = '防御激活';
+            defenseText.style.textShadow = '0 0 5px #000';
+            defenseText.style.zIndex = '2';
+            home1.appendChild(defenseText);
+        }
+        
         home1.style.left = `${homes.player1.x}px`;
         home1.style.top = `${homes.player1.y}px`;
         home1.style.width = `${homes.player1.width}px`;
         home1.style.height = `${homes.player1.height}px`;
-        home1.style.zIndex = '2'; // 确保基地在其他元素之上
+        home1.style.zIndex = '2';
         
         // 添加基地的图标和名称
         const name1 = document.createElement('div');
         name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩家1'}的基地`;
         name1.style.textAlign = 'center';
-        name1.style.marginTop = '15px';
-        name1.style.fontSize = '14px';
+        name1.style.marginTop = '25px';
+        name1.style.fontSize = '16px';
+        name1.style.fontWeight = 'bold';
+        name1.style.zIndex = '2';
         home1.appendChild(name1);
         
         // 添加血条
         const healthBar1 = document.createElement('div');
         healthBar1.className = 'home-health-bar';
+        healthBar1.style.bottom = '-22px';
+        healthBar1.style.zIndex = '2';
         
         const healthFill1 = document.createElement('div');
         healthFill1.className = 'home-health-fill home1-health-fill';
@@ -1950,7 +2065,8 @@ function drawHomes() {
         const healthText1 = document.createElement('div');
         healthText1.className = 'home-health-text';
         healthText1.textContent = `HP: ${homes.player1.health}/${homes.player1.maxHealth}`;
-        healthText1.style.fontSize = '11px';
+        healthText1.style.fontSize = '12px';
+        healthText1.style.zIndex = '2';
         
         healthBar1.appendChild(healthFill1);
         home1.appendChild(healthText1);
@@ -1959,27 +2075,124 @@ function drawHomes() {
         gameBoard.appendChild(home1);
     }
     
-    // 绘制玩家2的基地
+    // 绘制玩家2的基地（右下角）
     if (!homes.player2.destroyed) {
         const home2 = document.createElement('div');
         home2.className = `home-base player2 ${homes.player2.health < homes.player2.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
+        
+        // 如果基地防御激活，添加激活样式
+        if (baseDefense.player2.active && baseDefense.player2.targetSnake) {
+            home2.classList.add('defense-active');
+            
+            const targetHead = snakes[baseDefense.player2.targetSnake][0];
+            const isInside = isPointInRect(targetHead, homes.player2);
+            const firingPoints = calculateFiringPoints(homes.player2, targetHead, isInside);
+            
+            // 计算哪些边在攻击
+            const activeSides = {};
+            firingPoints.forEach(point => {
+                if (point.side) {
+                    activeSides[point.side] = true;
+                }
+            });
+            
+            // 为每个攻击边添加高亮边框
+            Object.keys(activeSides).forEach(side => {
+                const sideHighlighter = document.createElement('div');
+                sideHighlighter.className = 'active-side-highlight';
+                sideHighlighter.style.position = 'absolute';
+                sideHighlighter.style.background = 'linear-gradient(90deg, transparent, rgba(33, 150, 243, 0.7), transparent)';
+                sideHighlighter.style.animation = 'sidePulse 1s infinite alternate';
+                sideHighlighter.style.zIndex = '1';
+                sideHighlighter.style.boxShadow = '0 0 10px rgba(33, 150, 243, 0.5)';
+                
+                switch(side) {
+                    case 'top':
+                        sideHighlighter.style.top = '-5px';
+                        sideHighlighter.style.left = '0';
+                        sideHighlighter.style.width = '100%';
+                        sideHighlighter.style.height = '10px';
+                        break;
+                    case 'bottom':
+                        sideHighlighter.style.bottom = '-5px';
+                        sideHighlighter.style.left = '0';
+                        sideHighlighter.style.width = '100%';
+                        sideHighlighter.style.height = '10px';
+                        break;
+                    case 'left':
+                        sideHighlighter.style.left = '-5px';
+                        sideHighlighter.style.top = '0';
+                        sideHighlighter.style.width = '10px';
+                        sideHighlighter.style.height = '100%';
+                        break;
+                    case 'right':
+                        sideHighlighter.style.right = '-5px';
+                        sideHighlighter.style.top = '0';
+                        sideHighlighter.style.width = '10px';
+                        sideHighlighter.style.height = '100%';
+                        break;
+                }
+                
+                home2.appendChild(sideHighlighter);
+            });
+            
+            // 为每个发射点添加指示器
+            firingPoints.forEach(point => {
+                const turretIndicator = document.createElement('div');
+                turretIndicator.className = 'base-turret-indicator';
+                turretIndicator.style.position = 'absolute';
+                turretIndicator.style.left = `${point.x - homes.player2.x}px`;
+                turretIndicator.style.top = `${point.y - homes.player2.y}px`;
+                turretIndicator.style.transform = 'translate(-50%, -50%)';
+                
+                turretIndicator.style.width = '8px';
+                turretIndicator.style.height = '8px';
+                turretIndicator.style.background = 'radial-gradient(circle, #2196F3, #0000FF)';
+                turretIndicator.style.borderRadius = '50%';
+                turretIndicator.style.boxShadow = '0 0 8px #0000FF';
+                turretIndicator.style.animation = 'turretPulse 1s infinite alternate';
+                turretIndicator.style.zIndex = '3';
+                
+                home2.appendChild(turretIndicator);
+            });
+            
+            // 添加防御激活文字提示
+            const defenseText = document.createElement('div');
+            defenseText.style.position = 'absolute';
+            defenseText.style.top = '5px';
+            defenseText.style.left = '0';
+            defenseText.style.width = '100%';
+            defenseText.style.textAlign = 'center';
+            defenseText.style.fontSize = '12px';
+            defenseText.style.color = '#FFFF00';
+            defenseText.style.fontWeight = 'bold';
+            defenseText.textContent = '防御激活';
+            defenseText.style.textShadow = '0 0 5px #000';
+            defenseText.style.zIndex = '2';
+            home2.appendChild(defenseText);
+        }
+        
         home2.style.left = `${homes.player2.x}px`;
         home2.style.top = `${homes.player2.y}px`;
         home2.style.width = `${homes.player2.width}px`;
         home2.style.height = `${homes.player2.height}px`;
-        home2.style.zIndex = '2'; // 确保基地在其他元素之上
+        home2.style.zIndex = '2';
         
         // 添加基地的图标和名称
         const name2 = document.createElement('div');
         name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩家2'}的基地`;
         name2.style.textAlign = 'center';
-        name2.style.marginTop = '15px';
-        name2.style.fontSize = '14px';
+        name2.style.marginTop = '25px';
+        name2.style.fontSize = '16px';
+        name2.style.fontWeight = 'bold';
+        name2.style.zIndex = '2';
         home2.appendChild(name2);
         
         // 添加血条
         const healthBar2 = document.createElement('div');
         healthBar2.className = 'home-health-bar';
+        healthBar2.style.bottom = '-22px';
+        healthBar2.style.zIndex = '2';
         
         const healthFill2 = document.createElement('div');
         healthFill2.className = 'home-health-fill home2-health-fill';
@@ -1988,7 +2201,8 @@ function drawHomes() {
         const healthText2 = document.createElement('div');
         healthText2.className = 'home-health-text';
         healthText2.textContent = `HP: ${homes.player2.health}/${homes.player2.maxHealth}`;
-        healthText2.style.fontSize = '11px';
+        healthText2.style.fontSize = '12px';
+        healthText2.style.zIndex = '2';
         
         healthBar2.appendChild(healthFill2);
         home2.appendChild(healthText2);
@@ -1997,7 +2211,67 @@ function drawHomes() {
         gameBoard.appendChild(home2);
     }
 }
-
+const baseDefenseStyle = document.createElement('style');
+baseDefenseStyle.textContent = `
+    /* 基地防御特效 - 更新 */
+    .base-turret-indicator {
+        position: absolute;
+        animation: turretPulse 1s infinite alternate;
+    }
+    
+    @keyframes turretPulse {
+        from {
+            transform: scale(1);
+            box-shadow: 0 0 10px;
+            opacity: 0.7;
+        }
+        to {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px;
+            opacity: 1;
+        }
+    }
+    
+    /* 防御激活时的基地边框效果 */
+    .home-base.defense-active {
+        box-shadow: 0 0 40px;
+    }
+    
+    .home-base.defense-active.player1 {
+        box-shadow: 0 0 40px rgba(255, 87, 34, 0.8);
+    }
+    
+    .home-base.defense-active.player2 {
+        box-shadow: 0 0 40px rgba(33, 150, 243, 0.8);
+    }
+`;
+document.head.appendChild(baseDefenseStyle);
+// 添加新的CSS样式
+const activeSideStyle = document.createElement('style');
+activeSideStyle.textContent = `
+    /* 激活边的闪烁效果 */
+    .active-side-highlight {
+        z-index: 1;
+    }
+    
+    @keyframes sidePulse {
+        from {
+            opacity: 0.3;
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+        }
+        to {
+            opacity: 0.7;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.8);
+        }
+    }
+    
+    /* 玩家2的颜色 */
+    .home-base.player2 .active-side-highlight {
+        background: linear-gradient(90deg, transparent, rgba(33, 150, 243, 0.7), transparent) !important;
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+    }
+`;
+document.head.appendChild(activeSideStyle);
 // 初始化游戏
 function initGame() {
     document.getElementById("back").style.display ="none"
@@ -2051,7 +2325,6 @@ attackMode = {
     intervalId1: null,
     intervalId2: null
 };
-
 // 4. 重置子弹发射的计时器
 lastMoveTime = {
     snake1: 0,
@@ -2151,6 +2424,26 @@ lastMoveTime = {
         lastShot2: 0,
         intervalId1: null,
         intervalId2: null
+};
+let baseDefense = {
+    player1: {
+        lastShotTime: 0,
+        bulletSpeed: 6, // 稍微降低速度
+        attackRange: 15, // 20格 = 400像素
+        active: false,
+        targetSnake: null,
+        damage: 0.5,
+        shootInterval: 1000 // 2秒间隔
+    },
+    player2: {
+        lastShotTime: 0,
+        bulletSpeed: 12,
+        attackRange: 15,
+        active: false,
+        targetSnake: null,
+        damage: 0.5,
+        shootInterval: 1000
+    }
 };
     walls = [];
     generateAllWalls();
@@ -2842,7 +3135,7 @@ function handleHomes(timestamp) {
                     
                     // 检查自己是否死亡
                     if (health[snakeId] <= 0) {
-                        deathCause[snakeId] = '在对方家中致死';
+                        deathCause[snakeId] = '在对方基地中致死';
                         gameOver();
                     }
                 } else {
@@ -2888,6 +3181,179 @@ function handleHomes(timestamp) {
         }
     }
 }
+function calculateFiringPoints(home, targetPoint, isInsideHome) {
+    const points = [];
+    
+    if (isInsideHome) {
+        // 如果在基地内部，从所有边的所有点发射
+        return getAllHomeBorderPoints(home);
+    }
+    
+    // 计算目标相对于基地的位置
+    const targetX = targetPoint.x;
+    const targetY = targetPoint.y;
+    const homeLeft = home.x;
+    const homeRight = home.x + home.width;
+    const homeTop = home.y;
+    const homeBottom = home.y + home.height;
+    
+    // 确定目标在基地的哪个象限/方向
+    const isLeft = targetX < homeLeft;
+    const isRight = targetX > homeRight;
+    const isAbove = targetY < homeTop;
+    const isBelow = targetY > homeBottom;
+    
+    // 根据目标位置确定攻击的边
+    if (isAbove && !isLeft && !isRight) {
+        // 正上方 → 上边整条边攻击
+        points.push(...getHomeBorderPointsBySide(home, 'top'));
+    } 
+    else if (isBelow && !isLeft && !isRight) {
+        // 正下方 → 下边整条边攻击
+        points.push(...getHomeBorderPointsBySide(home, 'bottom'));
+    }
+    else if (isLeft && !isAbove && !isBelow) {
+        // 正左方 → 左边整条边攻击
+        points.push(...getHomeBorderPointsBySide(home, 'left'));
+    }
+    else if (isRight && !isAbove && !isBelow) {
+        // 正右方 → 右边整条边攻击
+        points.push(...getHomeBorderPointsBySide(home, 'right'));
+    }
+    else {
+        // 斜方向 → 用接近的两条边整条边攻击
+        // 优先考虑更接近的边
+        const horizontalSide = targetX < (homeLeft + homeRight) / 2 ? 'left' : 'right';
+        const verticalSide = targetY < (homeTop + homeBottom) / 2 ? 'top' : 'bottom';
+        
+        // 计算距离权重
+        const horizontalDistance = horizontalSide === 'left' ? homeLeft - targetX : targetX - homeRight;
+        const verticalDistance = verticalSide === 'top' ? homeTop - targetY : targetY - homeBottom;
+        
+        // 如果目标更接近水平边，主要从水平边攻击，次要从垂直边攻击
+        if (Math.abs(horizontalDistance) < Math.abs(verticalDistance)) {
+            // 主要攻击水平边（整条边）
+            points.push(...getHomeBorderPointsBySide(home, horizontalSide));
+            
+            // 次要攻击垂直边的接近部分
+            const verticalPoints = getHomeBorderPointsBySide(home, verticalSide);
+            const closestVerticalPoints = getClosestBorderPoints(home, verticalSide, targetPoint, 0.5); // 50%的边
+            points.push(...closestVerticalPoints);
+        } else {
+            // 主要攻击垂直边（整条边）
+            points.push(...getHomeBorderPointsBySide(home, verticalSide));
+            
+            // 次要攻击水平边的接近部分
+            const horizontalPoints = getHomeBorderPointsBySide(home, horizontalSide);
+            const closestHorizontalPoints = getClosestBorderPoints(home, horizontalSide, targetPoint, 0.5);
+            points.push(...closestHorizontalPoints);
+        }
+    }
+    
+    return points;
+}
+
+
+// 新增函数：检查投影点是否在边上
+function isProjectionOnSide(home, side, projectionPoint) {
+    switch(side) {
+        case 'top':
+        case 'bottom':
+            return projectionPoint.x >= home.x && projectionPoint.x <= home.x + home.width;
+        case 'left':
+        case 'right':
+            return projectionPoint.y >= home.y && projectionPoint.y <= home.y + home.height;
+        default:
+            return false;
+    }
+}
+
+// 新增函数：计算点到边的距离
+function getDistanceToSide(point, home, side) {
+    switch(side) {
+        case 'top':
+            return Math.abs(point.y - home.y);
+        case 'bottom':
+            return Math.abs(point.y - (home.y + home.height));
+        case 'left':
+            return Math.abs(point.x - home.x);
+        case 'right':
+            return Math.abs(point.x - (home.x + home.width));
+        default:
+            return Infinity;
+    }
+}
+
+// 新增函数：获取边接近目标的部分
+function getClosestBorderPoints(home, side, targetPoint, proportion = 0.3) {
+    const points = [];
+    const allPoints = getHomeBorderPointsBySide(home, side);
+    
+    if (allPoints.length <= 3) {
+        return allPoints;
+    }
+    
+    // 找到边上距离目标最近的点
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    allPoints.forEach((point, index) => {
+        const distance = Math.sqrt(
+            Math.pow(point.x - targetPoint.x, 2) + 
+            Math.pow(point.y - targetPoint.y, 2)
+        );
+        
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+        }
+    });
+    
+    // 根据比例计算应该取多少点
+    const pointsToTake = Math.max(3, Math.floor(allPoints.length * proportion));
+    const halfPoints = Math.floor(pointsToTake / 2);
+    
+    const startIndex = Math.max(0, closestIndex - halfPoints);
+    const endIndex = Math.min(allPoints.length - 1, startIndex + pointsToTake - 1);
+    
+    for (let i = startIndex; i <= endIndex; i++) {
+        points.push(allPoints[i]);
+    }
+    
+    return points;
+}
+// 新增函数：获取所有边的所有点
+function getAllHomeBorderPoints(home) {
+    const points = [];
+    const gridSize = 20;
+    
+    const startX = home.x;
+    const startY = home.y;
+    const endX = home.x + home.width;
+    const endY = home.y + home.height;
+    
+    // 上边框
+    for (let x = startX; x < endX; x += gridSize) {
+        points.push({ x: x, y: startY, side: 'top' });
+    }
+    
+    // 下边框
+    for (let x = startX; x < endX; x += gridSize) {
+        points.push({ x: x, y: endY - 2, side: 'bottom' });
+    }
+    
+    // 左边框
+    for (let y = startY; y < endY; y += gridSize) {
+        points.push({ x: startX, y: y, side: 'left' });
+    }
+    
+    // 右边框
+    for (let y = startY; y < endY; y += gridSize) {
+        points.push({ x: endX - 2, y: y, side: 'right' });
+    }
+    
+    return points;
+}
         
         // 检查点是否在矩形内
         function isPointInRect(point, rect) {
@@ -2905,6 +3371,225 @@ function handleHomes(timestamp) {
                 gameBoard.removeChild(gameBoard.firstChild);
             }
         }
+function updateBaseDefense(playerHomeId, timestamp) {
+    const defense = baseDefense[playerHomeId];
+    const home = homes[playerHomeId];
+    const targetSnakeId = playerHomeId === 'player1' ? 'snake2' : 'snake1';
+    const targetSnake = snakes[targetSnakeId];
+    const targetHead = targetSnake[0];
+    
+    // 检查是否在攻击范围内（20格 = 400像素）
+    const distance = calculateDistanceToRect(targetHead, home);
+    const inRange = distance <= defense.attackRange * 20;
+    
+    // 检查目标蛇是否在基地内部
+    const isInsideHome = isPointInRect(targetHead, home);
+    
+    // 激活防御条件：目标在攻击范围内
+    defense.active = inRange || isInsideHome;
+    defense.targetSnake = defense.active ? targetSnakeId : null;
+    
+    // 如果防御激活，发射子弹
+    if (defense.active && timestamp - defense.lastShotTime > defense.shootInterval) {
+        // 计算应该发射子弹的边和具体位置
+        const firingPoints = calculateFiringPoints(home, targetHead, isInsideHome);
+        
+        if (firingPoints.length > 0) {
+            fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp);
+            defense.lastShotTime = timestamp;
+            
+            // 显示攻击方向提示（可选）
+            showAttackDirectionHint(playerHomeId, targetHead, home);
+        }
+    }
+}
+function showAttackDirectionHint(playerHomeId, targetHead, home) {
+    const targetX = targetHead.x;
+    const targetY = targetHead.y;
+    const homeCenterX = home.x + home.width / 2;
+    const homeCenterY = home.y + home.height / 2;
+    
+    // 计算方向
+    const isLeft = targetX < home.x;
+    const isRight = targetX > home.x + home.width;
+    const isAbove = targetY < home.y;
+    const isBelow = targetY > home.y + home.height;
+    
+    let direction = '';
+    
+    if (isAbove && !isLeft && !isRight) {
+        direction = '上方';
+    } else if (isBelow && !isLeft && !isRight) {
+        direction = '下方';
+    } else if (isLeft && !isAbove && !isBelow) {
+        direction = '左方';
+    } else if (isRight && !isAbove && !isBelow) {
+        direction = '右方';
+    } else if (isAbove && isLeft) {
+        direction = '左上方';
+    } else if (isAbove && isRight) {
+        direction = '右上方';
+    } else if (isBelow && isLeft) {
+        direction = '左下方';
+    } else if (isBelow && isRight) {
+        direction = '右下方';
+    } else {
+        direction = '内部';
+    }
+    
+    // 显示方向提示（只在基地中心附近显示，避免干扰）
+    const showX = home.x + home.width / 2;
+    const showY = home.y + home.height / 2 - 20;
+    
+    showNotice(`${direction}防御!`, playerHomeId === 'player1' ? '#FF5722' : '#2196F3',
+              showX, showY);
+}
+
+function handleBaseDefense(timestamp) {
+    // 检查玩家1的基地防御
+    if (!homes.player1.destroyed) {
+        updateBaseDefense('player1', timestamp);
+    }
+    
+    // 检查玩家2的基地防御
+    if (!homes.player2.destroyed) {
+        updateBaseDefense('player2', timestamp);
+    }
+}
+// 新增函数：计算应该从哪边发射子弹
+function calculateFiringSides(home, targetPoint, isInsideHome) {
+    const sides = [];
+    
+    if (isInsideHome) {
+        // 如果在基地内部，从所有边发射
+        return ['top', 'bottom', 'left', 'right'];
+    }
+    
+    // 计算目标相对于基地的位置
+    const homeCenterX = home.x + home.width / 2;
+    const homeCenterY = home.y + home.height / 2;
+    
+    // 计算角度（0度是正右方，逆时针增加）
+    const angle = Math.atan2(targetPoint.y - homeCenterY, targetPoint.x - homeCenterX) * 180 / Math.PI;
+    
+    // 标准化角度到0-360度
+    const normalizedAngle = (angle + 360) % 360;
+    
+    // 根据角度确定应该从哪边发射
+    if (normalizedAngle >= 45 && normalizedAngle < 135) {
+        // 下方（目标在基地下方）
+        sides.push('bottom');
+    } else if (normalizedAngle >= 135 && normalizedAngle < 225) {
+        // 左方（目标在基地左方）
+        sides.push('left');
+    } else if (normalizedAngle >= 225 && normalizedAngle < 315) {
+        // 上方（目标在基地上方）
+        sides.push('top');
+    } else {
+        // 右方（目标在基地右方）
+        sides.push('right');
+    }
+    
+    return sides;
+}
+
+// 修改fireBaseBullet函数，只从指定边发射
+function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
+    const defense = baseDefense[playerHomeId];
+    const home = homes[playerHomeId];
+    const targetSnakeId = playerHomeId === 'player1' ? 'snake2' : 'snake1';
+    
+    // 从所有发射点发射子弹
+    firingPoints.forEach(point => {
+        // 计算子弹方向（朝向目标蛇头）
+        const angle = Math.atan2(
+            targetHead.y + 10 - point.y,
+            targetHead.x + 10 - point.x
+        );
+        
+        const bullet = {
+            x: point.x,
+            y: point.y,
+            angle: angle,
+            speed: defense.bulletSpeed,
+            player: 'base_' + playerHomeId,
+            size: 6,
+            damage: defense.damage,
+            fromSide: point.side || 'unknown'
+        };
+        
+        bullets.push(bullet);
+        
+        // 发射特效
+        createParticles(point.x, point.y, 2, playerHomeId === 'player1' ? '#FF5722' : '#2196F3');
+    });
+    
+    // 显示基地攻击提示
+    if (timestamp - defense.lastShotTime > 4000) {
+        const sideCount = {};
+        firingPoints.forEach(point => {
+            if (point.side) {
+                sideCount[point.side] = (sideCount[point.side] || 0) + 1;
+            }
+        });
+        
+        const sides = Object.keys(sideCount);
+        if (sides.length > 0) {
+            const directionText = sides.map(side => {
+                switch(side) {
+                    case 'top': return '上方';
+                    case 'bottom': return '下方';
+                    case 'left': return '左方';
+                    case 'right': return '右方';
+                    default: return '';
+                }
+            }).join('、');
+            
+            showNotice(`基地${directionText}防御激活!`, playerHomeId === 'player1' ? '#FF5722' : '#2196F3',
+                      home.x + home.width/2, home.y + home.height/2);
+        }
+    }
+}
+
+// 新增函数：获取基地指定边的发射点
+function getHomeBorderPointsBySide(home, side) {
+    const points = [];
+    const gridSize = 20;
+    
+    const startX = home.x;
+    const startY = home.y;
+    const endX = home.x + home.width;
+    const endY = home.y + home.height;
+    
+    switch(side) {
+        case 'top':
+            for (let x = startX; x < endX; x += gridSize) {
+                points.push({ x: x, y: startY, side: 'top' });
+            }
+            break;
+            
+        case 'bottom':
+            for (let x = startX; x < endX; x += gridSize) {
+                points.push({ x: x, y: endY - 2, side: 'bottom' });
+            }
+            break;
+            
+        case 'left':
+            for (let y = startY; y < endY; y += gridSize) {
+                points.push({ x: startX, y: y, side: 'left' });
+            }
+            break;
+            
+        case 'right':
+            for (let y = startY; y < endY; y += gridSize) {
+                points.push({ x: endX - 2, y: y, side: 'right' });
+            }
+            break;
+    }
+    
+    return points;
+}
+
 // 游戏主循环
 function gameLoop(timestamp) {
     if (!gameStarted) return;
@@ -2973,6 +3658,7 @@ requestAnimationFrame(gameLoop);
     drawSpecialItems();
     drawVolcanoes();
     drawSnakes();
+    handleBaseDefense(timestamp);
     drawHomes();
     drawFoods();
 }
@@ -3732,26 +4418,29 @@ function moveBullets(timestamp) {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
         
-        // 根据方向移动子弹
-        switch (bullet.direction) {
-            case 'up':
-                bullet.y -= bullet.speed;
-                break;
-            case 'down':
-                bullet.y += bullet.speed;
-                break;
-            case 'left':
-                bullet.x -= bullet.speed;
-                break;
-            case 'right':
-                bullet.x += bullet.speed;
-                break;
-     
+        // 根据子弹类型移动
+        if (bullet.player.startsWith('base_')) {
+            // 基地子弹：按角度移动
+            bullet.x += Math.cos(bullet.angle) * bullet.speed;
+            bullet.y += Math.sin(bullet.angle) * bullet.speed;
+        } else {
+            // 蛇子弹：按方向移动
+            switch (bullet.direction) {
+                case 'up':
+                    bullet.y -= bullet.speed;
+                    break;
+                case 'down':
+                    bullet.y += bullet.speed;
+                    break;
+                case 'left':
+                    bullet.x -= bullet.speed;
+                    break;
+                case 'right':
+                    bullet.x += bullet.speed;
+                    break;
+            }
         }
-            if (checkBulletHitHome(bullet)) {
-            bullets.splice(i, 1);
-            continue;
-        } 
+        
         // 检查是否超出边界
         const boardWidth = gameBoard.clientWidth;
         const boardHeight = gameBoard.clientHeight;
@@ -3771,9 +4460,8 @@ function moveBullets(timestamp) {
                     Math.pow(bullet.y - segment.y - 10, 2)
                 );
                 
-                if (distance < 15) { // 子弹与墙块碰撞检测
+                if (distance < 15) {
                     hitWall = true;
-                    // 子弹击中墙的特效
                     createParticles(bullet.x, bullet.y, 5, '#FFFFFF');
                     break;
                 }
@@ -3786,47 +4474,253 @@ function moveBullets(timestamp) {
             continue;
         }
         
-        // 检查是否击中对方蛇
-        const targetSnakeId = bullet.player === 'snake1' ? 'snake2' : 'snake1';
-        const targetSnake = snakes[targetSnakeId];
+        // 检查是否击中蛇
+        if (bullet.player.startsWith('base_')) {
+            // 基地子弹检查
+            const targetSnakeId = bullet.player === 'base_player1' ? 'snake2' : 'snake1';
+            checkBaseBulletHit(bullet, targetSnakeId, i);
+        } else {
+            // 蛇子弹检查（原有逻辑）
+            const targetSnakeId = bullet.player === 'snake1' ? 'snake2' : 'snake1';
+            checkSnakeBulletHit(bullet, targetSnakeId, i);
+        }
+    }
+}
+
+// 新增/修改函数：检查蛇子弹是否击中
+function checkSnakeBulletHit(bullet, targetSnakeId, bulletIndex) {
+    const targetSnake = snakes[targetSnakeId];
+    
+    for (let j = 0; j < targetSnake.length; j++) {
+        const segment = targetSnake[j];
+        const distance = Math.sqrt(
+            Math.pow(bullet.x - segment.x - 10, 2) + 
+            Math.pow(bullet.y - segment.y - 10, 2)
+        );
         
-        for (let j = 0; j < targetSnake.length; j++) {
-            const segment = targetSnake[j];
-            const distance = Math.sqrt(Math.pow(bullet.x - segment.x, 2) + Math.pow(bullet.y - segment.y, 2));
+        if (distance < (20 + bullet.size) / 2) {
+            // 击中目标
+            bullets.splice(bulletIndex, 1);
             
-            if (distance < (20 + bullet.size) / 2) {
-                // 击中目标
-                bullets.splice(i, 1);
-                
-                // 如果目标有免疫效果，则不造成伤害
-                if ((targetSnakeId === 'snake1' && immunity.snake1) || 
-                    (targetSnakeId === 'snake2' && immunity.snake2)) {
-                    showNotice('免疫子弹!', '#FFFF00', segment.x, segment.y);
-                    createParticles(segment.x + 10, segment.y + 10, 15, '#FFFF00');
-                } 
-                // 如果是坚硬蛇，有50%概率免疫子弹伤害
-                else if ((targetSnakeId === 'snake1' && snakeTypes.snake1 === 'tough' && Math.random() < 0.5) ||
-                        (targetSnakeId === 'snake2' && snakeTypes.snake2 === 'tough' && Math.random() < 0.5)) {
-                    showNotice('坚硬免疫!', '#C0C0C0', segment.x, segment.y);
-                    createParticles(segment.x + 10, segment.y + 10, 15, '#C0C0C0');
-                }
-                else {
-                    // 造成0.5点伤害
-                    health[targetSnakeId] -= 0.5;
-                    updateHealthBars();
-                    
-                    // 显示伤害提示
-                    showNotice('-0.5HP', '#FF0000', segment.x, segment.y);
-                    createParticles(segment.x + 10, segment.y + 10, 20, '#FF0000');
-                    
-                    // 检查游戏结束条件
-                    if (health.snake1 <= 0 || health.snake2 <= 0) {
-                        deathCause[targetSnakeId] = '被子弹击中';
-                        gameOver();
-                    }
-                }
-                break;
+            // 如果目标有免疫效果，则不造成伤害
+            if ((targetSnakeId === 'snake1' && immunity.snake1) || 
+                (targetSnakeId === 'snake2' && immunity.snake2)) {
+                showNotice('免疫子弹!', '#FFFF00', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 15, '#FFFF00');
+            } 
+            // 如果是坚硬蛇，有50%概率免疫子弹伤害
+            else if ((targetSnakeId === 'snake1' && snakeTypes.snake1 === 'tough' && Math.random() < 0.5) ||
+                    (targetSnakeId === 'snake2' && snakeTypes.snake2 === 'tough' && Math.random() < 0.5)) {
+                showNotice('坚硬免疫!', '#C0C0C0', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 15, '#C0C0C0');
             }
+            else {
+                // 造成0.5点伤害
+                health[targetSnakeId] -= 0.5;
+                updateHealthBars();
+                
+                // 显示伤害提示
+                showNotice('-0.5HP', '#FF0000', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 20, '#FF0000');
+                
+                // 检查游戏结束条件
+                if (health[targetSnakeId] <= 0) {
+                    deathCause[targetSnakeId] = '被子弹击中';
+                    gameOver();
+                }
+            }
+            break;
+        }
+    }
+}
+
+// 修改后的moveBullets函数
+function moveBullets(timestamp) {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const bullet = bullets[i];
+        
+        // 根据子弹类型移动
+        if (bullet.player.startsWith('base_')) {
+            // 基地子弹：按角度移动
+            bullet.x += Math.cos(bullet.angle) * bullet.speed;
+            bullet.y += Math.sin(bullet.angle) * bullet.speed;
+        } else {
+            // 蛇子弹：按方向移动
+            switch (bullet.direction) {
+                case 'up':
+                    bullet.y -= bullet.speed;
+                    break;
+                case 'down':
+                    bullet.y += bullet.speed;
+                    break;
+                case 'left':
+                    bullet.x -= bullet.speed;
+                    break;
+                case 'right':
+                    bullet.x += bullet.speed;
+                    break;
+            }
+        }
+        
+        // 检查是否超出边界
+        const boardWidth = gameBoard.clientWidth;
+        const boardHeight = gameBoard.clientHeight;
+        
+        if (bullet.x < 0 || bullet.x >= boardWidth || 
+            bullet.y < 0 || bullet.y >= boardHeight) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        
+        // 检查是否击中墙
+        let hitWall = false;
+        for (const wall of walls) {
+            for (const segment of wall.segments) {
+                const distance = Math.sqrt(
+                    Math.pow(bullet.x - segment.x - 10, 2) + 
+                    Math.pow(bullet.y - segment.y - 10, 2)
+                );
+                
+                if (distance < 15) {
+                    hitWall = true;
+                    createParticles(bullet.x, bullet.y, 5, '#FFFFFF');
+                    break;
+                }
+            }
+            if (hitWall) break;
+        }
+        
+        if (hitWall) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        
+        // 检查是否击中蛇
+        if (bullet.player.startsWith('base_')) {
+            // 基地子弹检查
+            const targetSnakeId = bullet.player === 'base_player1' ? 'snake2' : 'snake1';
+            checkBaseBulletHit(bullet, targetSnakeId, i);
+        } else {
+            // 蛇子弹检查
+            const targetSnakeId = bullet.player === 'snake1' ? 'snake2' : 'snake1';
+            checkSnakeBulletHit(bullet, targetSnakeId, i);
+        }
+        
+        // 检查是否击中基地
+        if (!bullet.player.startsWith('base_')) { // 只有蛇子弹可以伤害基地
+            checkBulletHitHome(bullet, i);
+        }
+    }
+}
+
+// 新增函数：检查子弹是否击中基地（从原checkBulletHitHome分离）
+function checkBulletHitHome(bullet, bulletIndex) {
+    // 根据子弹所属玩家确定目标基地
+    const targetHome = bullet.player === 'snake1' ? homes.player2 : homes.player1;
+    
+    // 如果目标基地已被摧毁，跳过检查
+    if (targetHome.destroyed) return false;
+    
+    // 检查子弹是否在基地的范围内
+    if (bullet.x >= targetHome.x && 
+        bullet.x <= targetHome.x + targetHome.width &&
+        bullet.y >= targetHome.y && 
+        bullet.y <= targetHome.y + targetHome.height) {
+        
+        // 检查目标基地所属玩家是否有免疫效果
+        const targetSnakeId = bullet.player === 'snake1' ? 'snake2' : 'snake1';
+        const hasImmunity = (targetSnakeId === 'snake1' && immunity.snake1) || 
+                           (targetSnakeId === 'snake2' && immunity.snake2);
+        
+        if (!hasImmunity) {
+            // 没有免疫效果：子弹对基地造成伤害
+            targetHome.health = Math.max(0, targetHome.health - 2);
+            
+            // 显示伤害效果
+            showNotice('-2HP', bullet.player === 'snake1' ? '#FF5722' : '#2196F3', 
+                     targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
+            
+            // 创建击中效果
+            createParticles(bullet.x, bullet.y, 15, bullet.player === 'snake1' ? '#FF5722' : '#2196F3');
+            
+            // 移除子弹
+            bullets.splice(bulletIndex, 1);
+            
+        } else {
+            // 有免疫效果：显示免疫提示
+            showNotice('免疫子弹伤害!', '#FFFF00', 
+                     targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
+            
+            // 创建免疫效果
+            createParticles(bullet.x, bullet.y, 15, '#FFFF00');
+        }
+        
+        // 检查基地是否被摧毁（无论是否有免疫）
+        if (targetHome.health <= 0) {
+            targetHome.destroyed = true;
+            const playerName = bullet.player === 'snake1' ? 
+                (localStorage.getItem('player2_username') || '玩家2') : 
+                (localStorage.getItem('username') || '玩家1');
+            
+            showNotice(`${playerName}的基地被摧毁了!`, '#FF0000', 
+                     targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
+            
+            // 基地被摧毁的大爆炸效果
+            createParticles(
+                targetHome.x + targetHome.width/2,
+                targetHome.y + targetHome.height/2,
+                40,
+                bullet.player === 'snake1' ? '#2196F3' : '#FF5722'
+            );
+        }
+        
+        return true; // 子弹已击中目标
+    }
+    
+    return false; // 子弹未击中
+}
+function checkBaseBulletHit(bullet, targetSnakeId, bulletIndex) {
+    const targetSnake = snakes[targetSnakeId];
+    
+    for (let j = 0; j < targetSnake.length; j++) {
+        const segment = targetSnake[j];
+        const distance = Math.sqrt(
+            Math.pow(bullet.x - segment.x - 10, 2) + 
+            Math.pow(bullet.y - segment.y - 10, 2)
+        );
+        
+        if (distance < (20 + bullet.size) / 2) {
+            // 击中目标
+            bullets.splice(bulletIndex, 1);
+            
+            // 检查目标是否有免疫效果
+            if ((targetSnakeId === 'snake1' && immunity.snake1) || 
+                (targetSnakeId === 'snake2' && immunity.snake2)) {
+                showNotice('免疫基地子弹!', '#FFFF00', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 15, '#FFFF00');
+            } 
+            // 如果是坚硬蛇，有50%概率免疫子弹伤害
+            else if ((targetSnakeId === 'snake1' && snakeTypes.snake1 === 'tough' && Math.random() < 0.5) ||
+                    (targetSnakeId === 'snake2' && snakeTypes.snake2 === 'tough' && Math.random() < 0.5)) {
+                showNotice('坚硬免疫!', '#C0C0C0', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 15, '#C0C0C0');
+            }
+            else {
+                // 造成1点伤害
+                health[targetSnakeId] -= bullet.damage;
+                updateHealthBars();
+                
+                // 显示伤害提示
+                showNotice('-1HP', bullet.player === 'base_player1' ? '#FF5722' : '#2196F3', segment.x, segment.y);
+                createParticles(segment.x + 10, segment.y + 10, 15, bullet.player === 'base_player1' ? '#FF5722' : '#2196F3');
+                
+                // 检查游戏结束条件
+                if (health[targetSnakeId] <= 0) {
+                    deathCause[targetSnakeId] = '被基地防御系统击杀';
+                    gameOver();
+                }
+            }
+            break;
         }
     }
 }
@@ -4828,10 +5722,10 @@ function gameOver() {
                         border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
                     ">
                         <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-                            <i class="fas fa-skull-crossbones"></i> 失败分析
+                            <i class="fas fa-skull-crossbones"></i> 失败原因
                         </div>
                         <div style="font-size: 18px; font-weight: bold; color: white;">
-                            ${loserName} ${loserCause}
+                            ${loserName}${loserCause}
                         </div>
                         <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
                             血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
