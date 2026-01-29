@@ -1533,9 +1533,9 @@
             <div id="records-modal" class="modal">
             <div class="modal-content" style="max-width: 800px;">
                 <span class="close-modal">&times;</span>
-                <h2>玩基地对战记录</h2>
+                <h2>玩家对战记录</h2>
                 <div class="search-controls">
-                    <input type="text" id="search-username" placeholder="搜索玩基地...">
+                    <input type="text" id="search-username" placeholder="搜索玩家...">
                     <button id="refresh-records">刷新</button>
                 </div>
                 <div id="records-container"></div>
@@ -1547,11 +1547,11 @@
             <button class="start-btn">开始游戏</button>
             <div class="instructions">
                 <p>两条蛇各有10点生命值，撞到对方蛇身会扣血并缩短</p>
-                <p>活到最后的玩基地获胜！</p>
+                <p>活到最后的玩家获胜！</p>
                 
                 <div class="player-instructions">
                     <div class="player-instruction player-1-instruction">
-                        <h3><i class="fas fa-fire"></i> 玩基地1 (橙色)</h3>
+                        <h3><i class="fas fa-fire"></i> 玩家1 (橙色)</h3>
                         <p>使用WASD控制</p>
                         <div>
                             <div class="key">W</div>
@@ -1562,7 +1562,7 @@
                     </div>
                     
                     <div class="player-instruction player-2-instruction">
-                        <h3><i class="fas fa-tint"></i> 玩基地2 (蓝色)</h3>
+                        <h3><i class="fas fa-tint"></i> 玩家2 (蓝色)</h3>
                         <p>使用方向键控制</p>
                         <div>
                             <div class="key">↑</div>
@@ -1599,7 +1599,7 @@
         <div class="score-board">
             <div class="player-score player-1">
                 <div class="score-display">
-                    <span class="player-name" id="player1-name">玩基地1: </span>
+                    <span class="player-name" id="player1-name">玩家1: </span>
                     <span class="score-text" id="score-1">0分</span>
                 </div>
                 <div class="health-display">
@@ -1612,7 +1612,7 @@
             </div>
             <div class="player-score player-2">
                 <div class="score-display">
-                    <span class="player-name" id="player2-name">玩基地2: </span>
+                    <span class="player-name" id="player2-name">玩家2: </span>
                     <span class="score-text" id="score-2">0分</span>
                 </div>
                 <div class="health-display">
@@ -1625,7 +1625,7 @@
             </div>
         </div>
         <div class="ball-storage player-1-storage">
-            <div id ="storage-title1" class="storage-title">玩基地1储存:</div>
+            <div id ="storage-title1" class="storage-title">玩家1储存:</div>
             <div class="ball-slot" id="p1-slot-1"><span class="key-hint">1</span></div>
             <div class="ball-slot" id="p1-slot-2"><span class="key-hint">2</span></div>
             <div class="ball-slot" id="p1-slot-3"><span class="key-hint">3</span></div>
@@ -1634,7 +1634,7 @@
         </div>
         
         <div class="ball-storage player-2-storage">
-            <div id ="storage-title2" class="storage-title">玩基地2储存:</div>
+            <div id ="storage-title2" class="storage-title">玩家2储存:</div>
             <div class="ball-slot" id="p2-slot-1"><span class="key-hint">6</span></div>
             <div class="ball-slot" id="p2-slot-2"><span class="key-hint">7</span></div>
             <div class="ball-slot" id="p2-slot-3"><span class="key-hint">8</span></div>
@@ -1647,7 +1647,7 @@
             
             <div class="player-selections">
 <div class="player-selection">
-    <div class="player-label" id="player-label1">玩基地1 (橙色)</div>
+    <div class="player-label" id="player-label1">玩家1 (橙色)</div>
     <div class="snake-options">
         <div class="snake-option speed-snake" data-player="1" data-type="speed">
             <div class="snake-type" style="color: #FFD700;">
@@ -1682,7 +1682,7 @@
 </div>
 
 <div class="player-selection">
-    <div class="player-label" id="player-label2">玩基地2 (蓝色)</div>
+    <div class="player-label" id="player-label2">玩家2 (蓝色)</div>
     <div class="snake-options">
         <div class="snake-option speed-snake" data-player="2" data-type="speed">
             <div class="snake-type" style="color: #FFD700;">
@@ -1807,6 +1807,10 @@ let lastWallHitTime = {
 snake1: 0,
 snake2: 0
 };
+let deathCause = {
+    snake1: null,
+    snake2: null
+};
 // 游戏变量中添加
 let volcanoes = [];
 let lavaTiles = [];
@@ -1825,6 +1829,7 @@ let speedBoosts = {
     snake1: 0,
     snake2: 0
 };
+
 const gameBoard = document.getElementById('game-board');
 const startBtn = document.querySelector('.start-btn');
 const restartBtn = document.querySelector('.restart-btn');
@@ -1880,7 +1885,7 @@ function initHomes() {
     const homeWidth = 250;
     const homeHeight = 200;
     
-    // 玩基地1的基地在左上角
+    // 玩家1的基地在左上角
     homes.player1 = {
         x: 20,
         y: 110, // 避开计分板
@@ -1893,7 +1898,7 @@ function initHomes() {
         lastDamageTime: 0
     };
     
-    // 玩基地2的基地在右下角
+    // 玩家2的基地在右下角
     homes.player2 = {
         x: boardWidth - homeWidth - 20,
         y: boardHeight - homeHeight - 80, // 避开底部UI
@@ -1906,12 +1911,17 @@ function initHomes() {
         lastDamageTime: 0
     };
 }
-        // 绘制基地
+function resetDeathCauses() {
+    deathCause = {
+        snake1: null,
+        snake2: null
+    };
+}           // 绘制基地
 function drawHomes() {
     // 移除现有的基地元素
     document.querySelectorAll('.home-base').forEach(el => el.remove());
     
-    // 绘制玩基地1的基地
+    // 绘制玩家1的基地
     if (!homes.player1.destroyed) {
         const home1 = document.createElement('div');
         home1.className = `home-base player1 ${homes.player1.health < homes.player1.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
@@ -1923,7 +1933,7 @@ function drawHomes() {
         
         // 添加基地的图标和名称
         const name1 = document.createElement('div');
-        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩基地1'}的基地`;
+        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩家1'}的基地`;
         name1.style.textAlign = 'center';
         name1.style.marginTop = '15px';
         name1.style.fontSize = '14px';
@@ -1949,7 +1959,7 @@ function drawHomes() {
         gameBoard.appendChild(home1);
     }
     
-    // 绘制玩基地2的基地
+    // 绘制玩家2的基地
     if (!homes.player2.destroyed) {
         const home2 = document.createElement('div');
         home2.className = `home-base player2 ${homes.player2.health < homes.player2.maxHealth * 0.3 ? 'home-under-attack' : ''}`;
@@ -1961,7 +1971,7 @@ function drawHomes() {
         
         // 添加基地的图标和名称
         const name2 = document.createElement('div');
-        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩基地2'}的基地`;
+        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩家2'}的基地`;
         name2.style.textAlign = 'center';
         name2.style.marginTop = '15px';
         name2.style.fontSize = '14px';
@@ -1992,16 +2002,16 @@ function drawHomes() {
 function initGame() {
     document.getElementById("back").style.display ="none"
     viewRecords.style.display = 'none';
-    const player1Name = localStorage.getItem('username') || '玩基地1';
+    const player1Name = localStorage.getItem('username') || '玩家1';
     document.getElementById('player1-name').textContent = player1Name + ': ';
-            
-    // 如果玩基地2已登录，设置其名称
-    const player2Name = localStorage.getItem('player2_username') || '玩基地2';
+    resetDeathCauses();        
+    // 如果玩家2已登录，设置其名称
+    const player2Name = localStorage.getItem('player2_username') || '玩家2';
     document.getElementById('player2-name').textContent = player2Name + ': '; 
-    document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)" || '玩基地1'
-    document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)" || '玩基地2'
-    document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:" || '玩基地1储存:'
-    document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"  || '玩基地2储存:'    
+    document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)" || '玩家1'
+    document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)" || '玩家2'
+    document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:" || '玩家1储存:'
+    document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"  || '玩家2储存:'    
     // 清除现有蛇和食物
     if (currentMap === 'snow') {
         document.body.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298, #7b4397)';
@@ -2383,7 +2393,7 @@ function clearBoard() {
 
 // 添加更新储存显示的函数
 function updateStorageDisplay() {
-    // 更新玩基地1的储存显示
+    // 更新玩家1的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p1-slot-${i+1}`);
         if (i < ballStorage.snake1.length) {
@@ -2418,7 +2428,7 @@ function updateStorageDisplay() {
         }
     }
     
-    // 更新玩基地2的储存显示
+    // 更新玩家2的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p2-slot-${i+1}`);
         if (i < ballStorage.snake2.length) {
@@ -2453,7 +2463,7 @@ function updateStorageDisplay() {
     }
 }
     
-    // 更新玩基地2的储存显示
+    // 更新玩家2的储存显示
     for (let i = 0; i < 5; i++) {
         const slot = document.getElementById(`p2-slot-${i+1}`);
         if (i < ballStorage.snake2.length) {
@@ -2832,6 +2842,7 @@ function handleHomes(timestamp) {
                     
                     // 检查自己是否死亡
                     if (health[snakeId] <= 0) {
+                        deathCause[snakeId] = '在对方家中致死';
                         gameOver();
                     }
                 } else {
@@ -2856,8 +2867,8 @@ function handleHomes(timestamp) {
                 if (homes[opponentNum].health <= 0) {
                     homes[opponentNum].destroyed = true;
                     const playerName = opponentNum === 'player1' ? 
-                        (localStorage.getItem('username') || '玩基地1') : 
-                        (localStorage.getItem('player2_username') || '玩基地2');
+                        (localStorage.getItem('username') || '玩家1') : 
+                        (localStorage.getItem('player2_username') || '玩家2');
                     
                     showNotice(`${playerName}的基地被摧毁了!`, '#FF0000', 
                              homes[opponentNum].x + homes[opponentNum].width/2, 
@@ -2952,11 +2963,6 @@ requestAnimationFrame(gameLoop);
         lastMoveTime.snake2 = timestamp;
     }
     
-    // 检查游戏结束条件
-    if (health.snake1 <= 0 || health.snake2 <= 0) {
-        gameOver();
-        return;
-    }
     
     // 检查墙碰撞
     checkWallCollisions(timestamp);
@@ -3274,7 +3280,7 @@ function handleVolcanoEruption(timestamp) {
         setTimeout(() => {
             isErupting = false;
             lavaTiles = [];
-            nextEruptionTime = timestamp + 30000; // 30秒后下次喷发
+            nextEruptionTime = timestamp + 1; // 30秒后下次喷发
         }, 10000);
     }
     
@@ -3324,31 +3330,54 @@ function generateLava() {
 function checkLavaDamage(timestamp) {
     for (const snakeId in snakes) {
         const head = snakes[snakeId][0];
+        const headGridX = Math.floor(head.x / 20) * 20;
+        const headGridY = Math.floor(head.y / 20) * 20;
         
         for (const lava of lavaTiles) {
-            if (head.x === lava.x && head.y === lava.y) {
+            // 精确网格对齐检查
+            if (headGridX === lava.x && headGridY === lava.y) {
                 // 检查是否有免疫效果
                 const isImmune = (snakeId === 'snake1' && immunity.snake1) || 
                                 (snakeId === 'snake2' && immunity.snake2);
                 
-                // 每秒造成2点伤害（免疫状态下不受伤害）
-                if (timestamp - lava.spawnTime > 1000 && !isImmune) {
-                    health[snakeId] -= 2;
-                    updateHealthBars();
-                    
-                    // 显示伤害提示
-                    showNotice('-2HP', '#FF4500', head.x, head.y);
-                    
-                    // 检查游戏结束
-                    if (health[snakeId] <= 0) {
-                        gameOver();
+                // 检查是否移动到这个岩浆格（避免重复伤害）
+                const lastMove = lastMoveTime[snakeId];
+                const justMovedToLava = timestamp - lastMove < 200; // 200ms内移动过来的
+                
+                // 只在以下情况掉血：
+                // 1. 没有免疫效果
+                // 2. 刚刚移动到这个岩浆格
+                if (!isImmune && justMovedToLava) {
+                    // 检查距离上次伤害是否超过1秒（避免重复伤害）
+                    const lastDamageTime = lava.lastDamageTime || 0;
+                    if (timestamp - lastDamageTime > 1000) {
+                        health[snakeId] -= 2;
+                        updateHealthBars();
+                        
+                        // 显示伤害提示
+                        showNotice('-2HP', '#FF4500', head.x, head.y);
+                        
+                        // 记录伤害时间
+                        lava.lastDamageTime = timestamp;
+                        
+                        // 检查游戏结束
+                        if (health[snakeId] <= 0) {
+                            deathCause[snakeId] = '被岩浆烧死';
+                            gameOver();
+                        }
                     }
-                    
-                    lava.spawnTime = timestamp;
                 } else if (isImmune) {
                     // 显示免疫提示
                     showNotice('免疫岩浆!', '#FFFF00', head.x, head.y);
                 }
+                
+                // 更新岩浆接触时间（用于触发效果）
+                if (!lava.lastContactTime || timestamp - lava.lastContactTime > 500) {
+                    // 创建接触特效
+                    createParticles(head.x + 10, head.y + 10, 5, '#FF4500');
+                    lava.lastContactTime = timestamp;
+                }
+                
                 break;
             }
         }
@@ -3428,6 +3457,7 @@ function checkWallCollisions(timestamp) {
                         
                         // 检查游戏结束（只在非免疫状态下）
                         if (!immunity[snakeId] && health[snakeId] <= 0) {
+                            deathCause[snakeId] = '撞墙致死';
                             gameOver();
                         }
                     }
@@ -3484,13 +3514,13 @@ wallStyle.textContent = `
 `;
 document.head.appendChild(wallStyle);
 function updateMagicSnakeTimers(timestamp) {
-    // 检查玩基地1是否是魔法蛇
+    // 检查玩家1是否是魔法蛇
     if (snakeTypes.snake1 === 'magic' && timestamp - magicSnakeTimers.snake1 > 20000) {
         generateMagicBall('snake1');
         magicSnakeTimers.snake1 = timestamp;
     }
     
-    // 检查玩基地2是否是魔法蛇
+    // 检查玩家2是否是魔法蛇
     if (snakeTypes.snake2 === 'magic' && timestamp - magicSnakeTimers.snake2 > 20000) {
         generateMagicBall('snake2');
         magicSnakeTimers.snake2 = timestamp;
@@ -3558,7 +3588,7 @@ function drawBullets() {
         bulletElement.style.left = `${bullet.x}px`;
         bulletElement.style.top = `${bullet.y}px`;
         
-        // 根据玩基地设置子弹颜色
+        // 根据玩家设置子弹颜色
         if (bullet.player === 'snake1') {
             bulletElement.style.background = 'linear-gradient(45deg, #FF5722, #FF9800)';
             bulletElement.style.boxShadow = '0 0 5px #FF5722';
@@ -3571,7 +3601,7 @@ function drawBullets() {
     });
 }
 function checkBulletHitHome(bullet) {
-    // 根据子弹所属玩基地确定目标基地
+    // 根据子弹所属玩家确定目标基地
     const targetHome = bullet.player === 'snake1' ? homes.player2 : homes.player1;
     
     // 如果目标基地已被摧毁，跳过检查
@@ -3597,8 +3627,8 @@ function checkBulletHitHome(bullet) {
         if (targetHome.health <= 0) {
             targetHome.destroyed = true;
             const playerName = bullet.player === 'snake1' ? 
-                (localStorage.getItem('player2_username') || '玩基地2') : 
-                (localStorage.getItem('username') || '玩基地1');
+                (localStorage.getItem('player2_username') || '玩家2') : 
+                (localStorage.getItem('username') || '玩家1');
             
             showNotice(`${playerName}的基地被摧毁了!`, '#FF0000', 
                      targetHome.x + targetHome.width/2, targetHome.y + targetHome.height/2);
@@ -3791,6 +3821,7 @@ function moveBullets(timestamp) {
                     
                     // 检查游戏结束条件
                     if (health.snake1 <= 0 || health.snake2 <= 0) {
+                        deathCause[targetSnakeId] = '被子弹击中';
                         gameOver();
                     }
                 }
@@ -3886,85 +3917,132 @@ function moveSnake(snakeId) {
     const isOtherImmune = (otherSnakeId === 'snake1' && immunity.snake1) || 
                          (otherSnakeId === 'snake2' && immunity.snake2);
     
-// 在 moveSnake 函数中修改碰撞处理部分
-        if (collisionResult.collided) {
-            if (collisionResult.isHeadCollision) {
-                // 蛇头相撞处理
-                if (!isImmune && !isOtherImmune) {
-                    // 双方都没有免疫，都扣血
-                    // 如果是坚硬蛇，造成双倍伤害
-                    const damage1 = snakeTypes.snake1 === 'tough' ? 5 : 1;
-                    const damage2 = snakeTypes.snake2 === 'tough' ? 5 : 1;
-                    
-                    health.snake1 -= damage2;
-                    health.snake2 -= damage1;
-                    updateHealthBars();
-                    
-                    // 双方碰撞特效
-                    createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
-                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
-                    
-                    // 显示双方伤害提示
-                    showNotice(`-${damage1}HP`, '#FF0000', head.x, head.y);
-                    showNotice(`-${damage2}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
-                } else if (isImmune && !isOtherImmune) {
-                    // 只有当前蛇有免疫，只扣对方血
-                    const damage = snakeTypes[otherSnakeId] === 'tough' ? 2 : 1;
-                    health[otherSnakeId] -= damage;
-                    updateHealthBars();
-                    
-                    // 显示免疫提示和伤害提示
-                    showNotice('免疫!', '#FFFF00', head.x, head.y);
-                    showNotice(`-${damage}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
-                    
-                    // 特效
-                    createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
-                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
-                } else if (!isImmune && isOtherImmune) {
-                    // 只有对方蛇有免疫，只扣当前蛇血
-                    const damage = snakeTypes[snakeId] === 'tough' ? 2 : 1;
-                    health[snakeId] -= damage;
-                    updateHealthBars();
-                    
-                    // 显示免疫提示和伤害提示
-                    showNotice(`-${damage}HP`, '#FF0000', head.x, head.y);
-                    showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
-                    
-                    // 特效
-                    createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
-                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
-                } else {
-                    // 双方都有免疫，都不扣血
-                    showNotice('免疫!', '#FFFF00', head.x, head.y);
-                    showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
-                    
-                    // 特效
-                    createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
-                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
-                }
-            } else if (!isImmune) {
-                // 普通碰撞：撞的蛇扣血，被撞的蛇截断
+    // 在 moveSnake 函数中修改碰撞处理部分
+    if (collisionResult.collided) {
+        if (collisionResult.isHeadCollision) {
+            // 蛇头相撞处理
+            if (!isImmune && !isOtherImmune) {
+                // 双方都没有免疫，都扣血
                 // 如果是坚硬蛇，造成双倍伤害
+                const damage1 = snakeTypes.snake1 === 'tough' ? 5 : 1;
+                const damage2 = snakeTypes.snake2 === 'tough' ? 5 : 1;
+                
+                health.snake1 -= damage2;
+                health.snake2 -= damage1;
+                updateHealthBars();
+                
+                // 双方碰撞特效
+                createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
+                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
+                
+                // 显示双方伤害提示
+                showNotice(`-${damage1}HP`, '#FF0000', head.x, head.y);
+                showNotice(`-${damage2}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                
+                // 检查是否死亡并记录原因
+                if (health.snake1 <= 0) {
+                    deathCause.snake1 = '蛇头相撞而死';
+                    if (damage2 === 5) {
+                        deathCause.snake1 += ' (被坚硬蛇撞死)';
+                    }
+                    gameOver();
+                }
+                if (health.snake2 <= 0) {
+                    deathCause.snake2 = '蛇头相撞而死';
+                    if (damage1 === 5) {
+                        deathCause.snake2 += ' (被坚硬蛇撞死)';
+                    }
+                    gameOver();
+                }
+                
+            } else if (isImmune && !isOtherImmune) {
+                // 只有当前蛇有免疫，只扣对方血
+                const damage = snakeTypes[otherSnakeId] === 'tough' ? 2 : 1;
+                health[otherSnakeId] -= damage;
+                updateHealthBars();
+                
+                // 显示免疫提示和伤害提示
+                showNotice('免疫!', '#FFFF00', head.x, head.y);
+                showNotice(`-${damage}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                
+                // 特效
+                createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
+                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
+                
+                // 检查对方是否死亡
+                if (health[otherSnakeId] <= 0) {
+                    deathCause[otherSnakeId] = '蛇头相撞而死 (对方免疫)';
+                    if (damage === 2) {
+                        deathCause[otherSnakeId] += ' (被坚硬蛇撞死)';
+                    }
+                    gameOver();
+                }
+                
+            } else if (!isImmune && isOtherImmune) {
+                // 只有对方蛇有免疫，只扣当前蛇血
                 const damage = snakeTypes[snakeId] === 'tough' ? 2 : 1;
                 health[snakeId] -= damage;
                 updateHealthBars();
                 
-                // 被撞的蛇从碰撞点开始截断
-                snakes[otherSnakeId] = snakes[otherSnakeId].slice(0, collisionResult.collisionIndex);
+                // 显示免疫提示和伤害提示
+                showNotice(`-${damage}HP`, '#FF0000', head.x, head.y);
+                showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
                 
-                // 碰撞特效
-                createParticles(head.x + 10, head.y + 10, 20, snakeId === 'snake1' ? '#FF5722' : '#2196F3');
+                // 特效
+                createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
+                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
                 
-                // 显示伤害提示
-                showNotice(`-${damage}HP`, snakeId === 'snake1' ? '#FF5722' : '#2196F3', head.x, head.y);
+                // 检查自己是否死亡
+                if (health[snakeId] <= 0) {
+                    deathCause[snakeId] = '蛇头相撞而死 (对方免疫)';
+                    if (damage === 2) {
+                        deathCause[snakeId] += ' (被坚硬蛇撞死)';
+                    }
+                    gameOver();
+                }
+                
             } else {
-                // 如果有免疫效果，显示免疫提示，不扣血
+                // 双方都有免疫，都不扣血
                 showNotice('免疫!', '#FFFF00', head.x, head.y);
+                showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                
+                // 特效
                 createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
+                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
             }
+        } else if (!isImmune) {
+            // 普通碰撞：撞的蛇扣血，被撞的蛇截断
+            // 如果是坚硬蛇，造成双倍伤害
+            const damage = snakeTypes[snakeId] === 'tough' ? 2 : 1;
+            health[snakeId] -= damage;
+            updateHealthBars();
+            
+            // 被撞的蛇从碰撞点开始截断
+            snakes[otherSnakeId] = snakes[otherSnakeId].slice(0, collisionResult.collisionIndex);
+            
+            // 碰撞特效
+            createParticles(head.x + 10, head.y + 10, 20, snakeId === 'snake1' ? '#FF5722' : '#2196F3');
+            
+            // 显示伤害提示
+            showNotice(`-${damage}HP`, snakeId === 'snake1' ? '#FF5722' : '#2196F3', head.x, head.y);
+            
+            // 检查自己是否死亡
+            if (health[snakeId] <= 0) {
+                if (snakeTypes[snakeId] === 'tough' && damage === 2) {
+                    deathCause[snakeId] = '撞到对方蛇身而死 (坚硬蛇)';
+                } else {
+                    deathCause[snakeId] = '撞到对方蛇身而死';
+                }
+                gameOver();
+            }
+            
+        } else {
+            // 如果有免疫效果，显示免疫提示，不扣血
+            showNotice('免疫!', '#FFFF00', head.x, head.y);
+            createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
         }
+    }
     
-    // 检查是否吃到食物（使用距离判断）
     // 检查是否吃到食物（使用距离判断）
     let ateFood = false;
     for (let i = 0; i < foods.length; i++) {
@@ -3983,7 +4061,7 @@ function moveSnake(snakeId) {
                 updateScoreDisplay();
                 
                 // 特殊食物储存为随机特殊球
-                const specialTypes = ['immunity', 'health', 'reverse',"bomb"];
+                const specialTypes = ['immunity', 'health', 'reverse'];
                 const randomType = specialTypes[Math.floor(Math.random() * specialTypes.length)];
                 
                 if (ballStorage[snakeId].length < 5) {
@@ -4338,6 +4416,7 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
         // 更新血条并检查游戏结束
         updateHealthBars();
         if (health[targetSnakeId] <= 0) {
+            deathCause[targetSnakeId] = '被炸弹炸死';
             gameOver();
         }
     } else if (totalDamage > 0 && hasImmunity) {
@@ -4409,8 +4488,8 @@ function applyBombDamageToHomes(snakeId, explosionCenter) {
         if (otherHome.health <= 0) {
             otherHome.destroyed = true;
             const playerName = otherHomeId === 'player1' ? 
-                (localStorage.getItem('username') || '玩基地1') : 
-                (localStorage.getItem('player2_username') || '玩基地2');
+                (localStorage.getItem('username') || '玩家1') : 
+                (localStorage.getItem('player2_username') || '玩家2');
             
             showNotice(`${playerName}的基地被炸毁了!`, '#FF0000', homeCenter.x, homeCenter.y);
             
@@ -4564,7 +4643,92 @@ function showNotice(text, color, x, y) {
         notice.remove();
     }, 1000);
 }
+function getDeathCause(snakeId) {
+    // 如果没有直接记录，尝试分析原因
+    if (deathCause[snakeId]) {
+        return deathCause[snakeId];
+    }
+    
+    // 分析可能的死亡原因
+    const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
+    
+    // 检查血量
+    if (health[snakeId] <= 0) {
+        if (health[otherSnakeId] > 0) {
+            // 只有自己死了
+            return '未知原因死亡';
+        } else {
+            // 双方都死了
+            return '同归于尽';
+        }
+    }
+    
+    return '未知原因';
+}
 
+// 新增函数：生成详细的死亡分析
+function generateDeathAnalysis() {
+    const analysis = {
+        snake1: {
+            cause: deathCause.snake1 || '存活',
+            health: health.snake1,
+            score: scores.snake1,
+            type: snakeTypes.snake1 || '未选择'
+        },
+        snake2: {
+            cause: deathCause.snake2 || '存活',
+            health: health.snake2,
+            score: scores.snake2,
+            type: snakeTypes.snake2 || '未选择'
+        }
+    };
+    
+    return analysis;
+}
+const deathCauseStyle = document.createElement('style');
+deathCauseStyle.textContent = `
+    /* 死亡原因样式 */
+    .death-cause {
+        animation: fadeInDeath 1s ease-out;
+    }
+    
+    @keyframes fadeInDeath {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .death-info {
+        min-height: 18px;
+    }
+    
+    /* 不同类型的死亡图标 */
+    .death-cause[data-type="collision"] i {
+        color: #FF5722;
+    }
+    
+    .death-cause[data-type="bullet"] i {
+        color: #2196F3;
+    }
+    
+    .death-cause[data-type="bomb"] i {
+        color: #FF4500;
+    }
+    
+    .death-cause[data-type="wall"] i {
+        color: #555;
+    }
+    
+    .death-cause[data-type="home"] i {
+        color: #4CAF50;
+    }
+`;
+document.head.appendChild(deathCauseStyle);
 function gameOver() {
     gameOverScreen.style.display = '';
     gameStarted = false;
@@ -4589,6 +4753,12 @@ function gameOver() {
     document.getElementById("back").style.display = "block";
     viewRecords.style.display = 'block';
     gameOverScreen.classList.remove('show');
+        if (health.snake1 <= 0) {
+        deathCause.snake1 = getDeathCause('snake1');
+    }
+    if (health.snake2 <= 0) {
+        deathCause.snake2 = getDeathCause('snake2');
+    }
     document.getElementById("back").onclick = function(){ 
         if(!gameStarted){     
             gameOverScreen.classList.remove('show');
@@ -4599,8 +4769,8 @@ function gameOver() {
         }
     }
 
-    // 确定获胜者
     let winner = null;
+    let loser = null;
     let currentWin1 = 0;
     let currentWin2 = 0;
     
@@ -4608,10 +4778,12 @@ function gameOver() {
         winner = 'draw';
     } else if (health.snake1 <= 0) {
         winner = 'snake2';
-        currentWin2 = 1; // 标记玩基地2本次获胜
+        loser = 'snake1';
+        currentWin2 = 1;
     } else {
         winner = 'snake1';
-        currentWin1 = 1; // 标记玩基地1本次获胜
+        loser = 'snake2';
+        currentWin1 = 1;
     }
 
     // 获取服务器数据并显示
@@ -4619,6 +4791,11 @@ function gameOver() {
         // 只显示历史战绩，不包含本次结果
         let player1Wins = serverData?.player1Wins || 0;
         let player2Wins = serverData?.player2Wins || 0;
+        const deathAnalysis = generateDeathAnalysis();
+        const loserName = loser === 'snake1' ? 
+        localStorage.getItem('username') || '玩家1' : 
+        localStorage.getItem('player2_username') || '玩家2';
+        const loserCause = deathAnalysis[loser]?.cause || '未知原因';
         // 创建游戏结束界面
         gameOverScreen.innerHTML = `
             <div class="game-over-content">
@@ -4639,18 +4816,50 @@ function gameOver() {
                     `}
                 </div>
                 
+                <!-- 失败者死亡原因 -->
+                ${loser ? `
+                    <div class="death-cause" style="
+                        margin: 15px auto;
+                        padding: 10px;
+                        background: ${loser === 'snake1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
+                        border-radius: 10px;
+                        max-width: 400px;
+                        text-align: center;
+                        border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
+                    ">
+                        <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
+                            <i class="fas fa-skull-crossbones"></i> 失败分析
+                        </div>
+                        <div style="font-size: 18px; font-weight: bold; color: white;">
+                            ${loserName} ${loserCause}
+                        </div>
+                        <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
+                            血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <!-- 详细统计 -->
                 <div class="stats-container">
                     <div class="player-stats player-1-stats">
                         <div class="player-avatar">
                             <i class="fas fa-user" style="color: #FF5722;"></i>
                         </div>
-                        <div class="player-name">${localStorage.getItem("username") || "玩基地1"}</div>
+                        <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
+                        <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
+                            ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
+                              snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
+                              snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                        </div>
                         <div class="win-count">
                             <span class="history-wins">${player1Wins}</span>
                             ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
+                        </div>
+                        <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                            ${deathCause.snake1 ? `💀 ${deathCause.snake1}` : health.snake1 > 0 ? '👍 存活' : ''}
                         </div>
                     </div>
                     
@@ -4660,13 +4869,21 @@ function gameOver() {
                         <div class="player-avatar">
                             <i class="fas fa-user" style="color: #2196F3;"></i>
                         </div>
-                        <div class="player-name">${localStorage.getItem("player2_username") || "玩基地2"}</div>
+                        <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
+                        <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
+                            ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
+                              snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
+                              snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                        </div>
                         <div class="win-count">
                             <span class="history-wins">${player2Wins}</span>
                             ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
                         </div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
+                        </div>
+                        <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                            ${deathCause.snake2 ? `💀 ${deathCause.snake2}` : health.snake2 > 0 ? '👍 存活' : ''}
                         </div>
                     </div>
                 </div>
@@ -4682,6 +4899,7 @@ function gameOver() {
             </div>
         `;
 
+
         // 再来一局按钮事件
         document.getElementById('play-again').addEventListener('click', () => {
             gameOverScreen.classList.remove('show');
@@ -4689,7 +4907,7 @@ function gameOver() {
                 initGame();
             }, 300);
         });
-
+        resetDeathCauses();
         // 保存战绩按钮事件
         document.getElementById('save-record').addEventListener('click', () => {
             // 禁用按钮防止重复点击
@@ -5057,7 +5275,7 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     
-    // 玩基地2释放球体 (按键6-0)
+    // 玩家2释放球体 (按键6-0)
     if ((e.key >= '6' && e.key <= '9') || e.key === '0') {
         const slotIndex = e.key === '0' ? 4 : parseInt(e.key) - 6;
         releaseBall('snake2', slotIndex);
@@ -5065,18 +5283,18 @@ document.addEventListener('keydown', (e) => {
     }
     if (e.key === 'z' || e.key === 'Z') {
         pausedSnakes.snake1 = !pausedSnakes.snake1;
-        showNotice(pausedSnakes.snake1 ? '玩基地1已暂停' : '玩基地1已恢复', 
+        showNotice(pausedSnakes.snake1 ? '玩家1已暂停' : '玩家1已恢复', 
                   '#FF5722', snakes.snake1[0].x, snakes.snake1[0].y);
         return;
     }
     
     if (e.key === 'm' || e.key === 'M') {
         pausedSnakes.snake2 = !pausedSnakes.snake2;
-        showNotice(pausedSnakes.snake2 ? '玩基地2已暂停' : '玩基地2已恢复', 
+        showNotice(pausedSnakes.snake2 ? '玩家2已暂停' : '玩家2已恢复', 
                   '#2196F3', snakes.snake2[0].x, snakes.snake2[0].y);
         return;
     }    
-    // 处理玩基地1控制 (WASD)
+    // 处理玩家1控制 (WASD)
     if (reversedControls.snake1) {
         // 反向控制
         switch (e.key) {
@@ -5119,7 +5337,7 @@ document.addEventListener('keydown', (e) => {
         }
     }
     
-    // 处理玩基地2控制 (方向键)
+    // 处理玩家2控制 (方向键)
     if (reversedControls.snake2) {
         // 反向控制
         switch (e.key) {
@@ -5157,7 +5375,7 @@ document.addEventListener('keydown', (e) => {
 
 // 开始游戏按钮
 startBtn.addEventListener('click', () => {
-    const player1Name = localStorage.getItem('username') || '玩基地1';
+    const player1Name = localStorage.getItem('username') || '玩家1';
     document.getElementById('player1-name').textContent = player1Name + ': ';
     player2Name=localStorage.getItem("player2_username");
     if(!player2Name){
@@ -5222,7 +5440,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const player = this.getAttribute('data-player');
             const type = this.getAttribute('data-type');
             
-            // 移除同玩基地的其他选择
+            // 移除同玩家的其他选择
             document.querySelectorAll(`.snake-option[data-player="${player}"]`).forEach(opt => {
                 opt.classList.remove('selected');
             });
@@ -5233,7 +5451,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 保存选择
             snakeTypes[`snake${player}`] = type;
             
-            // 检查是否两位玩基地都已选择
+            // 检查是否两位玩家都已选择
             if (snakeTypes.snake1 && snakeTypes.snake2) {
                 startGameBtn.disabled = false;
             }
@@ -5268,11 +5486,11 @@ document.querySelector('.map-selection .start-game-btn').addEventListener('click
     }, 500);
 });});
 
-        // 添加玩基地2登录功能
+        // 添加玩家2登录功能
 function loginPlayer2() {
         document.querySelector('.map-selection .start-game-btn').style.display = 'none';
     swal({
-        title: "玩基地2登录",
+        title: "玩家2登录",
         text: "请输入用户名和密码",
         type: "input",
         inputType: "text",
@@ -5288,16 +5506,16 @@ function loginPlayer2() {
             return false;
         }
         
-        // 检查是否与玩基地1用户名相同
+        // 检查是否与玩家1用户名相同
         const player1Username = localStorage.getItem('username');
         if (player1Username && username === player1Username) {
-            swal.showInputError("用户名不能与玩基地1相同");
+            swal.showInputError("用户名不能与玩家1相同");
             return false;
         }
         
         // 第二步：询问密码
         swal({
-            title: "玩基地2登录",
+            title: "玩家2登录",
             text: "请输入密码",
             type: "input",
             inputType: "password",
@@ -5357,7 +5575,7 @@ function loginPlayer2() {
                                         document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:";
                                         document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:";
                                         document.querySelector('.map-selection .start-game-btn').style.display = "block";               
-                                        swal("登录成功", "玩基地2已登录", "success");
+                                        swal("登录成功", "玩家2已登录", "success");
                                     } else {
                                         // 显示错误信息
                                         console.log(data.message);
@@ -5406,7 +5624,7 @@ const snakeDetails = {
                 desc: "专注于高速移动，没有其他特殊能力" 
             }
         ],
-        tips: "适合喜欢快节奏、高操作的玩基地。利用速度优势快速包围对手。"
+        tips: "适合喜欢快节奏、高操作的玩家。利用速度优势快速包围对手。"
     },
     tough: {
         title: "坚硬蛇",
@@ -5433,7 +5651,7 @@ const snakeDetails = {
                 desc: "移动速度较慢" 
             }
         ],
-        tips: "适合稳健型玩基地。高生命值让你可以承受更多失误，但要注意子弹伤害不减。"
+        tips: "适合稳健型玩家。高生命值让你可以承受更多失误，但要注意子弹伤害不减。"
     },
     magic: {
         title: "魔法蛇",
@@ -5460,7 +5678,7 @@ const snakeDetails = {
                 desc: "自动获得一个随机特殊球(攻击40%/血球30%/无敌20%/反转10%)" 
             }
         ],
-        tips: "适合策略型玩基地。合理规划特殊球使用时机，效果延长让你更有优势。"
+        tips: "适合策略型玩家。合理规划特殊球使用时机，效果延长让你更有优势。"
     }
 };
 
