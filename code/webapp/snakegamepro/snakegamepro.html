@@ -5213,8 +5213,8 @@ function handleVolcanoEruption(timestamp) {
         setTimeout(() => {
             isErupting = false;
             lavaTiles = [];
-            nextEruptionTime = timestamp + 1; // 30秒后下次喷发
-        }, 10000);
+            nextEruptionTime = timestamp + 20; // 30秒后下次喷发
+        }, 15000);
     }
     
     // 检查岩浆伤害
@@ -6771,56 +6771,55 @@ function showGameStats() {
                 </div>
                 
                 <!-- 输出伤害统计 -->
-                <div class="stats-section">
-                    <div class="section-title">
-                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
-                        <span>输出伤害统计</span>
+    <div class="stats-section">
+        <div class="section-title">
+            <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+            <span>输出伤害统计</span>
+        </div>
+    <div class="stats-section">
+
+            <div class="stats-items">
+                ${gameStats.snake1.totalDamageDealt > 0 ? `
+                    <div class="stat-item">
+                        <span>总输出伤害:</span>
+                        <span style="color: #4CAF50;">${gameStats.snake1.totalDamageDealt.toFixed(1)}</span>
                     </div>
-                    <div class="stats-items">
-                        <div class="stat-item">
-                            <span>总输出伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake1.totalDamageDealt.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>蛇相撞伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.snakeCollision.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>子弹伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bullet.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>炸弹伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bomb.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>基地子弹伤害:</span>
-                            <span style="color: #4CAF50;">${(gameStats.snake1.damageDealt.base || 0).toFixed(1)}</span>
-                        </div>
-                    </div>
-                </div>
+                ` : ''}
                 
-                <!-- 承受伤害统计 -->
-                    <div class="stats-section">
-                    <div class="section-title">
-                        <i class="fas fa-bullseye" style="color: #FF5722;"></i>
-                        <span>伤害统计</span>
+                ${gameStats.snake1.damageDealt.snakeCollision > 0 ? `
+                    <div class="stat-item">
+                        <span>蛇相撞伤害:</span>
+                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.snakeCollision.toFixed(1)}</span>
                     </div>
-                    <div class="stats-items">
-                        <div class="stat-item">
-                            <span>原始伤害:</span>
-                            <span style="color: #ff8a65;">${gameStats.snake1.totalDamageReceived.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>实际伤害:</span>
-                            <span style="color: #ff6b6b;">${(gameStats.snake1.totalOriginalDamageReceived || 0).toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>减免伤害:</span>
-                            <span style="color: #4CAF50;">${((gameStats.snake1.totalOriginalDamageReceived || 0) - gameStats.snake1.totalDamageReceived).toFixed(1)}</span>
-                        </div>
+                ` : ''}
+                
+                ${gameStats.snake1.damageDealt.bullet > 0 ? `
+                    <div class="stat-item">
+                        <span>子弹伤害:</span>
+                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bullet.toFixed(1)}</span>
                     </div>
-                </div>
+                ` : ''}
+                
+                ${gameStats.snake1.damageDealt.bomb > 0 ? `
+                    <div class="stat-item">
+                        <span>炸弹伤害:</span>
+                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bomb.toFixed(1)}</span>
+                    </div>
+                ` : ''}
+                
+                ${(gameStats.snake1.damageDealt.base || 0) > 0 ? `
+                    <div class="stat-item">
+                        <span>基地子弹伤害:</span>
+                        <span style="color: #4CAF50;">${(gameStats.snake1.damageDealt.base || 0).toFixed(1)}</span>
+                    </div>
+                ` : ''}
+                
+                ${gameStats.snake1.totalDamageDealt <= 0 ? `
+                    <div class="stat-item">无输出伤害记录</div>
+                ` : ''}
+            </div>
+        </div>
+        </div>
                 
                 <!-- 防御统计 -->
                 <div class="stats-section">
@@ -6908,54 +6907,52 @@ function showGameStats() {
                 
                 <!-- 输出伤害统计 -->
                 <div class="stats-section">
-                    <div class="section-title">
-                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
-                        <span>输出伤害统计</span>
-                    </div>
-                    <div class="stats-items">
-                        <div class="stat-item">
-                            <span>总输出伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake2.totalDamageDealt.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>蛇相撞伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.snakeCollision.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>子弹伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bullet.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>炸弹伤害:</span>
-                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bomb.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>基地子弹伤害:</span>
-                            <span style="color: #4CAF50;">${(gameStats.snake2.damageDealt.base || 0).toFixed(1)}</span>
-                        </div>
-                    </div>
+    <div class="stats-section">
+        <div class="section-title">
+            <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+            <span>输出伤害统计</span>
+        </div>
+        <div class="stats-items">
+            ${gameStats.snake2.totalDamageDealt > 0 ? `
+                <div class="stat-item">
+                    <span>总输出伤害:</span>
+                    <span style="color: #4CAF50;">${gameStats.snake2.totalDamageDealt.toFixed(1)}</span>
                 </div>
-                
-                    <!-- 伤害统计 -->
-                <div class="stats-section">
-                    <div class="section-title">
-                        <i class="fas fa-bullseye" style="color: #2196F3;"></i>
-                        <span>伤害统计</span>
-                    </div>
-                    <div class="stats-items">
-                        <div class="stat-item">
-                            <span>原始伤害:</span>
-                            <span style="color: #64b5f6;">${gameStats.snake2.totalDamageReceived.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>实际伤害:</span>
-                            <span style="color: #ff6b6b;">${(gameStats.snake2.totalOriginalDamageReceived || 0).toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>减免伤害:</span>
-                            <span style="color: #4CAF50;">${((gameStats.snake2.totalOriginalDamageReceived || 0) - gameStats.snake2.totalDamageReceived).toFixed(1)}</span>
-                        </div>
-                    </div>
+            ` : ''}
+            
+            ${gameStats.snake2.damageDealt.snakeCollision > 0 ? `
+                <div class="stat-item">
+                    <span>蛇相撞伤害:</span>
+                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.snakeCollision.toFixed(1)}</span>
+                </div>
+            ` : ''}
+            
+            ${gameStats.snake2.damageDealt.bullet > 0 ? `
+                <div class="stat-item">
+                    <span>子弹伤害:</span>
+                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bullet.toFixed(1)}</span>
+                </div>
+            ` : ''}
+            
+            ${gameStats.snake2.damageDealt.bomb > 0 ? `
+                <div class="stat-item">
+                    <span>炸弹伤害:</span>
+                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bomb.toFixed(1)}</span>
+                </div>
+            ` : ''}
+            
+            ${(gameStats.snake2.damageDealt.base || 0) > 0 ? `
+                <div class="stat-item">
+                    <span>基地子弹伤害:</span>
+                    <span style="color: #4CAF50;">${(gameStats.snake2.damageDealt.base || 0).toFixed(1)}</span>
+                </div>
+            ` : ''}
+            
+            ${gameStats.snake2.totalDamageDealt <= 0 ? `
+                <div class="stat-item">无输出伤害记录</div>
+            ` : ''}
+        </div>
+    </div>
                 </div>
                 
                 <!-- 防御统计 -->
