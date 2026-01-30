@@ -7821,7 +7821,7 @@ if (e.key === '/' || e.key === '?') {
     }
     
     // 玩家2商店：.或>键打开/关闭
-    if (e.key === '.' || e.key === '>') {
+    if (e.key === '+' || e.key === '+') {
         openStore('snake2');
         e.preventDefault();
         return;
@@ -7909,7 +7909,7 @@ if (e.key === '/' || e.key === '?') {
         }
         
         // .或>键关闭商店
-        if (e.key === '.' || e.key === '>') {
+        if (e.key === '+' || e.key === '+') {
             closeStore('snake2');
             e.preventDefault();
             return;
