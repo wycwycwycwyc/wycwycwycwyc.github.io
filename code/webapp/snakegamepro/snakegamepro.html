@@ -812,7 +812,7 @@
 .modal {
     display: none;
     position: fixed;
-    z-index: 100;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -1504,9 +1504,460 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+/* 添加统计详情样式 */
+.stats-details {
+    animation: fadeInUp 0.8s ease-out;
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #FF5722 rgba(255,255,255,0.1);
+}
+
+.stats-details::-webkit-scrollbar {
+    width: 8px;
+}
+
+.stats-details::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.stats-details::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #FF5722, #2196F3);
+    border-radius: 4px;
+}
+
+.player-stats-detail {
+    transition: transform 0.3s, box-shadow 0.3s;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.player-stats-detail:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 移动统计样式 */
+.distance-stats {
+    margin-top: 10px;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(0, 188, 212, 0.2), rgba(0, 150, 136, 0.2));
+    border-radius: 8px;
+    border-left: 4px solid #00BCD4;
+}
+
+/* 伤害统计行样式 */
+.damage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    margin: 2px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.damage-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.damage-received .damage-row {
+    border-left: 3px solid #ff6b6b;
+}
+
+.damage-dealt .damage-row {
+    border-left: 3px solid #4CAF50;
+}
+
+/* 总计行样式 */
+.total-row {
+    font-weight: bold;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+}
+
+/* 游戏时间样式 */
+.game-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    background: rgba(255, 215, 0, 0.2);
+    border-radius: 20px;
+    margin-left: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+}
+
+/* 图标颜色 */
+.fa-shield-alt {
+    color: #FFA500;
+}
+
+.fa-crosshairs {
+    color: #4CAF50;
+}
+
+.fa-road {
+    color: #00BCD4;
+}
+
+.fa-fire {
+    color: #FF5722;
+}
+
+.fa-tint {
+    color: #2196F3;
+}        
+/* 统计模态框样式 */
+#game-stats-modal .modal-content {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.player-stats-box {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    border: 2px solid;
+}
+
+.player-stats-box.player1 {
+    border-color: #FF5722;
+}
+
+.player-stats-box.player2 {
+    border-color: #2196F3;
+}
+
+.stats-header {
+    text-align: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stats-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.stats-section {
+    margin-bottom: 15px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #FFD700;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.stats-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    font-size: 12px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.stat-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+}
+
+.game-time-display {
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+}
+
+.game-time-display i {
+    margin-right: 8px;
+    color: #FFD700;
+}
+/* 商店系统样式 */
+.store-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.store-container {
+    width: 400px;
+
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.store-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.store-header h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.store-player-name {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.store-player-name.player1 {
+    color: #FF9800;
+}
+
+.store-player-name.player2 {
+    color: #2196F3;
+}
+
+.store-score {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #FFD700;
+}
+
+.store-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.store-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.store-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.store-item.selected {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.2);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.store-item-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    margin-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.store-item-info {
+    flex: 1;
+}
+
+.store-item-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.store-item-desc {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.store-item-price {
+    font-size: 16px;
+    color: #FFD700;
+    display: flex;
+    align-items: center;
+}
+
+.store-item-price i {
+    margin-right: 5px;
+}
+
+.store-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.store-buy-btn {
+    padding: 12px 30px;
+    background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+.store-buy-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+}
+
+.store-buy-btn:disabled {
+    background: linear-gradient(45deg, #666, #888);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.store-hint {
+    font-size: 12px;
+    margin-top: 10px;
+    opacity: 0.7;
+    color: #aaa;
+}
+
+/* 玩家1商店位置 */
+.store-overlay.player1 {
+    justify-content: flex-start;
+}
+
+.store-overlay.player1 .store-container {
+    margin-left: 20px;
+}
+
+/* 玩家2商店位置 */
+.store-overlay.player2 {
+    justify-content: flex-end;
+}
+
+.store-overlay.player2 .store-container {
+    margin-right: 20px;
+}
+
+
     </style>
 </head>
 <body>
+    <div id="game-stats-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
+        <span class="close-modal" data-modal="game-stats-modal">&times;</span>
+        <h2><i class="fas fa-chart-bar"></i> 本局游戏详细数据</h2>
+        <div id="game-stats-content"></div>
+    </div>
+</div>   
+<!-- 玩家1商店 -->
+<div id="store-player1" class="store-overlay player1">
+    <div class="store-container">
+        <div class="store-header">
+            <h2><i class="fas fa-shopping-cart"></i> 商店</h2>
+            <div class="store-player-name player1" id="store-player1-name">玩家1</div>
+            <div class="store-score">
+                当前分数: <span id="store-player1-score">0</span>分
+            </div>
+        </div>
+        
+        <div class="store-items" id="store-player1-items">
+            <!-- 商店项目将通过JS动态生成 -->
+        </div>
+        
+        <div class="store-footer">
+            <button class="store-buy-btn" id="store-player1-buy" disabled>
+                购买 (左Alt键)
+            </button>
+            <div class="store-hint">
+                <i class="fas fa-info-circle"></i> WSAD选择，左Alt购买，左Ctrl关闭
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 玩家2商店 -->
+<div id="store-player2" class="store-overlay player2">
+    <div class="store-container">
+        <div class="store-header">
+            <h2><i class="fas fa-shopping-cart"></i> 商店</h2>
+            <div class="store-player-name player2" id="store-player2-name">玩家2</div>
+            <div class="store-score">
+                当前分数: <span id="store-player2-score">0</span>分
+            </div>
+        </div>
+        
+        <div class="store-items" id="store-player2-items">
+            <!-- 商店项目将通过JS动态生成 -->
+        </div>
+        
+        <div class="store-footer">
+            <button class="store-buy-btn" id="store-player2-buy" disabled>
+                购买 (右Alt键)
+            </button>
+            <div class="store-hint">
+                <i class="fas fa-info-circle"></i> 方向键选择，右Alt购买，右Ctrl关闭
+            </div>
+        </div>
+    </div>
+</div>
     <!-- 添加到character-selection div之后 -->
 <div class="map-selection">
     <h2 class="selection-title">选择地图</h2>
@@ -1727,7 +2178,9 @@
             </div>
         </div>
         <!-- 添加到body的合适位置 -->
-    
+<!-- 在HTML文件的合适位置（比如在records-modal之后）添加统计数据模态框 -->
+
+
 <script>
 // 游戏变量
 let snakes = {
@@ -1832,7 +2285,7 @@ let speedBoosts = {
 let baseDefense = {
     player1: {
         lastShotTime: 0,
-        bulletSpeed: 1.5, // 稍微降低速度
+        bulletSpeed: 1, // 稍微降低速度
         attackRange: 15, // 20格 = 400像素
         active: false,
         targetSnake: null,
@@ -1841,7 +2294,7 @@ let baseDefense = {
     },
     player2: {
         lastShotTime: 0,
-        bulletSpeed: 1.5,
+        bulletSpeed: 1,
         attackRange: 15,
         active: false,
         targetSnake: null,
@@ -1849,6 +2302,209 @@ let baseDefense = {
         shootInterval: 1000
     }
 };
+// 在游戏变量中添加统计变量
+// 修改游戏统计数据初始化
+let gameStats = {
+    startTime: 0,
+    snake1: {
+        // 承受伤害统计
+        damageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        originalDamageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        
+        // === 输出伤害统计 - 确保这部分存在 ===
+        damageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0,
+            base: 0, // 基地子弹伤害
+            wall: 0  // 撞墙伤害（如果有）
+        },
+        originalDamageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0,
+            base: 0,
+            wall: 0
+        },
+        
+        // 防御统计
+        shieldDamageAbsorbed: 0,
+        shieldBlocks: 0,
+        shieldBreaks: 0,
+        immuneDamagePrevented: {},
+        immuneBlocks: 0,
+        toughImmuneDamagePrevented: {},
+        toughImmuneBlocks: 0,
+        toughReducedDamage: {},
+        
+        // 移动统计
+        distanceTraveled: 0,
+        
+        // 总计
+        totalDamageReceived: 0,
+        totalOriginalDamageReceived: 0,
+        totalDamageDealt: 0,        // 确保这个存在
+        totalOriginalDamageDealt: 0 // 确保这个存在
+    },
+    snake2: {
+        // 同样的结构
+        damageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        originalDamageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        
+        // === 输出伤害统计 ===
+        damageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0,
+            base: 0,
+            wall: 0
+        },
+        originalDamageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0,
+            base: 0,
+            wall: 0
+        },
+        
+        // 防御统计
+        shieldDamageAbsorbed: 0,
+        shieldBlocks: 0,
+        shieldBreaks: 0,
+        immuneDamagePrevented: {},
+        immuneBlocks: 0,
+        toughImmuneDamagePrevented: {},
+        toughImmuneBlocks: 0,
+        toughReducedDamage: {},
+        
+        distanceTraveled: 0,
+        totalDamageReceived: 0,
+        totalOriginalDamageReceived: 0,
+        totalDamageDealt: 0,
+        totalOriginalDamageDealt: 0
+    }
+};
+let storeOpen = {
+    snake1: false,
+    snake2: false
+};
+
+let storeSelectedItem = {
+    snake1: 0,
+    snake2: 0
+};
+// 在游戏变量中添加护盾状态
+let shields = {
+    snake1: {
+        active: false,
+        health: 0,
+        maxHealth: 10
+    },
+    snake2: {
+        active: false,
+        health: 0,
+        maxHealth: 10
+    }
+};
+// 商店项目定义
+const storeItems = [
+    {
+        id: 'shield',
+        name: '能量护盾',
+        description: '获得10点护盾值，优先抵挡伤害',
+        price: 800,
+        icon: '🛡️',
+        color: '#00BCD4',
+        type: 'shield',
+        maxLevel: 1  // 只能购买一次
+    },
+    {
+        id: 'random_balls',
+        name: '随机魔法球礼包',
+        description: '获得3个随机魔法球 (攻击/血球/无敌/反转/炸弹)',
+        price: 800,
+        icon: '🎁',
+        color: '#9C27B0',
+        type: 'consumable'
+    },
+    {
+        id: 'speed_upgrade',
+        name: '速度属性升级',
+        description: '永久增加移动速度15% (最多叠加2次)',
+        price: 1000,
+        icon: '⚡',
+        color: '#FFD700',
+        type: 'upgrade',
+        maxLevel: 2
+    },
+    {
+        id: 'tough_upgrade',
+        name: '坚硬属性升级',
+        description: '永久增加生命值上限2点 (最多叠加2次)',
+        price: 1000,
+        icon: '🛡️',
+        color: '#C0C0C0',
+        type: 'upgrade',
+        maxLevel: 2
+    },
+    {
+        id: 'magic_upgrade',
+        name: '魔法属性升级',
+        description: '永久延长特殊效果时间20% (最多叠加2次)',
+        price: 1000,
+        icon: '✨',
+        color: '#2196F3',
+        type: 'upgrade',
+        maxLevel: 2
+    }
+];
+
+// 玩家升级状态
+let playerUpgrades = {
+    snake1: {
+        speed: 0,
+        tough: 0,
+        magic: 0
+    },
+    snake2: {
+        speed: 0,
+        tough: 0,
+        magic: 0
+    }
+};
+
 const gameBoard = document.getElementById('game-board');
 const startBtn = document.querySelector('.start-btn');
 const restartBtn = document.querySelector('.restart-btn');
@@ -1935,7 +2591,431 @@ function resetDeathCauses() {
         snake1: null,
         snake2: null
     };
-}           // 绘制基地
+}     
+// 统一的伤害处理函数
+// 在applyDamage函数中添加坚硬蛇子弹免疫
+// 修改applyDamage函数，添加护盾处理
+function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
+    if (!gameStarted || health[snakeId] <= 0) return false;
+    
+    const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
+    const snakeName = snakeId === 'snake1' ? '玩家1' : '玩家2';
+    const head = snakes[snakeId][0];
+    
+    // === 第一步：记录原始伤害（无论是否被抵挡）===
+    // 初始化伤害类型统计（如果不存在）
+    if (!gameStats[snakeId].originalDamageReceived) {
+        gameStats[snakeId].originalDamageReceived = {};
+    }
+    if (!gameStats[snakeId].originalDamageReceived[source]) {
+        gameStats[snakeId].originalDamageReceived[source] = 0;
+    }
+    gameStats[snakeId].originalDamageReceived[source] += damage;
+    
+    // === 第二步：检查是否有护盾 ===
+    if (shields[snakeId].active && shields[snakeId].health > 0) {
+        // 护盾优先抵挡伤害
+        const shield = shields[snakeId];
+        const damageToShield = Math.min(damage, shield.health);
+        const damageToHealth = damage - damageToShield;
+        
+        // 减少护盾值
+        shield.health -= damageToShield;
+        
+        // 记录护盾伤害统计
+        if (!gameStats[snakeId].shieldDamageAbsorbed) {
+            gameStats[snakeId].shieldDamageAbsorbed = 0;
+        }
+        gameStats[snakeId].shieldDamageAbsorbed += damageToShield;
+        
+        // 显示护盾抵挡提示
+        showNotice(`护盾抵挡${damageToShield}点伤害`, '#00BCD4', head.x, head.y);
+        createParticles(head.x + 10, head.y + 10, damageToShield * 2, '#00BCD4');
+        
+        // 更新护盾显示
+        updateShieldDisplay(snakeId);
+        
+        // 添加护盾被攻击的视觉反馈
+        const shieldIndicator = document.getElementById(`shield-indicator-${snakeId === 'snake1' ? '1' : '2'}`);
+        if (shieldIndicator) {
+            shieldIndicator.classList.add('shield-hit');
+            setTimeout(() => {
+                shieldIndicator.classList.remove('shield-hit');
+            }, 300);
+        }
+        
+        // 如果护盾被打破
+        if (shield.health <= 0) {
+            shield.active = false;
+            shield.health = 0;
+            showNotice('护盾被打破!', '#FF5722', head.x, head.y);
+            createParticles(head.x + 10, head.y + 10, 20, '#FF5722');
+            
+            // 更新护盾显示
+            updateShieldDisplay(snakeId);
+            
+            // 记录护盾被打破
+            if (!gameStats[snakeId].shieldBreaks) {
+                gameStats[snakeId].shieldBreaks = 0;
+            }
+            gameStats[snakeId].shieldBreaks++;
+        }
+        
+        // 记录护盾抵挡统计
+        if (!gameStats[snakeId].shieldBlocks) {
+            gameStats[snakeId].shieldBlocks = 0;
+        }
+        gameStats[snakeId].shieldBlocks++;
+        
+        // 如果有剩余伤害，继续处理
+        if (damageToHealth > 0) {
+            // 递归调用处理剩余伤害
+            return applyDamage(snakeId, damageToHealth, source, {
+                ...details,
+                shieldBroken: true,
+                originalDamage: damage,
+                shieldAbsorbed: damageToShield
+            });
+        }
+        
+        console.log(`${snakeName}的护盾抵挡了${damageToShield}点${source}伤害`);
+        return true;
+    }
+    
+    // === 第三步：检查免疫效果 ===
+    const isImmune = (snakeId === 'snake1' && immunity.snake1) || 
+                     (snakeId === 'snake2' && immunity.snake2);
+    
+    if (isImmune) {
+        // 记录免疫统计
+        if (!gameStats[snakeId].immuneDamagePrevented) {
+            gameStats[snakeId].immuneDamagePrevented = {};
+        }
+        if (!gameStats[snakeId].immuneDamagePrevented[source]) {
+            gameStats[snakeId].immuneDamagePrevented[source] = 0;
+        }
+        gameStats[snakeId].immuneDamagePrevented[source] += damage;
+        
+        if (!gameStats[snakeId].immuneBlocks) {
+            gameStats[snakeId].immuneBlocks = 0;
+        }
+        gameStats[snakeId].immuneBlocks++;
+        
+        // 显示免疫提示
+        showNotice('免疫伤害!', '#FFFF00', head.x, head.y);
+        createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
+        
+        console.log(`${snakeName}免疫了${damage}点${source}伤害`);
+        return false;
+    }
+    
+    // === 第四步：检查坚硬蛇特性 ===
+    let finalDamage = damage;
+    const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
+    let isToughImmune = false;
+    let isToughReduced = false;
+    
+// 完整修复后的坚硬蛇伤害处理逻辑
+if (isToughSnake) {
+    // 检查是否是子弹类伤害
+    const isBulletType = source === 'bullet' || source === 'base';
+    
+    if (isBulletType) {
+        // 对子弹类伤害有50%概率免疫
+        if (Math.random() < 0.5) {
+            const bulletTypeName = source === 'bullet' ? '子弹' : '基地子弹';
+            
+            // 记录免疫统计
+            if (!gameStats[snakeId].toughImmuneDamagePrevented) {
+                gameStats[snakeId].toughImmuneDamagePrevented = {};
+            }
+            if (!gameStats[snakeId].toughImmuneDamagePrevented[source]) {
+                gameStats[snakeId].toughImmuneDamagePrevented[source] = 0;
+            }
+            gameStats[snakeId].toughImmuneDamagePrevented[source] += damage;
+            
+            if (!gameStats[snakeId].toughImmuneBlocks) {
+                gameStats[snakeId].toughImmuneBlocks = 0;
+            }
+            gameStats[snakeId].toughImmuneBlocks++;
+            
+            showNotice(`坚硬免疫${bulletTypeName}!`, '#C0C0C0', head.x, head.y);
+            createParticles(head.x + 10, head.y + 10, 15, '#C0C0C0');
+            return false;
+        }
+    } else {
+        // 对非子弹类伤害减半
+        const originalDamage = damage;
+        finalDamage = Math.ceil(damage / 2);
+        
+        // 记录减伤统计
+        if (!gameStats[snakeId].toughReducedDamage) {
+            gameStats[snakeId].toughReducedDamage = {};
+        }
+        if (!gameStats[snakeId].toughReducedDamage[source]) {
+            gameStats[snakeId].toughReducedDamage[source] = 0;
+        }
+        gameStats[snakeId].toughReducedDamage[source] += (originalDamage - finalDamage);
+        
+        if (finalDamage < damage) {
+            showNotice(`坚硬减伤! (-${finalDamage}HP)`, '#C0C0C0', head.x, head.y);
+        }
+    }
+}
+    // === 第五步：应用实际伤害 ===
+    health[snakeId] = Math.max(0, health[snakeId] - finalDamage);
+    
+    // 更新血条显示
+    updateHealthBars();
+    
+    // 显示伤害提示
+    let damageMessage = `-${finalDamage}HP`;
+    if (source !== 'unknown') {
+        const sourceNames = {
+            'wall': '撞墙',
+            'snakeCollision': '蛇相撞',
+            'bullet': '子弹',
+            'base': '基地防御',
+            'lava': '岩浆',
+            'home': '敌方基地',
+            'bomb': '炸弹'
+        };
+        damageMessage += ` (${sourceNames[source] || source})`;
+    }
+    
+    // 添加备注信息
+    const notes = [];
+    if (details.shieldBroken) notes.push('破盾后');
+    if (isToughReduced) notes.push('坚硬减伤');
+    if (notes.length > 0) {
+        damageMessage += ` (${notes.join('+')})`;
+    }
+    
+    showNotice(damageMessage, '#FF0000', head.x, head.y);
+    
+    // 创建伤害特效
+    createParticles(head.x + 10, head.y + 10, finalDamage * 3, '#FF0000');
+    
+    // === 第六步：记录实际承受伤害统计 ===
+    if (!gameStats[snakeId].damageReceived[source]) {
+        gameStats[snakeId].damageReceived[source] = 0;
+    }
+    gameStats[snakeId].damageReceived[source] += finalDamage;
+    gameStats[snakeId].totalDamageReceived += finalDamage;
+    
+    // 记录输出伤害统计（如果有攻击者）
+// 在applyDamage函数中找到输出伤害统计部分，确保存在
+// === 记录输出伤害统计（如果有攻击者）===
+if (details.attacker) {
+    const attackerSnakeId = details.attacker === 'snake1' ? 'snake1' : 'snake2';
+    
+    // 记录攻击者的原始伤害输出
+    if (!gameStats[attackerSnakeId].originalDamageDealt) {
+        gameStats[attackerSnakeId].originalDamageDealt = {};
+    }
+    if (!gameStats[attackerSnakeId].originalDamageDealt[source]) {
+        gameStats[attackerSnakeId].originalDamageDealt[source] = 0;
+    }
+    gameStats[attackerSnakeId].originalDamageDealt[source] += damage;
+    
+    // 记录攻击者的实际伤害输出
+    if (!gameStats[attackerSnakeId].damageDealt) {
+        gameStats[attackerSnakeId].damageDealt = {};
+    }
+    if (!gameStats[attackerSnakeId].damageDealt[source]) {
+        gameStats[attackerSnakeId].damageDealt[source] = 0;
+    }
+    gameStats[attackerSnakeId].damageDealt[source] += finalDamage;
+    gameStats[attackerSnakeId].totalDamageDealt += finalDamage;
+    gameStats[attackerSnakeId].totalOriginalDamageDealt += damage;
+}
+    // === 第七步：检查死亡 ===
+    if (health[snakeId] <= 0) {
+        // 设置死亡原因
+        const causeNames = {
+            'wall': '撞墙而死',
+            'snakeCollision': '蛇相撞而死',
+            'bullet': '被子弹击中',
+            'base': '被基地防御系统击杀',
+            'lava': '被岩浆烧死',
+            'home': '在对方基地中致死',
+            'bomb': '被炸弹炸死'
+        };
+        
+        deathCause[snakeId] = causeNames[source] || '未知原因死亡';
+        
+        // 添加备注信息
+        const deathNotes = [];
+        if (details.shieldBroken) deathNotes.push('护盾被破后');
+        if (isToughSnake && isToughReduced) deathNotes.push('坚硬蛇减伤后');
+        if (deathNotes.length > 0) {
+            deathCause[snakeId] += ` (${deathNotes.join('+')})`;
+        }
+        
+        console.log(`${snakeName}死亡，原因: ${deathCause[snakeId]}`);
+        gameOver();
+        return true;
+    }
+
+    return true;
+}
+// 统一的治疗函数
+function applyHealing(snakeId, amount, source = 'unknown') {
+    if (!gameStarted || health[snakeId] <= 0) return false;
+    
+    // 计算最大生命值（考虑坚硬蛇和升级）
+    let maxHealth = 10;
+    const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
+    
+    if (isToughSnake) {
+        maxHealth = 15;
+        // 添加升级效果
+        const toughUpgradeLevel = playerUpgrades[snakeId]?.tough || 0;
+        maxHealth += toughUpgradeLevel * 2;
+    }
+    
+    const oldHealth = health[snakeId];
+    health[snakeId] = Math.min(maxHealth, health[snakeId] + amount);
+    const actualHeal = health[snakeId] - oldHealth;
+    
+    if (actualHeal > 0) {
+        // 更新血条
+        updateHealthBars();
+        
+        // 显示治疗提示
+        const head = snakes[snakeId][0];
+        showNotice(`+${actualHeal}HP`, '#4CAF50', head.x, head.y);
+        
+        // 创建治疗特效
+        createParticles(head.x + 10, head.y + 10, actualHeal * 3, '#4CAF50');
+        
+        console.log(`${snakeId === 'snake1' ? '玩家1' : '玩家2'}恢复了${actualHeal}点血量`);
+        return true;
+    }
+    
+    return false;
+}
+// 添加护盾显示更新函数
+function updateShieldDisplay(snakeId) {
+    const shield = shields[snakeId];
+    const shieldElementId = snakeId === 'snake1' ? 'shield-indicator-1' : 'shield-indicator-2';
+    let shieldElement = document.getElementById(shieldElementId);
+    
+    // 如果元素不存在，创建它
+    if (!shieldElement) {
+        const scoreBoard = snakeId === 'snake1' ? 
+            document.querySelector('.player-score.player-1') : 
+            document.querySelector('.player-score.player-2');
+        
+        if (scoreBoard) {
+            shieldElement = document.createElement('div');
+            shieldElement.id = shieldElementId;
+            shieldElement.className = 'shield-indicator';
+            shieldElement.style.marginTop = '5px';
+            shieldElement.style.padding = '3px 8px';
+            shieldElement.style.borderRadius = '10px';
+            shieldElement.style.fontSize = '12px';
+            shieldElement.style.display = 'flex';
+            shieldElement.style.alignItems = 'center';
+            shieldElement.style.gap = '5px';
+            
+            scoreBoard.appendChild(shieldElement);
+        }
+    }
+    
+    if (shieldElement) {
+        if (shield.active && shield.health > 0) {
+            shieldElement.style.display = 'flex';
+            shieldElement.style.background = 'linear-gradient(45deg, rgba(0, 188, 212, 0.3), rgba(0, 150, 136, 0.3))';
+            shieldElement.style.border = '1px solid rgba(0, 188, 212, 0.5)';
+            shieldElement.style.color = '#00BCD4';
+            shieldElement.innerHTML = `
+                <i class="fas fa-shield-alt"></i>
+                <span>护盾: ${shield.health}/${shield.maxHealth}</span>
+            `;
+            
+            // 添加护盾动画效果
+            shieldElement.style.animation = 'shieldPulse 2s infinite';
+        } else {
+            shieldElement.style.display = 'none';
+        }
+    }
+}
+
+// 添加护盾动画CSS
+const shieldStyle = document.createElement('style');
+shieldStyle.textContent = `
+    @keyframes shieldPulse {
+        0%, 100% { 
+            box-shadow: 0 0 5px rgba(0, 188, 212, 0.5);
+        }
+        50% { 
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.8);
+        }
+    }
+    
+    .shield-indicator {
+        transition: all 0.3s ease;
+    }
+    
+    /* 护盾被攻击时的效果 */
+    .shield-hit {
+        animation: shieldHit 0.3s ease;
+    }
+    
+    @keyframes shieldHit {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); box-shadow: 0 0 20px #00BCD4; }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(shieldStyle);
+// 创建护盾环绕特效
+function createShieldEffect(snakeId) {
+    // 移除旧的护盾特效
+    const oldEffects = document.querySelectorAll(`.shield-effect-${snakeId}`);
+    oldEffects.forEach(effect => effect.remove());
+    
+    // 创建新的护盾特效
+    const shieldEffect = document.createElement('div');
+    shieldEffect.className = `shield-effect shield-effect-${snakeId}`;
+    shieldEffect.style.position = 'absolute';
+    shieldEffect.style.width = '40px';
+    shieldEffect.style.height = '40px';
+    shieldEffect.style.borderRadius = '50%';
+    shieldEffect.style.border = '2px solid rgba(0, 188, 212, 0.7)';
+    shieldEffect.style.boxShadow = '0 0 20px rgba(0, 188, 212, 0.5)';
+    shieldEffect.style.animation = 'shieldRotate 3s linear infinite';
+    shieldEffect.style.zIndex = '2';
+    shieldEffect.style.pointerEvents = 'none';
+    
+    // 添加到游戏板
+    gameBoard.appendChild(shieldEffect);
+    
+    // 更新护盾位置
+    function updateShieldPosition() {
+        if (shields[snakeId].active && shields[snakeId].health > 0) {
+            const head = snakes[snakeId][0];
+            shieldEffect.style.left = `${head.x}px`;
+            shieldEffect.style.top = `${head.y}px`;
+            requestAnimationFrame(updateShieldPosition);
+        } else {
+            shieldEffect.remove();
+        }
+    }
+    
+    updateShieldPosition();
+}
+
+// 添加护盾旋转动画CSS
+const shieldRotateStyle = document.createElement('style');
+shieldRotateStyle.textContent = `
+    @keyframes shieldRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(shieldRotateStyle);
 function drawHomes() {
     // 移除现有的基地元素
     document.querySelectorAll('.home-base').forEach(el => el.remove());
@@ -2299,7 +3379,119 @@ function initGame() {
     }
     clearBoard();
 document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
-
+// 修改游戏统计数据初始化
+gameStats = {
+    startTime: 0,
+    snake1: {
+        damageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        originalDamageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        damageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0
+        },
+        originalDamageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0
+        },
+        // 防御统计
+        shieldDamageAbsorbed: 0,
+        shieldBlocks: 0,
+        shieldBreaks: 0,
+        immuneDamagePrevented: {},
+        immuneBlocks: 0,
+        toughImmuneDamagePrevented: {},
+        toughImmuneBlocks: 0,
+        toughReducedDamage: {},
+        
+        distanceTraveled: 0,
+        totalDamageReceived: 0,
+        totalOriginalDamageReceived: 0,
+        totalDamageDealt: 0,
+        totalOriginalDamageDealt: 0
+    },
+    snake2: {
+        damageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        originalDamageReceived: {
+            wall: 0,
+            snakeCollision: 0,
+            bullet: 0,
+            base: 0,
+            lava: 0,
+            home: 0,
+            bomb: 0
+        },
+        damageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0
+        },
+        originalDamageDealt: {
+            snakeCollision: 0,
+            bullet: 0,
+            bomb: 0
+        },
+        // 防御统计
+        shieldDamageAbsorbed: 0,
+        shieldBlocks: 0,
+        shieldBreaks: 0,
+        immuneDamagePrevented: {},
+        immuneBlocks: 0,
+        toughImmuneDamagePrevented: {},
+        toughImmuneBlocks: 0,
+        toughReducedDamage: {},
+        
+        distanceTraveled: 0,
+        totalDamageReceived: 0,
+        totalOriginalDamageReceived: 0,
+        totalDamageDealt: 0,
+        totalOriginalDamageDealt: 0
+    }
+};
+    
+    // 移除护盾显示
+    document.querySelectorAll('.shield-indicator, .shield-effect').forEach(el => el.remove());
+    storeOpen = {
+        snake1: false,
+        snake2: false
+    };
+    storeSelectedItem = {
+        snake1: 0,
+        snake2: 0
+    };
+    
+    // 关闭商店界面
+    document.getElementById('store-player1').style.display = 'none';
+    document.getElementById('store-player2').style.display = 'none';
+    
+    // 移除暂停效果
+    document.querySelector('.game-container').classList.remove('game-paused');
+    
 // 2. 完全重置攻击模式状态
 if (attackMode.intervalId1) {
     clearInterval(attackMode.intervalId1);
@@ -2428,7 +3620,7 @@ lastMoveTime = {
 let baseDefense = {
     player1: {
         lastShotTime: 0,
-        bulletSpeed: 6, // 稍微降低速度
+        bulletSpeed: 1, // 稍微降低速度
         attackRange: 15, // 20格 = 400像素
         active: false,
         targetSnake: null,
@@ -2437,7 +3629,7 @@ let baseDefense = {
     },
     player2: {
         lastShotTime: 0,
-        bulletSpeed: 12,
+        bulletSpeed: 1,
         attackRange: 15,
         active: false,
         targetSnake: null,
@@ -3077,18 +4269,12 @@ function handleHomes(timestamp) {
         const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
         
         if (inOwnHome && !homes[playerNum].destroyed) {
-            // 在自己的基地中回血（免疫不影响回血）
+            // 在自己的基地中回血
             if (timestamp - homes[playerNum].lastHealTime > 1000) {
-                const maxHealth = snakeTypes[snakeId] === 'tough' ? 15 : 10;
-                if (health[snakeId] < maxHealth) {
-                    health[snakeId] = Math.min(maxHealth, health[snakeId] + 1);
-                    updateHealthBars();
-                    
-                    // 显示回血效果
-                    showNotice('+1HP', '#4CAF50', 
-                             homes[playerNum].x + homes[playerNum].width/2,
-                             homes[playerNum].y + homes[playerNum].height/2);
-                    
+                // 使用统一的治疗函数
+                const healed = applyHealing(snakeId, 1, 'home');
+                
+                if (healed) {
                     createParticles(
                         homes[playerNum].x + homes[playerNum].width/2,
                         homes[playerNum].y + homes[playerNum].height/2,
@@ -3096,6 +4282,7 @@ function handleHomes(timestamp) {
                         '#4CAF50'
                     );
                 }
+                
                 homes[playerNum].lastHealTime = timestamp;
             }
         } else if (inOpponentHome && !homes[opponentNum].destroyed) {
@@ -3112,35 +4299,35 @@ function handleHomes(timestamp) {
                 
                 if (!hasImmunity) {
                     // 没有免疫效果：双方都掉血
-                    // 对方基地掉血（固定1点，不减半）
+                    // 对方基地掉血
                     homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
                     
-                    // 自己掉血（坚硬蛇减半）
-                    health[snakeId] = Math.max(0, health[snakeId] - damageToSelf);
+                    // 记录蛇对基地的伤害（输出伤害）- 这部分统计已经在applyDamage中处理
                     
-                    // 更新显示
-                    updateHealthBars();
+                    // 自己掉血（使用统一的伤害函数）
+                    const damageApplied = applyDamage(snakeId, damageToSelf, 'home', {
+                        home: opponentNum,
+                        damageToHome: damageToHome,
+                        isToughSnake: isToughSnake
+                    });
                     
-                    // 显示伤害效果
-                    let selfDamageMessage = `-${damageToSelf}HP`;
-                    if (isToughSnake) {
-                        selfDamageMessage += ' (坚硬减半)';
-                        showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FFA500',
-                                 homes[opponentNum].x + homes[opponentNum].width/2,
-                                 homes[opponentNum].y + homes[opponentNum].height/2);
-                        createParticles(head.x + 10, head.y + 10, 8, '#C0C0C0'); // 银色粒子
-                    } else {
-                        showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FF0000',
-                                 homes[opponentNum].x + homes[opponentNum].width/2,
-                                 homes[opponentNum].y + homes[opponentNum].height/2);
-                        createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
+                    if (damageApplied) {
+                        // 显示伤害效果
+                        let selfDamageMessage = `-${damageToSelf}HP`;
+                        if (isToughSnake) {
+                            selfDamageMessage += ' (坚硬减半)';
+                            showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FFA500',
+                                     homes[opponentNum].x + homes[opponentNum].width/2,
+                                     homes[opponentNum].y + homes[opponentNum].height/2);
+                            createParticles(head.x + 10, head.y + 10, 8, '#C0C0C0'); // 银色粒子
+                        } else {
+                            showNotice(`攻击对方基地! ${selfDamageMessage}`, '#FF0000',
+                                     homes[opponentNum].x + homes[opponentNum].width/2,
+                                     homes[opponentNum].y + homes[opponentNum].height/2);
+                            createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
+                        }
                     }
                     
-                    // 检查自己是否死亡
-                    if (health[snakeId] <= 0) {
-                        deathCause[snakeId] = '在对方基地中致死';
-                        gameOver();
-                    }
                 } else {
                     // 有免疫效果：只对对方基地造成伤害，自己不受伤
                     homes[opponentNum].health = Math.max(0, homes[opponentNum].health - damageToHome);
@@ -3684,15 +4871,16 @@ requestAnimationFrame(gameLoop);
     }
     
     // 计算蛇的速度（整合暴风雪减速效果）
-    const snake1Speed = (snakeTypes.snake1 === 'speed' ? gameSpeed * 0.55 : 
-                       (snakeTypes.snake1 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
-                       (1 + speedBoosts.snake1) / 
-                       (currentMap === 'snow' && blizzardActive && !immunity.snake1 ? snakeSpeedModifiers.snake1 : 1);
-    
-    const snake2Speed = (snakeTypes.snake2 === 'speed' ? gameSpeed * 0.55 : 
-                       (snakeTypes.snake2 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
-                       (1 + speedBoosts.snake2) / 
-                       (currentMap === 'snow' && blizzardActive && !immunity.snake2 ? snakeSpeedModifiers.snake2 : 1);
+// 在moveSnake函数开头附近，修改速度计算
+const snake1Speed = (snakeTypes.snake1 === 'speed' ? gameSpeed * 0.55 : 
+                   (snakeTypes.snake1 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
+                   (1 + speedBoosts.snake1) / 
+                   (currentMap === 'snow' && blizzardActive && !immunity.snake1 ? snakeSpeedModifiers.snake1 : 1);
+
+const snake2Speed = (snakeTypes.snake2 === 'speed' ? gameSpeed * 0.55 : 
+                   (snakeTypes.snake2 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
+                   (1 + speedBoosts.snake2) / 
+                   (currentMap === 'snow' && blizzardActive && !immunity.snake2 ? snakeSpeedModifiers.snake2 : 1);
     // 移动蛇1
     if (!pausedSnakes.snake1 && timestamp - lastMoveTime.snake1 > snake1Speed) {
         directions.snake1 = nextDirections.snake1;
@@ -4081,44 +5269,28 @@ function checkLavaDamage(timestamp) {
         for (const lava of lavaTiles) {
             // 精确网格对齐检查
             if (headGridX === lava.x && headGridY === lava.y) {
-                // 检查是否有免疫效果
-                const isImmune = (snakeId === 'snake1' && immunity.snake1) || 
-                                (snakeId === 'snake2' && immunity.snake2);
-                
-                // 检查是否移动到这个岩浆格（避免重复伤害）
+                // 检查是否移动到这个岩浆格
                 const lastMove = lastMoveTime[snakeId];
-                const justMovedToLava = timestamp - lastMove < 200; // 200ms内移动过来的
+                const justMovedToLava = timestamp - lastMove < 200;
                 
-                // 只在以下情况掉血：
-                // 1. 没有免疫效果
-                // 2. 刚刚移动到这个岩浆格
-                if (!isImmune && justMovedToLava) {
-                    // 检查距离上次伤害是否超过1秒（避免重复伤害）
+                // 只在刚刚移动过来时造成伤害
+                if (justMovedToLava) {
+                    // 检查距离上次伤害是否超过1秒
                     const lastDamageTime = lava.lastDamageTime || 0;
                     if (timestamp - lastDamageTime > 1000) {
-                        health[snakeId] -= 2;
-                        updateHealthBars();
-                        
-                        // 显示伤害提示
-                        showNotice('-2HP', '#FF4500', head.x, head.y);
+                        // 使用统一的伤害函数
+                        applyDamage(snakeId, 2, 'lava', {
+                            lavaTile: lava,
+                            timestamp: timestamp
+                        });
                         
                         // 记录伤害时间
                         lava.lastDamageTime = timestamp;
-                        
-                        // 检查游戏结束
-                        if (health[snakeId] <= 0) {
-                            deathCause[snakeId] = '被岩浆烧死';
-                            gameOver();
-                        }
                     }
-                } else if (isImmune) {
-                    // 显示免疫提示
-                    showNotice('免疫岩浆!', '#FFFF00', head.x, head.y);
                 }
                 
-                // 更新岩浆接触时间（用于触发效果）
+                // 更新岩浆接触时间
                 if (!lava.lastContactTime || timestamp - lava.lastContactTime > 500) {
-                    // 创建接触特效
                     createParticles(head.x + 10, head.y + 10, 5, '#FF4500');
                     lava.lastContactTime = timestamp;
                 }
@@ -4152,11 +5324,12 @@ function drawVolcanoes() {
         gameBoard.appendChild(lavaElement);
     });
 }
+// 修改checkWallCollisions函数中的伤害处理
 function checkWallCollisions(timestamp) {
     for (const snakeId in snakes) {
         const head = snakes[snakeId][0];
-        const headCenterX = head.x + 10; // 蛇头中心X坐标
-        const headCenterY = head.y + 10; // 蛇头中心Y坐标
+        const headCenterX = head.x + 10;
+        const headCenterY = head.y + 10;
         
         // 遍历所有墙
         for (let w = walls.length - 1; w >= 0; w--) {
@@ -4165,10 +5338,10 @@ function checkWallCollisions(timestamp) {
             // 遍历墙的所有段
             for (let s = wall.segments.length - 1; s >= 0; s--) {
                 const segment = wall.segments[s];
-                const wallCenterX = segment.x + 10; // 墙块中心X坐标
-                const wallCenterY = segment.y + 10; // 墙块中心Y坐标
+                const wallCenterX = segment.x + 10;
+                const wallCenterY = segment.y + 10;
                 
-                // 计算蛇头与墙块中心的距离
+                // 计算距离
                 const distance = Math.sqrt(
                     Math.pow(headCenterX - wallCenterX, 2) + 
                     Math.pow(headCenterY - wallCenterY, 2)
@@ -4176,20 +5349,15 @@ function checkWallCollisions(timestamp) {
                 
                 // 距离小于20像素就算碰撞
                 if (distance < 20) {
-                    // 检查是否是新碰撞（避免同一面墙连续扣血）
+                    // 检查是否是新碰撞
                     if (timestamp - lastWallHitTime[snakeId] > 1000) {
                         lastWallHitTime[snakeId] = timestamp;
                         
-                        if (!immunity[snakeId]) { // 非免疫状态下扣血
-                            health[snakeId] -= 5; // 直接扣5血
-                            updateHealthBars();
-                            
-                            // 显示撞墙提示
-                            showNotice('撞墙! -5HP', '#FF0000', head.x, head.y);
-                        } else {
-                            // 免疫状态下不扣血
-                            showNotice('无敌撞墙!', '#FFFF00', head.x, head.y);
-                        }
+                        // 使用统一的伤害函数
+                        applyDamage(snakeId, 5, 'wall', {
+                            wallSegment: segment,
+                            distance: distance
+                        });
                         
                         // 无论是否免疫，都能撞烂墙
                         createParticles(head.x + 10, head.y + 10, 10, '#FF0000');
@@ -4199,16 +5367,7 @@ function checkWallCollisions(timestamp) {
                         if (wall.segments.length === 0) {
                             walls.splice(w, 1);
                         }
-                        
-                        // 检查游戏结束（只在非免疫状态下）
-                        if (!immunity[snakeId] && health[snakeId] <= 0) {
-                            deathCause[snakeId] = '撞墙而死';
-                            gameOver();
-                        }
                     }
-                    
-                    // 移除了回弹代码，蛇可以继续前进
-                    
                     break;
                 }
             }
@@ -4501,79 +5660,6 @@ function fireBullet(snakeId) {
     const particleColor = snakeId === 'snake1' ? '#FF5722' : '#2196F3';
     createParticles(head.x + 10, head.y + 10, 10, particleColor);
 }
-function moveBullets(timestamp) {
-    for (let i = bullets.length - 1; i >= 0; i--) {
-        const bullet = bullets[i];
-        
-        // 根据子弹类型移动
-        if (bullet.player.startsWith('base_')) {
-            // 基地子弹：按角度移动
-            bullet.x += Math.cos(bullet.angle) * bullet.speed;
-            bullet.y += Math.sin(bullet.angle) * bullet.speed;
-        } else {
-            // 蛇子弹：按方向移动
-            switch (bullet.direction) {
-                case 'up':
-                    bullet.y -= bullet.speed;
-                    break;
-                case 'down':
-                    bullet.y += bullet.speed;
-                    break;
-                case 'left':
-                    bullet.x -= bullet.speed;
-                    break;
-                case 'right':
-                    bullet.x += bullet.speed;
-                    break;
-            }
-        }
-        
-        // 检查是否超出边界
-        const boardWidth = gameBoard.clientWidth;
-        const boardHeight = gameBoard.clientHeight;
-        
-        if (bullet.x < 0 || bullet.x >= boardWidth || 
-            bullet.y < 0 || bullet.y >= boardHeight) {
-            bullets.splice(i, 1);
-            continue;
-        }
-        
-        // 检查是否击中墙
-        let hitWall = false;
-        for (const wall of walls) {
-            for (const segment of wall.segments) {
-                const distance = Math.sqrt(
-                    Math.pow(bullet.x - segment.x - 10, 2) + 
-                    Math.pow(bullet.y - segment.y - 10, 2)
-                );
-                
-                if (distance < 15) {
-                    hitWall = true;
-                    createParticles(bullet.x, bullet.y, 5, '#FFFFFF');
-                    break;
-                }
-            }
-            if (hitWall) break;
-        }
-        
-        if (hitWall) {
-            bullets.splice(i, 1);
-            continue;
-        }
-        
-        // 检查是否击中蛇
-        if (bullet.player.startsWith('base_')) {
-            // 基地子弹检查
-            const targetSnakeId = bullet.player === 'base_player1' ? 'snake2' : 'snake1';
-            checkBaseBulletHit(bullet, targetSnakeId, i);
-        } else {
-            // 蛇子弹检查（原有逻辑）
-            const targetSnakeId = bullet.player === 'snake1' ? 'snake2' : 'snake1';
-            checkSnakeBulletHit(bullet, targetSnakeId, i);
-        }
-    }
-}
-
 // 新增/修改函数：检查蛇子弹是否击中
 function checkSnakeBulletHit(bullet, targetSnakeId, bulletIndex) {
     const targetSnake = snakes[targetSnakeId];
@@ -4589,37 +5675,23 @@ function checkSnakeBulletHit(bullet, targetSnakeId, bulletIndex) {
             // 击中目标
             bullets.splice(bulletIndex, 1);
             
-            // 如果目标有免疫效果，则不造成伤害
-            if ((targetSnakeId === 'snake1' && immunity.snake1) || 
-                (targetSnakeId === 'snake2' && immunity.snake2)) {
-                showNotice('免疫子弹!', '#FFFF00', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 15, '#FFFF00');
-            } 
-            // 如果是坚硬蛇，有50%概率免疫子弹伤害
-            else if ((targetSnakeId === 'snake1' && snakeTypes.snake1 === 'tough' && Math.random() < 0.5) ||
-                    (targetSnakeId === 'snake2' && snakeTypes.snake2 === 'tough' && Math.random() < 0.5)) {
-                showNotice('坚硬免疫!', '#C0C0C0', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 15, '#C0C0C0');
+            // 使用统一的伤害函数
+            const damageApplied = applyDamage(targetSnakeId, 0.5, 'bullet', {
+                attacker: bullet.player,
+                bulletSize: bullet.size,
+                hitSegment: j
+            });
+            
+            // 如果没有应用伤害（免疫或坚硬免疫），已经显示过提示
+            if (!damageApplied) {
+                break;
             }
-            else {
-                // 造成0.5点伤害
-                health[targetSnakeId] -= 0.5;
-                updateHealthBars();
-                
-                // 显示伤害提示
-                showNotice('-0.5HP', '#FF0000', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 20, '#FF0000');
-                
-                // 检查游戏结束条件
-                if (health[targetSnakeId] <= 0) {
-                    deathCause[targetSnakeId] = '被子弹击中';
-                    gameOver();
-                }
-            }
+            
             break;
         }
     }
 }
+
 
 // 修改后的moveBullets函数
 function moveBullets(timestamp) {
@@ -4780,33 +5852,18 @@ function checkBaseBulletHit(bullet, targetSnakeId, bulletIndex) {
             // 击中目标
             bullets.splice(bulletIndex, 1);
             
-            // 检查目标是否有免疫效果
-            if ((targetSnakeId === 'snake1' && immunity.snake1) || 
-                (targetSnakeId === 'snake2' && immunity.snake2)) {
-                showNotice('免疫基地子弹!', '#FFFF00', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 15, '#FFFF00');
-            } 
-            // 如果是坚硬蛇，有50%概率免疫子弹伤害
-            else if ((targetSnakeId === 'snake1' && snakeTypes.snake1 === 'tough' && Math.random() < 0.5) ||
-                    (targetSnakeId === 'snake2' && snakeTypes.snake2 === 'tough' && Math.random() < 0.5)) {
-                showNotice('坚硬免疫!', '#C0C0C0', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 15, '#C0C0C0');
+            // 使用统一的伤害函数
+            const damageApplied = applyDamage(targetSnakeId, bullet.damage, 'base', {
+                attacker: bullet.player,
+                fromBase: true,
+                bulletSize: bullet.size,
+                hitSegment: j
+            });
+            
+            if (!damageApplied) {
+                break;
             }
-            else {
-                // 造成1点伤害
-                health[targetSnakeId] -= bullet.damage;
-                updateHealthBars();
-                
-                // 显示伤害提示
-                showNotice('-1HP', bullet.player === 'base_player1' ? '#FF5722' : '#2196F3', segment.x, segment.y);
-                createParticles(segment.x + 10, segment.y + 10, 15, bullet.player === 'base_player1' ? '#FF5722' : '#2196F3');
-                
-                // 检查游戏结束条件
-                if (health[targetSnakeId] <= 0) {
-                    deathCause[targetSnakeId] = '被基地防御系统击杀';
-                    gameOver();
-                }
-            }
+            
             break;
         }
     }
@@ -4877,7 +5934,7 @@ function moveSnake(snakeId) {
             head.x += 20;
             break;
     }
-    
+    gameStats[snakeId].distanceTraveled += 1;
     // 穿墙逻辑
     const boardWidth = gameBoard.clientWidth;
     const boardHeight = gameBoard.clientHeight;
@@ -4908,78 +5965,64 @@ function moveSnake(snakeId) {
                 const damage1 = snakeTypes.snake1 === 'tough' ? 5 : 1;
                 const damage2 = snakeTypes.snake2 === 'tough' ? 5 : 1;
                 
-                health.snake1 -= damage2;
-                health.snake2 -= damage1;
-                updateHealthBars();
+                // 使用统一的伤害函数 - 玩家1受到玩家2的伤害
+                applyDamage('snake1', damage2, 'snakeCollision', {
+                    attacker: 'snake2',
+                    isHeadCollision: true,
+                    collisionPoint: head
+                });
+                
+                // 使用统一的伤害函数 - 玩家2受到玩家1的伤害
+                applyDamage('snake2', damage1, 'snakeCollision', {
+                    attacker: 'snake1',
+                    isHeadCollision: true,
+                    collisionPoint: snakes[otherSnakeId][0]
+                });
                 
                 // 双方碰撞特效
                 createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
                 createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
                 
-                // 显示双方伤害提示
-                showNotice(`-${damage1}HP`, '#FF0000', head.x, head.y);
-                showNotice(`-${damage2}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
-                
-                // 检查是否死亡并记录原因
-                if (health.snake1 <= 0) {
-                    deathCause.snake1 = '蛇头相撞而死';
-                    if (damage2 === 5) {
-                        deathCause.snake1 += ' (被坚硬蛇撞死)';
-                    }
-                    gameOver();
-                }
-                if (health.snake2 <= 0) {
-                    deathCause.snake2 = '蛇头相撞而死';
-                    if (damage1 === 5) {
-                        deathCause.snake2 += ' (被坚硬蛇撞死)';
-                    }
-                    gameOver();
-                }
-                
             } else if (isImmune && !isOtherImmune) {
                 // 只有当前蛇有免疫，只扣对方血
                 const damage = snakeTypes[otherSnakeId] === 'tough' ? 2 : 1;
-                health[otherSnakeId] -= damage;
-                updateHealthBars();
                 
-                // 显示免疫提示和伤害提示
-                showNotice('免疫!', '#FFFF00', head.x, head.y);
-                showNotice(`-${damage}HP`, '#FF0000', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                // 使用统一的伤害函数 - 对方受到伤害
+                const damageApplied = applyDamage(otherSnakeId, damage, 'snakeCollision', {
+                    attacker: snakeId,
+                    isHeadCollision: true,
+                    collisionPoint: head,
+                    immuneAttacker: true
+                });
                 
-                // 特效
-                createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
-                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
-                
-                // 检查对方是否死亡
-                if (health[otherSnakeId] <= 0) {
-                    deathCause[otherSnakeId] = '蛇头相撞而死 (对方免疫)';
-                    if (damage === 2) {
-                        deathCause[otherSnakeId] += ' (被坚硬蛇撞死)';
-                    }
-                    gameOver();
+                if (damageApplied) {
+                    // 显示免疫提示
+                    showNotice('免疫!', '#FFFF00', head.x, head.y);
+                    
+                    // 特效
+                    createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
+                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 30, '#FF0000');
                 }
                 
             } else if (!isImmune && isOtherImmune) {
                 // 只有对方蛇有免疫，只扣当前蛇血
                 const damage = snakeTypes[snakeId] === 'tough' ? 2 : 1;
-                health[snakeId] -= damage;
-                updateHealthBars();
                 
-                // 显示免疫提示和伤害提示
-                showNotice(`-${damage}HP`, '#FF0000', head.x, head.y);
-                showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                // 使用统一的伤害函数 - 当前蛇受到伤害
+                const damageApplied = applyDamage(snakeId, damage, 'snakeCollision', {
+                    attacker: otherSnakeId,
+                    isHeadCollision: true,
+                    collisionPoint: snakes[otherSnakeId][0],
+                    immuneTarget: true
+                });
                 
-                // 特效
-                createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
-                createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
-                
-                // 检查自己是否死亡
-                if (health[snakeId] <= 0) {
-                    deathCause[snakeId] = '蛇头相撞而死 (对方免疫)';
-                    if (damage === 2) {
-                        deathCause[snakeId] += ' (被坚硬蛇撞死)';
-                    }
-                    gameOver();
+                if (damageApplied) {
+                    // 显示免疫提示
+                    showNotice('免疫!', '#FFFF00', snakes[otherSnakeId][0].x, snakes[otherSnakeId][0].y);
+                    
+                    // 特效
+                    createParticles(head.x + 10, head.y + 10, 30, '#FF0000');
+                    createParticles(snakes[otherSnakeId][0].x + 10, snakes[otherSnakeId][0].y + 10, 15, '#FFFF00');
                 }
                 
             } else {
@@ -4995,26 +6038,20 @@ function moveSnake(snakeId) {
             // 普通碰撞：撞的蛇扣血，被撞的蛇截断
             // 如果是坚硬蛇，造成双倍伤害
             const damage = snakeTypes[snakeId] === 'tough' ? 2 : 1;
-            health[snakeId] -= damage;
-            updateHealthBars();
             
-            // 被撞的蛇从碰撞点开始截断
-            snakes[otherSnakeId] = snakes[otherSnakeId].slice(0, collisionResult.collisionIndex);
+            // 使用统一的伤害函数
+            const damageApplied = applyDamage(snakeId, damage, 'snakeCollision', {
+                attacker: otherSnakeId,
+                isHeadCollision: false,
+                collisionIndex: collisionResult.collisionIndex
+            });
             
-            // 碰撞特效
-            createParticles(head.x + 10, head.y + 10, 20, snakeId === 'snake1' ? '#FF5722' : '#2196F3');
-            
-            // 显示伤害提示
-            showNotice(`-${damage}HP`, snakeId === 'snake1' ? '#FF5722' : '#2196F3', head.x, head.y);
-            
-            // 检查自己是否死亡
-            if (health[snakeId] <= 0) {
-                if (snakeTypes[snakeId] === 'tough' && damage === 2) {
-                    deathCause[snakeId] = '撞到对方蛇身而死 (坚硬蛇)';
-                } else {
-                    deathCause[snakeId] = '撞到对方蛇身而死';
-                }
-                gameOver();
+            if (damageApplied) {
+                // 被撞的蛇从碰撞点开始截断
+                snakes[otherSnakeId] = snakes[otherSnakeId].slice(0, collisionResult.collisionIndex);
+                
+                // 碰撞特效
+                createParticles(head.x + 10, head.y + 10, 20, snakeId === 'snake1' ? '#FF5722' : '#2196F3');
             }
             
         } else {
@@ -5053,15 +6090,15 @@ function moveSnake(snakeId) {
                 }
             } else {
                 // 普通食物：加10分，蛇身增长，速度增加3%（最多15%）
-                scores[snakeId] += 10;
+                scores[snakeId] += 50;
                 updateScoreDisplay();
                 
                 // 增加速度（最多15%）
                 if (speedBoosts[snakeId] < 0.3) {
                     speedBoosts[snakeId] = Math.min(0.30, speedBoosts[snakeId] + 0.03);
-                    showNotice('+10分! 速度+3%', '#4CAF50', head.x, head.y);
+                    showNotice('+50分! 速度+3%', '#4CAF50', head.x, head.y);
                 } else {
-                    showNotice('+10分! 速度已达上限', '#4CAF50', head.x, head.y);
+                    showNotice('+50分! 速度已达上限', '#4CAF50', head.x, head.y);
                 }
                 
                 ateFood = true; // 蛇身增长
@@ -5147,29 +6184,23 @@ function applySpecialItemEffect(snakeId, itemType) {
     
     switch(itemType) {
         case 'immunity':
-            // 免疫效果：10秒内完全免疫（锁血），魔法蛇为15秒
             const immunityDuration = 10000 * timeMultiplier;
             if (snakeId === 'snake1') {
                 immunity.snake1 = true;
                 immunity.timer1 = currentTime + immunityDuration;
-                document.getElementById('player1-effect').textContent = '免疫' + (isMagicSnake ? ' (魔法)' : '');
-                showNotice('完全免疫激活!' + (isMagicSnake ? ' (魔法延长)' : ''), '#FFFF00', snakes.snake1[0].x, snakes.snake1[0].y);
+                document.getElementById('player1-effect').textContent = '免疫' + (isMagicSnake || magicUpgradeLevel > 0 ? ' (延长)' : '');
+                showNotice('完全免疫激活!' + (isMagicSnake || magicUpgradeLevel > 0 ? ' (效果延长)' : ''), '#FFFF00', snakes.snake1[0].x, snakes.snake1[0].y);
             } else {
                 immunity.snake2 = true;
                 immunity.timer2 = currentTime + immunityDuration;
-                document.getElementById('player2-effect').textContent = '免疫' + (isMagicSnake ? ' (魔法)' : '');
-                showNotice('完全免疫激活!' + (isMagicSnake ? ' (魔法延长)' : ''), '#FFFF00', snakes.snake2[0].x, snakes.snake2[0].y);
+                document.getElementById('player2-effect').textContent = '免疫' + (isMagicSnake || magicUpgradeLevel > 0 ? ' (延长)' : '');
+                showNotice('完全免疫激活!' + (isMagicSnake || magicUpgradeLevel > 0 ? ' (效果延长)' : ''), '#FFFF00', snakes.snake2[0].x, snakes.snake2[0].y);
             }
             break;
             
         case 'health':
-            // 加血效果：增加0.5点生命值
-            const maxHealth = snakeId === 'snake1' ? (snakeTypes.snake1 === 'tough' ? 15 : 10) : (snakeTypes.snake2 === 'tough' ? 15 : 10);
-            health[snakeId] = Math.min(maxHealth, health[snakeId] + 5);
-            updateHealthBars();
-            showNotice('+0.5HP', '#FF0000', 
-                snakeId === 'snake1' ? snakes.snake1[0].x : snakes.snake2[0].x, 
-                snakeId === 'snake1' ? snakes.snake1[0].y : snakes.snake2[0].y);
+            // 加血效果：增加5点生命值
+            applyHealing(snakeId, 5, 'special_item');
             break;
             
         case 'reverse':
@@ -5346,7 +6377,7 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
     const isToughSnake = targetSnakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
     
     let totalDamage = 0;
-    let maxSegmentDistance = 0; // 用于记录最远距离的蛇身段
+    let maxSegmentDistance = 0;
     
     // 找到离爆炸中心最近的蛇身段
     for (let i = 0; i < targetSnake.length; i++) {
@@ -5362,56 +6393,33 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
     const gridDistance = Math.floor(maxSegmentDistance / 20);
     
     if (gridDistance <= 3) {
-        // 3格内：5点基础伤害
         totalDamage = 5;
     } else if (gridDistance <= 6) {
-        // 3-6格：2点基础伤害
         totalDamage = 2;
     } else if (gridDistance <= 10) {
-        // 6-10格：1点基础伤害
         totalDamage = 1;
     }
     
-    // 如果是坚硬蛇，伤害减半（向上取整）
-    if (isToughSnake && totalDamage > 0) {
-        totalDamage = Math.floor(totalDamage / 2);
-    }
-    
-    // 应用伤害（如果有伤害并且没有免疫）
-    if (totalDamage > 0 && !hasImmunity) {
-        health[targetSnakeId] -= totalDamage;
+    if (totalDamage > 0) {
+        // 使用统一的伤害函数
+        const damageApplied = applyDamage(targetSnakeId, totalDamage, 'bomb', {
+            attacker: snakeId,
+            explosionCenter: explosionCenter,
+            distance: gridDistance,
+            isToughSnake: isToughSnake
+        });
         
-        // 在对方蛇头位置显示伤害
-        const targetHead = targetSnake[0];
-        const damageColor = isToughSnake ? '#FFA500' : '#FF0000'; // 橙色表示减伤后的伤害
-        
-        // 显示伤害提示（如果是坚硬蛇，显示减伤提示）
-        if (isToughSnake) {
-            showNotice(`-${totalDamage}HP (坚硬减半)`, damageColor, targetHead.x, targetHead.y);
-            createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#C0C0C0'); // 银色粒子
-        } else {
-            showNotice(`-${totalDamage}HP`, damageColor, targetHead.x, targetHead.y);
-            createParticles(targetHead.x + 10, targetHead.y + 10, totalDamage * 3, '#FF0000');
+        if (damageApplied) {
+            // 记录炸弹输出伤害统计
+            gameStats[snakeId].damageDealt.bomb += totalDamage;
+            gameStats[snakeId].totalDamageDealt += totalDamage;
         }
-        
-        // 更新血条并检查游戏结束
-        updateHealthBars();
-        if (health[targetSnakeId] <= 0) {
-            deathCause[targetSnakeId] = '被炸弹炸死';
-            gameOver();
-        }
-    } else if (totalDamage > 0 && hasImmunity) {
-        // 免疫情况下的提示
-        const targetHead = targetSnake[0];
-        showNotice('免疫炸弹伤害!', '#FFFF00', targetHead.x, targetHead.y);
-        createParticles(targetHead.x + 10, targetHead.y + 10, 10, '#FFFF00');
-    } else if (totalDamage === 0) {
+    } else {
         // 在安全距离外
         const targetHead = targetSnake[0];
         showNotice('安全距离', '#00FF00', targetHead.x, targetHead.y);
     }
 }
-
 function calculateDistanceToRect(point, rect) {
     // 计算点到矩形四条边的最短距离
     const dx = Math.max(rect.x - point.x, 0, point.x - (rect.x + rect.width));
@@ -5595,14 +6603,19 @@ function updateScoreDisplay() {
 }
 
 // 更新血量显示
+// 在updateHealthBars函数中调用护盾显示更新
 function updateHealthBars() {
-    const maxHealth1 = snakeTypes.snake1 === 'tough' ? 13 : 10;
-    const maxHealth2 = snakeTypes.snake2 === 'tough' ? 13 : 10;
+    const maxHealth1 = snakeTypes.snake1 === 'tough' ? 13 + (playerUpgrades.snake1?.tough || 0) * 2 : 10;
+    const maxHealth2 = snakeTypes.snake2 === 'tough' ? 13 + (playerUpgrades.snake2?.tough || 0) * 2 : 10;
     
     health1El.style.width = `${(health.snake1 / maxHealth1) * 100}%`;
     health2El.style.width = `${(health.snake2 / maxHealth2) * 100}%`;
     document.getElementById('health-text-1').textContent = `${health.snake1}HP`;
     document.getElementById('health-text-2').textContent = `${health.snake2}HP`;
+    
+    // 更新护盾显示
+    updateShieldDisplay('snake1');
+    updateShieldDisplay('snake2');
 }
 
 // 显示通知
@@ -5710,6 +6723,439 @@ deathCauseStyle.textContent = `
     }
 `;
 document.head.appendChild(deathCauseStyle);
+// 修改showGameStats函数，显示更详细的统计
+function showGameStats() {
+    const modal = document.getElementById('game-stats-modal');
+    const content = document.getElementById('game-stats-content');
+    
+    // 计算游戏总时间
+    let totalTime;
+    if (gameStats.endTime) {
+        totalTime = Math.floor((gameStats.endTime - gameStats.startTime) / 1000);
+    } else {
+        totalTime = Math.floor((performance.now() - gameStats.startTime) / 1000);
+    }
+    
+    const minutes = Math.floor(totalTime / 60);
+    const seconds = totalTime % 60;
+    const timeString = `${minutes}分${seconds}秒`;
+    
+    // 计算防御效率
+    const calculateDefenseEfficiency = (snakeId) => {
+        const stats = gameStats[snakeId];
+        const totalOriginal = stats.totalOriginalDamageReceived || 0;
+        const totalActual = stats.totalDamageReceived || 0;
+        
+        if (totalOriginal === 0) return 0;
+        return Math.round(((totalOriginal - totalActual) / totalOriginal) * 100);
+    };
+    
+    // 生成统计数据HTML
+    content.innerHTML = `
+        <div class="game-time-display">
+            <i class="fas fa-clock"></i> 游戏时长: <strong>${timeString}</strong>
+        </div>
+        
+        <div class="stats-grid">
+            <!-- 玩家1统计 -->
+            <div class="player-stats-box player1">
+                <div class="stats-header">
+                    <h3 style="color: #FF5722;">
+                        <i class="fas fa-fire"></i> ${localStorage.getItem("username") || "玩家1"}
+                    </h3>
+                    <div style="font-size: 12px; color: #aaa;">
+                        ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
+                          snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
+                          snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                    </div>
+                </div>
+                
+                <!-- 输出伤害统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+                        <span>输出伤害统计</span>
+                    </div>
+                    <div class="stats-items">
+                        <div class="stat-item">
+                            <span>总输出伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake1.totalDamageDealt.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>蛇相撞伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.snakeCollision.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>子弹伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bullet.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>炸弹伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bomb.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>基地子弹伤害:</span>
+                            <span style="color: #4CAF50;">${(gameStats.snake1.damageDealt.base || 0).toFixed(1)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 承受伤害统计 -->
+                    <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-bullseye" style="color: #FF5722;"></i>
+                        <span>伤害统计</span>
+                    </div>
+                    <div class="stats-items">
+                        <div class="stat-item">
+                            <span>原始伤害:</span>
+                            <span style="color: #ff8a65;">${gameStats.snake1.totalDamageReceived.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>实际伤害:</span>
+                            <span style="color: #ff6b6b;">${(gameStats.snake1.totalOriginalDamageReceived || 0).toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>减免伤害:</span>
+                            <span style="color: #4CAF50;">${((gameStats.snake1.totalOriginalDamageReceived || 0) - gameStats.snake1.totalDamageReceived).toFixed(1)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 防御统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-shield-alt" style="color: #00BCD4;"></i>
+                        <span>防御统计</span>
+                    </div>
+                    <div class="stats-items">
+                        ${gameStats.snake1.shieldDamageAbsorbed > 0 ? `
+                        <div class="stat-item">
+                            <span>护盾吸收:</span>
+                            <span style="color: #00BCD4;">${gameStats.snake1.shieldDamageAbsorbed.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>护盾格挡:</span>
+                            <span style="color: #00BCD4;">${gameStats.snake1.shieldBlocks || 0}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.immuneBlocks > 0 ? `
+                        <div class="stat-item">
+                            <span>免疫格挡:</span>
+                            <span style="color: #FFFF00;">${gameStats.snake1.immuneBlocks}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>免疫免伤:</span>
+                            <span style="color: #FFFF00;">${getTotalImmuneDamage('snake1').toFixed(1)}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.toughImmuneBlocks > 0 ? `
+                        <div class="stat-item">
+                            <span>坚硬免疫:</span>
+                            <span style="color: #C0C0C0;">${gameStats.snake1.toughImmuneBlocks}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${getTotalToughReducedDamage('snake1') > 0 ? `
+                        <div class="stat-item">
+                            <span>坚硬减伤:</span>
+                            <span style="color: #C0C0C0;">${getTotalToughReducedDamage('snake1').toFixed(1)}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- 承受伤害详情 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-heartbeat" style="color: #ff6b6b;"></i>
+                        <span>承受伤害详情</span>
+                    </div>
+                    <div class="stats-items">
+                        ${generateDamageDetailStats('snake1')}
+                    </div>
+                </div>
+                
+                <!-- 移动统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-road" style="color: #00BCD4;"></i>
+                        <span>移动统计</span>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: rgba(0, 188, 212, 0.2); border-radius: 8px;">
+                        <div style="font-size: 24px; color: #00BCD4; font-weight: bold;">
+                            ${gameStats.snake1.distanceTraveled}
+                        </div>
+                        <div style="font-size: 14px; color: white;">格 (20px/格)</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 玩家2统计 -->
+            <div class="player-stats-box player2">
+                <div class="stats-header">
+                    <h3 style="color: #2196F3;">
+                        <i class="fas fa-tint"></i> ${localStorage.getItem("player2_username") || "玩家2"}
+                    </h3>
+                    <div style="font-size: 12px; color: #aaa;">
+                        ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
+                          snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
+                          snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+
+                    </div>
+                </div>
+                
+                <!-- 输出伤害统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+                        <span>输出伤害统计</span>
+                    </div>
+                    <div class="stats-items">
+                        <div class="stat-item">
+                            <span>总输出伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake2.totalDamageDealt.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>蛇相撞伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.snakeCollision.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>子弹伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bullet.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>炸弹伤害:</span>
+                            <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bomb.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>基地子弹伤害:</span>
+                            <span style="color: #4CAF50;">${(gameStats.snake2.damageDealt.base || 0).toFixed(1)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                    <!-- 伤害统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-bullseye" style="color: #2196F3;"></i>
+                        <span>伤害统计</span>
+                    </div>
+                    <div class="stats-items">
+                        <div class="stat-item">
+                            <span>原始伤害:</span>
+                            <span style="color: #64b5f6;">${gameStats.snake2.totalDamageReceived.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>实际伤害:</span>
+                            <span style="color: #ff6b6b;">${(gameStats.snake2.totalOriginalDamageReceived || 0).toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>减免伤害:</span>
+                            <span style="color: #4CAF50;">${((gameStats.snake2.totalOriginalDamageReceived || 0) - gameStats.snake2.totalDamageReceived).toFixed(1)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 防御统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-shield-alt" style="color: #00BCD4;"></i>
+                        <span>防御统计</span>
+                    </div>
+                    <div class="stats-items">
+                        ${gameStats.snake2.shieldDamageAbsorbed > 0 ? `
+                        <div class="stat-item">
+                            <span>护盾吸收:</span>
+                            <span style="color: #00BCD4;">${gameStats.snake2.shieldDamageAbsorbed.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>护盾格挡:</span>
+                            <span style="color: #00BCD4;">${gameStats.snake2.shieldBlocks || 0}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.immuneBlocks > 0 ? `
+                        <div class="stat-item">
+                            <span>免疫格挡:</span>
+                            <span style="color: #FFFF00;">${gameStats.snake2.immuneBlocks}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>免疫免伤:</span>
+                            <span style="color: #FFFF00;">${getTotalImmuneDamage('snake2').toFixed(1)}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.toughImmuneBlocks > 0 ? `
+                        <div class="stat-item">
+                            <span>坚硬免疫:</span>
+                            <span style="color: #C0C0C0;">${gameStats.snake2.toughImmuneBlocks}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${getTotalToughReducedDamage('snake2') > 0 ? `
+                        <div class="stat-item">
+                            <span>坚硬减伤:</span>
+                            <span style="color: #C0C0C0;">${getTotalToughReducedDamage('snake2').toFixed(1)}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- 承受伤害详情 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-heartbeat" style="color: #ff6b6b;"></i>
+                        <span>承受伤害详情</span>
+                    </div>
+                    <div class="stats-items">
+                        ${generateDamageDetailStats('snake2')}
+                    </div>
+                </div>
+                
+                <!-- 移动统计 -->
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-road" style="color: #00BCD4;"></i>
+                        <span>移动统计</span>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: rgba(0, 188, 212, 0.2); border-radius: 8px;">
+                        <div style="font-size: 24px; color: #00BCD4; font-weight: bold;">
+                            ${gameStats.snake2.distanceTraveled}
+                        </div>
+                        <div style="font-size: 14px; color: white;">格 (20px/格)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 12px; color: #aaa;">
+            <i class="fas fa-info-circle"></i> 注：原始伤害包括所有受到的攻击伤害，实际伤害为扣除防御后的实际血量减少
+        </div>
+    `;
+
+    
+    modal.style.display = 'block';
+}
+function generateDefenseStats(snakeId) {
+    const stats = gameStats[snakeId];
+    let html = '';
+    
+    if (stats.shieldDamageAbsorbed > 0) {
+        html += `
+            <div class="stat-item">
+                <span>护盾吸收:</span>
+                <span style="color: #00BCD4;">${stats.shieldDamageAbsorbed.toFixed(1)}</span>
+            </div>
+            <div class="stat-item">
+                <span>护盾格挡:</span>
+                <span style="color: #00BCD4;">${stats.shieldBlocks || 0}</span>
+            </div>
+        `;
+    }
+    
+    if (stats.immuneBlocks > 0) {
+        html += `
+            <div class="stat-item">
+                <span>免疫格挡:</span>
+                <span style="color: #FFFF00;">${stats.immuneBlocks}</span>
+            </div>
+        `;
+    }
+    
+    if (stats.toughImmuneBlocks > 0) {
+        html += `
+            <div class="stat-item">
+                <span>坚硬免疫:</span>
+                <span style="color: #C0C0C0;">${stats.toughImmuneBlocks}</span>
+            </div>
+        `;
+    }
+    
+    const toughReduced = getTotalToughReducedDamage(snakeId);
+    if (toughReduced > 0) {
+        html += `
+            <div class="stat-item">
+                <span>坚硬减伤:</span>
+                <span style="color: #C0C0C0;">${toughReduced.toFixed(1)}</span>
+            </div>
+        `;
+    }
+    
+    return html || '<div class="stat-item">无防御记录</div>';
+}
+// 辅助函数：计算总免疫伤害
+function getTotalImmuneDamage(snakeId) {
+    const stats = gameStats[snakeId];
+    if (!stats.immuneDamagePrevented) return 0;
+    
+    let total = 0;
+    for (const source in stats.immuneDamagePrevented) {
+        total += stats.immuneDamagePrevented[source];
+    }
+    return total;
+}
+
+// 辅助函数：计算总坚硬减伤
+function getTotalToughReducedDamage(snakeId) {
+    const stats = gameStats[snakeId];
+    if (!stats.toughReducedDamage) return 0;
+    
+    let total = 0;
+    for (const source in stats.toughReducedDamage) {
+        total += stats.toughReducedDamage[source];
+    }
+    return total;
+}
+
+// 辅助函数：生成伤害详情统计
+function generateDamageDetailStats(snakeId) {
+    const stats = gameStats[snakeId];
+    const damageTypes = ['wall', 'snakeCollision', 'bullet', 'base', 'lava', 'home', 'bomb'];
+    const typeNames = {
+        'wall': '撞墙',
+        'snakeCollision': '蛇相撞',
+        'bullet': '子弹',
+        'base': '基地防御',
+        'lava': '岩浆',
+        'home': '敌方基地',
+        'bomb': '炸弹'
+    };
+    
+    let html = '';
+    
+    damageTypes.forEach(type => {
+        const original = stats.originalDamageReceived?.[type] || 0;
+        const actual = stats.damageReceived?.[type] || 0;
+        
+        if (original > 0) {
+            const reduction = original - actual;
+            const reductionPercent = original > 0 ? Math.round((reduction / original) * 100) : 0;
+            
+            html += `
+                <div class="stat-item">
+                    <span>${typeNames[type]}:</span>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <div style="font-size: 11px; color: #aaa;">
+                            原始: ${original.toFixed(1)}
+                        </div>
+                        <div style="font-size: 12px; color: #ff6b6b;">
+                            实际: ${actual.toFixed(1)}
+                        </div>
+                        ${reduction > 0 ? `
+                        <div style="font-size: 10px; color: #4CAF50;">
+                            减免: ${reduction.toFixed(1)} (${reductionPercent}%)
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    return html || '<div class="stat-item">无伤害记录</div>';
+}
 function gameOver() {
     gameOverScreen.style.display = '';
     gameStarted = false;
@@ -5723,7 +7169,16 @@ function gameOver() {
         clearInterval(attackMode.intervalId2);
         attackMode.intervalId2 = null;
     }
-    
+      attackMode = {
+        snake1: false,
+        snake2: false,
+        timer1: 0,
+        timer2: 0,
+        lastShot1: 0,
+        lastShot2: 0,
+        intervalId1: null,
+        intervalId2: null
+    };  
     // 清除子弹数组和DOM元素
     bullets = [];
     document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
@@ -5774,7 +7229,8 @@ function gameOver() {
             document.getElementById("back").onclick=goBackOrHome();
         }
     }
-
+document.getElementById("store-player1").style.display="none";
+document.getElementById("store-player2").style.display="none";
     let winner = null;
     let loser = null;
     let currentWin1 = 0;
@@ -5802,110 +7258,120 @@ function gameOver() {
         localStorage.getItem('username') || '玩家1' : 
         localStorage.getItem('player2_username') || '玩家2';
         const loserCause = deathAnalysis[loser]?.cause || '未知原因';
+        
+        const currentTime = performance.now();
+        const totalTime = Math.floor((currentTime - gameStats.startTime) / 1000);
+        gameStats.endTime = performance.now();
+        const minutes = Math.floor(totalTime / 60);
+        const seconds = totalTime % 60;
+        const timeString = `${minutes}分${seconds}秒`;
+        
         // 创建游戏结束界面
-        gameOverScreen.innerHTML = `
-            <div class="game-over-content">
-                <div class="winner-container">
-                    ${winner === 'draw' ? `
-                        <div class="trophy-icon">
-                            <i class="fas fa-trophy" style="color: #FFD700;"></i>
-                            <i class="fas fa-trophy" style="color: #C0C0C0;"></i>
-                        </div>
-                        <h2 class="winner-banner">平局!</h2>
-                    ` : `
-                        <div class="trophy-icon">
-                            <i class="fas fa-trophy" style="color: ${winner === 'snake1' ? '#FFD700' : '#C0C0C0'};"></i>
-                        </div>
-                        <h2 class="winner-banner ${winner === 'snake1' ? 'player-1-win' : 'player-2-win'}">
-                            ${winner === 'snake1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}获胜!
-                        </h2>
-                    `}
+    gameOverScreen.innerHTML = `
+        <div class="game-over-content">
+            <div class="winner-container">
+                ${winner === 'draw' ? `
+                    <div class="trophy-icon">
+                        <i class="fas fa-trophy" style="color: #FFD700;"></i>
+                        <i class="fas fa-trophy" style="color: #C0C0C0;"></i>
+                    </div>
+                    <h2 class="winner-banner">平局!</h2>
+                ` : `
+                    <div class="trophy-icon">
+                        <i class="fas fa-trophy" style="color: ${winner === 'snake1' ? '#FFD700' : '#C0C0C0'};"></i>
+                    </div>
+                    <h2 class="winner-banner ${winner === 'snake1' ? 'player-1-win' : 'player-2-win'}">
+                        ${winner === 'snake1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}获胜!
+                    </h2>
+                `}
+            </div>
+            
+            <!-- 失败者死亡原因 -->
+            ${loser ? `
+                <div class="death-cause" style="
+                    margin: 15px auto;
+                    padding: 10px;
+                    background: ${loser === 'snake1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
+                    border-radius: 10px;
+                    max-width: 400px;
+                    text-align: center;
+                    border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
+                ">
+                    <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
+                        <i class="fas fa-skull-crossbones"></i> 原因
+                    </div>
+                    <div style="font-size: 18px; font-weight: bold; color: white;">
+                        ${loserName}${loserCause}
+                    </div>
+                    <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
+                        血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
+                    </div>
                 </div>
-                
-                <!-- 失败者死亡原因 -->
-                ${loser ? `
-                    <div class="death-cause" style="
-                        margin: 15px auto;
-                        padding: 10px;
-                        background: ${loser === 'snake1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
-                        border-radius: 10px;
-                        max-width: 400px;
-                        text-align: center;
-                        border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
-                    ">
-                        <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-                            <i class="fas fa-skull-crossbones"></i> 原因
-                        </div>
-                        <div style="font-size: 18px; font-weight: bold; color: white;">
-                            ${loserName}${loserCause}
-                        </div>
-                        <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
-                            血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
-                        </div>
+            ` : ''}
+            
+            <!-- 详细统计 -->
+            <div class="stats-container">
+                <div class="player-stats player-1-stats">
+                    <div class="player-avatar">
+                        <i class="fas fa-user" style="color: #FF5722;"></i>
                     </div>
-                ` : ''}
-                
-                <!-- 详细统计 -->
-                <div class="stats-container">
-                    <div class="player-stats player-1-stats">
-                        <div class="player-avatar">
-                            <i class="fas fa-user" style="color: #FF5722;"></i>
-                        </div>
-                        <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
-                        <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
-                            ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
-                              snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
-                              snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
-                        </div>
-                        <div class="win-count">
-                            <span class="history-wins">${player1Wins}</span>
-                            ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
-                        </div>
-                        <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                            ${deathCause.snake1 ? `💀 ${deathCause.snake1}` : health.snake1 > 0 ? '👍 存活' : ''}
-                        </div>
+                    <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
+                    <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
+                        ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
+                          snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
+                          snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
                     </div>
-                    
-                    <div class="vs-text">VS</div>
-                    
-                    <div class="player-stats player-2-stats">
-                        <div class="player-avatar">
-                            <i class="fas fa-user" style="color: #2196F3;"></i>
-                        </div>
-                        <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
-                        <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
-                            ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
-                              snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
-                              snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
-                        </div>
-                        <div class="win-count">
-                            <span class="history-wins">${player2Wins}</span>
-                            ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
-                        </div>
-                        <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                            ${deathCause.snake2 ? `💀 ${deathCause.snake2}` : health.snake2 > 0 ? '👍 存活' : ''}
-                        </div>
+                    <div class="win-count">
+                        <span class="history-wins">${player1Wins}</span>
+                        ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
+                    </div>
+                    <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                        ${deathCause.snake1 ? `💀 ${deathCause.snake1}` : health.snake1 > 0 ? '👍 存活' : ''}
                     </div>
                 </div>
                 
-                <div class="buttons-container">
-                    <button class="restart-btn" id="play-again">
-                        <i class="fas fa-redo"></i> 再来一局
-                    </button>
-                    <button class="restart-btn upload-btn" id="save-record">
-                        <i class="fas fa-save"></i> 保存战绩
-                    </button>
+                <div class="vs-text">VS</div>
+                
+                <div class="player-stats player-2-stats">
+                    <div class="player-avatar">
+                        <i class="fas fa-user" style="color: #2196F3;"></i>
+                    </div>
+                    <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
+                    <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
+                        ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
+                          snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
+                          snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                    </div>
+                    <div class="win-count">
+                        <span class="history-wins">${player2Wins}</span>
+                        ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
+                    </div>
+                    <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                        ${deathCause.snake2 ? `💀 ${deathCause.snake2}` : health.snake2 > 0 ? '👍 存活' : ''}
+                    </div>
                 </div>
             </div>
-        `;
-
-
+            
+            <div class="buttons-container">
+                <button class="restart-btn" id="show-game-stats">
+                    <i class="fas fa-chart-bar"></i> 显示本局数据
+                </button>
+                <button class="restart-btn" id="play-again">
+                    <i class="fas fa-redo"></i> 再来一局
+                </button>
+                <button class="restart-btn upload-btn" id="save-record">
+                    <i class="fas fa-save"></i> 保存战绩
+                </button>
+            </div>
+        </div>
+    `;
+    
         // 再来一局按钮事件
         document.getElementById('play-again').addEventListener('click', () => {
             gameOverScreen.classList.remove('show');
@@ -5913,6 +7379,25 @@ function gameOver() {
                 initGame();
             }, 300);
         });
+        // 修改关闭模态框的事件处理
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = this.getAttribute('data-modal') || 'records-modal';
+                document.getElementById(modalId).style.display = 'none';
+            });
+        });
+
+        // 点击外部关闭所有模态框
+        window.addEventListener('click', function(event) {
+            const modals = ['records-modal', 'game-stats-modal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        document.getElementById('show-game-stats').addEventListener('click', showGameStats);
         resetDeathCauses();
         // 保存战绩按钮事件
         document.getElementById('save-record').addEventListener('click', () => {
@@ -6266,9 +7751,193 @@ function createBackgroundParticles() {
         particlesContainer.appendChild(particle);
     }
 }
-
+let isTabKeyPressed = false;
 // 键盘控制
 document.addEventListener('keydown', (e) => {
+    // 修改手动暂停/恢复的逻辑
+if (e.key === 'q' || e.key === 'Q') {
+    // 如果商店打开，不允许手动暂停/恢复
+    if (storeOpen.snake1) {
+        e.preventDefault();
+        return;
+    }
+    
+    // 切换暂停状态
+    pausedSnakes.snake1 = !pausedSnakes.snake1;
+    
+    // 显示状态提示
+    const head = snakes.snake1[0];
+    showNotice(pausedSnakes.snake1 ? '玩家1已暂停' : '玩家1已恢复', 
+              '#FF5722', head.x, head.y);
+    
+    // 添加音效或特效（可选）
+    if (pausedSnakes.snake1) {
+        // 暂停特效
+        createParticles(head.x + 10, head.y + 10, 10, '#FF5722');
+    } else {
+        // 恢复特效
+        createParticles(head.x + 10, head.y + 10, 10, '#4CAF50');
+    }
+    
+    e.preventDefault();
+    return;
+}
+
+if (e.key === '/' || e.key === '?') {
+    // 如果商店打开，不允许手动暂停/恢复
+    if (storeOpen.snake2) {
+        e.preventDefault();
+        return;
+    }
+    
+    // 切换暂停状态
+    pausedSnakes.snake2 = !pausedSnakes.snake2;
+    
+    // 显示状态提示
+    const head = snakes.snake2[0];
+    showNotice(pausedSnakes.snake2 ? '玩家2已暂停' : '玩家2已恢复', 
+              '#2196F3', head.x, head.y);
+    
+    // 添加音效或特效（可选）
+    if (pausedSnakes.snake2) {
+        // 暂停特效
+        createParticles(head.x + 10, head.y + 10, 10, '#2196F3');
+    } else {
+        // 恢复特效
+        createParticles(head.x + 10, head.y + 10, 10, '#4CAF50');
+    }
+    
+    e.preventDefault();
+    return;
+}
+    // 防止默认行为
+    if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+    }
+    
+    // === 商店控制逻辑 ===
+    // 玩家1商店：E键打开/关闭
+    if (e.key === 'e' || e.key === 'E') {
+        openStore('snake1');
+        e.preventDefault();
+        return;
+    }
+    
+    // 玩家2商店：.或>键打开/关闭
+    if (e.key === '.' || e.key === '>') {
+        openStore('snake2');
+        e.preventDefault();
+        return;
+    }
+    
+    // === 商店内控制（修改这里）===
+    // 玩家1商店内控制 - 只阻止玩家1的控制键
+    if (storeOpen.snake1) {
+        // W/S选择
+        if (e.key === 'w' || e.key === 'W' || e.key === 's' || e.key === 'S') {
+            if (e.key === 'w' || e.key === 'W') {
+                storeSelectedItem.snake1 = Math.max(0, storeSelectedItem.snake1 - 1);
+            } else {
+                storeSelectedItem.snake1 = Math.min(storeItems.length - 1, storeSelectedItem.snake1 + 1);
+            }
+            updateStoreDisplay('snake1');
+            e.preventDefault();
+            return;
+        }
+        
+        // R键购买并关闭
+        if (e.key === 'r' || e.key === 'R') {
+            const selectedItem = storeItems[storeSelectedItem.snake1];
+            const upgradeLevel = playerUpgrades.snake1[selectedItem.id.split('_')[0]] || 0;
+            const isMaxLevel = selectedItem.type === 'upgrade' && selectedItem.maxLevel && upgradeLevel >= selectedItem.maxLevel;
+            const canAfford = scores.snake1 >= selectedItem.price && !isMaxLevel;
+            
+            if (canAfford) {
+                buyStoreItem('snake1');
+                setTimeout(() => closeStore('snake1'), 300);
+            } else {
+                const head = snakes.snake1[0];
+                if (isMaxLevel) {
+                    showNotice('已经达到最大等级!', '#FF0000', head.x, head.y);
+                } else {
+                    showNotice('分数不足!', '#FF0000', head.x, head.y);
+                }
+            }
+            e.preventDefault();
+            return;
+        }
+        
+        // E键关闭商店
+        if (e.key === 'e' || e.key === 'E') {
+            closeStore('snake1');
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // 玩家2商店内控制 - 只阻止玩家2的控制键
+    if (storeOpen.snake2) {
+        // 上下方向键选择
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            if (e.key === 'ArrowUp') {
+                storeSelectedItem.snake2 = Math.max(0, storeSelectedItem.snake2 - 1);
+            } else {
+                storeSelectedItem.snake2 = Math.min(storeItems.length - 1, storeSelectedItem.snake2 + 1);
+            }
+            updateStoreDisplay('snake2');
+            e.preventDefault();
+            return;
+        }
+        
+        // Enter键购买并关闭
+        if (e.key === 'Enter') {
+            const selectedItem = storeItems[storeSelectedItem.snake2];
+            const upgradeLevel = playerUpgrades.snake2[selectedItem.id.split('_')[0]] || 0;
+            const isMaxLevel = selectedItem.type === 'upgrade' && selectedItem.maxLevel && upgradeLevel >= selectedItem.maxLevel;
+            const canAfford = scores.snake2 >= selectedItem.price && !isMaxLevel;
+            
+            if (canAfford) {
+                buyStoreItem('snake2');
+                setTimeout(() => closeStore('snake2'), 300);
+            } else {
+                const head = snakes.snake2[0];
+                if (isMaxLevel) {
+                    showNotice('已经达到最大等级!', '#FF0000', head.x, head.y);
+                } else {
+                    showNotice('分数不足!', '#FF0000', head.x, head.y);
+                }
+            }
+            e.preventDefault();
+            return;
+        }
+        
+        // .或>键关闭商店
+        if (e.key === '.' || e.key === '>') {
+            closeStore('snake2');
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // === 原有游戏控制逻辑 ===
+    // 注意：这里不再阻止所有按键，只阻止特定商店控制键
+    
+    // 检查蛇是否暂停
+    if (pausedSnakes.snake1 && isPlayer1ControlKey(e.key)) {
+        // 如果蛇1暂停，只阻止玩家1的控制键
+        if (isPlayer1ControlKey(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    if (pausedSnakes.snake2 && isPlayer2ControlKey(e.key)) {
+        // 如果蛇2暂停，只阻止玩家2的控制键
+        if (isPlayer2ControlKey(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    }
     // 阻止空格和Enter键的默认行为，避免触发按钮点击
     if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -6378,7 +8047,18 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+function isPlayer1ControlKey(key) {
+    const player1Keys = ['w', 'W', 's', 'S', 'a', 'A', 'd', 'D', 'q', 'Q'];
+    const player1Numbers = ['1', '2', '3', '4', '5'];
+    return player1Keys.includes(key) || player1Numbers.includes(key);
+}
 
+function isPlayer2ControlKey(key) {
+    const player2Keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const player2Numbers = ['6', '7', '8', '9', '0'];
+    const player2Special = ['/', '?'];
+    return player2Keys.includes(key) || player2Numbers.includes(key) || player2Special.includes(key);
+}
 // 开始游戏按钮
 startBtn.addEventListener('click', () => {
     const player1Name = localStorage.getItem('username') || '玩家1';
@@ -6924,6 +8604,320 @@ window.addEventListener('click', function(event) {
     if (event.target === document.getElementById('records-modal')) {
         document.getElementById('records-modal').style.display = 'none';
     }
+});
+// 修改后的打开商店函数
+function openStore(snakeId) {
+    if (gameOverScreen.classList.contains('show')) return;
+    
+    // 移除检查其他商店是否已打开的代码
+    // const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
+    // if (storeOpen[otherSnakeId]) {
+    //     // 先关闭其他商店
+    //     closeStore(otherSnakeId);
+    // }
+    
+    const storeId = snakeId === 'snake1' ? 'store-player1' : 'store-player2';
+    const storeElement = document.getElementById(storeId);
+    
+    // 如果商店已经打开，则关闭它（切换功能）
+    if (storeOpen[snakeId]) {
+        closeStore(snakeId);
+        return;
+    }
+    
+    // 暂停蛇的移动
+    pausedSnakes[snakeId] = true;
+    
+    // 如果两个商店都打开，不需要重复添加模糊效果
+    
+    // 更新商店信息
+    updateStoreDisplay(snakeId);
+    
+    // 显示商店
+    storeElement.style.display = 'flex';
+    storeOpen[snakeId] = true;
+    
+    // 显示商店提示
+    const head = snakes[snakeId][0];
+    showNotice('商店已打开', snakeId === 'snake1' ? '#FF5722' : '#2196F3', head.x, head.y);
+}
+
+// 关闭商店
+function closeStore(snakeId) {
+    const storeId = snakeId === 'snake1' ? 'store-player1' : 'store-player2';
+    const storeElement = document.getElementById(storeId);
+    
+    // 恢复蛇的移动
+    pausedSnakes[snakeId] = false;
+    
+    // 移除模糊效果
+    
+    // 隐藏商店
+    storeElement.style.display = 'none';
+    storeOpen[snakeId] = false;
+    
+    // 重置选择
+    storeSelectedItem[snakeId] = 0;
+    
+    // 显示关闭提示
+    const head = snakes[snakeId][0];
+}
+
+// 更新商店显示
+// 修改updateStoreDisplay函数，添加护盾检查
+// 修改updateStoreDisplay函数，修复变量作用域问题
+function updateStoreDisplay(snakeId) {
+    const playerNum = snakeId === 'snake1' ? '1' : '2';
+    const storeItemsElement = document.getElementById(`store-player${playerNum}-items`);
+    const storeScoreElement = document.getElementById(`store-player${playerNum}-score`);
+    const storeNameElement = document.getElementById(`store-player${playerNum}-name`);
+    const storeBuyBtn = document.getElementById(`store-player${playerNum}-buy`);
+    
+    // 更新玩家名称和分数
+    const playerName = snakeId === 'snake1' ? 
+        localStorage.getItem('username') || '玩家1' : 
+        localStorage.getItem('player2_username') || '玩家2';
+    storeNameElement.textContent = playerName;
+    storeScoreElement.textContent = scores[snakeId];
+    
+    // 生成商店项目列表
+    storeItemsElement.innerHTML = '';
+    
+    storeItems.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.className = `store-item ${index === storeSelectedItem[snakeId] ? 'selected' : ''}`;
+        itemElement.dataset.index = index;
+        
+        // 检查是否已购买并达到最大等级
+        let isMaxLevel = false;
+        let canAfford = scores[snakeId] >= item.price;
+        let upgradeLevel = 0; // 在这里定义upgradeLevel变量
+        
+        if (item.type === 'upgrade') {
+            upgradeLevel = playerUpgrades[snakeId][item.id.split('_')[0]] || 0;
+            isMaxLevel = item.maxLevel && upgradeLevel >= item.maxLevel;
+            canAfford = canAfford && !isMaxLevel;
+        } else if (item.id === 'shield') {
+            // 护盾：如果已经有护盾，不能购买
+            isMaxLevel = shields[snakeId].active && shields[snakeId].health > 0;
+            canAfford = canAfford && !isMaxLevel;
+        } else if (item.id === 'random_balls') {
+            // 随机球礼包：可以重复购买
+            canAfford = canAfford;
+        }
+        
+        // 项目内容 - 现在upgradeLevel在作用域内
+        itemElement.innerHTML = `
+            <div class="store-item-icon" style="background: ${item.color};">
+                ${item.icon}
+            </div>
+            <div class="store-item-info">
+                <div class="store-item-name">
+                    ${item.name}
+                    ${isMaxLevel ? '<span style="color:#4CAF50;">(已拥有)</span>' : ''}
+                </div>
+                <div class="store-item-desc">${item.description}</div>
+                <div class="store-item-price">
+                    <i class="fas fa-coins"></i> ${item.price}分
+                    ${item.type === 'upgrade' ? 
+                        `<span style="margin-left:10px;color:#aaa;">等级: ${upgradeLevel}/${item.maxLevel}</span>` : 
+                        ''}
+                </div>
+            </div>
+        `;
+        
+        // 点击事件
+        itemElement.addEventListener('click', () => {
+            if (!isMaxLevel) {
+                storeSelectedItem[snakeId] = index;
+                updateStoreDisplay(snakeId);
+            }
+        });
+        
+        storeItemsElement.appendChild(itemElement);
+    });
+    
+    // 更新购买按钮状态
+    const selectedItem = storeItems[storeSelectedItem[snakeId]];
+    
+    // 重新计算选择项的状态
+    let selectedIsMaxLevel = false;
+    let selectedUpgradeLevel = 0; // 为选中项定义变量
+    
+    if (selectedItem.type === 'upgrade') {
+        selectedUpgradeLevel = playerUpgrades[snakeId][selectedItem.id.split('_')[0]] || 0;
+        selectedIsMaxLevel = selectedItem.maxLevel && selectedUpgradeLevel >= selectedItem.maxLevel;
+    } else if (selectedItem.id === 'shield') {
+        selectedIsMaxLevel = shields[snakeId].active && shields[snakeId].health > 0;
+    }
+    
+    const selectedCanAfford = scores[snakeId] >= selectedItem.price && !selectedIsMaxLevel;
+    
+    storeBuyBtn.disabled = !selectedCanAfford;
+    if (selectedIsMaxLevel) {
+        if (selectedItem.id === 'shield') {
+            storeBuyBtn.textContent = '已有护盾';
+        } else if (selectedItem.id === 'random_balls') {
+            storeBuyBtn.textContent = '可购买';
+        } else {
+            storeBuyBtn.textContent = '已满级';
+        }
+    } else {
+        storeBuyBtn.textContent = selectedCanAfford ? '购买' : '分数不足';
+    }
+}
+
+// 购买商店物品
+function buyStoreItem(snakeId) {
+    if (!storeOpen[snakeId]) return;
+    
+    const selectedIndex = storeSelectedItem[snakeId];
+    const item = storeItems[selectedIndex];
+    const playerName = snakeId === 'snake1' ? 
+        localStorage.getItem('username') || '玩家1' : 
+        localStorage.getItem('player2_username') || '玩家2';
+    
+    // 检查是否已满级
+    const upgradeLevel = playerUpgrades[snakeId][item.id.split('_')[0]] || 0;
+    if (item.type === 'upgrade' && item.maxLevel && upgradeLevel >= item.maxLevel) {
+        showNotice('已经达到最大等级!', '#FF0000', 
+                  snakes[snakeId][0].x, snakes[snakeId][0].y);
+        return;
+    }
+    
+    // 检查分数是否足够
+    if (scores[snakeId] < item.price) {
+        showNotice('分数不足!', '#FF0000', 
+                  snakes[snakeId][0].x, snakes[snakeId][0].y);
+        return;
+    }
+    
+    // 扣除分数
+    scores[snakeId] -= item.price;
+    updateScoreDisplay();
+    
+    // 应用物品效果
+    applyStoreItemEffect(snakeId, item);
+    
+    // 显示购买成功提示
+    showNotice(`购买成功! -${item.price}分`, '#4CAF50', 
+              snakes[snakeId][0].x, snakes[snakeId][0].y);
+    
+    // 播放购买特效
+    createParticles(snakes[snakeId][0].x + 10, snakes[snakeId][0].y + 10, 20, '#FFD700');
+    
+    // 更新商店显示
+    updateStoreDisplay(snakeId);
+}
+
+// 应用商店物品效果
+// 修改applyStoreItemEffect函数，添加护盾效果
+function applyStoreItemEffect(snakeId, item) {
+    const head = snakes[snakeId][0];
+    
+    switch(item.id) {
+        case 'shield':
+            // 激活护盾
+            if (!shields[snakeId].active) {
+                shields[snakeId].active = true;
+                shields[snakeId].health = shields[snakeId].maxHealth;
+                
+                // 更新护盾显示
+                updateShieldDisplay(snakeId);
+                
+                // 显示护盾激活特效
+                showNotice('护盾已激活!', '#00BCD4', head.x, head.y);
+                createParticles(head.x + 10, head.y + 10, 30, '#00BCD4');
+                
+                // 创建护盾环绕特效
+                createShieldEffect(snakeId);
+            }
+            break;
+            
+        case 'random_balls':
+            // 给予3个随机魔法球
+            for (let i = 0; i < 3; i++) {
+                if (ballStorage[snakeId].length < 5) {
+                    const ballTypes = ['attack', 'health', 'immunity', 'reverse', 'bomb'];
+                    const randomType = ballTypes[Math.floor(Math.random() * ballTypes.length)];
+                    ballStorage[snakeId].push({type: randomType});
+                    
+                    // 显示获得提示
+                    showNotice(`获得${getBallName(randomType)}!`, getBallColor(randomType), 
+                              head.x, head.y - i * 20);
+                }
+            }
+            updateStorageDisplay();
+            break;
+            
+        case 'speed_upgrade':
+            // 增加速度
+            playerUpgrades[snakeId].speed++;
+            speedBoosts[snakeId] += 0.15; // 增加15%速度
+            showNotice('速度增加15%!', '#FFD700', head.x, head.y);
+            break;
+            
+        case 'tough_upgrade':
+            // 增加生命值上限
+            playerUpgrades[snakeId].tough++;
+            const maxHealthIncrease = 2;
+            
+            // 更新最大生命值
+            if (snakeId === 'snake1') {
+                health.snake1 += maxHealthIncrease;
+            } else {
+                health.snake2 += maxHealthIncrease;
+            }
+            
+            showNotice(`生命值上限+${maxHealthIncrease}!`, '#C0C0C0', head.x, head.y);
+            updateHealthBars();
+            break;
+            
+        case 'magic_upgrade':
+            // 延长特殊效果时间
+            playerUpgrades[snakeId].magic++;
+            showNotice('魔法效果时间延长20%!', '#2196F3', head.x, head.y);
+            break;
+    }
+}
+
+// 获取球体名称
+function getBallName(ballType) {
+    const names = {
+        'attack': '攻击球',
+        'health': '血球',
+        'immunity': '无敌球',
+        'reverse': '反转球',
+        'bomb': '炸弹球'
+    };
+    return names[ballType] || '魔法球';
+}
+
+// 获取球体颜色
+function getBallColor(ballType) {
+    const colors = {
+        'attack': '#00BFFF',
+        'health': '#FF0000',
+        'immunity': '#FFFF00',
+        'reverse': '#800080',
+        'bomb': '#FF4500'
+    };
+    return colors[ballType] || '#FFFFFF';
+}
+document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('store-player1-buy').addEventListener('click', () => {
+        if (storeOpen.snake1) {
+            buyStoreItem('snake1');
+        }
+    });
+    
+    document.getElementById('store-player2-buy').addEventListener('click', () => {
+        if (storeOpen.snake2) {
+            buyStoreItem('snake2');
+        }
+    });
+    
+
 });
 </script>
 </body>
