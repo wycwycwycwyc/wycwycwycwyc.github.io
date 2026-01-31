@@ -2278,6 +2278,7 @@ let blizzardTimer = 0;
 let coldWindTimer = 0;
 let snakeSpeedModifiers = { snake1: 1, snake2: 1 };
 let frozenSnakes = { snake1: false, snake2: false, timer1: 0, timer2: 0 };
+const MAX_BULLETS = 100;
 let speedBoosts = {
     snake1: 0,
     snake2: 0
@@ -2438,13 +2439,35 @@ let shields = {
         maxHealth: 10
     }
 };
+let dashState = {
+    snake1: {
+        active: false,
+        lastKey: null,
+        lastKeyTime: 0,
+        endTime: 0
+    },
+    snake2: {
+        active: false,
+        lastKey: null,
+        lastKeyTime: 0,
+        endTime: 0
+    }
+};
+let lastDashTime = {
+    snake1: 0,
+    snake2: 0
+};
+let lastImmunityDashTime = {
+    snake1: 0,
+    snake2: 0
+};
 // 商店项目定义
 const storeItems = [
     {
         id: 'shield',
         name: '能量护盾',
         description: '获得10点护盾值，优先抵挡伤害',
-        price: 800,
+        price: 400,
         icon: '🛡️',
         color: '#00BCD4',
         type: 'shield',
@@ -2454,7 +2477,7 @@ const storeItems = [
         id: 'random_balls',
         name: '随机魔法球礼包',
         description: '获得3个随机魔法球 (攻击/血球/无敌/反转/炸弹)',
-        price: 800,
+        price: 400,
         icon: '🎁',
         color: '#9C27B0',
         type: 'consumable'
@@ -2463,7 +2486,7 @@ const storeItems = [
         id: 'speed_upgrade',
         name: '速度属性升级',
         description: '永久增加移动速度15% (最多叠加2次)',
-        price: 1000,
+        price: 500,
         icon: '⚡',
         color: '#FFD700',
         type: 'upgrade',
@@ -2473,7 +2496,7 @@ const storeItems = [
         id: 'tough_upgrade',
         name: '坚硬属性升级',
         description: '永久增加生命值上限2点 (最多叠加2次)',
-        price: 1000,
+        price: 500,
         icon: '🛡️',
         color: '#C0C0C0',
         type: 'upgrade',
@@ -2483,7 +2506,7 @@ const storeItems = [
         id: 'magic_upgrade',
         name: '魔法属性升级',
         description: '永久延长特殊效果时间20% (最多叠加2次)',
-        price: 1000,
+        price: 500,
         icon: '✨',
         color: '#2196F3',
         type: 'upgrade',
@@ -2548,7 +2571,10 @@ let lastMoveTime = {
                 lastDamageTime: 0
             }
         };
-        
+ const dashCooldown = {
+    snake1: 0,
+    snake2: 0
+};       
         // 修改initGame函数，在生成火山后初始化基地
 
         // 初始化基地的位置
@@ -3379,6 +3405,10 @@ function initGame() {
     }
     clearBoard();
 document.querySelectorAll('.bullet').forEach(bullet => bullet.remove());
+let dashCooldown = {
+    snake1: 0,
+    snake2: 0
+};
 // 修改游戏统计数据初始化
 gameStats = {
     startTime: 0,
@@ -3473,7 +3503,20 @@ gameStats = {
         totalOriginalDamageDealt: 0
     }
 };
-    
+     dashState = {
+        snake1: {
+            active: false,
+            lastKey: null,
+            lastKeyTime: 0,
+            endTime: 0
+        },
+        snake2: {
+            active: false,
+            lastKey: null,
+            lastKeyTime: 0,
+            endTime: 0
+        }
+    };   
     // 移除护盾显示
     document.querySelectorAll('.shield-indicator, .shield-effect').forEach(el => el.remove());
     storeOpen = {
@@ -3679,7 +3722,204 @@ function requestFullscreen() {
         elem.msRequestFullscreen();
     }
 }
-// 添加新的生成所有墙的函数
+function getSnakeSpeed(snakeId) {
+    const isSpeedSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'speed' : snakeTypes.snake2 === 'speed';
+    const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
+    const isMagicSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'magic' : snakeTypes.snake2 === 'magic';
+    
+    let baseSpeed = gameSpeed;
+    
+    // 基础速度调整
+    if (isSpeedSnake) {
+        baseSpeed *= 0.7; // 稍微降低基础速度（原来是0.55，现在是0.7）
+    } else if (isMagicSnake) {
+        baseSpeed *= 0.85;
+    } else if (isToughSnake) {
+        // 坚硬蛇保持原速
+        baseSpeed *= 1.0;
+    }
+    
+    // 速度加成
+    const speedBoost = speedBoosts[snakeId] || 0;
+    baseSpeed /= (1 + speedBoost);
+    
+    // 暴风雪减速
+    if (currentMap === 'snow' && blizzardActive && !immunity[snakeId]) {
+        baseSpeed /= snakeSpeedModifiers[snakeId];
+    }
+    
+    // 俯冲加速（速度蛇专属）
+    if (isSpeedSnake && dashState[snakeId].active) {
+        // 俯冲时速度极快（原速度的3倍）
+        baseSpeed *= 0.2; // 移动间隔减少到20%
+    }
+    
+    return baseSpeed;
+}
+const dashStyle = document.createElement('style');
+dashStyle.textContent = `
+    /* 俯冲动画 */
+    @keyframes dashPulse {
+        from {
+            box-shadow: 0 0 10px #FFD700;
+            transform: scale(1);
+        }
+        to {
+            box-shadow: 0 0 30px #FFD700;
+            transform: scale(1.05);
+        }
+    }
+    
+    .snake-segment.dashing {
+        z-index: 4 !important;
+    }
+    
+    .snake-segment.dashing.snake-head {
+        z-index: 5 !important;
+    }
+    
+    /* 俯冲拖尾效果 */
+    .snake-segment.dashing::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 30px;
+        height: 30px;
+        background: radial-gradient(circle, transparent 30%, #FFD700 70%);
+        transform: translate(-50%, -50%);
+        opacity: 0.5;
+        filter: blur(5px);
+        animation: dashTrail 0.3s forwards;
+        z-index: 3;
+    }
+    
+    @keyframes dashTrail {
+        from {
+            opacity: 0.5;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+    }
+`;
+document.head.appendChild(dashStyle);
+
+
+
+// 添加移动统计，记录俯冲次数
+gameStats.snake1.dashCount = 0;
+gameStats.snake2.dashCount = 0;
+
+// 修改checkDoubleTap函数，记录俯冲次数
+function checkDoubleTap(snakeId, key) {
+    const now = performance.now();
+    const state = dashState[snakeId];
+    
+    // 检查是否是速度蛇
+    const isSpeedSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'speed' : snakeTypes.snake2 === 'speed';
+    if (!isSpeedSnake) return false;
+    
+    // 转换玩家2的方向键
+    let normalizedKey = key;
+    if (snakeId === 'snake2') {
+        switch(key) {
+            case 'ArrowUp': normalizedKey = 'w'; break;
+            case 'ArrowDown': normalizedKey = 's'; break;
+            case 'ArrowLeft': normalizedKey = 'a'; break;
+            case 'ArrowRight': normalizedKey = 'd'; break;
+            default: return false;
+        }
+    }
+    
+    // 检查是否是对应的方向键
+    const directionKeys = ['w', 's', 'a', 'd'];
+    if (!directionKeys.includes(normalizedKey)) return false;
+    
+    // 检查是否是连续按相同键（500毫秒内）
+    if (state.lastKey === normalizedKey && now - state.lastKeyTime < 500) {
+        // 重置按键记录
+        state.lastKey = null;
+        state.lastKeyTime = 0;
+        
+        // 检查是否已经在俯冲中
+        if (state.active) {
+            // 如果在俯冲中再次触发，只延长俯冲时间，不给予任何免疫
+            state.endTime = now + 500; // 延长俯冲时间
+            
+            // 显示提示（无免疫）
+            const head = snakes[snakeId][0];
+            showNotice('俯冲延长 (无免疫)', '#FFA500', head.x, head.y);
+            createParticles(head.x + 10, head.y + 10, 8, '#FFA500');
+            
+            // 记录俯冲时间（但这不是有免疫的俯冲）
+            lastDashTime[snakeId] = now;
+            
+            return true;
+        } else {
+            // 新的俯冲开始
+            state.active = true;
+            state.endTime = now + 500; // 俯冲0.5秒
+            
+            // 记录本次俯冲时间
+            lastDashTime[snakeId] = now;
+            
+            // 计算距离上次有免疫的俯冲的时间间隔
+            const timeSinceLastImmunityDash = now - lastImmunityDashTime[snakeId];
+            
+            // 决定是否给予免疫
+            let giveImmunity = false;
+            let message = '';
+            let color = '';
+            let particleColor = '';
+            
+            if (timeSinceLastImmunityDash > 1000) {
+                // 距离上次有免疫的俯冲超过1秒，给予免疫
+                giveImmunity = true;
+                message = '俯冲+免疫!';
+                color = snakeId === 'snake1' ? '#FF5722' : '#2196F3';
+                particleColor = '#FFD700';
+                
+                // 记录这次是有免疫的俯冲
+                lastImmunityDashTime[snakeId] = now;
+                
+                // 给予0.5秒免疫
+                const immunityDuration = 500;
+                if (snakeId === 'snake1') {
+                    immunity.snake1 = true;
+                    immunity.timer1 = Math.max(immunity.timer1, now + immunityDuration);
+                } else {
+                    immunity.snake2 = true;
+                    immunity.timer2 = Math.max(immunity.timer2, now + immunityDuration);
+                }
+            } else {
+                // 距离上次有免疫的俯冲小于1秒，不给免疫
+                giveImmunity = false;
+                message = '俯冲! (无免疫)';
+                color = '#FFA500';
+                particleColor = '#FFA500';
+            }
+            
+            // 记录俯冲次数
+            gameStats[snakeId].dashCount = (gameStats[snakeId].dashCount || 0) + 1;
+            
+            // 显示提示
+            const head = snakes[snakeId][0];
+            showNotice(message, color, head.x, head.y);
+            createParticles(head.x + 10, head.y + 10, giveImmunity ? 15 : 10, particleColor);
+            
+            return true;
+        }
+    }
+    
+    // 记录按键
+    state.lastKey = normalizedKey;
+    state.lastKeyTime = now;
+    
+    return false;
+}
 function generateAllWalls() {
     const boardWidth = gameBoard.clientWidth;
     const boardHeight = gameBoard.clientHeight;
@@ -4155,14 +4395,31 @@ function generateSpecialItem() {
 }
 
 // 绘制蛇
+// 修改蛇的绘制，添加俯冲视觉效果
 function drawSnakes(withAnimation = false) {
     for (const snakeId in snakes) {
         const snake = snakes[snakeId];
         const isSnake1 = snakeId === 'snake1';
+        const isSpeedSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'speed' : snakeTypes.snake2 === 'speed';
         
         snake.forEach((segment, index) => {
             const segmentElement = document.createElement('div');
             segmentElement.className = `snake-segment ${snakeId}`;
+            
+            // 添加俯冲效果
+            if (isSpeedSnake && dashState[snakeId].active) {
+                segmentElement.classList.add('dashing');
+                segmentElement.style.boxShadow = '0 0 20px #FFD700';
+                segmentElement.style.animation = 'dashPulse 0.2s infinite alternate';
+                
+                if (index === 0) {
+                    segmentElement.innerHTML = '⚡';
+                    segmentElement.style.display = 'flex';
+                    segmentElement.style.justifyContent = 'center';
+                    segmentElement.style.alignItems = 'center';
+                    segmentElement.style.fontSize = '16px';
+                }
+            }
             
             // 添加冻结效果
             if (frozenSnakes[snakeId]) {
@@ -4691,6 +4948,12 @@ function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
     
     // 从所有发射点发射子弹
     firingPoints.forEach(point => {
+        // 检查子弹数量是否达到上限
+        if (bullets.length >= MAX_BULLETS) {
+            // 移除最旧的子弹
+            bullets.shift();
+        }
+        
         // 计算子弹方向（朝向目标蛇头）
         const angle = Math.atan2(
             targetHead.y + 10 - point.y,
@@ -4705,7 +4968,8 @@ function fireBaseBullet(playerHomeId, targetHead, firingPoints, timestamp) {
             player: 'base_' + playerHomeId, // 确保正确标识基地
             size: 6,
             damage: defense.damage,
-            fromSide: point.side || 'unknown'
+            fromSide: point.side || 'unknown',
+            createTime: performance.now() // 添加创建时间戳
         };
         
         bullets.push(bullet);
@@ -4835,7 +5099,18 @@ function getHomeBorderPointsBySide(home, side) {
     
     return points;
 }
-
+function updateDashState(timestamp) {
+    for (const snakeId of ['snake1', 'snake2']) {
+        const state = dashState[snakeId];
+        if (state.active && timestamp > state.endTime) {
+            state.active = false;
+            
+            // 俯冲结束提示
+            const head = snakes[snakeId][0];
+            showNotice('俯冲结束', '#888888', head.x, head.y);
+        }
+    }
+}
 // 游戏主循环
 function gameLoop(timestamp) {
     if (!gameStarted) return;
@@ -4845,6 +5120,7 @@ function gameLoop(timestamp) {
     } else if (currentMap === 'volcano') {
         handleVolcanoEruption(timestamp);
     }  
+    updateDashState(timestamp);
 requestAnimationFrame(gameLoop);
                 // 处理基地相关逻辑
     handleHomes(timestamp);
@@ -4872,15 +5148,8 @@ requestAnimationFrame(gameLoop);
     
     // 计算蛇的速度（整合暴风雪减速效果）
 // 在moveSnake函数开头附近，修改速度计算
-const snake1Speed = (snakeTypes.snake1 === 'speed' ? gameSpeed * 0.55 : 
-                   (snakeTypes.snake1 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
-                   (1 + speedBoosts.snake1) / 
-                   (currentMap === 'snow' && blizzardActive && !immunity.snake1 ? snakeSpeedModifiers.snake1 : 1);
-
-const snake2Speed = (snakeTypes.snake2 === 'speed' ? gameSpeed * 0.55 : 
-                   (snakeTypes.snake2 === 'magic' ? gameSpeed * 0.85 : gameSpeed)) / 
-                   (1 + speedBoosts.snake2) / 
-                   (currentMap === 'snow' && blizzardActive && !immunity.snake2 ? snakeSpeedModifiers.snake2 : 1);
+    const snake1Speed = getSnakeSpeed('snake1');
+    const snake2Speed = getSnakeSpeed('snake2');
     // 移动蛇1
     if (!pausedSnakes.snake1 && timestamp - lastMoveTime.snake1 > snake1Speed) {
         directions.snake1 = nextDirections.snake1;
@@ -5644,6 +5913,20 @@ function fireBullet(snakeId) {
     const head = snakes[snakeId][0];
     const direction = directions[snakeId];
     
+    // 检查子弹数量是否达到上限
+    if (bullets.length >= MAX_BULLETS) {
+        // 查找并移除最旧的蛇子弹（不是基地子弹）
+        const oldestSnakeBulletIndex = bullets.findIndex(bullet => 
+            bullet.player === 'snake1' || bullet.player === 'snake2');
+        
+        if (oldestSnakeBulletIndex !== -1) {
+            bullets.splice(oldestSnakeBulletIndex, 1);
+        } else {
+            // 如果没有找到蛇子弹，就移除最旧的子弹
+            bullets.shift();
+        }
+    }
+    
     // 创建子弹
     const bullet = {
         x: head.x + 10, // 从蛇头中心发射
@@ -5651,7 +5934,8 @@ function fireBullet(snakeId) {
         direction: direction,
         player: snakeId, // 确保正确标识玩家
         speed: 30,
-        size: 8
+        size: 8,
+        createTime: currentTime // 添加创建时间戳
     };
     
     bullets.push(bullet);
@@ -5695,6 +5979,24 @@ function checkSnakeBulletHit(bullet, targetSnakeId, bulletIndex) {
 
 // 修改后的moveBullets函数
 function moveBullets(timestamp) {
+    // 首先检查子弹数量，如果超过限制，移除最旧的
+    if (bullets.length > MAX_BULLETS) {
+        // 按创建时间排序，移除最旧的
+        bullets.sort((a, b) => (a.createTime || 0) - (b.createTime || 0));
+        const bulletsToRemove = bullets.length - MAX_BULLETS;
+        bullets.splice(0, bulletsToRemove);
+        
+        // 清理对应的DOM元素
+        setTimeout(() => {
+            const bulletElements = document.querySelectorAll('.bullet');
+            if (bulletElements.length > MAX_BULLETS) {
+                for (let i = 0; i < bulletsToRemove && i < bulletElements.length; i++) {
+                    bulletElements[i].remove();
+                }
+            }
+        }, 0);
+    }
+    
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
         
@@ -5771,6 +6073,7 @@ function moveBullets(timestamp) {
         }
     }
 }
+
 
 // 新增函数：检查子弹是否击中基地（从原checkBulletHitHome分离）
 function checkBulletHitHome(bullet, bulletIndex) {
@@ -6410,9 +6713,6 @@ function applyBombDamageToSnake(snakeId, targetSnakeId, explosionCenter) {
         });
         
         if (damageApplied) {
-            // 记录炸弹输出伤害统计
-            gameStats[snakeId].damageDealt.bomb += totalDamage;
-            gameStats[snakeId].totalDamageDealt += totalDamage;
         }
     } else {
         // 在安全距离外
@@ -7915,7 +8215,20 @@ if (e.key === '/' || e.key === '?') {
             return;
         }
     }
+        if (e.key >= '1' && e.key <= '5') {
+        const slotIndex = parseInt(e.key) - 1;
+        releaseBall('snake1', slotIndex);
+        e.preventDefault();
+        return;
+    }
     
+    // 玩家2释放球体 (按键6-0)
+    if ((e.key >= '6' && e.key <= '9') || e.key === '0') {
+        const slotIndex = e.key === '0' ? 4 : parseInt(e.key) - 6;
+        releaseBall('snake2', slotIndex);
+        e.preventDefault();
+        return;
+    }
     // === 原有游戏控制逻辑 ===
     // 注意：这里不再阻止所有按键，只阻止特定商店控制键
     
@@ -7972,19 +8285,37 @@ if (e.key === '/' || e.key === '?') {
         switch (e.key) {
             case 'w':
             case 'W':
-                if (directions.snake1 !== 'up') nextDirections.snake1 = 'down';
+                // 检查俯冲
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    // 俯冲时立即设置方向
+                    nextDirections.snake1 = 'down';
+                } else if (directions.snake1 !== 'up') {
+                    nextDirections.snake1 = 'down';
+                }
                 break;
             case 's':
             case 'S':
-                if (directions.snake1 !== 'down') nextDirections.snake1 = 'up';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'up';
+                } else if (directions.snake1 !== 'down') {
+                    nextDirections.snake1 = 'up';
+                }
                 break;
             case 'a':
             case 'A':
-                if (directions.snake1 !== 'left') nextDirections.snake1 = 'right';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'right';
+                } else if (directions.snake1 !== 'right') {
+                    nextDirections.snake1 = 'right';
+                }
                 break;
             case 'd':
             case 'D':
-                if (directions.snake1 !== 'right') nextDirections.snake1 = 'left';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'left';
+                } else if (directions.snake1 !== 'left') {
+                    nextDirections.snake1 = 'left';
+                }
                 break;
         }
     } else {
@@ -7992,19 +8323,35 @@ if (e.key === '/' || e.key === '?') {
         switch (e.key) {
             case 'w':
             case 'W':
-                if (directions.snake1 !== 'down') nextDirections.snake1 = 'up';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'up';
+                } else if (directions.snake1 !== 'down') {
+                    nextDirections.snake1 = 'up';
+                }
                 break;
             case 's':
             case 'S':
-                if (directions.snake1 !== 'up') nextDirections.snake1 = 'down';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'down';
+                } else if (directions.snake1 !== 'up') {
+                    nextDirections.snake1 = 'down';
+                }
                 break;
             case 'a':
             case 'A':
-                if (directions.snake1 !== 'right') nextDirections.snake1 = 'left';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'left';
+                } else if (directions.snake1 !== 'right') {
+                    nextDirections.snake1 = 'left';
+                }
                 break;
             case 'd':
             case 'D':
-                if (directions.snake1 !== 'left') nextDirections.snake1 = 'right';
+                if (checkDoubleTap('snake1', e.key.toLowerCase())) {
+                    nextDirections.snake1 = 'right';
+                } else if (directions.snake1 !== 'left') {
+                    nextDirections.snake1 = 'right';
+                }
                 break;
         }
     }
@@ -8014,32 +8361,64 @@ if (e.key === '/' || e.key === '?') {
         // 反向控制
         switch (e.key) {
             case 'ArrowUp':
-                if (directions.snake2 !== 'up') nextDirections.snake2 = 'down';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'down';
+                } else if (directions.snake2 !== 'up') {
+                    nextDirections.snake2 = 'down';
+                }
                 break;
             case 'ArrowDown':
-                if (directions.snake2 !== 'down') nextDirections.snake2 = 'up';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'up';
+                } else if (directions.snake2 !== 'down') {
+                    nextDirections.snake2 = 'up';
+                }
                 break;
             case 'ArrowLeft':
-                if (directions.snake2 !== 'left') nextDirections.snake2 = 'right';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'right';
+                } else if (directions.snake2 !== 'right') {
+                    nextDirections.snake2 = 'right';
+                }
                 break;
             case 'ArrowRight':
-                if (directions.snake2 !== 'right') nextDirections.snake2 = 'left';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'left';
+                } else if (directions.snake2 !== 'left') {
+                    nextDirections.snake2 = 'left';
+                }
                 break;
         }
     } else {
         // 正常控制
         switch (e.key) {
             case 'ArrowUp':
-                if (directions.snake2 !== 'down') nextDirections.snake2 = 'up';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'up';
+                } else if (directions.snake2 !== 'down') {
+                    nextDirections.snake2 = 'up';
+                }
                 break;
             case 'ArrowDown':
-                if (directions.snake2 !== 'up') nextDirections.snake2 = 'down';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'down';
+                } else if (directions.snake2 !== 'up') {
+                    nextDirections.snake2 = 'down';
+                }
                 break;
             case 'ArrowLeft':
-                if (directions.snake2 !== 'right') nextDirections.snake2 = 'left';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'left';
+                } else if (directions.snake2 !== 'right') {
+                    nextDirections.snake2 = 'left';
+                }
                 break;
             case 'ArrowRight':
-                if (directions.snake2 !== 'left') nextDirections.snake2 = 'right';
+                if (checkDoubleTap('snake2', e.key)) {
+                    nextDirections.snake2 = 'right';
+                } else if (directions.snake2 !== 'left') {
+                    nextDirections.snake2 = 'right';
+                }
                 break;
         }
     }
@@ -8606,58 +8985,48 @@ window.addEventListener('click', function(event) {
 function openStore(snakeId) {
     if (gameOverScreen.classList.contains('show')) return;
     
-    // 移除检查其他商店是否已打开的代码
-    // const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
-    // if (storeOpen[otherSnakeId]) {
-    //     // 先关闭其他商店
-    //     closeStore(otherSnakeId);
-    // }
-    
     const storeId = snakeId === 'snake1' ? 'store-player1' : 'store-player2';
     const storeElement = document.getElementById(storeId);
     
-    // 如果商店已经打开，则关闭它（切换功能）
     if (storeOpen[snakeId]) {
         closeStore(snakeId);
         return;
     }
     
-    // 暂停蛇的移动
+    // 记录商店打开前的暂停状态
+    const wasPausedBeforeStore = pausedSnakes[snakeId];
+    
+    // 暂停蛇的移动（如果还没暂停）
     pausedSnakes[snakeId] = true;
     
-    // 如果两个商店都打开，不需要重复添加模糊效果
+    // 将状态存储在数据属性中
+    storeElement.dataset.wasPaused = wasPausedBeforeStore;
     
     // 更新商店信息
     updateStoreDisplay(snakeId);
     
-    // 显示商店
     storeElement.style.display = 'flex';
     storeOpen[snakeId] = true;
-    
-    // 显示商店提示
-    const head = snakes[snakeId][0];
-    showNotice('商店已打开', snakeId === 'snake1' ? '#FF5722' : '#2196F3', head.x, head.y);
 }
+
 
 // 关闭商店
 function closeStore(snakeId) {
     const storeId = snakeId === 'snake1' ? 'store-player1' : 'store-player2';
     const storeElement = document.getElementById(storeId);
     
-    // 恢复蛇的移动
-    pausedSnakes[snakeId] = false;
+    // 获取商店打开前的状态
+    const wasPaused = storeElement.dataset.wasPaused === 'true';
     
-    // 移除模糊效果
+    // 恢复商店打开前的状态
+    pausedSnakes[snakeId] = wasPaused;
     
-    // 隐藏商店
+    // 移除数据属性
+    delete storeElement.dataset.wasPaused;
+    
     storeElement.style.display = 'none';
     storeOpen[snakeId] = false;
-    
-    // 重置选择
     storeSelectedItem[snakeId] = 0;
-    
-    // 显示关闭提示
-    const head = snakes[snakeId][0];
 }
 
 // 更新商店显示
