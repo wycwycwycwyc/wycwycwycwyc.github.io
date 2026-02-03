@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
@@ -18,13 +19,13 @@
             overflow: hidden;
             height: 100vh;
         }
-        
+
         #game-container {
             width: 100%;
             height: 100vh;
             position: relative;
         }
-        
+
         /* 分屏容器 */
         .split-screen {
             position: absolute;
@@ -34,7 +35,7 @@
             height: 100%;
             display: flex;
         }
-        
+
         .split-left {
             width: 50%;
             height: 100%;
@@ -42,28 +43,29 @@
             position: relative;
             border-right: 2px solid rgba(255, 255, 255, 0.3);
         }
-        
+
         .split-right {
             width: 50%;
             height: 100%;
             overflow: hidden;
             position: relative;
         }
-        
+
         .player-viewport {
             width: 100%;
             height: 100%;
             position: relative;
             /* 移除或调整背景色 */
-            background: rgba(0, 0, 0, 0.3); /* 半透明黑色，让视野更清晰 */
+            background: rgba(0, 0, 0, 0.3);
+            /* 半透明黑色，让视野更清晰 */
         }
-        
+
         .player-canvas {
             width: 100%;
             height: 100%;
             display: block;
         }
-        
+
         /* UI覆盖层 */
         #ui-overlay {
             position: absolute;
@@ -74,7 +76,7 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         /* 玩家信息面板 */
         .player-panel {
             position: absolute;
@@ -87,23 +89,23 @@
             pointer-events: auto;
             font-size: 0.9rem;
         }
-        
+
         #player1-panel {
             left: 10px;
             border-color: #FF7F00;
         }
-        
+
         #player2-panel {
             right: 10px;
             border-color: #4169E1;
         }
-        
+
         .player-header {
             display: flex;
             align-items: center;
             margin-bottom: 8px;
         }
-        
+
         .snake-type {
             padding: 2px 6px;
             border-radius: 4px;
@@ -111,11 +113,22 @@
             margin-left: 8px;
             font-size: 0.8rem;
         }
-        
-        .speed-snake { background: #FFA500; color: #000; }
-        .hard-snake { background: #C0C0C0; color: #000; }
-        .magic-snake { background: #9370DB; color: #000; }
-        
+
+        .speed-snake {
+            background: #FFA500;
+            color: #000;
+        }
+
+        .hard-snake {
+            background: #C0C0C0;
+            color: #000;
+        }
+
+        .magic-snake {
+            background: #9370DB;
+            color: #000;
+        }
+
         .health-bar {
             width: 100%;
             height: 16px;
@@ -124,21 +137,26 @@
             overflow: hidden;
             margin: 4px 0;
         }
-        
+
         .health-fill {
             height: 100%;
             transition: width 0.3s;
         }
-        
-        #player1-health { background: linear-gradient(to right, #FF4444, #FF7F00); }
-        #player2-health { background: linear-gradient(to right, #4444FF, #4169E1); }
-        
+
+        #player1-health {
+            background: linear-gradient(to right, #FF4444, #FF7F00);
+        }
+
+        #player2-health {
+            background: linear-gradient(to right, #4444FF, #4169E1);
+        }
+
         .magic-balls {
             display: flex;
             gap: 4px;
             margin: 8px 0;
         }
-        
+
         .ball-slot {
             width: 26px;
             height: 26px;
@@ -151,13 +169,32 @@
             cursor: pointer;
             pointer-events: auto;
         }
-        
-        .invincible { background: #FFFF00; color: #000; }
-        .health { background: #FF0000; color: #FFF; }
-        .reverse { background: #800080; color: #FFF; }
-        .attack { background: #87CEEB; color: #000; }
-        .bomb { background: #FF8C00; color: #000; }
-        
+
+        .invincible {
+            background: #FFFF00;
+            color: #000;
+        }
+
+        .health {
+            background: #FF0000;
+            color: #FFF;
+        }
+
+        .reverse {
+            background: #800080;
+            color: #FFF;
+        }
+
+        .attack {
+            background: #87CEEB;
+            color: #000;
+        }
+
+        .bomb {
+            background: #FF8C00;
+            color: #000;
+        }
+
         /* 游戏控制按钮 */
         .game-controls {
             position: absolute;
@@ -171,7 +208,7 @@
             padding: 10px;
             border-radius: 8px;
         }
-        
+
         button {
             background: linear-gradient(to bottom, #4444FF, #2222AA);
             color: white;
@@ -183,20 +220,20 @@
             transition: all 0.3s;
             pointer-events: auto;
         }
-        
+
         button:hover {
             background: linear-gradient(to bottom, #5555FF, #3333BB);
             transform: translateY(-2px);
         }
-        
+
         #start-btn {
             background: linear-gradient(to bottom, #00AA00, #008800);
         }
-        
+
         #start-btn:hover {
             background: linear-gradient(to bottom, #00CC00, #00AA00);
         }
-        
+
         /* 商店界面 */
         .shop-overlay {
             position: absolute;
@@ -211,7 +248,7 @@
             z-index: 200;
             pointer-events: auto;
         }
-        
+
         .shop-content {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             padding: 25px;
@@ -220,20 +257,20 @@
             max-width: 500px;
             border: 3px solid #FFD700;
         }
-        
+
         .shop-title {
             text-align: center;
             font-size: 1.8rem;
             color: #FFD700;
             margin-bottom: 15px;
         }
-        
+
         .shop-items {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
-        
+
         .shop-item {
             background: rgba(255, 255, 255, 0.1);
             padding: 12px;
@@ -242,23 +279,23 @@
             transition: all 0.3s;
             border: 2px solid transparent;
         }
-        
+
         .shop-item:hover {
             background: rgba(255, 255, 255, 0.2);
             border-color: #FFD700;
         }
-        
+
         .item-name {
             font-size: 1.1rem;
             color: #FFD700;
             margin-bottom: 4px;
         }
-        
+
         .item-price {
             color: #87CEEB;
             font-weight: bold;
         }
-        
+
         /* 游戏结束界面 */
         .game-over {
             position: absolute;
@@ -274,13 +311,13 @@
             z-index: 200;
             pointer-events: auto;
         }
-        
+
         #winner-text {
             font-size: 2.5rem;
             margin-bottom: 15px;
             text-shadow: 0 0 10px currentColor;
         }
-        
+
         .stats-container {
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -289,27 +326,13 @@
             width: 70%;
             max-width: 450px;
         }
-        
+
         .stat-item {
             display: flex;
             justify-content: space-between;
             margin: 8px 0;
         }
-        
-        /* 控制提示 */
-        .controls-hint {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 500px;
-            font-size: 0.9rem;
-        }
-        
+
         .key-hint {
             display: inline-block;
             background-color: #333;
@@ -320,7 +343,7 @@
             font-family: monospace;
             border: 1px solid #666;
         }
-        
+
         /* 分数显示 */
         .score-display {
             position: absolute;
@@ -333,7 +356,7 @@
             padding: 8px 15px;
             border-radius: 6px;
         }
-        
+
         /* 基地信息 */
         .base-info {
             position: absolute;
@@ -344,17 +367,17 @@
             min-width: 130px;
             font-size: 0.9rem;
         }
-        
+
         #player1-base {
             left: 10px;
             border: 2px solid #FF7F00;
         }
-        
+
         #player2-base {
             right: 10px;
             border: 2px solid #4169E1;
         }
-        
+
         .base-health {
             height: 8px;
             background: #333;
@@ -362,12 +385,12 @@
             overflow: hidden;
             margin: 4px 0;
         }
-        
+
         .base-health-fill {
             height: 100%;
             background: #00FF00;
         }
-        
+
         /* 第一视角准星 */
         .crosshair {
             position: absolute;
@@ -378,52 +401,66 @@
             height: 20px;
             pointer-events: none;
         }
-        
+
         .crosshair::before,
         .crosshair::after {
             content: '';
             position: absolute;
             background: rgba(255, 255, 255, 0.8);
         }
-        
+
         .crosshair::before {
             width: 2px;
             height: 20px;
             top: 0;
             left: 9px;
         }
-        
+
         .crosshair::after {
             width: 20px;
             height: 2px;
             top: 9px;
             left: 0;
         }
-        
+
         .p1-crosshair {
             position: absolute;
             top: 50%;
             left: 25%;
             transform: translate(-50%, -50%);
         }
-        
+
         .p2-crosshair {
             position: absolute;
             top: 50%;
             left: 75%;
             transform: translate(-50%, -50%);
         }
-        
+
         /* 第一视角镜头晃动效果 */
-        
+
         @keyframes shake {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(-2px, 2px); }
-            50% { transform: translate(2px, -2px); }
-            75% { transform: translate(-2px, -2px); }
-            100% { transform: translate(0, 0); }
+            0% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(-2px, 2px);
+            }
+
+            50% {
+                transform: translate(2px, -2px);
+            }
+
+            75% {
+                transform: translate(-2px, -2px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
         }
-        
+
         /* 受伤效果 */
         .damage-overlay {
             position: absolute;
@@ -436,16 +473,17 @@
             transition: opacity 0.3s;
             pointer-events: none;
         }
-        
+
         .p1-damage {
             left: 0;
             width: 50%;
         }
-        
+
         .p2-damage {
             left: 50%;
             width: 50%;
         }
+
         .selection-overlay {
             position: absolute;
             top: 0;
@@ -470,25 +508,29 @@
             border: 3px solid #FFD700;
         }
 
-        .player-selection, .map-selection {
+        .player-selection,
+        .map-selection {
             margin-bottom: 30px;
         }
 
-        .player-selection h3, .map-selection h3 {
+        .player-selection h3,
+        .map-selection h3 {
             color: #FFD700;
             margin-bottom: 15px;
             text-align: center;
             font-size: 1.8rem;
         }
 
-        .snake-options, .map-options {
+        .snake-options,
+        .map-options {
             display: flex;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        .snake-option, .map-option {
+        .snake-option,
+        .map-option {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
@@ -498,12 +540,14 @@
             border: 2px solid transparent;
         }
 
-        .snake-option:hover, .map-option:hover {
+        .snake-option:hover,
+        .map-option:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-5px);
         }
 
-        .snake-option.active, .map-option.active {
+        .snake-option.active,
+        .map-option.active {
             border-color: #FFD700;
             background: rgba(255, 215, 0, 0.1);
         }
@@ -534,12 +578,14 @@
             background: linear-gradient(135deg, #FF4500, #8B4513);
         }
 
-        .snake-option h4, .map-option h4 {
+        .snake-option h4,
+        .map-option h4 {
             color: #FFD700;
             margin-bottom: 8px;
         }
 
-        .snake-option p, .map-option p {
+        .snake-option p,
+        .map-option p {
             font-size: 0.9rem;
             margin: 3px 0;
             color: #CCCCCC;
@@ -607,11 +653,6 @@
             min-width: 120px;
             font-size: 0.8rem;
         }
-
-        .game-fullscreen .controls-hint {
-            display: none; /* 全屏时隐藏控制提示 */
-        }
-
         .game-fullscreen .game-controls {
             opacity: 0.3;
             transition: opacity 0.3s;
@@ -619,101 +660,98 @@
 
         .game-fullscreen .game-controls:hover {
             opacity: 1;
-}
+        }
     </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <body>
     <div class="selection-overlay" id="selection-overlay">
-    <div class="selection-content">
-        <!-- 玩家1选择 -->
-        <div class="player-selection">
-            <h3>玩家1选择蛇类型</h3>
-            <div class="snake-options">
-                <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player1', 'speed')">
-                    <div class="snake-preview" style="background: #FFA500;"></div>
-                    <h4>速度蛇</h4>
-                    <p>生命: ★★★☆☆</p>
-                    <p>速度: ★★★★★</p>
-                    <p>特点: 双击方向键俯冲加速</p>
-                </div>
-                <div class="snake-option" data-type="hard" onclick="selectSnakeType('player1', 'hard')">
-                    <div class="snake-preview" style="background: #C0C0C0;"></div>
-                    <h4>坚硬蛇</h4>
-                    <p>生命: ★★★★★</p>
-                    <p>速度: ★★☆☆☆</p>
-                    <p>特点: 伤害减半，50%子弹免疫</p>
-                </div>
-                <div class="snake-option" data-type="magic" onclick="selectSnakeType('player1', 'magic')">
-                    <div class="snake-preview" style="background: #9370DB;"></div>
-                    <h4>魔法蛇</h4>
-                    <p>生命: ★★★☆☆</p>
-                    <p>速度: ★★★☆☆</p>
-                    <p>特点: 效果时间延长，自动生成魔法球</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 玩家2选择 -->
-        <div class="player-selection">
-            <h3>玩家2选择蛇类型</h3>
-            <div class="snake-options">
-                <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player2', 'speed')">
-                    <div class="snake-preview" style="background: #4169E1;"></div>
-                    <h4>速度蛇</h4>
-                    <p>生命: ★★★☆☆</p>
-                    <p>速度: ★★★★★</p>
-                    <p>特点: 双击方向键俯冲加速</p>
-                </div>
-                <div class="snake-option" data-type="hard" onclick="selectSnakeType('player2', 'hard')">
-                    <div class="snake-preview" style="background: #C0C0C0;"></div>
-                    <h4>坚硬蛇</h4>
-                    <p>生命: ★★★★★</p>
-                    <p>速度: ★★☆☆☆</p>
-                    <p>特点: 伤害减半，50%子弹免疫</p>
-                </div>
-                <div class="snake-option" data-type="magic" onclick="selectSnakeType('player2', 'magic')">
-                    <div class="snake-preview" style="background: #9370DB;"></div>
-                    <h4>魔法蛇</h4>
-                    <p>生命: ★★★☆☆</p>
-                    <p>速度: ★★★☆☆</p>
-                    <p>特点: 效果时间延长，自动生成魔法球</p>
+        <div class="selection-content">
+            <!-- 玩家1选择 -->
+            <div class="player-selection">
+                <h3>玩家1选择蛇类型</h3>
+                <div class="snake-options">
+                    <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player1', 'speed')">
+                        <div class="snake-preview" style="background: #FFA500;"></div>
+                        <h4>速度蛇</h4>
+                        <p>生命: ★★★☆☆</p>
+                        <p>速度: ★★★★★</p>
+                        <p>特点: 双击方向键俯冲加速</p>
+                    </div>
+                    <div class="snake-option" data-type="hard" onclick="selectSnakeType('player1', 'hard')">
+                        <div class="snake-preview" style="background: #C0C0C0;"></div>
+                        <h4>坚硬蛇</h4>
+                        <p>生命: ★★★★★</p>
+                        <p>速度: ★★☆☆☆</p>
+                        <p>特点: 伤害减半，50%子弹免疫</p>
+                    </div>
+                    <div class="snake-option" data-type="magic" onclick="selectSnakeType('player1', 'magic')">
+                        <div class="snake-preview" style="background: #9370DB;"></div>
+                        <h4>魔法蛇</h4>
+                        <p>生命: ★★★☆☆</p>
+                        <p>速度: ★★★☆☆</p>
+                        <p>特点: 效果时间延长，自动生成魔法球</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- 地图选择 -->
-        <div class="map-selection">
-            <h3>选择地图类型</h3>
-            <div class="map-options">
-                <div class="map-option active" data-map="classic" onclick="selectMapType('classic')">
-                    <div class="map-preview classic-map"></div>
-                    <h4>经典地图</h4>
-                    <p>标准对战地图，随机墙壁</p>
-                </div>
-                <div class="map-option" data-map="snow" onclick="selectMapType('snow')">
-                    <div class="map-preview snow-map"></div>
-                    <h4>雪山地图</h4>
-                    <p>暴风雪机制，减速冻结效果</p>
-                </div>
-                <div class="map-option" data-map="volcano" onclick="selectMapType('volcano')">
-                    <div class="map-preview volcano-map"></div>
-                    <h4>火山地图</h4>
-                    <p>火山喷发，岩浆区域伤害</p>
+
+            <!-- 玩家2选择 -->
+            <div class="player-selection">
+                <h3>玩家2选择蛇类型</h3>
+                <div class="snake-options">
+                    <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player2', 'speed')">
+                        <div class="snake-preview" style="background: #4169E1;"></div>
+                        <h4>速度蛇</h4>
+                        <p>生命: ★★★☆☆</p>
+                        <p>速度: ★★★★★</p>
+                        <p>特点: 双击方向键俯冲加速</p>
+                    </div>
+                    <div class="snake-option" data-type="hard" onclick="selectSnakeType('player2', 'hard')">
+                        <div class="snake-preview" style="background: #C0C0C0;"></div>
+                        <h4>坚硬蛇</h4>
+                        <p>生命: ★★★★★</p>
+                        <p>速度: ★★☆☆☆</p>
+                        <p>特点: 伤害减半，50%子弹免疫</p>
+                    </div>
+                    <div class="snake-option" data-type="magic" onclick="selectSnakeType('player2', 'magic')">
+                        <div class="snake-preview" style="background: #9370DB;"></div>
+                        <h4>魔法蛇</h4>
+                        <p>生命: ★★★☆☆</p>
+                        <p>速度: ★★★☆☆</p>
+                        <p>特点: 效果时间延长，自动生成魔法球</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- 开始游戏按钮 -->
-        <div class="start-game-section">
-            <button id="confirm-start-btn" onclick="startGameWithSelections()">开始游戏</button>
-            <div class="controls-hint">
-                <p>玩家1控制: WASD移动 | E打开商店 | 1-5使用魔法球</p>
-                <p>玩家2控制: 方向键移动 | +打开商店 | 6-0使用魔法球</p>
+
+            <!-- 地图选择 -->
+            <div class="map-selection">
+                <h3>选择地图类型</h3>
+                <div class="map-options">
+                    <div class="map-option active" data-map="classic" onclick="selectMapType('classic')">
+                        <div class="map-preview classic-map"></div>
+                        <h4>经典地图</h4>
+                        <p>标准对战地图，随机墙壁</p>
+                    </div>
+                    <div class="map-option" data-map="snow" onclick="selectMapType('snow')">
+                        <div class="map-preview snow-map"></div>
+                        <h4>雪山地图</h4>
+                        <p>暴风雪机制，减速冻结效果</p>
+                    </div>
+                    <div class="map-option" data-map="volcano" onclick="selectMapType('volcano')">
+                        <div class="map-preview volcano-map"></div>
+                        <h4>火山地图</h4>
+                        <p>火山喷发，岩浆区域伤害</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 开始游戏按钮 -->
+            <div class="start-game-section">
+                <button id="confirm-start-btn" onclick="startGameWithSelections()">开始游戏</button>
             </div>
         </div>
     </div>
-</div>
     <div id="game-container">
         <!-- 分屏第一视角 -->
         <div class="split-screen">
@@ -732,7 +770,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- UI覆盖层 -->
         <div id="ui-overlay">
             <!-- 玩家1面板 -->
@@ -745,13 +783,12 @@
                 <div class="health-bar">
                     <div class="health-fill" id="player1-health" style="width: 100%"></div>
                 </div>
+                    <div>魔法球:</div>
+                    <div class="magic-balls" id="player1-balls"></div>
                 <div>护盾: <span id="player1-shield">0</span></div>
                 <div>分数: <span id="player1-score">0</span></div>
-                <div>魔法球:</div>
-                <div class="magic-balls" id="player1-balls"></div>
-                <div>状态: <span id="player1-status">正常</span></div>
             </div>
-            
+
             <!-- 玩家2面板 -->
             <div class="player-panel" id="player2-panel">
                 <div class="player-header">
@@ -762,48 +799,26 @@
                 <div class="health-bar">
                     <div class="health-fill" id="player2-health" style="width: 100%"></div>
                 </div>
+                    <div>魔法球:</div>
+                    <div class="magic-balls" id="player2-balls"></div>
                 <div>护盾: <span id="player2-shield">0</span></div>
                 <div>分数: <span id="player2-score">0</span></div>
-                <div>魔法球:</div>
-                <div class="magic-balls" id="player2-balls"></div>
-                <div>状态: <span id="player2-status">正常</span></div>
             </div>
-            
+
             <!-- 分数显示 -->
             <div class="score-display">
                 游戏时间: <span id="game-time">00:00</span>
             </div>
+
             
-            <!-- 基地信息 -->
-            <div class="base-info" id="player1-base">
-                <div>基地</div>
-                <div>生命值: <span id="base1-hp">50</span></div>
-                <div class="base-health">
-                    <div class="base-health-fill" id="base1-health" style="width: 100%"></div>
-                </div>
-            </div>
-            
-            <div class="base-info" id="player2-base">
-                <div>基地</div>
-                <div>生命值: <span id="base2-hp">50</span></div>
-                <div class="base-health">
-                    <div class="base-health-fill" id="base2-health" style="width: 100%"></div>
-                </div>
-            </div>
-            
-            <!-- 控制提示 -->
-            <div class="controls-hint">
-                <div>玩家1: 移动 <span class="key-hint">WASD</span> | 商店 <span class="key-hint">E</span> | 魔法球 <span class="key-hint">1-5</span></div>
-                <div>玩家2: 移动 <span class="key-hint">方向键</span> | 商店 <span class="key-hint">+</span> | 魔法球 <span class="key-hint">6-0</span></div>
-            </div>
-            
+
             <!-- 游戏控制按钮 -->
             <div class="game-controls">
                 <button id="start-btn">开始游戏</button>
                 <button id="reset-btn">重新开始</button>
                 <button id="map-btn">切换地图</button>
             </div>
-            
+
             <!-- 玩家1商店界面 -->
             <div class="shop-overlay" id="shop1-overlay">
                 <div class="shop-content">
@@ -840,7 +855,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- 玩家2商店界面 -->
             <div class="shop-overlay" id="shop2-overlay">
                 <div class="shop-content">
@@ -877,7 +892,22 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="base-info" id="player1-base">
+                <div>基地</div>
+                <div>生命值: <span id="base1-hp">50</span></div>
+                <div class="base-health">
+                    <div class="base-health-fill" id="base1-health" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="base-info" id="player2-base">
+                <div>基地</div>
+                <div>生命值: <span id="base2-hp">50</span></div>
+                <div class="base-health">
+                    <div class="base-health-fill" id="base2-health" style="width: 100%"></div>
+                </div>
+            </div>
+
             <!-- 游戏结束界面 -->
             <div class="game-over" id="game-over">
                 <div id="winner-text">游戏结束</div>
@@ -921,7 +951,7 @@
                 baseHp: 50,
                 basePosition: { x: -80, y: 0, z: 0 },
                 camera: null, // 第一视角相机
-                renderer: null ,// 玩家1的渲染器
+                renderer: null,// 玩家1的渲染器
                 paused: false,
             },
             player2: {
@@ -966,6 +996,21 @@
             player1: 0,
             player2: 0
         };
+        gameState.lastCollisionTime = {
+                player1: 0,
+                player2: 0
+            };  
+       gameState.player1.status = {
+                        normal: true,
+                        effects: [] // 确保 effects 数组存在
+                    };
+
+                    // 重置玩家2  
+        gameState.player2.status = {
+                        normal: true,
+                        effects: [] // 确保 effects 数组存在
+                    };
+                      
         let clock;
         // 游戏元素
         const gameTimeElement = document.getElementById('game-time');
@@ -981,8 +1026,6 @@
         const player2ScoreElement = document.getElementById('player2-score');
         const player1BallsElement = document.getElementById('player1-balls');
         const player2BallsElement = document.getElementById('player2-balls');
-        const player1StatusElement = document.getElementById('player1-status');
-        const player2StatusElement = document.getElementById('player2-status');
         const base1HpElement = document.getElementById('base1-hp');
         const base2HpElement = document.getElementById('base2-hp');
         const base1HealthBar = document.getElementById('base1-health');
@@ -1001,7 +1044,7 @@
         function selectSnakeType(playerKey, type) {
             const player = gameState[playerKey];
             player.type = type;
-    
+
             // 根据类型设置血量
             if (type === 'hard') {
                 player.maxHp = 15;
@@ -1010,7 +1053,7 @@
                 player.maxHp = 10;
                 player.hp = 10;
             }
-            
+
             // 更新UI显示
             const options = document.querySelectorAll(`.player-selection:nth-child(${playerKey === 'player1' ? 1 : 2}) .snake-option`);
             options.forEach(option => {
@@ -1020,18 +1063,18 @@
                     option.classList.remove('active');
                 }
             });
-            
+
             // 更新预览颜色
             const previews = document.querySelectorAll(`.player-selection:nth-child(${playerKey === 'player1' ? 1 : 2}) .snake-preview`);
             previews.forEach((preview, index) => {
                 const types = ['speed', 'hard', 'magic'];
                 if (types[index] === type) {
                     if (playerKey === 'player1') {
-                        preview.style.background = type === 'speed' ? '#FFA500' : 
-                                                type === 'hard' ? '#C0C0C0' : '#9370DB';
+                        preview.style.background = type === 'speed' ? '#FFA500' :
+                            type === 'hard' ? '#C0C0C0' : '#9370DB';
                     } else {
-                        preview.style.background = type === 'speed' ? '#4169E1' : 
-                                                type === 'hard' ? '#C0C0C0' : '#9370DB';
+                        preview.style.background = type === 'speed' ? '#4169E1' :
+                            type === 'hard' ? '#C0C0C0' : '#9370DB';
                     }
                 }
             });
@@ -1040,7 +1083,7 @@
         // 选择地图类型
         function selectMapType(mapType) {
             gameState.mapType = mapType;
-            
+
             // 更新UI显示
             const options = document.querySelectorAll('.map-option');
             options.forEach(option => {
@@ -1056,22 +1099,22 @@
         function startGameWithSelections() {
             // 隐藏选择界面
             document.getElementById('selection-overlay').style.display = 'none';
-            
+
             // 进入全屏游戏模式
             document.body.classList.add('game-fullscreen');
-            
+
             // 隐藏不需要的UI元素
             hideUnnecessaryUI();
-            
+
             // 初始化游戏
             initGame();
-            
+
             // 开始游戏
             gameState.running = true;
             document.getElementById('start-btn').textContent = '游戏中';
             document.getElementById('start-btn').disabled = true;
             clock.start();
-            
+            startButton.style.display = 'none';
             // 设置选择模式为false
             gameState.selectionMode = false;
         }
@@ -1080,10 +1123,9 @@
         function hideUnnecessaryUI() {
             // 可以在这里选择性隐藏一些UI元素
             const elementsToHide = [
-                '.controls-hint', // 控制提示
                 '.game-controls button:not(#start-btn)' // 除了开始按钮的其他按钮
             ];
-            
+
             elementsToHide.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
                 elements.forEach(el => {
@@ -1097,26 +1139,25 @@
             if (gameState.running) {
                 gameState.running = false;
             }
-            
+
             // 显示选择界面
             document.getElementById('selection-overlay').style.display = 'flex';
-            
+
             // 退出全屏模式
             document.body.classList.remove('game-fullscreen');
-            
+
             // 恢复UI元素
             const elementsToShow = [
-                '.controls-hint',
                 '.game-controls button'
             ];
-            
+
             elementsToShow.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
                 elements.forEach(el => {
                     el.style.display = '';
                 });
             });
-            
+
             // 设置选择模式为true
             gameState.selectionMode = true;
         }
@@ -1125,17 +1166,17 @@
         resetButton.addEventListener('click', resetToSelection);
 
         // 修改playAgain按钮事件
-        playAgainButton.addEventListener('click', function() {
+        playAgainButton.addEventListener('click', function () {
             // 游戏结束后返回选择界面
             resetToSelection();
         });
-                
+
         // 初始化场景
         function initScene() {
             // 创建场景
             gameState.scene = new THREE.Scene();
             gameState.scene.fog = new THREE.Fog(0x87CEEB, 20, 200);
-            clock = new THREE.Clock();  
+            clock = new THREE.Clock();
             // 创建相机
             gameState.player1.camera = new THREE.PerspectiveCamera(
                 75,
@@ -1143,50 +1184,50 @@
                 1,
                 300
             );
-            
+
             gameState.player2.camera = new THREE.PerspectiveCamera(
                 75,
                 (window.innerWidth / 2) / window.innerHeight,
                 1,
                 300
             );
-            
+
             // 创建渲染器
-            gameState.player1.renderer = new THREE.WebGLRenderer({ 
+            gameState.player1.renderer = new THREE.WebGLRenderer({
                 canvas: document.getElementById('player1-canvas'),
                 antialias: true,
                 alpha: true
             });
             gameState.player1.renderer.setSize(window.innerWidth / 2, window.innerHeight);
-            
-            gameState.player2.renderer = new THREE.WebGLRenderer({ 
+
+            gameState.player2.renderer = new THREE.WebGLRenderer({
                 canvas: document.getElementById('player2-canvas'),
                 antialias: true,
                 alpha: true
             });
             gameState.player2.renderer.setSize(window.innerWidth / 2, window.innerHeight);
-            
+
             // 创建灯光
             createLights();
-            
+
             // 创建环境
             createEnvironment();
-            
+
             // 显示选择界面
             document.getElementById('selection-overlay').style.display = 'flex';
-            
+
             // 不初始化游戏，等待选择
-            
+
             // 开始动画循环
             animate();
         }
-        
+
         // 创建灯光
         function createLights() {
             // 环境光
             const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
             gameState.scene.add(ambientLight);
-            
+
             // 主方向光
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(50, 100, 50);
@@ -1196,47 +1237,47 @@
             directionalLight.shadow.camera.top = 100;
             directionalLight.shadow.camera.bottom = -100;
             gameState.scene.add(directionalLight);
-            
+
             // 补充灯光
             const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
             fillLight.position.set(-50, 50, -50);
             gameState.scene.add(fillLight);
         }
-        
+
         // 创建环境
         function createEnvironment() {
             // 天空盒
             const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-            const skyMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0x87CEEB, 
-                side: THREE.BackSide 
+            const skyMaterial = new THREE.MeshBasicMaterial({
+                color: 0x87CEEB,
+                side: THREE.BackSide
             });
             const sky = new THREE.Mesh(skyGeometry, skyMaterial);
             gameState.scene.add(sky);
-            
+
             // 创建地面
             createGround();
         }
-        
+
         // 创建地面
         function createGround() {
             const groundSize = 300;
             const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 32, 32);
-            
+
             // 创建网格地面纹理
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
-            
+
             // 绘制网格
             ctx.fillStyle = '#2E7D32'; // 绿色背景
             ctx.fillRect(0, 0, 512, 512);
-            
+
             // 绘制网格线
             ctx.strokeStyle = '#388E3C';
             ctx.lineWidth = 2;
-            
+
             // 水平线
             for (let i = 0; i <= 20; i++) {
                 const y = i * 25.6;
@@ -1245,7 +1286,7 @@
                 ctx.lineTo(512, y);
                 ctx.stroke();
             }
-            
+
             // 垂直线
             for (let i = 0; i <= 20; i++) {
                 const x = i * 25.6;
@@ -1254,22 +1295,22 @@
                 ctx.lineTo(x, 512);
                 ctx.stroke();
             }
-            
+
             const groundTexture = new THREE.CanvasTexture(canvas);
             groundTexture.wrapS = THREE.RepeatWrapping;
             groundTexture.wrapT = THREE.RepeatWrapping;
             groundTexture.repeat.set(10, 10);
-            
-            const groundMaterial = new THREE.MeshStandardMaterial({ 
+
+            const groundMaterial = new THREE.MeshStandardMaterial({
                 map: groundTexture,
                 roughness: 0.9
             });
-            
+
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
             ground.rotation.x = -Math.PI / 2;
             ground.receiveShadow = true;
             gameState.scene.add(ground);
-            
+
             // 添加地图边界线
             createMapBoundaries();
         }
@@ -1279,16 +1320,16 @@
             const boundarySize = 100; // 边界大小
             const boundaryHeight = 0.2; // 边界线高度
             const boundaryColor = 0xFF0000; // 红色边界线
-            
+
             // 创建边界线材质
-            const boundaryMaterial = new THREE.LineBasicMaterial({ 
+            const boundaryMaterial = new THREE.LineBasicMaterial({
                 color: boundaryColor,
                 linewidth: 3
             });
-            
+
             // 创建边界几何体
             const boundaryPoints = [];
-            
+
             // 左上角
             boundaryPoints.push(new THREE.Vector3(-boundarySize, boundaryHeight, -boundarySize));
             // 右上角
@@ -1299,48 +1340,49 @@
             boundaryPoints.push(new THREE.Vector3(-boundarySize, boundaryHeight, boundarySize));
             // 闭合回到左上角
             boundaryPoints.push(new THREE.Vector3(-boundarySize, boundaryHeight, -boundarySize));
-            
+
             const boundaryGeometry = new THREE.BufferGeometry().setFromPoints(boundaryPoints);
             const boundaryLine = new THREE.Line(boundaryGeometry, boundaryMaterial);
             gameState.scene.add(boundaryLine);
 
         }
-        
+
         // 初始化游戏
         function initGame() {
             // 清除场景
             clearScene();
-            
+
             // 重置游戏状态
             resetGameState();
-            
+
             // 根据地图类型创建环境
             createMapEnvironment();
-            
+
             // 创建基地
             createBases();
-            
+
             // 创建蛇
             createSnakes();
-            
+
             // 生成食物
             generateFood();
-            
+
             // 生成魔法球
             generateMagicBalls();
-            
+
             // 更新相机初始位置
             updateCameras();
-            
+
             // 更新UI
             updateUI();
             clock = new THREE.Clock();
+            
             // 隐藏商店和游戏结束界面
             shop1Overlay.style.display = 'none';
             shop2Overlay.style.display = 'none';
             gameOverScreen.style.display = 'none';
         }
-        
+
         // 清除场景
         function clearScene() {
             // 移除所有游戏对象
@@ -1350,9 +1392,9 @@
                     objectsToRemove.push(child);
                 }
             });
-            
+
             objectsToRemove.forEach(obj => gameState.scene.remove(obj));
-            
+
             // 清空数组
             gameState.magicBalls = [];
             gameState.food = [];
@@ -1361,60 +1403,80 @@
             gameState.explosions = [];
             gameState.volcanoes = [];
         }
-        
+
         // 重置游戏状态
-        function resetGameState() {
-            gameState.running = false;
-            gameState.paused = false;
-            gameState.gameTime = 0;
-            
-            // 重置玩家1
-            gameState.player1.hp = 10;
-            gameState.player1.maxHp = 10;
-            gameState.player1.shield = 0;
-            gameState.player1.score = 0;
-            gameState.player1.magicBalls = [];
-            gameState.player1.status = 'normal';
-            gameState.player1.statusTime = 0;
-            gameState.player1.speedMultiplier = 1;
-            gameState.player1.hardUpgrades = 0;
-            gameState.player1.magicUpgrades = 0;
-            gameState.player1.segments = [];
-            gameState.player1.baseHp = 20;
-            gameState.player1.position = { x: -50, y: 1.5, z: 0 };
-            gameState.player1.direction = { x: 1, y: 0, z: 0 };
-            gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
-            gameState.player1.rotationAngle = 0;
-            gameState.player1.paused = false;
-            gameState.player1.pauseIndicator = null;
-            gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
-            gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
-            // 重置玩家2
-            gameState.player2.hp = 10;
-            gameState.player2.maxHp = 10;
-            gameState.player2.shield = 0;
-            gameState.player2.score = 0;
-            gameState.player2.magicBalls = [];
-            gameState.player2.status = 'normal';
-            gameState.player2.statusTime = 0;
-            gameState.player2.speedMultiplier = 1;
-            gameState.player2.hardUpgrades = 0;
-            gameState.player2.magicUpgrades = 0;
-            gameState.player2.segments = [];
-            gameState.player2.baseHp = 20;
-            gameState.player2.position = { x: 50, y: 1.5, z: 0 };
-            gameState.player2.direction = { x: -1, y: 0, z: 0 };
-            gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
-            gameState.player2.rotationAngle = Math.PI;
-            gameState.player2.paused = false;
-            gameState.player2.pauseIndicator = null;
-            gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
-            gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;            
-            // 重置环境
-            gameState.stormDirection = null;
-            gameState.stormActive = false;
-            gameState.stormWarning = false;
-        }
+    function resetGameState() {
+        gameState.running = false;
+        gameState.paused = false;
+        gameState.gameTime = 0;
+
+        // 重置玩家1 - 使用简单属性
+        gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
+        gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
+        gameState.player1.shield = 0;
+        gameState.player1.score = 0;
+        gameState.player1.magicBalls = [];
+        // 使用简单状态属性
+        gameState.player1.isInvincible = false;
+        gameState.player1.isReversed = false;
+        gameState.player1.isAttacking = false;
+        gameState.player1.invincibleTime = 0;
+        gameState.player1.reversedTime = 0;
+        gameState.player1.attackTime = 0;
+        gameState.player1.speedMultiplier = 1;
+        gameState.player1.hardUpgrades = 0;
+        gameState.player1.magicUpgrades = 0;
+        gameState.player1.segments = [];
+        gameState.player1.baseHp = 50;
+        gameState.player1.position = {
+            x: -80,
+            y: 1.5,
+            z: -80
+        };
+        gameState.player1.direction = { x: 1, y: 0, z: 0 };
+        gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
+        gameState.player1.rotationAngle = 0;
+        gameState.player1.paused = false;
+
+        // 重置玩家2 - 使用简单属性
+        gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
+        gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;
+        gameState.player2.shield = 0;
+        gameState.player2.score = 0;
+        gameState.player2.magicBalls = [];
+        // 使用简单状态属性
+        gameState.player2.isInvincible = false;
+        gameState.player2.isReversed = false;
+        gameState.player2.isAttacking = false;
+        gameState.player2.invincibleTime = 0;
+        gameState.player2.reversedTime = 0;
+        gameState.player2.attackTime = 0;
+        gameState.player2.speedMultiplier = 1;
+        gameState.player2.hardUpgrades = 0;
+        gameState.player2.magicUpgrades = 0;
+        gameState.player2.segments = [];
+        gameState.player2.baseHp = 50;
+        gameState.player2.position = {
+            x: 80,
+            y: 1.5,
+            z: 80
+        };
+        gameState.player2.direction = { x: -1, y: 0, z: 0 };
+        gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
+        gameState.player2.rotationAngle = Math.PI;
+        gameState.player2.paused = false;
+
+        // 重置其他状态
+        gameState.magicBalls = [];
+        gameState.food = [];
+        gameState.walls = [];
+        gameState.bullets = [];
+        gameState.explosions = [];
+        gameState.volcanoes = [];
+        gameState.stormDirection = null;
+        gameState.stormActive = false;
+        gameState.stormWarning = false;
+    }
         // 创建地图环境
         function createMapEnvironment() {
             switch (gameState.mapType) {
@@ -1429,95 +1491,198 @@
                     break;
             }
         }
-        
+
         // 创建经典地图
-        function createClassicMap() {
-            // 创建随机墙壁
-            const wallCount = 20;
-            for (let i = 0; i < wallCount; i++) {
-                const wall = createWall(
-                    Math.random() * 200 - 100,
-                    0.5,
-                    Math.random() * 200 - 100
-                );
-                gameState.walls.push(wall);
-                gameState.scene.add(wall);
+    function createClassicMap() {
+        // 设置边界和基地的安全区域
+        const boundaryMargin = 15; // 边界安全距离
+        const baseSafeRadius = 25; // 基地安全半径
+
+        // 生成更多墙（增加到30个）
+        const wallCount = 20;
+
+        for (let i = 0; i < wallCount; i++) {
+            let validPosition = false;
+            let startX, startZ, endX, endZ;
+
+            // 尝试生成有效的位置
+            for (let attempts = 0; attempts < 10; attempts++) {
+                // 随机生成起点
+                startX = Math.random() * 180 - 90; // -90 到 90
+                startZ = Math.random() * 180 - 90;
+
+                // 随机生成长度和方向
+                const length = 5 + Math.random() * 15; // 长度5-20
+                const angle = Math.random() * Math.PI * 2; // 随机方向
+
+                // 计算终点
+                endX = startX + Math.cos(angle) * length;
+                endZ = startZ + Math.sin(angle) * length;
+
+                // 检查起点和终点是否都在边界内
+                if (Math.abs(startX) > 100 - boundaryMargin || Math.abs(startZ) > 100 - boundaryMargin ||
+                    Math.abs(endX) > 100 - boundaryMargin || Math.abs(endZ) > 100 - boundaryMargin) {
+                    continue; // 太靠近边界，重新生成
+                }
+
+                // 检查是否太靠近基地
+                const player1Base = gameState.player1.basePosition;
+                const player2Base = gameState.player2.basePosition;
+
+                // 计算到两个基地的距离
+                const distToBase1Start = Math.sqrt(Math.pow(startX - player1Base.x, 2) + Math.pow(startZ - player1Base.z, 2));
+                const distToBase2Start = Math.sqrt(Math.pow(startX - player2Base.x, 2) + Math.pow(startZ - player2Base.z, 2));
+                const distToBase1End = Math.sqrt(Math.pow(endX - player1Base.x, 2) + Math.pow(endZ - player1Base.z, 2));
+                const distToBase2End = Math.sqrt(Math.pow(endX - player2Base.x, 2) + Math.pow(endZ - player2Base.z, 2));
+
+                // 确保墙的起点和终点都不在基地安全区域内
+                if (distToBase1Start < baseSafeRadius || distToBase2Start < baseSafeRadius ||
+                    distToBase1End < baseSafeRadius || distToBase2End < baseSafeRadius) {
+                    continue; // 太靠近基地，重新生成
+                }
+
+                // 检查墙的中点是否太靠近基地
+                const midX = (startX + endX) / 2;
+                const midZ = (startZ + endZ) / 2;
+                const distToBase1Mid = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
+                const distToBase2Mid = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
+
+                if (distToBase1Mid < baseSafeRadius || distToBase2Mid < baseSafeRadius) {
+                    continue; // 中点太靠近基地，重新生成
+                }
+
+                validPosition = true;
+                break;
             }
+
+            if (!validPosition) {
+                continue; // 无法找到有效位置，跳过这个墙
+            }
+
+            const wall = createWall(startX, startZ, endX, endZ);
+            gameState.walls.push(wall);
+            gameState.scene.add(wall);
         }
-        
+
+        // 3. 添加一些固定方向的墙来增加多样性（可选）
+        addDirectionalWalls();
+    }
+    function addDirectionalWalls() {
+        // 水平和垂直墙
+        const directionalWalls = [
+            // 水平墙
+            { x1: -60, z1: -30, x2: -30, z2: -30, length: 30 },
+            { x1: 30, z1: -30, x2: 60, z2: -30, length: 30 },
+            { x1: -60, z1: 30, x2: -30, z2: 30, length: 30 },
+            { x1: 30, z1: 30, x2: 60, z2: 30, length: 30 },
+
+            // 垂直墙
+            { x1: -30, z1: -60, x2: -30, z2: -30, length: 30 },
+            { x1: 30, z1: -60, x2: 30, z2: -30, length: 30 },
+            { x1: -30, z1: 30, x2: -30, z2: 60, length: 30 },
+            { x1: 30, z1: 30, x2: 30, z2: 60, length: 30 },
+        ];
+
+        directionalWalls.forEach(wallData => {
+            // 检查是否太靠近基地
+            const player1Base = gameState.player1.basePosition;
+            const player2Base = gameState.player2.basePosition;
+            const baseSafeRadius = 25;
+
+            const midX = (wallData.x1 + wallData.x2) / 2;
+            const midZ = (wallData.z1 + wallData.z2) / 2;
+
+            const distToBase1 = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
+            const distToBase2 = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
+
+            if (distToBase1 < baseSafeRadius || distToBase2 < baseSafeRadius) {
+                return; // 太靠近基地，跳过
+            }
+
+            const wall = createWall(wallData.x1, wallData.z1, wallData.x2, wallData.z2);
+            gameState.walls.push(wall);
+            gameState.scene.add(wall);
+        });
+    }
         // 创建雪山地圖
-        function createSnowMap() {
-            // 改变天空颜色
-            const sky = gameState.scene.children.find(child => child.material && child.material.color);
-            if (sky) {
-                sky.material.color.set(0x778899); // 蓝灰色
-            }
-            
-            // 添加雪山
-            createMountains();
-            
-            // 添加一些冰块作为障碍
-            for (let i = 0; i < 15; i++) {
-                const ice = createIceWall(
-                    Math.random() * 180 - 90,
-                    0.5,
-                    Math.random() * 180 - 90
-                );
-                gameState.walls.push(ice);
-                gameState.scene.add(ice);
-            }
+    function createSnowMap() {
+        // 改变天空颜色
+        const sky = gameState.scene.children.find(child => child.material && child.material.color);
+        if (sky) {
+            sky.material.color.set(0x778899);
         }
-        
+
+        // 添加一些冰块条状墙
+        createClassicMap(); // 使用相同的墙生成逻辑
+
+        // 添加雪山
+        createMountains();
+    }
         // 创建火山地图
-        function createVolcanoMap() {
-            // 改变天空颜色
-            const sky = gameState.scene.children.find(child => child.material && child.material.color);
-            if (sky) {
-                sky.material.color.set(0xFF4500); // 橙红色
-            }
-            
-            // 创建火山
-            const volcanoCount = Math.floor(Math.random() * 4) + 4; // 4-7个
-            for (let i = 0; i < volcanoCount; i++) {
-                const volcano = createVolcano(
-                    Math.random() * 150 - 75,
-                    Math.random() * 150 - 75
-                );
+    function createVolcanoMap() {
+        // 改变天空颜色
+        const sky = gameState.scene.children.find(child => child.material && child.material.color);
+        if (sky) {
+            sky.material.color.set(0xFF4500);
+        }
+
+        // 使用相同的墙生成逻辑
+        createClassicMap();
+
+        // 创建火山
+        const volcanoCount = Math.floor(Math.random() * 4) + 4;
+        for (let i = 0; i < volcanoCount; i++) {
+            const volcano = createVolcano(
+                Math.random() * 150 - 75,
+                Math.random() * 150 - 75
+            );
+            if (volcano) {
                 gameState.volcanoes.push(volcano);
                 gameState.scene.add(volcano);
             }
-            
-            // 添加熔岩石块作为障碍
-            for (let i = 0; i < 15; i++) {
-                const lavaRock = createLavaWall(
-                    Math.random() * 180 - 90,
-                    0.5,
-                    Math.random() * 180 - 90
-                );
-                gameState.walls.push(lavaRock);
-                gameState.scene.add(lavaRock);
-            }
         }
-        
+    }
+
+
         // 创建墙壁
-        function createWall(x, y, z) {
-            const geometry = new THREE.BoxGeometry(5, 1, 5);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: 0x808080,
-                roughness: 0.8
-            });
-            const wall = new THREE.Mesh(geometry, material);
-            wall.position.set(x, y, z);
-            wall.castShadow = true;
-            wall.receiveShadow = true;
-            wall.userData = { type: 'wall' };
-            return wall;
-        }
-        
+    function createWall(x1, z1, x2, z2) {
+        // 计算墙的长度和方向
+        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2));
+        const angle = Math.atan2(z2 - z1, x2 - x1);
+
+        // 创建墙的几何体：条状，高度与蛇相同（2个单位），宽度较窄
+        const wallGeometry = new THREE.BoxGeometry(length, 2, 1); // 长度可变，高度2，宽度1
+        const wallMaterial = new THREE.MeshStandardMaterial({
+            color: 0x808080,
+            roughness: 0.8,
+            metalness: 0.2
+        });
+
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+
+        // 计算中心点位置
+        const centerX = (x1 + x2) / 2;
+        const centerZ = (z1 + z2) / 2;
+
+        wall.position.set(centerX, 1, centerZ); // 高度设为1（中心点在y=1，总高度2）
+        wall.rotation.y = -angle; // 旋转到正确方向
+
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        wall.userData = {
+            type: 'wall',
+            start: { x: x1, z: z1 },
+            end: { x: x2, z: z2 },
+            length: length
+        };
+
+        return wall;
+    }
+
         // 创建冰墙
         function createIceWall(x, y, z) {
             const geometry = new THREE.BoxGeometry(5, 1, 5);
-            const material = new THREE.MeshStandardMaterial({ 
+            const material = new THREE.MeshStandardMaterial({
                 color: 0x87CEEB,
                 roughness: 0.2,
                 transparent: true,
@@ -1530,11 +1695,11 @@
             ice.userData = { type: 'wall' };
             return ice;
         }
-        
+
         // 创建熔岩墙
         function createLavaWall(x, y, z) {
             const geometry = new THREE.BoxGeometry(5, 1, 5);
-            const material = new THREE.MeshStandardMaterial({ 
+            const material = new THREE.MeshStandardMaterial({
                 color: 0xFF4500,
                 emissive: 0xFF4500,
                 emissiveIntensity: 0.2,
@@ -1547,24 +1712,43 @@
             lavaRock.userData = { type: 'wall' };
             return lavaRock;
         }
-        
+
         // 创建火山
         function createVolcano(x, z) {
+            const player1BasePos = gameState.player1.basePosition;
+            const player2BasePos = gameState.player2.basePosition;
+            const baseSafeRadius = 40; // 火山需要更大的安全距离
+
+            // 检查是否在基地安全区域内
+            const distToBase1 = Math.sqrt(
+                Math.pow(x - player1BasePos.x, 2) +
+                Math.pow(z - player1BasePos.z, 2)
+            );
+
+            const distToBase2 = Math.sqrt(
+                Math.pow(x - player2BasePos.x, 2) +
+                Math.pow(z - player2BasePos.z, 2)
+            );
+
+            // 如果在基地安全区域内，返回null
+            if (distToBase1 < baseSafeRadius || distToBase2 < baseSafeRadius) {
+                return null; // 不在基地附近生成火山
+            }
             const volcanoGroup = new THREE.Group();
-            
+
             // 火山主体
             const coneGeometry = new THREE.ConeGeometry(8, 15, 32);
-            const coneMaterial = new THREE.MeshStandardMaterial({ 
+            const coneMaterial = new THREE.MeshStandardMaterial({
                 color: 0x8B4513,
                 roughness: 0.9
             });
             const volcano = new THREE.Mesh(coneGeometry, coneMaterial);
             volcano.position.y = 7.5;
             volcanoGroup.add(volcano);
-            
+
             // 火山口
             const craterGeometry = new THREE.CylinderGeometry(3, 5, 2, 32);
-            const craterMaterial = new THREE.MeshStandardMaterial({ 
+            const craterMaterial = new THREE.MeshStandardMaterial({
                 color: 0xFF4500,
                 emissive: 0xFF4500,
                 emissiveIntensity: 0.3
@@ -1572,26 +1756,26 @@
             const crater = new THREE.Mesh(craterGeometry, craterMaterial);
             crater.position.y = 14;
             volcanoGroup.add(crater);
-            
+
             volcanoGroup.position.set(x, 0, z);
-            volcanoGroup.userData = { 
+            volcanoGroup.userData = {
                 type: 'volcano',
                 cooldown: 0,
                 warning: false,
-                active: false 
+                active: false
             };
-            
+
             return volcanoGroup;
         }
-        
+
         // 创建山脉
         function createMountains() {
             const mountainGeometry = new THREE.ConeGeometry(20, 40, 32);
-            const mountainMaterial = new THREE.MeshStandardMaterial({ 
+            const mountainMaterial = new THREE.MeshStandardMaterial({
                 color: 0xFFFFFF,
                 roughness: 0.8
             });
-            
+
             // 在边界处添加山脉
             const positions = [
                 { x: -120, z: -120 },
@@ -1599,7 +1783,7 @@
                 { x: -120, z: 120 },
                 { x: 120, z: 120 }
             ];
-            
+
             positions.forEach(pos => {
                 const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
                 mountain.position.set(pos.x, 20, pos.z);
@@ -1607,112 +1791,159 @@
                 gameState.scene.add(mountain);
             });
         }
-        
+
         // 创建基地
-        function createBases() {
-            // 玩家1基地 - 左上方 (-80, 0, -80)
-            const base1 = createBase(
-                { x: -80, y: 0, z: -80 }, // 左上方
-                0xFF7F00
-            );
-            gameState.scene.add(base1);
-            gameState.player1.baseObject = base1;
-            gameState.player1.basePosition = { x: -80, y: 0, z: -80 }; // 更新位置
-            
-            // 玩家2基地 - 右下方 (80, 0, 80)
-            const base2 = createBase(
-                { x: 80, y: 0, z: 80 }, // 右下方
-                0x4169E1
-            );
-            gameState.scene.add(base2);
-            gameState.player2.baseObject = base2;
-            gameState.player2.basePosition = { x: 80, y: 0, z: 80 }; // 更新位置
+    function createBase(position, color) {
+        const baseGroup = new THREE.Group();
+
+        // 基地底座
+        const baseGeometry = new THREE.BoxGeometry(30, 2, 30);
+        const baseMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.3,
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide
+        });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 1;
+        base.receiveShadow = true;
+        baseGroup.add(base);
+
+        // 基地防护罩
+        const shieldGeometry = new THREE.SphereGeometry(18, 32, 32);
+        const shieldMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.2,
+            transparent: true,
+            opacity: 0.2,
+            side: THREE.DoubleSide,
+            wireframe: true
+        });
+        const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
+        shield.position.y = 8;
+        baseGroup.add(shield);
+
+        baseGroup.position.set(position.x, position.y, position.z);
+        baseGroup.userData = {
+            type: 'base',
+            safeRadius: 20,
+            color: color
+        };
+
+        return baseGroup;
+    }
+
+
+    // 更新基地血量显示
+    function updateBaseHealthDisplay(playerKey) {
+        const player = gameState[playerKey];
+        if (!player || !player.baseHealthDisplay) {
+            return;
         }
 
-        // 修复基地交互逻辑
-        function checkBaseInteraction(playerKey) {
-            const player = gameState[playerKey];
-            const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
-            const otherPlayer = gameState[otherPlayerKey];
-            
-            // 检查是否在自己的基地内
-            const distanceToOwnBase = Math.sqrt(
-                Math.pow(player.position.x - player.basePosition.x, 2) +
-                Math.pow(player.position.z - player.basePosition.z, 2)
-            );
-            
-            // 基地范围调整为15（原来20）
-            if (distanceToOwnBase < 20) {
-                // 在自己的基地内，每秒恢复1点生命值
-                // 使用deltaTime确保每秒1点
-                player.hp += 1 * deltaTime*10; // 修改为每秒1点
-                if (player.hp > player.maxHp) player.hp = player.maxHp;
-                
-            }
-            
-            // 检查是否在对方基地内
-            const distanceToOtherBase = Math.sqrt(
-                Math.pow(player.position.x - otherPlayer.basePosition.x, 2) +
-                Math.pow(player.position.z - otherPlayer.basePosition.z, 2)
-            );
-            
-            if (distanceToOtherBase < 15) {
-                // 在对方基地内，每秒对基地造成3点伤害
-                otherPlayer.baseHp -= 3 * deltaTime;
-                if (otherPlayer.baseHp < 0) otherPlayer.baseHp = 0;
-                
-                // 基地被摧毁
-                if (otherPlayer.baseHp <= 0 && otherPlayer.baseObject) {
-                    // 改变基地颜色为灰色
-                    otherPlayer.baseObject.children.forEach(child => {
-                        if (child.material && child.material.color) {
-                            child.material.color.set(0x808080);
-                            if (child.material.emissive) {
-                                child.material.emissive.set(0x000000);
-                            }
-                        }
-                    });
-                }
+        const healthDisplay = player.baseHealthDisplay;
+
+        // 检查 healthDisplay 是否已被销毁
+        if (!healthDisplay.parent) {
+            player.baseHealthDisplay = null;
+            return;
+        }
+
+        const healthBar = healthDisplay.userData.healthBar;
+        const sprite = healthDisplay.userData.textSprite;
+        const ctx = healthDisplay.userData.ctx;
+        const canvas = healthDisplay.userData.canvas;
+
+        if (healthBar && healthBar.material) {
+            // 更新血量条宽度
+            const healthRatio = player.baseHp / 50;
+            healthBar.scale.x = Math.max(0, healthRatio);
+
+            // 根据血量改变颜色
+            if (healthRatio > 0.5) {
+                healthBar.material.color.set(playerKey === 'player1' ? 0x00FF00 : 0x00AAFF);
+            } else if (healthRatio > 0.25) {
+                healthBar.material.color.set(0xFFFF00);
+            } else {
+                healthBar.material.color.set(0xFF0000);
             }
         }
 
-        
-        // 创建单个基地
-        function createBase(position, color) {
-            const baseGroup = new THREE.Group();
-            
-            // 基地底座
-            const baseGeometry = new THREE.BoxGeometry(30, 2, 30);
-            const baseMaterial = new THREE.MeshStandardMaterial({ 
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.1
+        if (sprite && ctx && canvas) {
+            // 更新血量数值
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制血量数值
+            ctx.font = 'bold 40px Arial';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const displayHp = Math.max(0, Math.ceil(player.baseHp));
+            ctx.fillText(displayHp.toString(), 64, 32);
+
+            // 更新纹理
+            if (sprite.material && sprite.material.map) {
+                sprite.material.map.needsUpdate = true;
+            }
+        }
+
+        // 基地被摧毁时移除显示
+        if (player.baseHp <= 0) {
+            // 不在这里移除，让 destroyBase 处理
+        }
+    }
+        function showBaseThreatWarning(position) {
+            if (Math.random() > 0.1) return; // 降低频率
+
+            const warningGeometry = new THREE.RingGeometry(15, 17, 16);
+            const warningMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFF0000,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
             });
-            const base = new THREE.Mesh(baseGeometry, baseMaterial);
-            base.position.y = 1;
-            baseGroup.add(base);
-            
-            // 基地旗帜
-            const flagGeometry = new THREE.BoxGeometry(1, 15, 0.5);
-            const flagMaterial = new THREE.MeshStandardMaterial({ color: color });
-            const flag = new THREE.Mesh(flagGeometry, flagMaterial);
-            flag.position.set(0, 8, 15);
-            baseGroup.add(flag);
-            
-            // 旗帜布
-            const flagClothGeometry = new THREE.PlaneGeometry(10, 7);
-            const flagClothMaterial = new THREE.MeshStandardMaterial({ color: color });
-            const flagCloth = new THREE.Mesh(flagClothGeometry, flagClothMaterial);
-            flagCloth.position.set(5, 12, 15);
-            flagCloth.rotation.y = Math.PI / 2;
-            baseGroup.add(flagCloth);
-            
-            baseGroup.position.set(position.x, position.y, position.z);
-            baseGroup.userData = { type: 'base' };
-            
-            return baseGroup;
+            const warningRing = new THREE.Mesh(warningGeometry, warningMaterial);
+            warningRing.rotation.x = -Math.PI / 2;
+            warningRing.position.set(position.x, 0.1, position.z);
+
+            gameState.scene.add(warningRing);
+
+            // 1秒后移除
+            setTimeout(() => {
+                if (warningRing.parent) {
+                    gameState.scene.remove(warningRing);
+                }
+            }, 1000);
         }
-        
+        // 创建单个基地
+    function createBases() {
+        // 玩家1基地
+        const base1 = createBase(
+            { x: -80, y: 0, z: -80 },
+            0xFF7F00,
+            'player1' // 传递 playerKey
+        );
+        gameState.scene.add(base1);
+        gameState.player1.baseObject = base1;
+        gameState.player1.basePosition = { x: -80, y: 0, z: -80 };
+
+        // 玩家2基地
+        const base2 = createBase(
+            { x: 80, y: 0, z: 80 },
+            0x4169E1,
+            'player2' // 传递 playerKey
+        );
+        gameState.scene.add(base2);
+        gameState.player2.baseObject = base2;
+        gameState.player2.basePosition = { x: 80, y: 0, z: 80 };
+    }
         // 创建蛇
         function createSnakes() {
             // 玩家1的蛇
@@ -1723,7 +1954,7 @@
             );
             gameState.scene.add(snake1);
             gameState.player1.snake = snake1;
-            
+
             // 初始化蛇段
             for (let i = 0; i < 5; i++) {
                 const segment = createSnakeSegment(
@@ -1735,7 +1966,7 @@
                 gameState.scene.add(segment);
                 gameState.player1.segments.push(segment);
             }
-            
+
             // 玩家2的蛇
             const snake2 = createSnake(
                 gameState.player2.position,
@@ -1744,7 +1975,7 @@
             );
             gameState.scene.add(snake2);
             gameState.player2.snake = snake2;
-            
+
             // 初始化蛇段
             for (let i = 0; i < 5; i++) {
                 const segment = createSnakeSegment(
@@ -1757,7 +1988,7 @@
                 gameState.player2.segments.push(segment);
             }
         }
-        
+
         // 创建蛇头（在第一视角中，蛇头不可见，但保留用于碰撞检测）
         function createSnake(position, direction, color) {
             // 在第一视角中，我们不需要渲染蛇头模型
@@ -1770,21 +2001,21 @@
             snakeHead.userData = { type: 'snake' };
             return snakeHead;
         }
-        
+
         // 创建蛇段
-        function createSnakeSegment(x, y, z, color) {
-            const geometry = new THREE.BoxGeometry(2, 2, 2);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: color,
-                roughness: 0.5
-            });
-            const segment = new THREE.Mesh(geometry, material);
-            segment.position.set(x, y, z);
-            segment.castShadow = true;
-            segment.userData = { type: 'snakeSegment' };
-            return segment;
-        }
-        
+    function createSnakeSegment(x, y, z, color) {
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.5
+        });
+        const segment = new THREE.Mesh(geometry, material);
+        segment.position.set(x, y, z);
+        segment.castShadow = true;
+        segment.userData = { type: 'snakeSegment' };
+        return segment;
+    }
+
         // 生成食物
         function generateFood() {
             for (let i = 0; i < 20; i++) {
@@ -1797,38 +2028,38 @@
                 gameState.scene.add(food);
             }
         }
-        
+
         // 创建食物
         function createFood(x, y, z) {
             const foodGroup = new THREE.Group();
-            
+
             // 食物主体
             const foodGeometry = new THREE.SphereGeometry(0.8, 16, 16);
-            const foodMaterial = new THREE.MeshStandardMaterial({ 
+            const foodMaterial = new THREE.MeshStandardMaterial({
                 color: 0x00FF00,
                 emissive: 0x00FF00,
                 emissiveIntensity: 0.2
             });
             const food = new THREE.Mesh(foodGeometry, foodMaterial);
             foodGroup.add(food);
-            
+
             // 食物茎
             const stemGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8);
             const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
             const stem = new THREE.Mesh(stemGeometry, stemMaterial);
             stem.position.y = 0.5;
             foodGroup.add(stem);
-            
+
             foodGroup.position.set(x, y, z);
             foodGroup.userData = { type: 'food' };
-            
+
             return foodGroup;
         }
-        
+
         // 生成魔法球
         function generateMagicBalls() {
             const ballTypes = ['invincible', 'health', 'reverse', 'attack', 'bomb'];
-            
+
             for (let i = 0; i < 10; i++) {
                 const type = ballTypes[Math.floor(Math.random() * ballTypes.length)];
                 const ball = createMagicBall(
@@ -1841,91 +2072,91 @@
                 gameState.scene.add(ball);
             }
         }
-        
+
         // 创建魔法球
         function createMagicBall(x, y, z, type) {
             const geometry = new THREE.SphereGeometry(1, 16, 16);
             let material;
-            
+
             switch (type) {
                 case 'invincible':
-                    material = new THREE.MeshStandardMaterial({ 
+                    material = new THREE.MeshStandardMaterial({
                         color: 0xFFFF00,
                         emissive: 0xFFFF00,
                         emissiveIntensity: 0.5
                     });
                     break;
                 case 'health':
-                    material = new THREE.MeshStandardMaterial({ 
+                    material = new THREE.MeshStandardMaterial({
                         color: 0xFF0000,
                         emissive: 0xFF0000,
                         emissiveIntensity: 0.5
                     });
                     break;
                 case 'reverse':
-                    material = new THREE.MeshStandardMaterial({ 
+                    material = new THREE.MeshStandardMaterial({
                         color: 0x800080,
                         emissive: 0x800080,
                         emissiveIntensity: 0.5
                     });
                     break;
                 case 'attack':
-                    material = new THREE.MeshStandardMaterial({ 
+                    material = new THREE.MeshStandardMaterial({
                         color: 0x87CEEB,
                         emissive: 0x87CEEB,
                         emissiveIntensity: 0.5
                     });
                     break;
                 case 'bomb':
-                    material = new THREE.MeshStandardMaterial({ 
+                    material = new THREE.MeshStandardMaterial({
                         color: 0xFF8C00,
                         emissive: 0xFF8C00,
                         emissiveIntensity: 0.5
                     });
                     break;
             }
-            
+
             const ball = new THREE.Mesh(geometry, material);
             ball.position.set(x, y, z);
             ball.userData = { type: 'magicBall', ballType: type };
-            
+
             return ball;
         }
-        
+
         // 更新相机位置和朝向（第一视角）
         function updateCameras() {
             // 玩家1相机 - 斜45度俯视视角
             const p1 = gameState.player1;
             const p1Camera = p1.camera;
-            
+
             // 相机高度和距离
             const cameraHeight = 50;  // 俯视高度
             const cameraDistance = 40; // 距离玩家水平距离
-            
+
             // 相机位置：在玩家斜上方45度角
             p1Camera.position.set(
                 p1.position.x + cameraDistance, // X方向偏移
                 p1.position.y + cameraHeight,   // 高度
                 p1.position.z + cameraDistance  // Z方向偏移
             );
-            
+
             // 相机朝向：看向玩家位置
             p1Camera.lookAt(
                 p1.position.x,
                 p1.position.y + 10, // 稍微看向玩家上方一点
                 p1.position.z
             );
-            
+
             // 玩家2相机 - 同样的俯视视角
             const p2 = gameState.player2;
             const p2Camera = p2.camera;
-            
+
             p2Camera.position.set(
                 p2.position.x + cameraDistance,
                 p2.position.y + cameraHeight,
                 p2.position.z + cameraDistance
             );
-            
+
             p2Camera.lookAt(
                 p2.position.x,
                 p2.position.y + 10,
@@ -1934,80 +2165,106 @@
         }
 
 
-        
+    function updateInvincibleParticles(playerKey, deltaTime) {
+        const player = gameState[playerKey];
+        if (!player.isInvincible || !player.invincibleParticles) return;
+
+        const particleGroup = player.invincibleParticles;
+        const position = player.position;
+
+        // 更新粒子组位置到蛇的位置
+        particleGroup.position.set(position.x, position.y + 2, position.z);
+
+        // 更新单个粒子的旋转和移动
+        particleGroup.children.forEach((particle, index) => {
+            if (particle.userData) {
+                particle.userData.angle += particle.userData.speed * deltaTime;
+
+                // 粒子围绕蛇旋转
+                particle.position.x = Math.cos(particle.userData.angle) * particle.userData.radius;
+                particle.position.z = Math.sin(particle.userData.angle) * particle.userData.radius;
+                particle.position.y = Math.sin(particle.userData.angle + index) * 1.5;
+
+                // 粒子闪烁效果
+                particle.material.opacity = 0.3 + 0.4 * Math.sin(gameState.gameTime * 5 + index);
+            }
+        });
+    }
         // 更新游戏
         function update() {
             if (!clock) {
                 clock = new THREE.Clock(); // 如果clock未定义，立即创建
             }
-            
+
             const deltaTime = clock.getDelta();
-            
+
             if (gameState.running) {
                 gameState.gameTime += deltaTime;
-                
+
                 // 更新游戏时间
                 updateGameTime();
-                
+
                 // 更新玩家状态
                 updatePlayerStatus('player1', deltaTime);
                 updatePlayerStatus('player2', deltaTime);
-                
+
                 // 移动蛇
                 moveSnake('player1', deltaTime);
                 moveSnake('player2', deltaTime);
-                
+
                 // 更新相机
                 updateCameras();
-                
+
                 // 检查碰撞
                 checkCollisions('player1');
                 checkCollisions('player2');
-                
+
                 // 更新子弹
                 updateBullets(deltaTime);
-                
+
                 // 更新爆炸效果
                 updateExplosions(deltaTime);
-                
+                updateExplosionFragments(deltaTime);
+                updateInvincibleParticles('player1', deltaTime);
+                updateInvincibleParticles('player2', deltaTime);
                 // 更新墙碎片效果
                 if (gameState.wallFragments && gameState.wallFragments.length > 0) {
                     updateWallFragments(deltaTime);
                 }
-                
+
                 // 更新环境效果
                 updateEnvironment(deltaTime);
-                
+
                 // 渲染场景
                 renderScenes();
-                
+
                 // 更新UI
                 updateUI();
-                
+
                 // 检查游戏结束
                 checkGameEnd();
             }
         }
-        
+
         // 渲染场景（两个分屏视角）
         function renderScenes() {
             // 渲染玩家1视角
             gameState.player1.renderer.render(gameState.scene, gameState.player1.camera);
-            
+
             // 渲染玩家2视角
             gameState.player2.renderer.render(gameState.scene, gameState.player2.camera);
         }
-        
+
         // 更新游戏时间显示
         function updateGameTime() {
             const minutes = Math.floor(gameState.gameTime / 60);
             const seconds = Math.floor(gameState.gameTime % 60);
             gameTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
-        
+
         function updatePlayerStatus(playerKey, deltaTime) {
             const player = gameState[playerKey];
-            
+
             // 更新状态时间
             if (player.status !== 'normal' && player.statusTime > 0) {
                 player.statusTime -= deltaTime;
@@ -2016,7 +2273,7 @@
                     player.statusTime = 0;
                 }
             }
-            
+
             // 更新俯冲状态
             if (player.isDashing && player.dashDuration > 0) {
                 player.dashDuration -= deltaTime;
@@ -2025,7 +2282,7 @@
                     player.dashDuration = 0;
                 }
             }
-            
+
             // 魔法蛇自动生成魔法球
             if (player.type === 'magic') {
                 player.lastMagicGenerateTime += deltaTime;
@@ -2034,7 +2291,7 @@
                     generateRandomMagicBall(playerKey);
                 }
             }
-            
+
             // 更新攻击模式下的自动射击
             if (player.status === 'attacking') {
                 player.lastAttackTime = (player.lastAttackTime || 0) + deltaTime;
@@ -2044,29 +2301,29 @@
                 }
             }
         }
-        
+
         // 为玩家生成随机魔法球
         function generateRandomMagicBall(playerKey) {
             const player = gameState[playerKey];
             if (player.magicBalls.length >= 5) return;
-            
+
             const rand = Math.random();
             let ballType;
-            
+
             if (rand < 0.4) ballType = 'attack';      // 40%
             else if (rand < 0.7) ballType = 'health'; // 30%
             else if (rand < 0.9) ballType = 'invincible'; // 20%
             else ballType = 'reverse';                // 10%
-            
+
             player.magicBalls.push(ballType);
             updateMagicBallsDisplay(playerKey);
         }
-// 更新蛇的朝向（用于蛇头模型）
+        // 更新蛇的朝向（用于蛇头模型）
         function updateSnakeOrientation(playerKey) {
             const player = gameState[playerKey];
             const snake = player.snake;
             if (!snake) return;
-            
+
             // 根据方向旋转蛇头
             const direction = player.direction;
             if (direction.x !== 0 || direction.z !== 0) {
@@ -2074,64 +2331,103 @@
                 const angle = Math.atan2(direction.z, direction.x);
                 snake.rotation.y = -angle + Math.PI / 2;
             }
-        }    
-        function checkWallCollision(playerKey) {
-            const player = gameState[playerKey];
-            const currentTime = performance.now();
-            const timeSinceLastCollision = currentTime - lastWallCollisionTime[playerKey];
-            
-            for (let i = gameState.walls.length - 1; i >= 0; i--) {
-                const wall = gameState.walls[i];
-                const distance = Math.sqrt(
-                    Math.pow(player.position.x - wall.position.x, 2) +
-                    Math.pow(player.position.z - wall.position.z, 2)
-                );
-                
-                if (distance < 3) {
-                    // 如果距离上次撞墙不到1秒，跳过伤害
-                    if (timeSinceLastCollision > 1000) { // 1000毫秒 = 1秒
-                        // 撞墙伤害：5点
-                        applyDamage(playerKey, 5, 'wall');
-                        // 更新最后撞墙时间
-                        lastWallCollisionTime[playerKey] = currentTime;
-                    }
-                    
-                    // 撞烂墙：从场景和数组中移除墙
-                    gameState.scene.remove(wall);
-                    gameState.walls.splice(i, 1);
-                    
-                    // 显示墙被撞烂的效果
-                    showWallDestroyEffect(wall.position);
-                    
-                    // 直接穿过去，不弹开
-                    // 只是继续移动，没有反弹逻辑
-                    
-                    break; // 一次只撞一堵墙
+        }
+        function getClosestPointOnSegment(px, pz, x1, z1, x2, z2) {
+                const A = px - x1;
+                const B = pz - z1;
+                const C = x2 - x1;
+                const D = z2 - z1;
+
+                const dot = A * C + B * D;
+                const lenSq = C * C + D * D;
+                let param = -1;
+
+                if (lenSq !== 0) {
+                    param = dot / lenSq;
                 }
+
+                let xx, zz;
+
+                if (param < 0) {
+                    xx = x1;
+                    zz = z1;
+                } else if (param > 1) {
+                    xx = x2;
+                    zz = z2;
+                } else {
+                    xx = x1 + param * C;
+                    zz = z1 + param * D;
+                }
+
+                return { x: xx, z: zz };
             }
-        }    
+    function checkWallCollision(playerKey) {
+        const player = gameState[playerKey];
+        const currentTime = performance.now();
+        const timeSinceLastCollision = currentTime - lastWallCollisionTime[playerKey];
+
+        for (let i = gameState.walls.length - 1; i >= 0; i--) {
+            const wall = gameState.walls[i];
+            const wallData = wall.userData;
+
+            if (!wallData) continue;
+
+            // 计算玩家到墙线段的最近点
+            const closestPoint = getClosestPointOnSegment(
+                player.position.x, player.position.z,
+                wallData.start.x, wallData.start.z,
+                wallData.end.x, wallData.end.z
+            );
+
+            // 计算距离
+            const distance = Math.sqrt(
+                Math.pow(player.position.x - closestPoint.x, 2) +
+                Math.pow(player.position.z - closestPoint.z, 2)
+            );
+
+            // 考虑墙的宽度（0.5）和玩家的半径（1.5）
+            const collisionDistance = 0.5 + 1.5;
+
+            if (distance < collisionDistance) {
+                // 如果距离上次撞墙不到1秒，跳过伤害
+                if (timeSinceLastCollision > 1000) {
+                    applyDamage(playerKey, 5, 'wall');
+                    lastWallCollisionTime[playerKey] = currentTime;
+                }
+
+                // 撞烂墙
+                gameState.scene.remove(wall);
+                gameState.walls.splice(i, 1);
+
+                // 显示墙被撞烂的效果
+                showWallDestroyEffect({ x: closestPoint.x, y: 1, z: closestPoint.z });
+
+                break;
+            }
+        }
+    }
         function showWallDestroyEffect(position) {
             // 创建碎片粒子效果
             const fragmentCount = 8;
-            
+
             for (let i = 0; i < fragmentCount; i++) {
                 const fragmentGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-                const fragmentMaterial = new THREE.MeshStandardMaterial({ 
+                const fragmentMaterial = new THREE.MeshStandardMaterial({
                     color: 0x808080,
                     roughness: 0.8
                 });
                 const fragment = new THREE.Mesh(fragmentGeometry, fragmentMaterial);
-                
+
                 fragment.position.copy(position);
                 fragment.position.y = 0.5; // 从地面高度开始
-                
+
                 // 随机速度和方向
                 const velocity = new THREE.Vector3(
                     (Math.random() - 0.5) * 8,
                     Math.random() * 4 + 2,
                     (Math.random() - 0.5) * 8
                 );
-                
+
                 fragment.userData = {
                     velocity: velocity,
                     lifeTime: 1.5,
@@ -2141,9 +2437,9 @@
                         Math.random() * 0.2 - 0.1
                     )
                 };
-                
+
                 gameState.scene.add(fragment);
-                
+
                 // 添加碎片到临时数组，用于更新
                 if (!gameState.wallFragments) {
                     gameState.wallFragments = [];
@@ -2151,31 +2447,110 @@
                 gameState.wallFragments.push(fragment);
             }
         }
+    function checkSnakeCollision(playerKey) {
+        const player = gameState[playerKey];
+        const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
+        const otherPlayer = gameState[otherPlayerKey];
+
+        const currentTime = performance.now();
+        const collisionCooldown = 500;
+
+        // 使用gameState中的lastCollisionTime
+        if (currentTime - gameState.lastCollisionTime[playerKey] < collisionCooldown) {
+            return;
+        }
+
+        // 1. 只检测与对方蛇头的碰撞
+        const distanceToOtherHead = Math.sqrt(
+            Math.pow(player.position.x - otherPlayer.position.x, 2) +
+            Math.pow(player.position.z - otherPlayer.position.z, 2)
+        );
+
+        const headCollisionDistance = 5;
+
+        if (distanceToOtherHead < headCollisionDistance) {
+
+            const damage = 1;
+            if (applyDamage(playerKey, damage, 'headCollision')) {
+                showDamageEffect(playerKey);
+            }
+            if (applyDamage(otherPlayerKey, damage, 'headCollision')) {
+                showDamageEffect(otherPlayerKey);
+            }
+
+            // 更新碰撞时间
+            gameState.lastCollisionTime[playerKey] = currentTime;
+            gameState.lastCollisionTime[otherPlayerKey] = currentTime;
+
+            return;
+        }
+
+        // 2. 移除自己撞自己的检测（完全注释掉）
+        // 不检测自己撞自己
+
+        // 3. 检测与对方蛇身体的碰撞（放宽条件）
+        for (let i = 2; i < otherPlayer.segments.length; i++) {
+            const segment = otherPlayer.segments[i];
+            const distance = Math.sqrt(
+                Math.pow(player.position.x - segment.position.x, 2) +
+                Math.pow(player.position.z - segment.position.z, 2)
+            );
+
+            const bodyCollisionDistance = 3.5;
+
+            if (distance < bodyCollisionDistance) {
+                // 只有撞到的蛇掉血
+                const damage = 1;
+                if (applyDamage(playerKey, damage, 'bodyCollision')) {
+                    showDamageEffect(playerKey);
+                }
+
+                // 更新碰撞时间
+                gameState.lastCollisionTime[playerKey] = currentTime;
+
+                // 被撞的蛇从碰撞点截断（可选，先注释掉）
+                
+                if (i < otherPlayer.segments.length - 3 && i > 5) {
+                    const segmentsToRemove = otherPlayer.segments.slice(i + 1);
+                    segmentsToRemove.forEach(seg => {
+                        if (seg.parent) {
+                            gameState.scene.remove(seg);
+                        }
+                    });
+                    
+                    otherPlayer.segments = otherPlayer.segments.slice(0, i + 1);
+                }
+                
+
+                break;
+            }
+        }
+    }
 
         // 更新墙碎片
         function updateWallFragments(deltaTime) {
             if (!gameState.wallFragments || gameState.wallFragments.length === 0) return;
-            
+
             for (let i = gameState.wallFragments.length - 1; i >= 0; i--) {
                 const fragment = gameState.wallFragments[i];
                 const data = fragment.userData;
-                
+
                 // 应用重力
                 data.velocity.y -= 9.8 * deltaTime;
-                
+
                 // 更新位置
                 fragment.position.x += data.velocity.x * deltaTime;
                 fragment.position.y += data.velocity.y * deltaTime;
                 fragment.position.z += data.velocity.z * deltaTime;
-                
+
                 // 更新旋转
                 fragment.rotation.x += data.rotationSpeed.x;
                 fragment.rotation.y += data.rotationSpeed.y;
                 fragment.rotation.z += data.rotationSpeed.z;
-                
+
                 // 减少生命周期
                 data.lifeTime -= deltaTime;
-                
+
                 // 如果碰到地面或生命周期结束
                 if (fragment.position.y < 0 || data.lifeTime <= 0) {
                     gameState.scene.remove(fragment);
@@ -2186,13 +2561,13 @@
         // 更新蛇的方向
         function updateSnakeDirection(playerKey) {
             const player = gameState[playerKey];
-            
-            // 检查反转控制
+
+            // 检查是否有反转效果
             let directionMultiplier = 1;
-            if (player.status === 'reversed') {
+            if (player.isReversed) {
                 directionMultiplier = -1;
             }
-            
+
             // 玩家1控制 - 传统贪吃蛇转向（不能直接反向）
             if (playerKey === 'player1') {
                 if ((gameState.keys['w'] || gameState.keys['W']) && player.direction.z <= 0) {
@@ -2226,15 +2601,110 @@
                 }
             }
         }
+    function updatePlayerStatusDisplay(playerKey) {
+        const player = gameState[playerKey];
+
+        // 检查是否已初始化蛇对象
+        if (!player.snake) return;
+
+        // 无敌时蛇冒金光
+        if (player.isInvincible) {
+            // 确保蛇头有材质
+            if (player.snake.material) {
+                // 蛇头不可见，不需要修改材质
+            }
+
+            // 给所有蛇段添加金光效果
+            for (let i = 0; i < player.segments.length; i++) {
+                const segment = player.segments[i];
+                if (segment && segment.material) {
+                    segment.material.color.set(0xFFFF00);
+                    if (segment.material.emissive) {
+                        segment.material.emissive.set(0xFFFF00);
+                        segment.material.emissiveIntensity = 0.3;
+                    }
+                }
+            }
+
+            // 添加金色粒子效果
+            if (!player.invincibleParticles) {
+                createInvincibleParticles(playerKey);
+            }
+        } else {
+            // 恢复蛇段的原始颜色
+            const segmentColor = playerKey === 'player1' ? 0xFFA500 : 0x87CEEB;
+            for (let i = 0; i < player.segments.length; i++) {
+                const segment = player.segments[i];
+                if (segment && segment.material) {
+                    segment.material.color.set(segmentColor);
+                    if (segment.material.emissive) {
+                        segment.material.emissive.set(0x000000);
+                        if (segment.material.emissiveIntensity) {
+                            segment.material.emissiveIntensity = 0;
+                        }
+                    }
+                }
+            }
+
+            // 移除粒子效果
+            if (player.invincibleParticles) {
+                removeInvincibleParticles(playerKey);
+            }
+        }
+    }
+    // 创建无敌时的粒子效果
+    function createInvincibleParticles(playerKey) {
+        const player = gameState[playerKey];
+
+        // 创建一个粒子组
+        const particleGroup = new THREE.Group();
+
+        // 在蛇周围创建一些金色粒子
+        for (let i = 0; i < 10; i++) {
+            const particleGeometry = new THREE.SphereGeometry(0.4, 6, 6);
+            const particleMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFFF00,
+                transparent: true,
+                opacity: 0.5
+            });
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+
+            // 随机位置（在蛇周围）
+            particle.userData = {
+                angle: Math.random() * Math.PI * 2,
+                radius: 3 + Math.random() * 2,
+                speed: 1 + Math.random() * 1
+            };
+
+            particleGroup.add(particle);
+        }
+
+        particleGroup.userData = {
+            type: 'invincibleParticles',
+            playerKey: playerKey
+        };
+
+        gameState.scene.add(particleGroup);
+        player.invincibleParticles = particleGroup;
+    }
+
+    // 移除无敌粒子效果
+    function removeInvincibleParticles(playerKey) {
+        const player = gameState[playerKey];
+        if (player.invincibleParticles && player.invincibleParticles.parent) {
+            gameState.scene.remove(player.invincibleParticles);
+            player.invincibleParticles = null;
+        }
+    }
         function updateSnakeSegments(playerKey) {
             const player = gameState[playerKey];
             const segments = player.segments;
-            
-            // 初始蛇段数量增加到10个（原来是5个）
+
             if (segments.length === 0) {
-                for (let i = 0; i < 10; i++) { // 改为10个初始段
+                // 初始化蛇段
+                for (let i = 0; i < 5; i++) {
                     const segment = createSnakeSegment(
-                        player.position.x - i * 1.5, // 间隔改为1.5，更密集
+                        player.position.x - i * 2,
                         player.position.y - 0.25,
                         player.position.z,
                         playerKey === 'player1' ? 0xFFA500 : 0x87CEEB
@@ -2244,7 +2714,8 @@
                 }
                 return;
             }
-            
+
+            // 正常更新蛇段位置
             // 将最后一个蛇段移动到蛇头后面
             const lastSegment = segments[segments.length - 1];
             lastSegment.position.set(
@@ -2252,11 +2723,11 @@
                 player.position.y + 1.25,
                 player.position.z
             );
-            
+
             // 将最后一个蛇段移到数组开头
             segments.unshift(segments.pop());
         }
-        
+
         // 移动蛇
         function moveSnake(playerKey, deltaTime) {
             const player = gameState[playerKey];
@@ -2265,63 +2736,63 @@
             if (player.paused) return;
             // 计算移动速度
             let speed = 15 * deltaTime; // 基础速度
-            
+
             // 应用蛇类型的速度加成
             if (player.type === 'speed') {
                 speed *= 1.5; // 速度蛇增加50%
             } else if (player.type === 'magic') {
                 speed *= 1.15; // 魔法蛇增加15%
             }
-            
+
             // 应用速度升级
             speed *= player.speedMultiplier;
-            
+
             // 应用俯冲加速
             if (player.isDashing) {
                 speed *= 3; // 俯冲期间3倍速度
             }
-            
+
             // 应用暴风雪减速
             if (gameState.stormActive) {
                 speed *= 0.8; // 暴风雪中减速20%
             }
-            
+
             // 更新方向
             updateSnakeDirection(playerKey);
-            
+
             // 直接设置方向
             if (player.targetDirection.x !== 0 || player.targetDirection.z !== 0) {
                 player.direction.x = player.targetDirection.x;
                 player.direction.z = player.targetDirection.z;
             }
-            
+
             // 更新位置
             player.position.x += player.direction.x * speed;
             player.position.z += player.direction.z * speed;
-            
+
             // 边界检查（使用新的边界大小100）
             const boundary = 100;
             if (player.position.x < -boundary) player.position.x = boundary;
             if (player.position.x > boundary) player.position.x = -boundary;
             if (player.position.z < -boundary) player.position.z = boundary;
             if (player.position.z > boundary) player.position.z = -boundary;
-            
+
             // 更新蛇头位置
             snake.position.set(
                 player.position.x,
                 player.position.y,
                 player.position.z
             );
-            
+
             // 更新蛇段位置
             updateSnakeSegments(playerKey);
         }
 
-        
+
         // 更新蛇段位置
         function addSnakeSegment(playerKey) {
             const player = gameState[playerKey];
-            
+
             // 如果蛇段数量为0，创建第一个段
             if (player.segments.length === 0) {
                 const segment = createSnakeSegment(
@@ -2334,10 +2805,10 @@
                 player.segments.push(segment);
                 return;
             }
-            
+
             // 获取最后一个蛇段
             const lastSegment = player.segments[player.segments.length - 1];
-            
+
             // 修改：每次吃球增加3个段（原来是1个）
             for (let i = 0; i < 9; i++) {
                 const newSegment = createSnakeSegment(
@@ -2351,12 +2822,12 @@
             }
         }
 
-        
+
         function checkCollisions(playerKey, deltaTime) {
             const player = gameState[playerKey];
             const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
             const otherPlayer = gameState[otherPlayerKey];
-            
+
             // 检查与食物的碰撞
             for (let i = gameState.food.length - 1; i >= 0; i--) {
                 const food = gameState.food[i];
@@ -2364,18 +2835,18 @@
                     Math.pow(player.position.x - food.position.x, 2) +
                     Math.pow(player.position.z - food.position.z, 2)
                 );
-                
+
                 if (distance < 2) {
                     // 吃食物，增加分数
                     player.score += 50;
-                    
+
                     // 蛇变长：增加3个段
                     addSnakeSegment(playerKey);
-                    
+
                     // 移除食物
                     gameState.scene.remove(food);
                     gameState.food.splice(i, 1);
-                    
+
                     // 生成新食物
                     const newFood = createFood(
                         Math.random() * 200 - 100,
@@ -2386,7 +2857,7 @@
                     gameState.scene.add(newFood);
                 }
             }
-            
+
             // 检查与魔法球的碰撞
             for (let i = gameState.magicBalls.length - 1; i >= 0; i--) {
                 const ball = gameState.magicBalls[i];
@@ -2394,7 +2865,7 @@
                     Math.pow(player.position.x - ball.position.x, 2) +
                     Math.pow(player.position.z - ball.position.z, 2)
                 );
-                
+
                 if (distance < 2) {
                     player.score += 100;
                     // 收集魔法球
@@ -2402,14 +2873,14 @@
                         player.magicBalls.push(ball.userData.ballType);
                         updateMagicBallsDisplay(playerKey);
                     }
-                    
+
                     // 蛇变长：增加3个段（魔法球也增长）
                     addSnakeSegment(playerKey);
-                    
+
                     // 移除魔法球
                     gameState.scene.remove(ball);
                     gameState.magicBalls.splice(i, 1);
-                    
+
                     // 生成新魔法球
                     const ballTypes = ['invincible', 'health', 'reverse', 'attack', 'bomb'];
                     const type = ballTypes[Math.floor(Math.random() * ballTypes.length)];
@@ -2423,73 +2894,33 @@
                     gameState.scene.add(newBall);
                 }
             }
-            
+
             // 修改：调用新的撞墙检测函数
             checkWallCollision(playerKey);
-            
-            // 检查与另一条蛇的碰撞
-            const distanceToOtherHead = Math.sqrt(
-                Math.pow(player.position.x - otherPlayer.position.x, 2) +
-                Math.pow(player.position.z - otherPlayer.position.z, 2)
-            );
-            
-            if (distanceToOtherHead < 3) {
-                const damageAmount = playerKey === 'player1' ? 
-                    (gameState.player2.type === 'hard' ? 2 : 1) : 
-                    (gameState.player1.type === 'hard' ? 2 : 1);
-                
-                applyDamage(playerKey, damageAmount, 'collision');
-                
-                const pushDirection = {
-                    x: player.position.x - otherPlayer.position.x,
-                    z: player.position.z - otherPlayer.position.z
-                };
-                const length = Math.sqrt(pushDirection.x * pushDirection.x + pushDirection.z * pushDirection.z);
-                if (length > 0) {
-                    pushDirection.x /= length;
-                    pushDirection.z /= length;
-                    
-                    player.position.x += pushDirection.x * 2;
-                    player.position.z += pushDirection.z * 2;
-                    
-                    otherPlayer.position.x -= pushDirection.x * 2;
-                    otherPlayer.position.z -= pushDirection.z * 2;
-                }
-            }
-            
-            // 检查与另一条蛇身体的碰撞
-            for (const segment of otherPlayer.segments) {
-                const distance = Math.sqrt(
-                    Math.pow(player.position.x - segment.position.x, 2) +
-                    Math.pow(player.position.z - segment.position.z, 2)
-                );
-                
-                if (distance < 2.5) {
-                    applyDamage(playerKey, 1, 'collision');
-                }
-            }
-            
+
+            checkSnakeCollision(playerKey);
+
             // 检查与子弹的碰撞
             for (let i = gameState.bullets.length - 1; i >= 0; i--) {
                 const bullet = gameState.bullets[i];
-                
+
                 if (bullet.userData.owner === playerKey) continue;
-                
+
                 const distance = Math.sqrt(
                     Math.pow(player.position.x - bullet.position.x, 2) +
                     Math.pow(player.position.z - bullet.position.z, 2)
                 );
-                
+
                 if (distance < 2) {
                     applyDamage(playerKey, 0.5, 'bullet');
                     gameState.scene.remove(bullet);
                     gameState.bullets.splice(i, 1);
                 }
             }
-            
+
             // 检查与基地的交互
             checkBaseInteraction(playerKey);
-            
+
             // 检查与岩浆的碰撞
             if (gameState.mapType === 'volcano') {
                 checkLavaDamage(playerKey);
@@ -2498,155 +2929,284 @@
         // 显示受伤效果
         function showDamageEffect(playerKey) {
             const damageOverlay = playerKey === 'player1' ? p1DamageOverlay : p2DamageOverlay;
-            
+
             // 显示红色覆盖层
             damageOverlay.style.opacity = '0.7';
-            
+
             // 添加镜头晃动效果
-            const viewport = playerKey === 'player1' ? 
-                document.getElementById('player1-viewport') : 
+            const viewport = playerKey === 'player1' ?
+                document.getElementById('player1-viewport') :
                 document.getElementById('player2-viewport');
             viewport.classList.add('camera-shake');
-            
+
             // 1秒后隐藏效果
             setTimeout(() => {
                 damageOverlay.style.opacity = '0';
                 viewport.classList.remove('camera-shake');
             }, 300);
         }
-        
+
         // 应用伤害
-        function applyDamage(playerKey, damage, source) {
-            const player = gameState[playerKey];
-            
-            // 检查免疫状态
-            if (player.status === 'invincible') {
+    function applyDamage(playerKey, damage, source) {
+        const player = gameState[playerKey];
+
+        // 检查无敌状态
+        if (player.isInvincible) {
+            return false;
+        }
+
+        // 检查护盾
+        if (player.shield > 0) {
+            const shieldDamage = Math.min(damage, player.shield);
+            player.shield -= shieldDamage;
+            damage -= shieldDamage;
+
+            console.log(`${playerKey}护盾吸收${shieldDamage}点伤害，剩余护盾: ${player.shield}`);
+
+            if (player.shield <= 0) {
+                player.shield = 0;
+            }
+
+            if (damage <= 0) return false;
+        }
+
+        // 坚硬蛇特性：非子弹类伤害减半
+        let finalDamage = damage;
+        if (player.type === 'hard' && source !== 'bullet' && source !== 'baseBullet') {
+            finalDamage *= 0.5;
+
+            // 子弹免疫：50%概率免疫子弹伤害
+            if ((source === 'bullet' || source === 'baseBullet') && Math.random() < 0.5) {
                 return false;
             }
-            
-            // 检查护盾
-            if (player.shield > 0) {
-                const shieldDamage = Math.min(damage, player.shield);
-                player.shield -= shieldDamage;
-                damage -= shieldDamage;
-                
-                if (player.shield <= 0) {
-                    player.shield = 0;
-                }
-                
-                if (damage <= 0) return false;
-            }
-            
-            // 坚硬蛇特性：非子弹类伤害减半
-            if (player.type === 'hard' && source !== 'bullet' && source !== 'baseBullet') {
-                damage *= 0.5;
-                
-                // 子弹免疫：50%概率免疫子弹伤害
-                if ((source === 'bullet' || source === 'baseBullet') && Math.random() < 0.5) {
-                    return false;
-                }
-            }
-            
-            // 应用伤害
-            const oldHp = player.hp;
-            player.hp -= damage;
-            if (player.hp < 0) player.hp = 0;
-            
-            // 返回是否实际造成了伤害
-            return oldHp > player.hp;
         }
-        
+
+        // 应用伤害
+        const oldHp = player.hp;
+        player.hp -= finalDamage;
+        if (player.hp < 0) player.hp = 0;
+
+        // 返回是否实际造成了伤害
+        return oldHp > player.hp;
+    }
+
         // 检查基地交互
-// 检查基地交互 - 修复回血部分
+        // 检查基地交互 - 修复回血部分
         function checkBaseInteraction(playerKey) {
             const player = gameState[playerKey];
             const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
             const otherPlayer = gameState[otherPlayerKey];
-            
-            // 检查是否在自己的基地内
-            const distanceToOwnBase = Math.sqrt(
+
+            const baseRadius = 15; // 基地半径
+            const currentTime = performance.now();
+
+            // 1. 检查自己基地（回血）
+            const distanceToOwnBaseCenter = Math.sqrt(
                 Math.pow(player.position.x - player.basePosition.x, 2) +
                 Math.pow(player.position.z - player.basePosition.z, 2)
             );
-            
-            // 基地回血区域：20格内
-            if (distanceToOwnBase < 20) {
-                // 在自己的基地内，每秒恢复3点生命值（需要deltaTime）
-                if (clock) {
-                    const deltaTime = clock.getDelta();
+
+            // 在自己基地内回血（使用原来的逻辑）
+            if (distanceToOwnBaseCenter < baseRadius) {
+                // 每秒回1点血
+                if (!player.lastHealTime) player.lastHealTime = currentTime;
+
+                if (currentTime - player.lastHealTime > 100) {
                     if (player.hp < player.maxHp) {
-                        player.hp += 3 * deltaTime; // 每秒恢复3点
+                        player.hp += 0.1; // 每100ms回0.1，每秒1点
                         if (player.hp > player.maxHp) player.hp = player.maxHp;
-                        
-                        // 显示回血效果（每0.5秒一次）
-                        if (Math.random() < deltaTime * 2) {
-                            showHealEffect(player.position);
-                        }
                     }
+                    player.lastHealTime = currentTime;
                 }
             }
-            
-            // 检查是否在对方基地内
-            const distanceToOtherBase = Math.sqrt(
+
+            // 2. 检查对方基地（攻击）
+            const distanceToOtherBaseCenter = Math.sqrt(
                 Math.pow(player.position.x - otherPlayer.basePosition.x, 2) +
                 Math.pow(player.position.z - otherPlayer.basePosition.z, 2)
             );
-            
-            // 对方基地攻击范围：20格内
-            if (distanceToOtherBase < 20) {
-                // 在对方基地内，对自己每秒造成1点伤害
-                if (clock) {
-                    const deltaTime = clock.getDelta();
-                    
-                    // 检查是否有无敌状态
+
+            // 恢复到基地边界内才造成伤害（15格内）
+            if (distanceToOtherBaseCenter < baseRadius) {
+                // 对玩家自身造成伤害（每秒1点）
+                if (!player.lastBaseDamageTime) player.lastBaseDamageTime = currentTime;
+
+                if (currentTime - player.lastBaseDamageTime > 1000) {
                     if (player.status !== 'invincible') {
-                        const damage = player.type === 'hard' ? 0.5 * deltaTime : 1 * deltaTime;
-                        const damageApplied = applyDamage(playerKey, damage, 'base');
-                        
-                        if (damageApplied) {
-                            showDamageEffect(playerKey);
-                        }
+                        const damage = player.type === 'hard' ? 0.5 : 1;
+                        applyDamage(playerKey, damage, 'base');
                     }
-                    
-                    // 对基地每秒造成5点伤害（比原来的3点更多）
-                    otherPlayer.baseHp -= 5 * deltaTime;
+                    player.lastBaseDamageTime = currentTime;
+                }
+
+                // 对基地造成伤害（每秒3点）
+                if (!otherPlayer.lastBaseUnderAttackTime) {
+                    otherPlayer.lastBaseUnderAttackTime = currentTime;
+                }
+
+                if (currentTime - otherPlayer.lastBaseUnderAttackTime > 1000) {
+                    otherPlayer.baseHp -= 3; // 每秒3点伤害
                     if (otherPlayer.baseHp < 0) otherPlayer.baseHp = 0;
-                    
-                    // 基地被摧毁
+                    otherPlayer.lastBaseUnderAttackTime = currentTime;
+
+                    // 显示基地被攻击效果
+                    showBaseDamageEffect(otherPlayer.basePosition);
+
+                    // 基地被摧毁 - 直接消失
                     if (otherPlayer.baseHp <= 0 && otherPlayer.baseObject) {
-                        // 改变基地颜色为灰色
-                        otherPlayer.baseObject.children.forEach(child => {
-                            if (child.material && child.material.color) {
-                                child.material.color.set(0x808080);
-                                if (child.material.emissive) {
-                                    child.material.emissive.set(0x000000);
-                                }
-                            }
-                        });
+                        destroyBase(otherPlayerKey);
                     }
-                    
-                    // 基地防御系统：当敌人在15格内时发射子弹
-                    if (otherPlayer.baseHp > 0 && distanceToOtherBase < 15) {
-                        // 添加冷却时间检查
-                        const currentTime = performance.now();
-                        if (!otherPlayer.lastBaseShotTime) {
-                            otherPlayer.lastBaseShotTime = 0;
-                        }
-                        
-                        // 每0.5秒发射一次
-                        if (currentTime - otherPlayer.lastBaseShotTime > 500) {
-                            shootBaseBullet(otherPlayerKey, playerKey);
-                            otherPlayer.lastBaseShotTime = currentTime;
-                        }
-                    }
+
+                }
+            } else {
+                // 离开基地范围，重置计时器
+                player.lastBaseDamageTime = null;
+                if (otherPlayer) otherPlayer.lastBaseUnderAttackTime = null;
+            }
+
+            // 3. 基地防御系统（需要更大的检测范围）
+            const defenseDetectionRange = baseRadius + 50; // 基地边界外20格
+
+            if (distanceToOtherBaseCenter < defenseDetectionRange && otherPlayer.baseHp > 0) {
+                // 基地防御：每1秒发射一次子弹
+                if (!otherPlayer.lastBaseShotTime) {
+                    otherPlayer.lastBaseShotTime = 0;
+                }
+
+                // 每1000毫秒（1秒）发射一次
+                if (currentTime - otherPlayer.lastBaseShotTime > 1000) {
+                    shootBaseBullet(otherPlayerKey, playerKey);
+                    otherPlayer.lastBaseShotTime = currentTime;
                 }
             }
         }
-        
+    function destroyBase(playerKey) {
+        const player = gameState[playerKey];
+
+        // 移除基地对象
+        if (player.baseObject && player.baseObject.parent) {
+            // 创建爆炸效果
+            createBaseExplosion(player.basePosition);
+
+            // 延迟移除基地
+            setTimeout(() => {
+                if (player.baseObject && player.baseObject.parent) {
+                    gameState.scene.remove(player.baseObject);
+                    player.baseObject = null;
+                }
+            }, 500);
+        }
+    }
+        // 创建基地爆炸效果
+        function createBaseExplosion(position) {
+            // 创建大型爆炸效果
+            const explosionGroup = new THREE.Group();
+
+            // 爆炸火球
+            const fireGeometry = new THREE.SphereGeometry(8, 32, 32);
+            const fireMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFF4500,
+                emissive: 0xFF4500,
+                emissiveIntensity: 0.9,
+                transparent: true,
+                opacity: 0.8
+            });
+            const fireball = new THREE.Mesh(fireGeometry, fireMaterial);
+            explosionGroup.add(fireball);
+
+            // 爆炸冲击波
+            const shockwaveGeometry = new THREE.RingGeometry(5, 15, 32);
+            const shockwaveMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFFF00,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.6
+            });
+            const shockwave = new THREE.Mesh(shockwaveGeometry, shockwaveMaterial);
+            shockwave.rotation.x = -Math.PI / 2;
+            shockwave.position.y = 0.1;
+            explosionGroup.add(shockwave);
+
+            // 碎片
+            for (let i = 0; i < 20; i++) {
+                const fragmentGeometry = new THREE.BoxGeometry(1, 1, 1);
+                const fragmentMaterial = new THREE.MeshStandardMaterial({
+                    color: Math.random() > 0.5 ? 0xFF7F00 : 0x4169E1,
+                    emissiveIntensity: 0.3
+                });
+                const fragment = new THREE.Mesh(fragmentGeometry, fragmentMaterial);
+
+                fragment.position.set(
+                    position.x + (Math.random() - 0.5) * 5,
+                    position.y + Math.random() * 3,
+                    position.z + (Math.random() - 0.5) * 5
+                );
+
+                fragment.userData = {
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 10,
+                        Math.random() * 5 + 2,
+                        (Math.random() - 0.5) * 10
+                    ),
+                    rotationSpeed: new THREE.Vector3(
+                        Math.random() * 0.2 - 0.1,
+                        Math.random() * 0.2 - 0.1,
+                        Math.random() * 0.2 - 0.1
+                    ),
+                    lifeTime: 2
+                };
+
+                explosionGroup.add(fragment);
+                gameState.explosionFragments = gameState.explosionFragments || [];
+                gameState.explosionFragments.push(fragment);
+            }
+
+            explosionGroup.position.set(position.x, position.y, position.z);
+            explosionGroup.userData = { lifeTime: 1 };
+            gameState.explosions.push(explosionGroup);
+            gameState.scene.add(explosionGroup);
+        }
+
+        // 更新爆炸碎片
+        function updateExplosionFragments(deltaTime) {
+            if (!gameState.explosionFragments) return;
+
+            for (let i = gameState.explosionFragments.length - 1; i >= 0; i--) {
+                const fragment = gameState.explosionFragments[i];
+                const data = fragment.userData;
+
+                if (!data) continue;
+
+                // 更新位置
+                fragment.position.x += data.velocity.x * deltaTime;
+                fragment.position.y += data.velocity.y * deltaTime;
+                fragment.position.z += data.velocity.z * deltaTime;
+
+                // 应用重力
+                data.velocity.y -= 9.8 * deltaTime;
+
+                // 更新旋转
+                fragment.rotation.x += data.rotationSpeed.x;
+                fragment.rotation.y += data.rotationSpeed.y;
+                fragment.rotation.z += data.rotationSpeed.z;
+
+                // 减少生命周期
+                data.lifeTime -= deltaTime;
+
+                // 移除过期碎片
+                if (data.lifeTime <= 0 || fragment.position.y < 0) {
+                    if (fragment.parent) {
+                        gameState.scene.remove(fragment);
+                    }
+                    gameState.explosionFragments.splice(i, 1);
+                }
+            }
+        }
+
         // 检查岩浆伤害
         function checkLavaDamage(playerKey) {
             const player = gameState[playerKey];
-            
+
             // 检查是否在火山喷发的岩浆范围内
             for (const volcano of gameState.volcanoes) {
                 if (volcano.userData.active) {
@@ -2654,7 +3214,7 @@
                         Math.pow(player.position.x - volcano.position.x, 2) +
                         Math.pow(player.position.z - volcano.position.z, 2)
                     );
-                    
+
                     if (distance < 10) {
                         // 岩浆伤害
                         const damageApplied = applyDamage(playerKey, 2 * clock.getDelta(), 'lava');
@@ -2669,37 +3229,43 @@
         }
         function shootBullet(playerKey) {
             const player = gameState[playerKey];
-            
+
+            // 根据攻击叠加层数增加子弹大小
+            const attackStacks = player.attackStacks || 0;
+            const sizeMultiplier = 1 + attackStacks * 0.2; // 每层增加20%大小
+
             // 获取蛇的当前前进方向
             const direction = player.direction;
-            
+
             const bullet = createBullet(
                 player.position.x,
                 player.position.y + 1.5,
                 player.position.z,
-                direction, // 使用蛇的前进方向
+                direction,
                 playerKey === 'player1' ? 0xFF7F00 : 0x4169E1,
-                playerKey // 传入发射者
+                playerKey
             );
-            
+
+            // 调整子弹大小
+            bullet.scale.set(sizeMultiplier, sizeMultiplier, sizeMultiplier);
+
             gameState.bullets.push(bullet);
             gameState.scene.add(bullet);
         }
-
-        // 射击子弹
         function createBullet(x, y, z, direction, color, owner) {
+            // 改回原来的0.4大小
             const geometry = new THREE.SphereGeometry(0.4, 8, 8);
-            const material = new THREE.MeshStandardMaterial({ 
+            const material = new THREE.MeshStandardMaterial({
                 color: color,
                 emissive: color,
                 emissiveIntensity: 0.5
             });
             const bullet = new THREE.Mesh(geometry, material);
             bullet.position.set(x, y, z);
-            bullet.userData = { 
+            bullet.userData = {
                 type: 'bullet',
                 direction: { x: direction.x, y: 0, z: direction.z },
-                speed: 120,// 增加速度：从30增加到60
+                speed: 180, // 改回原来的速度
                 lifeTime: 5,
                 owner: owner,
                 damage: 0.5
@@ -2707,202 +3273,372 @@
             return bullet;
         }
 
-        function createBaseBullet(x, y, z, direction, color) {
-            const geometry = new THREE.SphereGeometry(0.3, 8, 8);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.5
-            });
-            const bullet = new THREE.Mesh(geometry, material);
-            bullet.position.set(x, y, z);
-            bullet.userData = { 
-                type: 'baseBullet',
-                direction: direction,
-                speed: 5,
-                lifeTime: 5
-            };
-            return bullet;
+    function createBaseBullet(x, y, z, direction, color) {
+        const geometry = new THREE.SphereGeometry(0.4, 8, 8);
+        const material = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.5
+        });
+        const bullet = new THREE.Mesh(geometry, material);
+        bullet.position.set(x, y, z);
+        bullet.userData = {
+            type: 'baseBullet',
+            direction: direction,
+            speed: 25,
+            damage: 0.5  // 伤害0.5
+        };
+        return bullet;
+    }
+
+        function getPlayerSpeed(playerKey) {
+            const player = gameState[playerKey];
+            let speed = 15; // 基础速度
+
+            if (player.type === 'speed') {
+                speed *= 1.5;
+            } else if (player.type === 'magic') {
+                speed *= 1.15;
+            }
+
+            speed *= player.speedMultiplier;
+
+            if (player.isDashing) {
+                speed *= 3;
+            }
+
+            return speed;
         }
-        function shootBaseBullet(baseOwnerKey, targetPlayerKey) {
-            const owner = gameState[baseOwnerKey];
-            const target = gameState[targetPlayerKey];
-            
-            // 检查目标是否还活着
-            if (target.hp <= 0) return;
-            
-            const direction = {
-                x: target.position.x - owner.basePosition.x,
-                y: 0,
-                z: target.position.z - owner.basePosition.z
-            };
-            
-            // 归一化方向向量
+        // 修改shootBaseBullet函数
+        // 修改shootBaseBullet函数为批量发射
+   function shootBaseBullet(baseOwnerKey, targetPlayerKey) {
+        const owner = gameState[baseOwnerKey];
+        const target = gameState[targetPlayerKey];
+
+        if (target.hp <= 0) return;
+
+        // 计算目标相对于基地的方向
+        const dx = target.position.x - owner.basePosition.x;
+        const dz = target.position.z - owner.basePosition.z;
+
+        // 决定从哪条边发射（基地的四个边）
+        let side = '';
+        if (Math.abs(dx) > Math.abs(dz)) {
+            // X方向距离更大，从左边或右边发射
+            side = dx > 0 ? 'right' : 'left';
+        } else {
+            // Z方向距离更大，从上边或下边发射
+            side = dz > 0 ? 'bottom' : 'top';
+        }
+
+        // 从选定的边发射6颗子弹，对准玩家
+        const bulletCount = 6;
+        const baseRadius = 15;
+
+        for (let i = 0; i < bulletCount; i++) {
+            let firePosition;
+            let direction;
+
+            // 根据选定的边计算发射位置和方向
+            switch (side) {
+                case 'top': // 上边
+                    firePosition = {
+                        x: owner.basePosition.x - baseRadius + (2 * baseRadius / (bulletCount - 1)) * i,
+                        y: 3,
+                        z: owner.basePosition.z - baseRadius
+                    };
+                    // 从基地上边向玩家方向发射
+                    direction = {
+                        x: target.position.x - firePosition.x,
+                        y: 0,
+                        z: target.position.z - firePosition.z
+                    };
+                    break;
+
+                case 'bottom': // 下边
+                    firePosition = {
+                        x: owner.basePosition.x - baseRadius + (2 * baseRadius / (bulletCount - 1)) * i,
+                        y: 3,
+                        z: owner.basePosition.z + baseRadius
+                    };
+                    // 从基地下边向玩家方向发射
+                    direction = {
+                        x: target.position.x - firePosition.x,
+                        y: 0,
+                        z: target.position.z - firePosition.z
+                    };
+                    break;
+
+                case 'left': // 左边
+                    firePosition = {
+                        x: owner.basePosition.x - baseRadius,
+                        y: 3,
+                        z: owner.basePosition.z - baseRadius + (2 * baseRadius / (bulletCount - 1)) * i
+                    };
+                    // 从基地左边向玩家方向发射
+                    direction = {
+                        x: target.position.x - firePosition.x,
+                        y: 0,
+                        z: target.position.z - firePosition.z
+                    };
+                    break;
+
+                case 'right': // 右边
+                    firePosition = {
+                        x: owner.basePosition.x + baseRadius,
+                        y: 3,
+                        z: owner.basePosition.z - baseRadius + (2 * baseRadius / (bulletCount - 1)) * i
+                    };
+                    // 从基地右边向玩家方向发射
+                    direction = {
+                        x: target.position.x - firePosition.x,
+                        y: 0,
+                        z: target.position.z - firePosition.z
+                    };
+                    break;
+            }
+
+            // 归一化方向（使其长度为1）
             const length = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
-            if (length === 0) return; // 防止除零错误
-            
+            if (length === 0) continue;
             direction.x /= length;
             direction.z /= length;
-            
-            // 从基地中心发射子弹
+
+            // 创建子弹
             const bullet = createBaseBullet(
-                owner.basePosition.x,
-                5, // 发射高度
-                owner.basePosition.z,
+                firePosition.x,
+                firePosition.y,
+                firePosition.z,
                 direction,
                 baseOwnerKey === 'player1' ? 0xFF7F00 : 0x4169E1
             );
-            
+
             bullet.userData.owner = baseOwnerKey;
-            bullet.userData.type = 'baseBullet';
-            bullet.userData.damage = 0.5; // 基地子弹伤害
-            
+            bullet.userData.damage = 0.5;
+
             gameState.bullets.push(bullet);
             gameState.scene.add(bullet);
         }
+    }
+
+
         // 更新子弹
-        function updateBullets(deltaTime) {
-            for (let i = gameState.bullets.length - 1; i >= 0; i--) {
-                const bullet = gameState.bullets[i];
-                const data = bullet.userData;
-                
-                // 子弹独立移动，不受蛇移动影响
-                bullet.position.x += data.direction.x * data.speed * deltaTime;
-                bullet.position.z += data.direction.z * data.speed * deltaTime;
-                
-                // 减少生命周期
-                data.lifeTime -= deltaTime;
-                
-                // 边界检查
-                const boundary = 120;
-                if (Math.abs(bullet.position.x) > boundary || 
-                    Math.abs(bullet.position.z) > boundary ||
-                    data.lifeTime <= 0) {
-                    gameState.scene.remove(bullet);
-                    gameState.bullets.splice(i, 1);
-                    continue;
-                }
-                
-                // 检查与墙壁的碰撞
-                for (const wall of gameState.walls) {
-                    const distance = Math.sqrt(
-                        Math.pow(bullet.position.x - wall.position.x, 2) +
-                        Math.pow(bullet.position.z - wall.position.z, 2)
-                    );
-                    
-                    if (distance < 3) {
-                        gameState.scene.remove(bullet);
-                        gameState.bullets.splice(i, 1);
-                        break;
-                    }
-                }
-                
-                // 检查与玩家的碰撞
-                checkBulletPlayerCollision(bullet, i);
-                
-                // 检查与基地的碰撞
+    // 4. 修改 updateBullets 函数，确保碰撞检测被调用
+    function updateBullets(deltaTime) {
+        for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+            const bullet = gameState.bullets[i];
+            const data = bullet.userData;
+
+            if (!data) continue;
+
+            // 子弹移动
+            bullet.position.x += data.direction.x * data.speed * deltaTime;
+            bullet.position.z += data.direction.z * data.speed * deltaTime;
+
+            // 边界检查
+            const boundary = 120;
+            if (Math.abs(bullet.position.x) > boundary ||
+                Math.abs(bullet.position.z) > boundary) {
+                gameState.scene.remove(bullet);
+                gameState.bullets.splice(i, 1);
+                continue;
+            }
+
+            // 检查与墙壁的碰撞
+            checkBulletWallCollision(bullet, i);
+
+            // 如果子弹还在，检查与基地的碰撞
+            if (gameState.bullets[i] === bullet) {
                 checkBulletBaseCollision(bullet, i);
             }
+
+            // 如果子弹还在，检查与玩家的碰撞
+            if (gameState.bullets[i] === bullet) {
+                checkBulletPlayerCollision(bullet, i);
+            }
         }
-        function checkBulletPlayerCollision(bullet, bulletIndex) {
-            const data = bullet.userData;
-            const players = ['player1', 'player2'];
-            
-            for (const playerKey of players) {
-                const player = gameState[playerKey];
-                
-                // 跳过自己的子弹（包括基地子弹）
-                if (data.owner === playerKey) continue;
-                
-                const distance = Math.sqrt(
-                    Math.pow(player.position.x - bullet.position.x, 2) +
-                    Math.pow(player.position.z - bullet.position.z, 2)
-                );
-                
-                // 基地子弹碰撞距离稍微大一点
-                const collisionDistance = data.type === 'baseBullet' ? 3 : 2;
-                
-                if (distance < collisionDistance) {
-                    // 不同子弹类型伤害不同
-                    const damageAmount = data.type === 'baseBullet' ? 1 : 0.5;
-                    applyDamage(playerKey, damageAmount, data.type);
-                    
-                    // 显示伤害效果
+    }
+    function createBullet(x, y, z, direction, color, owner) {
+        const geometry = new THREE.SphereGeometry(0.4, 8, 8);
+        const material = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.5
+        });
+        const bullet = new THREE.Mesh(geometry, material);
+        bullet.position.set(x, y, z);
+        bullet.userData = {
+            type: 'bullet',
+            direction: { x: direction.x, y: 0, z: direction.z },
+            speed: 180,
+            owner: owner,
+            damage: 0.5
+        };
+        return bullet;
+    }
+    function checkBulletWallCollision(bullet, bulletIndex) {
+        const data = bullet.userData;
+        if (!data) return;
+
+        for (let j = gameState.walls.length - 1; j >= 0; j--) {
+            const wall = gameState.walls[j];
+            const wallData = wall.userData;
+
+            if (!wallData) continue;
+
+            // 计算子弹到墙线段的最近点
+            const closestPoint = getClosestPointOnSegment(
+                bullet.position.x, bullet.position.z,
+                wallData.start.x, wallData.start.z,
+                wallData.end.x, wallData.end.z
+            );
+
+            const distance = Math.sqrt(
+                Math.pow(bullet.position.x - closestPoint.x, 2) +
+                Math.pow(bullet.position.z - closestPoint.z, 2)
+            );
+
+            // 墙的宽度0.5，子弹半径0.4
+            if (distance < 0.5 + 0.4) {
+                gameState.scene.remove(bullet);
+                gameState.bullets.splice(bulletIndex, 1);
+                break;
+            }
+        }
+    }
+    function checkBulletPlayerCollision(bullet, bulletIndex) {
+        const data = bullet.userData;
+
+        if (data.type !== 'bullet' && data.type !== 'baseBullet') return;
+
+        const players = ['player1', 'player2'];
+
+        for (const playerKey of players) {
+            const player = gameState[playerKey];
+
+            // 跳过自己的子弹
+            if (data.owner === playerKey) continue;
+
+            // 检查与蛇头的碰撞
+            const playerRadius = 1.5;
+            const bulletRadius = 0.4;
+
+            const headDistance = Math.sqrt(
+                Math.pow(player.position.x - bullet.position.x, 2) +
+                Math.pow(player.position.z - bullet.position.z, 2)
+            );
+
+            if (headDistance < playerRadius + bulletRadius) {
+                const damageAmount = data.damage || 0.5;
+                const damageApplied = applyDamage(playerKey, damageAmount, data.type);
+
+                if (damageApplied) {
                     showDamageEffect(playerKey);
-                    
-                    // 移除子弹
+                }
+
+                gameState.scene.remove(bullet);
+                gameState.bullets.splice(bulletIndex, 1);
+                return;
+            }
+
+            // 检查与蛇身的碰撞
+            for (let i = 0; i < player.segments.length; i++) {
+                const segment = player.segments[i];
+                if (!segment) continue;
+
+                const segmentDistance = Math.sqrt(
+                    Math.pow(segment.position.x - bullet.position.x, 2) +
+                    Math.pow(segment.position.z - bullet.position.z, 2)
+                );
+
+                if (segmentDistance < 1.5 + bulletRadius) {
+                    const damageAmount = data.damage || 0.5;
+                    const damageApplied = applyDamage(playerKey, damageAmount, data.type);
+
+                    if (damageApplied) {
+                        showDamageEffect(playerKey);
+                    }
+
                     gameState.scene.remove(bullet);
                     gameState.bullets.splice(bulletIndex, 1);
                     return;
                 }
             }
         }
-        function checkBulletBaseCollision(bullet, bulletIndex) {
-            const data = bullet.userData;
-            const players = ['player1', 'player2'];
-            
-            for (const playerKey of players) {
-                const player = gameState[playerKey];
-                
-                // 跳过自己的子弹（自己的子弹不对自己基地造成伤害）
-                if (data.owner === playerKey) continue;
-                
-                // 检查子弹与基地的距离
-                const distance = Math.sqrt(
-                    Math.pow(bullet.position.x - player.basePosition.x, 2) +
-                    Math.pow(bullet.position.z - player.basePosition.z, 2)
-                );
-                
-                // 基地范围：30个单位
-                if (distance < 30) {
-                    // 子弹对基地伤害：1点
-                    player.baseHp -= 1;
-                    if (player.baseHp < 0) player.baseHp = 0;
-                    
-                    // 显示伤害效果
-                    showBaseDamageEffect(player.basePosition);
-                    
-                    // 移除子弹
-                    gameState.scene.remove(bullet);
-                    gameState.bullets.splice(bulletIndex, 1);
-                    
-                    // 基地被摧毁
-                    if (player.baseHp <= 0 && player.baseObject) {
-                        // 改变基地颜色为灰色
-                        player.baseObject.children.forEach(child => {
-                            if (child.material && child.material.color) {
-                                child.material.color.set(0x808080);
-                                if (child.material.emissive) {
-                                    child.material.emissive.set(0x000000);
-                                }
-                            }
-                        });
-                    }
-                    return;
+    }
+    function checkBulletBaseCollision(bullet, bulletIndex) {
+        const data = bullet.userData;
+        if (!data) return;
+
+        // 检查所有玩家的基地
+        const players = ['player1', 'player2'];
+
+        for (const playerKey of players) {
+            const player = gameState[playerKey];
+
+            // 跳过自己的子弹对自家基地的伤害
+            if (data.owner === playerKey && data.type === 'bullet') continue;
+
+            // 如果基地已被摧毁，跳过
+            if (player.baseHp <= 0 || !player.baseObject) continue;
+
+            // 计算子弹到基地中心的距离
+            const distance = Math.sqrt(
+                Math.pow(bullet.position.x - player.basePosition.x, 2) +
+                Math.pow(bullet.position.z - player.basePosition.z, 2)
+            );
+
+            // 基地半径约15（30/2），子弹半径0.4
+            if (distance < 15 + 0.4) {
+                // 不同子弹类型对基地伤害不同
+                let damage = 0;
+                if (data.type === 'baseBullet') {
+                    damage = 0.5; // 基地子弹对基地伤害0.5
+                } else {
+                    damage = 1; // 玩家子弹对基地伤害1
                 }
+
+                player.baseHp -= damage;
+                if (player.baseHp < 0) player.baseHp = 0;
+
+                // 显示基地伤害效果
+                showBaseDamageEffect(player.basePosition);
+
+                // 移除子弹
+                gameState.scene.remove(bullet);
+                gameState.bullets.splice(bulletIndex, 1);
+
+                // 基地被摧毁
+                if (player.baseHp <= 0 && player.baseObject) {
+                    destroyBase(playerKey);
+                }
+
+                return;
             }
-        }     
+        }
+    }
+
         // 基地伤害效果
         function showBaseDamageEffect(position) {
             // 创建伤害粒子效果
             const particleCount = 5;
             for (let i = 0; i < particleCount; i++) {
                 const particleGeometry = new THREE.SphereGeometry(0.3, 6, 6);
-                const particleMaterial = new THREE.MeshBasicMaterial({ 
+                const particleMaterial = new THREE.MeshBasicMaterial({
                     color: 0xFF0000,
                     transparent: true,
                     opacity: 0.7
                 });
                 const particle = new THREE.Mesh(particleGeometry, particleMaterial);
-                
+
                 particle.position.set(
                     position.x + (Math.random() - 0.5) * 10,
                     position.y + Math.random() * 5,
                     position.z + (Math.random() - 0.5) * 10
                 );
-                
+
                 gameState.scene.add(particle);
-                
+
                 // 1秒后移除粒子
                 setTimeout(() => {
                     if (particle.parent) {
@@ -2910,44 +3646,44 @@
                     }
                 }, 1000);
             }
-        }           
+        }
         // 更新爆炸效果
         function updateExplosions(deltaTime) {
             for (let i = gameState.explosions.length - 1; i >= 0; i--) {
                 const explosion = gameState.explosions[i];
                 explosion.userData.lifeTime -= deltaTime;
-                
+
                 if (explosion.userData.lifeTime <= 0) {
                     gameState.scene.remove(explosion);
                     gameState.explosions.splice(i, 1);
                 }
             }
         }
-        
+
         // 更新环境效果
         function updateEnvironment(deltaTime) {
             // 更新火山
             if (gameState.mapType === 'volcano') {
                 updateVolcanoes(deltaTime);
             }
-            
+
             // 更新暴风雪
             if (gameState.mapType === 'snow') {
                 updateSnowStorm(deltaTime);
             }
         }
-        
+
         // 更新火山
         function updateVolcanoes(deltaTime) {
             for (const volcano of gameState.volcanoes) {
                 volcano.userData.cooldown -= deltaTime;
-                
+
                 if (volcano.userData.cooldown <= 0) {
                     if (!volcano.userData.warning && !volcano.userData.active) {
                         // 开始警告阶段
                         volcano.userData.warning = true;
                         volcano.userData.warningTime = 5;
-                        
+
                         // 火山闪烁
                         const crater = volcano.children[1];
                         if (crater && crater.material) {
@@ -2956,31 +3692,31 @@
                     } else if (volcano.userData.warning && volcano.userData.warningTime > 0) {
                         // 警告阶段倒计时
                         volcano.userData.warningTime -= deltaTime;
-                        
+
                         // 火山闪烁效果
                         const crater = volcano.children[1];
                         if (crater && crater.material) {
                             crater.material.emissiveIntensity = 0.3 + 0.5 * Math.sin(gameState.gameTime * 10);
                         }
-                        
+
                         if (volcano.userData.warningTime <= 0) {
                             // 开始喷发
                             volcano.userData.warning = false;
                             volcano.userData.active = true;
                             volcano.userData.activeTime = 15;
-                            
+
                             // 创建岩浆区域
                             createLavaZone(volcano.position.x, volcano.position.z);
                         }
                     } else if (volcano.userData.active && volcano.userData.activeTime > 0) {
                         // 喷发阶段倒计时
                         volcano.userData.activeTime -= deltaTime;
-                        
+
                         if (volcano.userData.activeTime <= 0) {
                             // 结束喷发
                             volcano.userData.active = false;
                             volcano.userData.cooldown = 30;
-                            
+
                             // 恢复火山口亮度
                             const crater = volcano.children[1];
                             if (crater && crater.material) {
@@ -2991,7 +3727,7 @@
                 }
             }
         }
-        
+
         // 创建岩浆区域
         function createLavaZone(x, z) {
             // 创建3x3的岩浆区域
@@ -3000,7 +3736,7 @@
                     const lava = createLavaPatch(x + dx * 6, z + dz * 6);
                     lava.userData.lifeTime = 15;
                     gameState.scene.add(lava);
-                    
+
                     // 15秒后移除
                     setTimeout(() => {
                         if (lava.parent) {
@@ -3010,11 +3746,11 @@
                 }
             }
         }
-        
+
         // 创建岩浆贴片
         function createLavaPatch(x, z) {
             const geometry = new THREE.PlaneGeometry(5, 5);
-            const material = new THREE.MeshStandardMaterial({ 
+            const material = new THREE.MeshStandardMaterial({
                 color: 0xFF4500,
                 emissive: 0xFF4500,
                 emissiveIntensity: 0.5,
@@ -3027,14 +3763,14 @@
             lava.userData = { type: 'lava' };
             return lava;
         }
-        
+
         // 更新暴风雪
         function updateSnowStorm(deltaTime) {
             // 随机触发暴风雪
             if (!gameState.stormActive && !gameState.stormWarning && Math.random() < 0.001) {
                 gameState.stormWarning = true;
                 gameState.stormWarningTime = 5;
-                
+
                 // 随机选择一个方向
                 const directions = [
                     { x: 0, z: -1 }, // 上
@@ -3044,7 +3780,7 @@
                 ];
                 gameState.stormDirection = directions[Math.floor(Math.random() * directions.length)];
             }
-            
+
             if (gameState.stormWarning && gameState.stormWarningTime > 0) {
                 gameState.stormWarningTime -= deltaTime;
                 if (gameState.stormWarningTime <= 0) {
@@ -3053,7 +3789,7 @@
                     gameState.stormActiveTime = 10;
                 }
             }
-            
+
             if (gameState.stormActive && gameState.stormActiveTime > 0) {
                 gameState.stormActiveTime -= deltaTime;
                 if (gameState.stormActiveTime <= 0) {
@@ -3061,13 +3797,13 @@
                 }
             }
         }
-        
+
         // 添加蛇段
         function addSnakeSegment(playerKey) {
             const player = gameState[playerKey];
-            
-            // 如果蛇段数量为0，创建第一个段
+
             if (player.segments.length === 0) {
+                // 创建第一个段
                 const segment = createSnakeSegment(
                     player.position.x,
                     player.position.y - 0.25,
@@ -3078,106 +3814,243 @@
                 player.segments.push(segment);
                 return;
             }
-            
-            // 获取最后一个蛇段
+
+            // 获取最后一个蛇段的位置
             const lastSegment = player.segments[player.segments.length - 1];
-            
-            // 简单方法：在最后一个蛇段的位置添加新段
-            // 在updateSnakeSegments中会处理位置更新
-            const newSegment = createSnakeSegment(
-                lastSegment.position.x,
-                lastSegment.position.y,
-                lastSegment.position.z,
-                playerKey === 'player1' ? 0xFFA500 : 0x87CEEB
-            );
-            
-            gameState.scene.add(newSegment);
-            player.segments.push(newSegment);
-        }
-        
-        // 使用魔法球
-        function useMagicBall(playerKey, ballIndex) {
-            const player = gameState[playerKey];
-            if (ballIndex < 0 || ballIndex >= player.magicBalls.length) return;
-            
-            const ballType = player.magicBalls[ballIndex];
-            
-            // 移除魔法球
-            player.magicBalls.splice(ballIndex, 1);
-            updateMagicBallsDisplay(playerKey);
-            
-            // 应用效果
-            switch (ballType) {
-                case 'invincible':
-                    player.status = 'invincible';
-                    player.statusTime = player.type === 'magic' ? 15 : 10;
-                    if (player.magicUpgrades > 0) {
-                        player.statusTime *= 1 + (0.2 * player.magicUpgrades);
-                    }
-                    break;
-                    
-                case 'health':
-                    player.hp += 5;
-                    if (player.hp > player.maxHp) player.hp = player.maxHp;
-                    break;
-                    
-                case 'reverse':
-                    const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
-                    const otherPlayer = gameState[otherPlayerKey];
-                    otherPlayer.status = 'reversed';
-                    otherPlayer.statusTime = otherPlayer.type === 'magic' ? 12 : 8;
-                    if (otherPlayer.magicUpgrades > 0) {
-                        otherPlayer.statusTime *= 1 + (0.2 * otherPlayer.magicUpgrades);
-                    }
-                    break;
-                    
-                case 'attack':
-                    player.status = 'attacking';
-                    player.statusTime = player.type === 'magic' ? 45 : 30;
-                    if (player.magicUpgrades > 0) {
-                        player.statusTime *= 1 + (0.2 * player.magicUpgrades);
-                    }
-                    break;
-                    
-                case 'bomb':
-                    // 创建爆炸效果
-                    createExplosion(player.position.x, player.position.y, player.position.z);
-                    
-                    // 只对敌方玩家造成伤害，不对自己
-                    const enemyKey = playerKey === 'player1' ? 'player2' : 'player1';
-                    const enemyPlayer = gameState[enemyKey];
-                    
-                    // 计算与敌人的距离
-                    const distanceToEnemy = Math.sqrt(
-                        Math.pow(enemyPlayer.position.x - player.position.x, 2) +
-                        Math.pow(enemyPlayer.position.z - player.position.z, 2)
-                    );
-                    
-                    // 根据距离造成伤害
-                    if (distanceToEnemy < 5) {
-                        // 近距离：大伤害
-                        applyDamage(enemyKey, 5, 'bomb');
-                        showDamageEffect(enemyKey);
-                    } else if (distanceToEnemy < 8) {
-                        // 中等距离：中等伤害
-                        applyDamage(enemyKey, 2, 'bomb');
-                        showDamageEffect(enemyKey);
-                    } else if (distanceToEnemy < 12) {
-                        // 远距离：小伤害
-                        applyDamage(enemyKey, 1, 'bomb');
-                        showDamageEffect(enemyKey);
-                    }
-                    break;
+
+            // 添加3个新段
+            for (let i = 0; i < 3; i++) {
+                const newSegment = createSnakeSegment(
+                    lastSegment.position.x,
+                    lastSegment.position.y,
+                    lastSegment.position.z,
+                    playerKey === 'player1' ? 0xFFA500 : 0x87CEEB
+                );
+                gameState.scene.add(newSegment);
+                player.segments.push(newSegment);
             }
         }
-        
+        function showSnakeCutEffect(position, playerKey) {
+            // 创建粒子效果
+            const particleCount = 5;
+            const color = playerKey === 'player1' ? 0xFFA500 : 0x87CEEB;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particleGeometry = new THREE.SphereGeometry(0.3, 6, 6);
+                const particleMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+
+                particle.position.set(
+                    position.x + (Math.random() - 0.5) * 2,
+                    position.y + Math.random() * 1,
+                    position.z + (Math.random() - 0.5) * 2
+                );
+
+                gameState.scene.add(particle);
+
+                // 动画效果
+                const velocity = {
+                    x: (Math.random() - 0.5) * 3,
+                    y: Math.random() * 2,
+                    z: (Math.random() - 0.5) * 3
+                };
+
+                const startTime = performance.now();
+                function animateParticle() {
+                    const elapsed = performance.now() - startTime;
+                    if (elapsed > 1000) {
+                        if (particle.parent) gameState.scene.remove(particle);
+                        return;
+                    }
+
+                    particle.position.x += velocity.x * 0.016;
+                    particle.position.y += velocity.y * 0.016;
+                    particle.position.z += velocity.z * 0.016;
+
+                    particle.material.opacity = 0.7 * (1 - elapsed / 1000);
+
+                    requestAnimationFrame(animateParticle);
+                }
+                animateParticle();
+            }
+        }
+        // 使用魔法球
+    function useMagicBall(playerKey, ballIndex) {
+        const player = gameState[playerKey];
+        if (ballIndex < 0 || ballIndex >= player.magicBalls.length) return;
+
+        const ballType = player.magicBalls[ballIndex];
+
+        // 移除魔法球
+        player.magicBalls.splice(ballIndex, 1);
+        updateMagicBallsDisplay(playerKey);
+
+        // 应用效果
+        switch (ballType) {
+            case 'invincible':
+                player.isInvincible = true;
+                player.invincibleTime = player.type === 'magic' ? 15 : 10;
+                break;
+
+            case 'health':
+                player.hp += 5;
+                if (player.hp > player.maxHp) player.hp = player.maxHp;
+                break;
+
+            case 'reverse':
+                const otherPlayerKey = playerKey === 'player1' ? 'player2' : 'player1';
+                const otherPlayer = gameState[otherPlayerKey];
+                otherPlayer.isReversed = true;
+                otherPlayer.reversedTime = otherPlayer.type === 'magic' ? 12 : 8;
+                break;
+
+            case 'attack':
+                player.isAttacking = true;
+                player.attackTime = player.type === 'magic' ? 30 : 20;
+                break;
+
+            case 'bomb':
+                // 创建爆炸效果
+                createExplosion(player.position.x, player.position.y, player.position.z);
+
+                // 爆炸半径
+                const explosionRadius = 10;
+
+                // 对所有玩家和基地造成伤害
+                const allTargets = ['player1', 'player2'];
+
+                allTargets.forEach(targetKey => {
+                    const target = gameState[targetKey];
+
+                    // 跳过自己（如果炸弹不伤害自己）
+                    if (targetKey === playerKey) return;
+
+                    // 计算到爆炸中心的距离
+                    const distance = Math.sqrt(
+                        Math.pow(target.position.x - player.position.x, 2) +
+                        Math.pow(target.position.z - player.position.z, 2)
+                    );
+
+                    // 对玩家造成伤害
+                    if (distance < explosionRadius) {
+                        let damage = 0;
+                        if (distance < 3) damage = 5;
+                        else if (distance < 6) damage = 2;
+                        else if (distance < 10) damage = 1;
+
+                        if (damage > 0) {
+                            applyDamage(targetKey, damage, 'bomb');
+                            showDamageEffect(targetKey);
+                        }
+                    }
+
+                    // 对基地造成伤害
+                    const distanceToBase = Math.sqrt(
+                        Math.pow(target.basePosition.x - player.position.x, 2) +
+                        Math.pow(target.basePosition.z - player.position.z, 2)
+                    );
+
+                    // 如果爆炸在基地30格范围内
+                    if (distanceToBase < 30) {
+                        let baseDamage = 0;
+                        if (distanceToBase < 10) baseDamage = 10;
+                        else if (distanceToBase < 20) baseDamage = 5;
+                        else if (distanceToBase < 30) baseDamage = 2;
+
+                        if (baseDamage > 0) {
+                            target.baseHp -= baseDamage;
+                            if (target.baseHp < 0) target.baseHp = 0;
+
+                            // 显示基地被攻击效果
+                            showBaseDamageEffect(target.basePosition);
+
+                            // 检查基地是否被摧毁
+                            if (target.baseHp <= 0 && target.baseObject) {
+                                destroyBase(targetKey);
+                            }
+                        }
+                    }
+                });
+
+                // 对自己添加轻微反冲效果
+                const pushBack = 2;
+                player.position.x += player.direction.x * -pushBack;
+                player.position.z += player.direction.z * -pushBack;
+                break;
+        }
+
+        // 更新状态显示
+        updatePlayerStatusDisplay(playerKey);
+    }
+
+    function updatePlayerStatus(playerKey, deltaTime) {
+        const player = gameState[playerKey];
+
+        // 更新无敌状态时间
+        if (player.isInvincible && player.invincibleTime > 0) {
+            player.invincibleTime -= deltaTime;
+            if (player.invincibleTime <= 0) {
+                player.isInvincible = false;
+                player.invincibleTime = 0;
+            }
+        }
+
+        // 更新反向状态时间
+        if (player.isReversed && player.reversedTime > 0) {
+            player.reversedTime -= deltaTime;
+            if (player.reversedTime <= 0) {
+                player.isReversed = false;
+                player.reversedTime = 0;
+            }
+        }
+
+        // 更新攻击状态时间
+        if (player.isAttacking && player.attackTime > 0) {
+            player.attackTime -= deltaTime;
+            // 攻击状态下的自动射击
+            player.lastAttackTime = (player.lastAttackTime || 0) + deltaTime;
+            if (player.lastAttackTime >= 0.4) { // 每0.4秒射击一次
+                player.lastAttackTime = 0;
+                shootBullet(playerKey);
+            }
+            if (player.attackTime <= 0) {
+                player.isAttacking = false;
+                player.attackTime = 0;
+            }
+        }
+
+        // 魔法蛇自动生成魔法球
+        if (player.type === 'magic') {
+            player.lastMagicGenerateTime = (player.lastMagicGenerateTime || 0) + deltaTime;
+            if (player.lastMagicGenerateTime >= 20) {
+                player.lastMagicGenerateTime = 0;
+                generateRandomMagicBall(playerKey);
+            }
+        }
+
+        // 更新俯冲状态
+        if (player.isDashing && player.dashDuration > 0) {
+            player.dashDuration -= deltaTime;
+            if (player.dashDuration <= 0) {
+                player.isDashing = false;
+                player.dashDuration = 0;
+            }
+        }
+
+        // 更新状态显示
+        updatePlayerStatusDisplay(playerKey);
+    }
         // 创建爆炸效果
         function createExplosion(x, y, z) {
             const explosionGroup = new THREE.Group();
-            
+
             // 爆炸球体
             const explosionGeometry = new THREE.SphereGeometry(3, 16, 16);
-            const explosionMaterial = new THREE.MeshStandardMaterial({ 
+            const explosionMaterial = new THREE.MeshStandardMaterial({
                 color: 0xFF8C00,
                 emissive: 0xFF8C00,
                 emissiveIntensity: 0.8,
@@ -3186,27 +4059,27 @@
             });
             const explosion = new THREE.Mesh(explosionGeometry, explosionMaterial);
             explosionGroup.add(explosion);
-            
+
             explosionGroup.position.set(x, y, z);
             explosionGroup.userData = { lifeTime: 1 };
             gameState.explosions.push(explosionGroup);
             gameState.scene.add(explosionGroup);
         }
-        
+
         // 检查游戏结束
         function checkGameEnd() {
             if (gameState.player1.hp <= 0 || gameState.player2.hp <= 0) {
                 endGame();
             }
         }
-        
+
         // 结束游戏
         function endGame() {
             gameState.running = false;
             gameOverScreen.style.display = 'flex';
             startButton.textContent = '开始游戏';
             startButton.disabled = false;
-            
+
             // 确定获胜者
             let winner;
             if (gameState.player1.hp > 0 && gameState.player2.hp <= 0) {
@@ -3222,16 +4095,16 @@
                 winnerText.textContent = '平局！';
                 winnerText.style.color = '#FFD700';
             }
-            
+
             // 显示统计数据
             displayStats();
-            
+
             // 隐藏一些UI，让结果界面更清晰
             document.querySelectorAll('.player-panel, .base-info, .score-display').forEach(el => {
                 el.style.opacity = '0.3';
             });
         }
-        
+
         // 显示统计数据
         function displayStats() {
             const stats = `
@@ -3264,140 +4137,93 @@
                     <span>${gameState.player2.baseHp.toFixed(1)}</span>
                 </div>
             `;
-            
+
             statsContainer.innerHTML = stats;
         }
-        
+
         // 更新UI
-        function updateUI() {
-            // 更新玩家1信息
-            player1HealthElement.textContent = gameState.player1.hp.toFixed(1);
-            player1MaxHealthElement.textContent = gameState.player1.maxHp;
-            player1HealthBar.style.width = `${(gameState.player1.hp / gameState.player1.maxHp) * 100}%`;
-            player1ShieldElement.textContent = gameState.player1.shield;
-            player1ScoreElement.textContent = gameState.player1.score;
-            
-            // 更新玩家1状态
-            if (gameState.player1.status === 'invincible') {
-                player1StatusElement.textContent = '无敌';
-                player1StatusElement.style.color = '#FFFF00';
-            } else if (gameState.player1.status === 'reversed') {
-                player1StatusElement.textContent = '反向';
-                player1StatusElement.style.color = '#800080';
-            } else if (gameState.player1.status === 'attacking') {
-                player1StatusElement.textContent = '攻击';
-                player1StatusElement.style.color = '#87CEEB';
-            } else {
-                player1StatusElement.textContent = '正常';
-                player1StatusElement.style.color = '#FFFFFF';
-            }
-            
-            // 更新玩家2信息
-            player2HealthElement.textContent = gameState.player2.hp.toFixed(1);
-            player2MaxHealthElement.textContent = gameState.player2.maxHp;
-            player2HealthBar.style.width = `${(gameState.player2.hp / gameState.player2.maxHp) * 100}%`;
-            player2ShieldElement.textContent = gameState.player2.shield;
-            player2ScoreElement.textContent = gameState.player2.score;
-            
-            // 更新玩家2状态
-            if (gameState.player2.status === 'invincible') {
-                player2StatusElement.textContent = '无敌';
-                player2StatusElement.style.color = '#FFFF00';
-            } else if (gameState.player2.status === 'reversed') {
-                player2StatusElement.textContent = '反向';
-                player2StatusElement.style.color = '#800080';
-            } else if (gameState.player2.status === 'attacking') {
-                player2StatusElement.textContent = '攻击';
-                player2StatusElement.style.color = '#87CEEB';
-            } else {
-                player2StatusElement.textContent = '正常';
-                player2StatusElement.style.color = '#FFFFFF';
-            }
-            
-            // 更新基地信息
-            base1HpElement.textContent = Math.max(0, Math.floor(gameState.player1.baseHp));
-            // 将分母从50改为20
-            base1HealthBar.style.width = `${(gameState.player1.baseHp / 20) * 100}%`;
-            base2HpElement.textContent = Math.max(0, Math.floor(gameState.player2.baseHp));
-            base2HealthBar.style.width = `${(gameState.player2.baseHp / 20) * 100}%`;
-            // 如果基地被摧毁，显示特殊状态
-            if (gameState.player1.baseHp <= 0) {
-                base1HpElement.textContent = "已摧毁";
-                base1HealthBar.style.background = '#808080';
-            }
-            
-            if (gameState.player2.baseHp <= 0) {
-                base2HpElement.textContent = "已摧毁";
-                base2HealthBar.style.background = '#808080';
-            }
-            
-            // 更新蛇类型显示
-            const player1TypeElement = document.getElementById('player1-type');
-            const player2TypeElement = document.getElementById('player2-type');
-            
-            if (gameState.player1.type === 'speed') {
-                player1TypeElement.textContent = '速度蛇';
-                player1TypeElement.className = 'snake-type speed-snake';
-            } else if (gameState.player1.type === 'hard') {
-                player1TypeElement.textContent = '坚硬蛇';
-                player1TypeElement.className = 'snake-type hard-snake';
-            } else if (gameState.player1.type === 'magic') {
-                player1TypeElement.textContent = '魔法蛇';
-                player1TypeElement.className = 'snake-type magic-snake';
-            }
-            
-            if (gameState.player2.type === 'speed') {
-                player2TypeElement.textContent = '速度蛇';
-                player2TypeElement.className = 'snake-type speed-snake';
-            } else if (gameState.player2.type === 'hard') {
-                player2TypeElement.textContent = '坚硬蛇';
-                player2TypeElement.className = 'snake-type hard-snake';
-            } else if (gameState.player2.type === 'magic') {
-                player2TypeElement.textContent = '魔法蛇';
-                player2TypeElement.className = 'snake-type magic-snake';
-            }
+    function updateUI() {
+        // 更新玩家1信息
+        player1HealthElement.textContent = gameState.player1.hp.toFixed(1);
+        player1MaxHealthElement.textContent = gameState.player1.maxHp;
+        player1HealthBar.style.width = `${(gameState.player1.hp / gameState.player1.maxHp) * 100}%`;
+        player1ShieldElement.textContent = gameState.player1.shield;
+        player1ScoreElement.textContent = gameState.player1.score;
+
+        // 更新玩家2信息
+        player2HealthElement.textContent = gameState.player2.hp.toFixed(1);
+        player2MaxHealthElement.textContent = gameState.player2.maxHp;
+        player2HealthBar.style.width = `${(gameState.player2.hp / gameState.player2.maxHp) * 100}%`;
+        player2ShieldElement.textContent = gameState.player2.shield;
+        player2ScoreElement.textContent = gameState.player2.score;
+
+        // 更新基地血量显示（在UI栏中）
+        base1HpElement.textContent = Math.max(0, Math.floor(gameState.player1.baseHp));
+        base1HealthBar.style.width = `${(gameState.player1.baseHp / 50) * 100}%`;
+        base2HpElement.textContent = Math.max(0, Math.floor(gameState.player2.baseHp));
+        base2HealthBar.style.width = `${(gameState.player2.baseHp / 50) * 100}%`;
+
+        // 如果基地被摧毁，显示特殊状态
+        if (gameState.player1.baseHp <= 0) {
+            base1HpElement.textContent = "已摧毁";
+            base1HealthBar.style.background = '#808080';
         }
-        
+
+        if (gameState.player2.baseHp <= 0) {
+            base2HpElement.textContent = "已摧毁";
+            base2HealthBar.style.background = '#808080';
+        }
+
+        // 更新无敌视觉效果
+        updatePlayerStatusDisplay('player1');
+        updatePlayerStatusDisplay('player2');
+
+        // 更新魔法球显示（在状态栏中）
+        updateMagicBallsDisplay('player1');
+        updateMagicBallsDisplay('player2');
+    }
         // 更新魔法球显示
-        function updateMagicBallsDisplay(playerKey) {
-            const player = gameState[playerKey];
-            const ballsElement = document.getElementById(`${playerKey}-balls`);
-            ballsElement.innerHTML = '';
-            
-            player.magicBalls.forEach((ballType, index) => {
-                const ballSlot = document.createElement('div');
-                ballSlot.className = `ball-slot ${ballType}`;
-                
-                // 设置缩写
-                let abbreviation;
-                switch (ballType) {
-                    case 'invincible': abbreviation = '无'; break;
-                    case 'health': abbreviation = '血'; break;
-                    case 'reverse': abbreviation = '反'; break;
-                    case 'attack': abbreviation = '攻'; break;
-                    case 'bomb': abbreviation = '爆'; break;
-                    default: abbreviation = '?';
-                }
-                
-                ballSlot.textContent = abbreviation;
-                ballSlot.title = getBallDescription(ballType);
-                
-                // 添加点击事件
-                ballSlot.style.cursor = 'pointer';
-                ballSlot.onclick = () => useMagicBall(playerKey, index);
-                
-                ballsElement.appendChild(ballSlot);
-            });
-            
-            // 添加空槽位
-            for (let i = player.magicBalls.length; i < 5; i++) {
-                const emptySlot = document.createElement('div');
-                emptySlot.className = 'ball-slot';
-                emptySlot.textContent = '';
-                ballsElement.appendChild(emptySlot);
+    function updateMagicBallsDisplay(playerKey) {
+        const player = gameState[playerKey];
+        const ballsElement = document.getElementById(`${playerKey}-balls`);
+
+        if (!ballsElement) return;
+
+        ballsElement.innerHTML = '';
+
+        player.magicBalls.forEach((ballType, index) => {
+            const ballSlot = document.createElement('div');
+            ballSlot.className = `ball-slot ${ballType}`;
+
+            // 设置缩写
+            let abbreviation;
+            switch (ballType) {
+                case 'invincible': abbreviation = '无'; break;
+                case 'health': abbreviation = '血'; break;
+                case 'reverse': abbreviation = '反'; break;
+                case 'attack': abbreviation = '攻'; break;
+                case 'bomb': abbreviation = '爆'; break;
+                default: abbreviation = '?';
             }
+
+            ballSlot.textContent = abbreviation;
+            ballSlot.title = getBallDescription(ballType);
+
+            // 添加点击事件
+            ballSlot.style.cursor = 'pointer';
+            ballSlot.onclick = () => useMagicBall(playerKey, index);
+
+            ballsElement.appendChild(ballSlot);
+        });
+
+        // 添加空槽位
+        for (let i = player.magicBalls.length; i < 5; i++) {
+            const emptySlot = document.createElement('div');
+            emptySlot.className = 'ball-slot';
+            emptySlot.textContent = '';
+            ballsElement.appendChild(emptySlot);
         }
-        
+    }
         // 获取魔法球描述
         function getBallDescription(ballType) {
             switch (ballType) {
@@ -3409,23 +4235,23 @@
                 default: return '未知魔法球';
             }
         }
-        
+
         // 打开商店
         function openShop(playerKey) {
             const shopOverlay = document.getElementById(`${playerKey}-overlay`);
             shopOverlay.style.display = 'flex';
         }
-        
+
         // 关闭商店
         function closeShop(playerKey) {
             const shopOverlay = document.getElementById(`${playerKey}-overlay`);
             shopOverlay.style.display = 'none';
         }
-        
+
         // 购买物品
         function buyItem(playerKey, item) {
             const player = gameState[playerKey];
-            
+
             switch (item) {
                 case 'shield':
                     if (player.score >= 400 && player.shield === 0) {
@@ -3433,7 +4259,7 @@
                         player.shield = 10;
                     }
                     break;
-                    
+
                 case 'magic-pack':
                     if (player.score >= 400) {
                         player.score -= 400;
@@ -3445,14 +4271,14 @@
                         updateMagicBallsDisplay(playerKey);
                     }
                     break;
-                    
+
                 case 'speed-upgrade':
                     if (player.score >= 500) {
                         player.score -= 500;
                         player.speedMultiplier *= 1.15;
                     }
                     break;
-                    
+
                 case 'hard-upgrade':
                     if (player.score >= 500 && player.hardUpgrades < 3) { // 增加升级次数
                         player.score -= 500;
@@ -3463,7 +4289,7 @@
                         player.hp += hpIncrease;
                     }
                     break;
-                    
+
                 case 'magic-upgrade':
                     if (player.score >= 500 && player.magicUpgrades < 2) {
                         player.score -= 500;
@@ -3471,11 +4297,11 @@
                     }
                     break;
             }
-            
+
             // 关闭商店
             closeShop(playerKey);
         }
-        
+
         // 动画循环
         function animate() {
             requestAnimationFrame(animate);
@@ -3483,63 +4309,41 @@
         }
         function togglePlayerPause(playerKey) {
             if (!gameState.running) return;
-            
+
             const player = gameState[playerKey];
             player.paused = !player.paused;
-            
+
             // 更新UI显示暂停状态
             updatePauseStatus(playerKey);
-            
+
             // 检查是否所有玩家都暂停了
             checkAllPlayersPaused();
-        
+
         }
 
         // 更新暂停状态显示
         function updatePauseStatus(playerKey) {
             const player = gameState[playerKey];
-            const statusElement = document.getElementById(`${playerKey}-status`);
-            
+
             if (player.paused) {
-                statusElement.textContent = '已暂停';
-                statusElement.style.color = '#FF0000';
-                
                 // 在蛇上方显示暂停图标
                 showPauseIndicator(playerKey);
-            } else {
-                // 恢复原来的状态显示
-                if (player.status === 'invincible') {
-                    statusElement.textContent = '无敌';
-                    statusElement.style.color = '#FFFF00';
-                } else if (player.status === 'reversed') {
-                    statusElement.textContent = '反向';
-                    statusElement.style.color = '#800080';
-                } else if (player.status === 'attacking') {
-                    statusElement.textContent = '攻击';
-                    statusElement.style.color = '#87CEEB';
-                } else {
-                    statusElement.textContent = '正常';
-                    statusElement.style.color = '#FFFFFF';
-                }
-                
-                // 移除暂停图标
-                removePauseIndicator(playerKey);
             }
         }
 
         // 显示暂停指示器
         function showPauseIndicator(playerKey) {
             const player = gameState[playerKey];
-            
+
             // 创建暂停图标
             const pauseGeometry = new THREE.BoxGeometry(3, 3, 0.5);
-            const pauseMaterial = new THREE.MeshBasicMaterial({ 
+            const pauseMaterial = new THREE.MeshBasicMaterial({
                 color: 0xFF0000,
                 transparent: true,
                 opacity: 0.7
             });
             const pauseIndicator = new THREE.Mesh(pauseGeometry, pauseMaterial);
-            
+
             // 放在蛇上方
             pauseIndicator.position.set(
                 player.position.x,
@@ -3547,7 +4351,7 @@
                 player.position.z
             );
             pauseIndicator.userData = { type: 'pauseIndicator', player: playerKey };
-            
+
             gameState.scene.add(pauseIndicator);
             player.pauseIndicator = pauseIndicator;
         }
@@ -3565,10 +4369,10 @@
         function checkAllPlayersPaused() {
             const player1Paused = gameState.player1.paused;
             const player2Paused = gameState.player2.paused;
-            
+
             // 如果两个玩家都暂停了，整体游戏暂停
             gameState.paused = player1Paused && player2Paused;
-            
+
             if (gameState.paused) {
                 // 显示整体暂停提示
             } else {
@@ -3581,23 +4385,23 @@
                 togglePlayerPause('player1');
                 e.preventDefault();
             }
-            
+
             // 玩家2暂停/继续：/ 或 ? 键
             if (e.key === '/' || e.key === '?') {
                 togglePlayerPause('player2');
                 e.preventDefault();
             }
             // 玩家1打开商店
-    // 只处理游戏相关按键
+            // 只处理游戏相关按键
             const relevantKeys = [
                 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
                 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
                 'e', 'E', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ' '
             ];
-            
+
             if (relevantKeys.includes(e.key)) {
                 gameState.keys[e.key] = true;
-                
+
                 // 玩家1打开商店
                 if (e.key === 'e' || e.key === 'E') {
                     if (gameState.running && (!shop1Overlay.style.display || shop1Overlay.style.display === 'none')) {
@@ -3606,7 +4410,7 @@
                         closeShop('player1');
                     }
                 }
-                
+
                 // 玩家2打开商店
                 if (e.key === '+') {
                     if (gameState.running && (!shop2Overlay.style.display || shop2Overlay.style.display === 'none')) {
@@ -3615,7 +4419,7 @@
                         closeShop('player2');
                     }
                 }
-                
+
                 // 玩家1使用魔法球
                 if (e.key >= '1' && e.key <= '5') {
                     const index = parseInt(e.key) - 1;
@@ -3623,7 +4427,7 @@
                         useMagicBall('player1', index);
                     }
                 }
-                
+
                 // 玩家2使用魔法球
                 if (e.key === '6') {
                     if (gameState.running) useMagicBall('player2', 0);
@@ -3636,7 +4440,7 @@
                 } else if (e.key === '0') {
                     if (gameState.running) useMagicBall('player2', 4);
                 }
-                
+
                 // 或者更好的方法：使用小键盘数字键
                 if (e.key === 'Numpad6') {
                     if (gameState.running) useMagicBall('player2', 0);
@@ -3649,14 +4453,14 @@
                 } else if (e.key === 'Numpad0') {
                     if (gameState.running) useMagicBall('player2', 4);
                 }
-                
+
                 // 检查速度蛇俯冲
                 if (e.key === ' ') {
                     checkSpeedSnakeDash('player1');
                 }
-                
+
                 // 防止方向键滚动页面
-                if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','W','a','A','s','S','d','D'].includes(e.key)) {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(e.key)) {
                     e.preventDefault();
                 }
             }
@@ -3668,31 +4472,31 @@
                 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
                 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
             ];
-            
+
             if (relevantKeys.includes(e.key)) {
                 gameState.keys[e.key] = false;
             }
         });
-        
+
         document.addEventListener('keyup', (e) => {
             gameState.keys[e.key] = false;
         });
-        
+
         window.addEventListener('resize', () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
-            
+
             // 更新玩家1相机和渲染器
             gameState.player1.camera.aspect = (width / 2) / height;
             gameState.player1.camera.updateProjectionMatrix();
             gameState.player1.renderer.setSize(width / 2, height);
-            
+
             // 更新玩家2相机和渲染器
             gameState.player2.camera.aspect = (width / 2) / height;
             gameState.player2.camera.updateProjectionMatrix();
             gameState.player2.renderer.setSize(width / 2, height);
         });
-        
+
         startButton.addEventListener('click', () => {
             if (!gameState.running) {
                 gameState.running = true;
@@ -3701,20 +4505,20 @@
                 clock.start();
             }
         });
-        
+
         resetButton.addEventListener('click', () => {
             initGame();
         });
-        
+
         mapButton.addEventListener('click', () => {
             const maps = ['classic', 'snow', 'volcano'];
             const currentIndex = maps.indexOf(gameState.mapType);
             gameState.mapType = maps[(currentIndex + 1) % maps.length];
-            mapButton.textContent = `地图: ${gameState.mapType === 'classic' ? '经典' : 
+            mapButton.textContent = `地图: ${gameState.mapType === 'classic' ? '经典' :
                 gameState.mapType === 'snow' ? '雪山' : '火山'}`;
             initGame();
         });
-        
+
         playAgainButton.addEventListener('click', () => {
             initGame();
             gameState.running = true;
@@ -3722,7 +4526,7 @@
             startButton.disabled = true;
             clock.start();
         });
-        
+
         // 加载Three.js并初始化
         function loadThreeJS() {
             if (typeof THREE === 'undefined') {
@@ -3734,14 +4538,15 @@
                 initScene();
             }
         }
-        
+
         // 初始化魔法球显示
         setTimeout(() => {
             updateMagicBallsDisplay('player1');
             updateMagicBallsDisplay('player2');
         }, 100);
-        
+
         loadThreeJS();
     </script>
 </body>
+
 </html>
