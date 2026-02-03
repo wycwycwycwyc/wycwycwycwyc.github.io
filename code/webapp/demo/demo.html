@@ -283,7 +283,7 @@
             flex-direction: column !important; /* 竖向排列 */
             gap: 15px !important;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.85); /* 商店内容有背景，但覆盖层透明 */
+            background: rgba(0, 0, 0, 0); /* 商店内容有背景，但覆盖层透明 */
             border-radius: 10px;
             margin: 20px;
             width: 80%;
@@ -291,12 +291,12 @@
         }
         #shop1-overlay .shop-items {
             border: 3px solid #FF7F00; /* 玩家1颜色边框 */
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0);
         }
 
         #shop2-overlay .shop-items {
             border: 3px solid #4169E1; /* 玩家2颜色边框 */
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0);
         }
         .shop-item {
             background: rgba(255, 255, 255, 0.1);
@@ -2249,35 +2249,32 @@
         const deltaTime = clock.getDelta();
 
         if (gameState.running) {
-            // === 商店控制处理 ===
-            if (shopState.player1.open) {
-                handleShopControls('player1');
-            }
-            if (shopState.player2.open) {
-                handleShopControls('player2');
-            }
-
             gameState.gameTime += deltaTime;
             updateGameTime();
 
-            // === 更新游戏元素（无论是否暂停都更新）===
-            // 这些应该永远运行：
-            updateBullets(deltaTime);
-            updateExplosions(deltaTime);
-            updateExplosionFragments(deltaTime);
-            updateEnvironment(deltaTime);
-            updateCameras();
-            renderScenes();
-            updateUI();
+            // === 永远更新的游戏元素（无论是否暂停）===
+            // 这些应该永远运行，不受玩家暂停影响：
+            updateBullets(deltaTime);           // 子弹继续飞行
+            updateExplosions(deltaTime);        // 爆炸效果继续
+            updateExplosionFragments(deltaTime);// 碎片效果继续
+            updateEnvironment(deltaTime);       // 环境效果继续
+            updateCameras();                    // 相机继续更新
+            renderScenes();                     // 继续渲染
+            updateUI();                         // UI继续更新
+
+            // === 检查游戏结束（无论是否暂停）===
+            checkGameEnd();
+
+            // === 分别更新两个玩家，但只控制蛇的移动 ===
+
+            // 玩家1：即使暂停也要更新状态（比如无敌时间倒计时）
             updatePlayerStatus('player1', deltaTime);
             moveSnake('player1', deltaTime);
-            checkCollisions('player1'); // 碰撞检测只在移动时检查
+            checkCollisions('player1');
             updatePlayerStatus('player2', deltaTime);
             moveSnake('player2', deltaTime);
-            checkCollisions('player2'); // 碰撞检测只在移动时检查
-
-            // === 检查游戏结束 ===
-            checkGameEnd();
+            checkCollisions('player2');
+            
         }
     }
 
@@ -4624,11 +4621,25 @@
         if (!gameState.running) return;
 
         const player = gameState[playerKey];
+
+        // 如果是因为商店暂停的，不能手动取消暂停
+        if (player.wasPausedForShop && player.paused) {
+            console.log(`${playerKey} 因商店暂停，不能手动取消暂停`);
+            return;
+        }
+
         player.paused = !player.paused;
-        player.wasManuallyPaused = player.paused; // 记录手动暂停状态
+
+        console.log(`${playerKey} ${player.paused ? '暂停' : '继续'}`);
+
+        if (player.paused) {
+            player.wasManuallyPaused = true;
+        } else {
+            delete player.wasManuallyPaused;
+            delete player.wasPausedForShop; // 清除商店暂停标记
+        }
 
         updatePauseStatus(playerKey);
-        checkAllPlayersPaused();
     }
 
         // 更新暂停状态显示
@@ -4705,7 +4716,6 @@
 
         if (!relevantKeys.includes(e.key)) return;
 
-        // 设置按键状态（永远设置，供所有系统使用）
         gameState.keys[e.key] = true;
 
         // 防止方向键滚动页面
@@ -4713,23 +4723,63 @@
             e.preventDefault();
         }
 
-        // === 1. 先处理特殊功能键（无论什么状态都处理）===
+        // === 1. 永远可用的功能：暂停键和魔法球 ===
 
         // 玩家1暂停/继续：Q 键
         if ((e.key === 'q' || e.key === 'Q') && gameState.running) {
-            togglePlayerPause('player1');
+            // 检查玩家1是否因为商店暂停
+            if (!gameState.player1.wasPausedForShop) {
+                togglePlayerPause('player1');
+            }
             e.preventDefault();
-            return;
+            return; // 处理完暂停，直接返回
         }
 
         // 玩家2暂停/继续：/ 或 ? 键
         if ((e.key === '/' || e.key === '?') && gameState.running) {
-            togglePlayerPause('player2');
+            // 检查玩家2是否因为商店暂停
+            if (!gameState.player2.wasPausedForShop) {
+                togglePlayerPause('player2');
+            }
             e.preventDefault();
-            return;
+            return; // 处理完暂停，直接返回
         }
 
-        // === 2. 处理商店开关（独立处理，不阻止其他按键）===
+        // 魔法球使用（永远可用，无论商店是否打开）
+        if (gameState.running) {
+            // 玩家1魔法球（数字键1-5）
+            if (e.key >= '1' && e.key <= '5') {
+                const index = parseInt(e.key) - 1;
+                useMagicBall('player1', index);
+                e.preventDefault();
+                return; // 处理完魔法球，直接返回
+            }
+
+            // 玩家2魔法球（数字键6-0或小键盘）
+            if (e.key === '6' || e.key === 'Numpad6') {
+                useMagicBall('player2', 0);
+                e.preventDefault();
+                return;
+            } else if (e.key === '7' || e.key === 'Numpad7') {
+                useMagicBall('player2', 1);
+                e.preventDefault();
+                return;
+            } else if (e.key === '8' || e.key === 'Numpad8') {
+                useMagicBall('player2', 2);
+                e.preventDefault();
+                return;
+            } else if (e.key === '9' || e.key === 'Numpad9') {
+                useMagicBall('player2', 3);
+                e.preventDefault();
+                return;
+            } else if (e.key === '0' || e.key === 'Numpad0') {
+                useMagicBall('player2', 4);
+                e.preventDefault();
+                return;
+            }
+        }
+
+        // === 2. 商店相关功能 ===
 
         // 玩家1商店开关：E键
         if ((e.key === 'e' || e.key === 'E') && gameState.running) {
@@ -4739,7 +4789,7 @@
             } else {
                 openShop('player1');
             }
-            // 注意：这里不return，让其他按键也能处理
+            return; // 处理完商店开关，直接返回
         }
 
         // 玩家2商店开关：+键
@@ -4750,40 +4800,66 @@
             } else {
                 openShop('player2');
             }
-            // 注意：这里不return，让其他按键也能处理
+            return; // 处理完商店开关，直接返回
         }
 
-        // === 3. 魔法球使用（无论商店状态都处理）===
-        if (gameState.running) {
-            e.preventDefault(); // 为魔法球按键添加preventDefault
+        // 玩家1商店选择
+        if (shopState.player1.open) {
+            e.preventDefault();
 
-            // 玩家1魔法球（数字键1-5）
-            if (e.key >= '1' && e.key <= '5') {
-                const index = parseInt(e.key) - 1;
-                useMagicBall('player1', index);
-                return;
-            }
-
-            // 玩家2魔法球（数字键6-0或小键盘）
-            if (e.key === '6' || e.key === 'Numpad6') {
-                useMagicBall('player2', 0);
-                return;
-            } else if (e.key === '7' || e.key === 'Numpad7') {
-                useMagicBall('player2', 1);
-                return;
-            } else if (e.key === '8' || e.key === 'Numpad8') {
-                useMagicBall('player2', 2);
-                return;
-            } else if (e.key === '9' || e.key === 'Numpad9') {
-                useMagicBall('player2', 3);
-                return;
-            } else if (e.key === '0' || e.key === 'Numpad0') {
-                useMagicBall('player2', 4);
-                return;
+            if (e.key === 'w' || e.key === 'W') {
+                console.log("Player1 shop: W pressed (direct)");
+                const shop = shopState.player1;
+                shop.selectedIndex = Math.max(0, shop.selectedIndex - 1);
+                updateShopSelection('player1');
+                return; // 处理完商店选择，直接返回
+            } else if (e.key === 's' || e.key === 'S') {
+                console.log("Player1 shop: S pressed (direct)");
+                const shop = shopState.player1;
+                shop.selectedIndex = Math.min(shop.items.length - 1, shop.selectedIndex + 1);
+                updateShopSelection('player1');
+                return; // 处理完商店选择，直接返回
+            } else if (e.key === 'r' || e.key === 'R') {
+                console.log("Player1 shop: R pressed (direct)");
+                const shop = shopState.player1;
+                const selectedItem = shop.items[shop.selectedIndex];
+                if (selectedItem) {
+                    console.log(`Player1 buying: ${selectedItem.name}`);
+                    buyItem('player1', selectedItem.id);
+                }
+                return; // 处理完购买，直接返回
             }
         }
 
-        // === 4. 其他游戏控制（只在商店关闭时处理）===
+        // 玩家2商店选择
+        if (shopState.player2.open) {
+            e.preventDefault();
+
+            if (e.key === 'ArrowUp') {
+                console.log("Player2 shop: ArrowUp pressed (direct)");
+                const shop = shopState.player2;
+                shop.selectedIndex = Math.max(0, shop.selectedIndex - 1);
+                updateShopSelection('player2');
+                return; // 处理完商店选择，直接返回
+            } else if (e.key === 'ArrowDown') {
+                console.log("Player2 shop: ArrowDown pressed (direct)");
+                const shop = shopState.player2;
+                shop.selectedIndex = Math.min(shop.items.length - 1, shop.selectedIndex + 1);
+                updateShopSelection('player2');
+                return; // 处理完商店选择，直接返回
+            } else if (e.key === 'Enter') {
+                console.log("Player2 shop: Enter pressed (direct)");
+                const shop = shopState.player2;
+                const selectedItem = shop.items[shop.selectedIndex];
+                if (selectedItem) {
+                    console.log(`Player2 buying: ${selectedItem.name}`);
+                    buyItem('player2', selectedItem.id);
+                }
+                return; // 处理完购买，直接返回
+            }
+        }
+
+        // === 3. 其他游戏控制（只在没有商店打开时）===
         if (!shopState.player1.open && !shopState.player2.open) {
             // 速度蛇俯冲
             if (e.key === ' ') {
@@ -4791,19 +4867,21 @@
                 e.preventDefault();
             }
         }
-    }); 
+    });
+    document.addEventListener('keyup', (e) => {
+        const relevantKeys = [
+            'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
+            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+            'e', 'E', '+', 'r', 'R', 'Enter',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+            ' ', 'q', 'Q', '/', '?',
+            'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9', 'Numpad0'
+        ];
 
-        document.addEventListener('keyup', (e) => {
-            // 只处理游戏相关按键
-            const relevantKeys = [
-                'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
-                'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
-            ];
-
-            if (relevantKeys.includes(e.key)) {
-                gameState.keys[e.key] = false;
-            }
-        });
+        if (relevantKeys.includes(e.key)) {
+            gameState.keys[e.key] = false;
+        }
+    });
 
         document.addEventListener('keyup', (e) => {
             gameState.keys[e.key] = false;
