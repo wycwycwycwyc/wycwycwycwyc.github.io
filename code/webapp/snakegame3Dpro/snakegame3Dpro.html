@@ -443,12 +443,8 @@
         }
 
         .stats-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
-            width: 70%;
-            max-width: 450px;
         }
 
         .stat-item {
@@ -1671,7 +1667,7 @@
             <div class="player-panel" id="player1-panel">
                 <div class="player-header">
                     <span id="player1-panel-name">玩家1</span>
-                    <span class="snake-type speed-snake" id="player1-type">速度蛇</span>
+                    <span class="snake-type speed-snake" id="player1-type">未选择</span>
                 </div>
                 <div>生命值: <span id="player1-hp">10</span>/<span id="player1-max-hp">10</span></div>
                 <div class="health-bar">
@@ -1687,7 +1683,7 @@
             <div class="player-panel" id="player2-panel">
                 <div class="player-header">
                     <span id="player2-panel-name">玩家2</span>
-                    <span class="snake-type magic-snake" id="player2-type">魔法蛇</span>
+                    <span class="snake-type magic-snake" id="player2-type">未选择</span>
                 </div>
                 <div>生命值: <span id="player2-hp">10</span>/<span id="player2-max-hp">10</span></div>
                 <div class="health-bar">
@@ -1791,6 +1787,25 @@
                 camera: null, // 第一视角相机
                 renderer: null,// 玩家1的渲染器
                 paused: false,
+                stats: {
+                    totalDistance: 0,           // 总路程（米）
+                    damageTaken: {              // 承受伤害统计
+                        wall: 0,                // 撞墙伤害
+                        snakeCollision: 0,      // 与蛇相撞伤害
+                        bullet: 0,              // 子弹伤害
+                        base: 0,                // 基地伤害
+                        lava: 0,                // 岩浆伤害
+                        bomb: 0,                // 炸弹伤害
+                        total: 0                // 总承受伤害
+                    },
+                    damageDealt: {              // 输出伤害统计
+                        snakeCollision: 0,      // 对蛇碰撞伤害
+                        bullet: 0,              // 子弹伤害
+                        bomb: 0,                // 炸弹伤害
+                        baseDamage: 0,          // 对基地伤害
+                        total: 0                // 总输出伤害（不包括对基地）
+                    }
+                }
             },
             player2: {
                 snake: null,
@@ -1816,6 +1831,25 @@
                 camera: null, // 第一视角相机
                 renderer: null, // 玩家2的渲染器
                 paused: false,
+                stats: {
+                totalDistance: 0,
+                damageTaken: {
+                    wall: 0,
+                    snakeCollision: 0,
+                    bullet: 0,
+                    base: 0,
+                    lava: 0,
+                    bomb: 0,
+                    total: 0
+                },
+                damageDealt: {
+                    snakeCollision: 0,
+                    bullet: 0,
+                    bomb: 0,
+                    baseDamage: 0,
+                    total: 0
+                }
+        }
             },
             magicBalls: [], // 地图上的魔法球
             food: [], // 食物
@@ -1850,7 +1884,19 @@
             normal: true,
             effects: [] // 确保 effects 数组存在
         };
+    gameState.player1 = {
+        // ... 其他属性 ...
+        lastDamageSource: null,      // 最后受到的伤害来源
+        lastDamageAmount: 0,         // 最后受到的伤害量
+        deathReason: null            // 死亡原因
+    };
 
+    gameState.player2 = {
+        // ... 其他属性 ...
+        lastDamageSource: null,
+        lastDamageAmount: 0,
+        deathReason: null
+    };
         // 重置玩家2  
         gameState.player2.status = {
             normal: true,
@@ -2091,9 +2137,26 @@
 
         if (selectionOverlay) {
             // 淡出选择界面
+                    // 确保获取当前选中的蛇类型
+            const player1Selected = selectionOverlay.querySelector('.player-selection:nth-child(1) .snake-option.active');
+            const player2Selected = selectionOverlay.querySelector('.player-selection:nth-child(2) .snake-option.active');
             selectionOverlay.style.opacity = '0';
             selectionOverlay.style.transition = 'opacity 0.5s ease-out';
+            if (player1Selected) {
+                const player1Type = player1Selected.dataset.type;
+                gameState.player1.type = player1Type;
+                document.getElementById('player1-type').textContent = 
+                    player1Type === 'speed' ? '速度蛇' :
+                    player1Type === 'hard' ? '坚硬蛇' : '魔法蛇';
+            }
 
+            if (player2Selected) {
+                const player2Type = player2Selected.dataset.type;
+                gameState.player2.type = player2Type;
+                document.getElementById('player2-type').textContent = 
+                    player2Type === 'speed' ? '速度蛇' :
+                    player2Type === 'hard' ? '坚硬蛇' : '魔法蛇';
+            }
             setTimeout(() => {
                 selectionOverlay.style.display = 'none';
 
@@ -2456,78 +2519,153 @@
         }
 
         // 重置游戏状态
-        function resetGameState() {
-            gameState.running = false;
-            gameState.paused = false;
-            gameState.gameTime = 0;
+    function resetGameState() {
+        gameState.running = false;
+        gameState.paused = false;
+        gameState.gameTime = 0;
 
-            // 重置玩家1 - 使用简单属性
-            gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
-            gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
-            gameState.player1.shield = 0;
-            gameState.player1.score = 0;
-            gameState.player1.magicBalls = [];
-            // 使用简单状态属性
-            gameState.player1.isInvincible = false;
-            gameState.player1.isReversed = false;
-            gameState.player1.isAttacking = false;
-            gameState.player1.invincibleTime = 0;
-            gameState.player1.reversedTime = 0;
-            gameState.player1.attackTime = 0;
-            gameState.player1.speedMultiplier = 1;
-            gameState.player1.hardUpgrades = 0;
-            gameState.player1.magicUpgrades = 0;
-            gameState.player1.segments = [];
-            gameState.player1.baseHp = 50;
-            gameState.player1.position = {
-                x: -80,
-                y: 1.5,
-                z: -80
+        // 重置玩家1 - 保留蛇类型，只重置状态
+        gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
+        gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
+        gameState.player1.shield = 0;
+        gameState.player1.score = 0;
+        gameState.player1.magicBalls = [];
+        gameState.player1.isInvincible = false;
+        gameState.player1.isReversed = false;
+        gameState.player1.isAttacking = false;
+        gameState.player1.invincibleTime = 0;
+        gameState.player1.reversedTime = 0;
+        gameState.player1.attackTime = 0;
+        gameState.player1.speedMultiplier = 1;
+        gameState.player1.hardUpgrades = 0;
+        gameState.player1.magicUpgrades = 0;
+        gameState.player1.segments = [];
+        gameState.player1.baseHp = 50;
+        gameState.player1.position = { x: -80, y: 1.5, z: -80 };
+        gameState.player1.direction = { x: 1, y: 0, z: 0 };
+        gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
+        gameState.player1.rotationAngle = 0;
+        gameState.player1.paused = false;
+
+        // 死亡原因相关字段 - 确保不会覆盖类型
+        if (!gameState.player1.lastDamageSource) gameState.player1.lastDamageSource = null;
+        if (!gameState.player1.lastDamageAmount) gameState.player1.lastDamageAmount = 0;
+        if (!gameState.player1.deathReason) gameState.player1.deathReason = null;
+
+        // 统计字段 - 确保不会覆盖类型
+        if (!gameState.player1.stats) {
+            gameState.player1.stats = {
+                totalDistance: 0,
+                damageTaken: {
+                    wall: 0,
+                    snakeCollision: 0,
+                    bullet: 0,
+                    base: 0,
+                    lava: 0,
+                    bomb: 0,
+                    total: 0
+                },
+                damageDealt: {
+                    snakeCollision: 0,
+                    bullet: 0,
+                    bomb: 0,
+                    baseDamage: 0,
+                    total: 0
+                }
             };
-            gameState.player1.direction = { x: 1, y: 0, z: 0 };
-            gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
-            gameState.player1.rotationAngle = 0;
-            gameState.player1.paused = false;
-
-            // 重置玩家2 - 使用简单属性
-            gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
-            gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;
-            gameState.player2.shield = 0;
-            gameState.player2.score = 0;
-            gameState.player2.magicBalls = [];
-            // 使用简单状态属性
-            gameState.player2.isInvincible = false;
-            gameState.player2.isReversed = false;
-            gameState.player2.isAttacking = false;
-            gameState.player2.invincibleTime = 0;
-            gameState.player2.reversedTime = 0;
-            gameState.player2.attackTime = 0;
-            gameState.player2.speedMultiplier = 1;
-            gameState.player2.hardUpgrades = 0;
-            gameState.player2.magicUpgrades = 0;
-            gameState.player2.segments = [];
-            gameState.player2.baseHp = 50;
-            gameState.player2.position = {
-                x: 80,
-                y: 1.5,
-                z: 80
-            };
-            gameState.player2.direction = { x: -1, y: 0, z: 0 };
-            gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
-            gameState.player2.rotationAngle = Math.PI;
-            gameState.player2.paused = false;
-
-            // 重置其他状态
-            gameState.magicBalls = [];
-            gameState.food = [];
-            gameState.walls = [];
-            gameState.bullets = [];
-            gameState.explosions = [];
-            gameState.volcanoes = [];
-            gameState.stormDirection = null;
-            gameState.stormActive = false;
-            gameState.stormWarning = false;
+        } else {
+            // 重置统计但不覆盖整个对象
+            gameState.player1.stats.totalDistance = 0;
+            gameState.player1.stats.damageTaken.wall = 0;
+            gameState.player1.stats.damageTaken.snakeCollision = 0;
+            gameState.player1.stats.damageTaken.bullet = 0;
+            gameState.player1.stats.damageTaken.base = 0;
+            gameState.player1.stats.damageTaken.lava = 0;
+            gameState.player1.stats.damageTaken.bomb = 0;
+            gameState.player1.stats.damageTaken.total = 0;
+            gameState.player1.stats.damageDealt.snakeCollision = 0;
+            gameState.player1.stats.damageDealt.bullet = 0;
+            gameState.player1.stats.damageDealt.bomb = 0;
+            gameState.player1.stats.damageDealt.baseDamage = 0;
+            gameState.player1.stats.damageDealt.total = 0;
         }
+
+        // 重置玩家2 - 同样保留蛇类型
+        gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
+        gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;
+        gameState.player2.shield = 0;
+        gameState.player2.score = 0;
+        gameState.player2.magicBalls = [];
+        gameState.player2.isInvincible = false;
+        gameState.player2.isReversed = false;
+        gameState.player2.isAttacking = false;
+        gameState.player2.invincibleTime = 0;
+        gameState.player2.reversedTime = 0;
+        gameState.player2.attackTime = 0;
+        gameState.player2.speedMultiplier = 1;
+        gameState.player2.hardUpgrades = 0;
+        gameState.player2.magicUpgrades = 0;
+        gameState.player2.segments = [];
+        gameState.player2.baseHp = 50;
+        gameState.player2.position = { x: 80, y: 1.5, z: 80 };
+        gameState.player2.direction = { x: -1, y: 0, z: 0 };
+        gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
+        gameState.player2.rotationAngle = Math.PI;
+        gameState.player2.paused = false;
+
+        // 死亡原因相关字段
+        if (!gameState.player2.lastDamageSource) gameState.player2.lastDamageSource = null;
+        if (!gameState.player2.lastDamageAmount) gameState.player2.lastDamageAmount = 0;
+        if (!gameState.player2.deathReason) gameState.player2.deathReason = null;
+
+        // 统计字段
+        if (!gameState.player2.stats) {
+            gameState.player2.stats = {
+                totalDistance: 0,
+                damageTaken: {
+                    wall: 0,
+                    snakeCollision: 0,
+                    bullet: 0,
+                    base: 0,
+                    lava: 0,
+                    bomb: 0,
+                    total: 0
+                },
+                damageDealt: {
+                    snakeCollision: 0,
+                    bullet: 0,
+                    bomb: 0,
+                    baseDamage: 0,
+                    total: 0
+                }
+            };
+        } else {
+            gameState.player2.stats.totalDistance = 0;
+            gameState.player2.stats.damageTaken.wall = 0;
+            gameState.player2.stats.damageTaken.snakeCollision = 0;
+            gameState.player2.stats.damageTaken.bullet = 0;
+            gameState.player2.stats.damageTaken.base = 0;
+            gameState.player2.stats.damageTaken.lava = 0;
+            gameState.player2.stats.damageTaken.bomb = 0;
+            gameState.player2.stats.damageTaken.total = 0;
+            gameState.player2.stats.damageDealt.snakeCollision = 0;
+            gameState.player2.stats.damageDealt.bullet = 0;
+            gameState.player2.stats.damageDealt.bomb = 0;
+            gameState.player2.stats.damageDealt.baseDamage = 0;
+            gameState.player2.stats.damageDealt.total = 0;
+        }
+
+        // 重置其他状态
+        gameState.magicBalls = [];
+        gameState.food = [];
+        gameState.walls = [];
+        gameState.bullets = [];
+        gameState.explosions = [];
+        gameState.volcanoes = [];
+        gameState.stormDirection = null;
+        gameState.stormActive = false;
+        gameState.stormWarning = false;
+    }
         // 创建地图环境
         function createMapEnvironment() {
             switch (gameState.mapType) {
@@ -2544,80 +2682,87 @@
         }
 
         // 创建经典地图
-        function createClassicMap() {
-            // 设置边界和基地的安全区域
-            const boundaryMargin = 15; // 边界安全距离
-            const baseSafeRadius = 25; // 基地安全半径
+    function createClassicMap() {
+        // 确保基地位置已初始化
+        if (!gameState.player1.basePosition) {
+            gameState.player1.basePosition = { x: -80, y: 0, z: -80 };
+        }
+        if (!gameState.player2.basePosition) {
+            gameState.player2.basePosition = { x: 80, y: 0, z: 80 };
+        }
 
-            // 生成更多墙（增加到30个）
-            const wallCount = 20;
+        const player1Base = gameState.player1.basePosition;
+        const player2Base = gameState.player2.basePosition;
 
-            for (let i = 0; i < wallCount; i++) {
-                let validPosition = false;
-                let startX, startZ, endX, endZ;
+        // 设置边界和基地的安全区域
+        const boundaryMargin = 15;
+        const baseSafeRadius = 25;
 
-                // 尝试生成有效的位置
-                for (let attempts = 0; attempts < 10; attempts++) {
-                    // 随机生成起点
-                    startX = Math.random() * 180 - 90; // -90 到 90
-                    startZ = Math.random() * 180 - 90;
+        // 生成更多墙（增加到30个）
+        const wallCount = 20;
 
-                    // 随机生成长度和方向
-                    const length = 5 + Math.random() * 15; // 长度5-20
-                    const angle = Math.random() * Math.PI * 2; // 随机方向
+        for (let i = 0; i < wallCount; i++) {
+            let validPosition = false;
+            let startX, startZ, endX, endZ;
 
-                    // 计算终点
-                    endX = startX + Math.cos(angle) * length;
-                    endZ = startZ + Math.sin(angle) * length;
+            // 尝试生成有效的位置
+            for (let attempts = 0; attempts < 10; attempts++) {
+                // 随机生成起点
+                startX = Math.random() * 180 - 90;
+                startZ = Math.random() * 180 - 90;
 
-                    // 检查起点和终点是否都在边界内
-                    if (Math.abs(startX) > 100 - boundaryMargin || Math.abs(startZ) > 100 - boundaryMargin ||
-                        Math.abs(endX) > 100 - boundaryMargin || Math.abs(endZ) > 100 - boundaryMargin) {
-                        continue; // 太靠近边界，重新生成
-                    }
+                // 随机生成长度和方向
+                const length = 5 + Math.random() * 15;
+                const angle = Math.random() * Math.PI * 2;
 
-                    // 检查是否太靠近基地
-                    const player1Base = gameState.player1.basePosition;
-                    const player2Base = gameState.player2.basePosition;
+                // 计算终点
+                endX = startX + Math.cos(angle) * length;
+                endZ = startZ + Math.sin(angle) * length;
 
-                    // 计算到两个基地的距离
-                    const distToBase1Start = Math.sqrt(Math.pow(startX - player1Base.x, 2) + Math.pow(startZ - player1Base.z, 2));
-                    const distToBase2Start = Math.sqrt(Math.pow(startX - player2Base.x, 2) + Math.pow(startZ - player2Base.z, 2));
-                    const distToBase1End = Math.sqrt(Math.pow(endX - player1Base.x, 2) + Math.pow(endZ - player1Base.z, 2));
-                    const distToBase2End = Math.sqrt(Math.pow(endX - player2Base.x, 2) + Math.pow(endZ - player2Base.z, 2));
-
-                    // 确保墙的起点和终点都不在基地安全区域内
-                    if (distToBase1Start < baseSafeRadius || distToBase2Start < baseSafeRadius ||
-                        distToBase1End < baseSafeRadius || distToBase2End < baseSafeRadius) {
-                        continue; // 太靠近基地，重新生成
-                    }
-
-                    // 检查墙的中点是否太靠近基地
-                    const midX = (startX + endX) / 2;
-                    const midZ = (startZ + endZ) / 2;
-                    const distToBase1Mid = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
-                    const distToBase2Mid = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
-
-                    if (distToBase1Mid < baseSafeRadius || distToBase2Mid < baseSafeRadius) {
-                        continue; // 中点太靠近基地，重新生成
-                    }
-
-                    validPosition = true;
-                    break;
+                // 检查起点和终点是否都在边界内
+                if (Math.abs(startX) > 100 - boundaryMargin || Math.abs(startZ) > 100 - boundaryMargin ||
+                    Math.abs(endX) > 100 - boundaryMargin || Math.abs(endZ) > 100 - boundaryMargin) {
+                    continue;
                 }
 
-                if (!validPosition) {
-                    continue; // 无法找到有效位置，跳过这个墙
+                // 计算到两个基地的距离
+                const distToBase1Start = Math.sqrt(Math.pow(startX - player1Base.x, 2) + Math.pow(startZ - player1Base.z, 2));
+                const distToBase2Start = Math.sqrt(Math.pow(startX - player2Base.x, 2) + Math.pow(startZ - player2Base.z, 2));
+                const distToBase1End = Math.sqrt(Math.pow(endX - player1Base.x, 2) + Math.pow(endZ - player1Base.z, 2));
+                const distToBase2End = Math.sqrt(Math.pow(endX - player2Base.x, 2) + Math.pow(endZ - player2Base.z, 2));
+
+                // 确保墙的起点和终点都不在基地安全区域内
+                if (distToBase1Start < baseSafeRadius || distToBase2Start < baseSafeRadius ||
+                    distToBase1End < baseSafeRadius || distToBase2End < baseSafeRadius) {
+                    continue;
                 }
 
-                const wall = createWall(startX, startZ, endX, endZ);
-                gameState.walls.push(wall);
-                gameState.scene.add(wall);
+                // 检查墙的中点是否太靠近基地
+                const midX = (startX + endX) / 2;
+                const midZ = (startZ + endZ) / 2;
+                const distToBase1Mid = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
+                const distToBase2Mid = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
+
+                if (distToBase1Mid < baseSafeRadius || distToBase2Mid < baseSafeRadius) {
+                    continue;
+                }
+
+                validPosition = true;
+                break;
             }
 
-            // 3. 添加一些固定方向的墙来增加多样性（可选）
-            addDirectionalWalls();
+            if (!validPosition) {
+                continue;
+            }
+
+            const wall = createWall(startX, startZ, endX, endZ);
+            gameState.walls.push(wall);
+            gameState.scene.add(wall);
         }
+
+        // 添加一些固定方向的墙来增加多样性（可选）
+        addDirectionalWalls();
+    }
         function addDirectionalWalls() {
             // 水平和垂直墙
             const directionalWalls = [
@@ -3510,7 +3655,14 @@
                 if (applyDamage(otherPlayerKey, damage, 'headCollision')) {
                     showDamageEffect(otherPlayerKey);
                 }
-
+                
+                recordDamageDealt(playerKey, damage, otherPlayerKey, 'headCollision');
+                recordDamageDealt(otherPlayerKey, damage, playerKey, 'headCollision');
+                if (gameState[playerKey].hp <= 0) {
+                    gameState[playerKey].deathReason = `与${otherPlayerKey === 'player1' ?
+                        localStorage.getItem('username') || '玩家1' :
+                        localStorage.getItem('player2_username') || '玩家2'}迎面相撞身亡`;
+                }
                 // 更新碰撞时间
                 gameState.lastCollisionTime[playerKey] = currentTime;
                 gameState.lastCollisionTime[otherPlayerKey] = currentTime;
@@ -3536,8 +3688,14 @@
                     const damage = 1;
                     if (applyDamage(playerKey, damage, 'bodyCollision')) {
                         showDamageEffect(playerKey);
+                                        // 设置死亡原因
+                        if (gameState[playerKey].hp <= 0) {
+                            gameState[playerKey].deathReason = `撞到${otherPlayerKey === 'player1' ?
+                                localStorage.getItem('username') || '玩家1' :
+                                localStorage.getItem('player2_username') || '玩家2'}的蛇身身亡`;
+                        }
                     }
-
+                    recordDamageDealt(otherPlayerKey, damage, playerKey, 'bodyCollision');
                     // 更新碰撞时间
                     gameState.lastCollisionTime[playerKey] = currentTime;
 
@@ -3797,16 +3955,16 @@
             const snake = player.snake;
             if (!snake) return;
             if (player.paused) return;
-            // 计算移动速度
-            let speed = 15 * deltaTime; // 基础速度
 
-            // 应用蛇类型的速度加成
+            // 计算移动速度
+            let speed = 22 * deltaTime; // 基础速度
+
+            // 应用蛇类型的速度加成 - 这里需要检查
             if (player.type === 'speed') {
                 speed *= 1.5; // 速度蛇增加50%
             } else if (player.type === 'magic') {
                 speed *= 1.15; // 魔法蛇增加15%
             }
-
             // 应用速度升级
             speed *= player.speedMultiplier;
 
@@ -3828,7 +3986,8 @@
                 player.direction.x = player.targetDirection.x;
                 player.direction.z = player.targetDirection.z;
             }
-
+            const prevX = player.position.x;
+            const prevZ = player.position.z;
             // 更新位置
             player.position.x += player.direction.x * speed;
             player.position.z += player.direction.z * speed;
@@ -3839,7 +3998,15 @@
             if (player.position.x > boundary) player.position.x = -boundary;
             if (player.position.z < -boundary) player.position.z = boundary;
             if (player.position.z > boundary) player.position.z = -boundary;
+            // 计算移动距离（像素距离）
+            const distancePixels = Math.sqrt(
+                Math.pow(player.position.x - prevX, 2) +
+                Math.pow(player.position.z - prevZ, 2)
+            );
 
+            // 转换为米（1米 = 20像素）
+            const distanceMeters = distancePixels / 20;
+            player.stats.totalDistance += distanceMeters;
             // 更新蛇头位置
             snake.position.set(
                 player.position.x,
@@ -4012,7 +4179,22 @@
         // 应用伤害
         function applyDamage(playerKey, damage, source) {
             const player = gameState[playerKey];
-
+            player.lastDamageSource = source;
+            player.lastDamageAmount = damage;
+            if (source === 'wall') {
+                player.stats.damageTaken.wall += damage;
+            } else if (source === 'headCollision' || source === 'bodyCollision') {
+                player.stats.damageTaken.snakeCollision += damage;
+            } else if (source === 'bullet' || source === 'baseBullet') {
+                player.stats.damageTaken.bullet += damage;
+            } else if (source === 'base') {
+                player.stats.damageTaken.base += damage;
+            } else if (source === 'lava') {
+                player.stats.damageTaken.lava += damage;
+            } else if (source === 'bomb') {
+                player.stats.damageTaken.bomb += damage;
+            }
+            player.stats.damageTaken.total += damage;
             // 检查无敌状态
             if (player.isInvincible) {
                 return false;
@@ -4023,9 +4205,6 @@
                 const shieldDamage = Math.min(damage, player.shield);
                 player.shield -= shieldDamage;
                 damage -= shieldDamage;
-
-                console.log(`${playerKey}护盾吸收${shieldDamage}点伤害，剩余护盾: ${player.shield}`);
-
                 if (player.shield <= 0) {
                     player.shield = 0;
                 }
@@ -4044,15 +4223,82 @@
                 }
             }
 
-            // 应用伤害
             const oldHp = player.hp;
             player.hp -= finalDamage;
             if (player.hp < 0) player.hp = 0;
 
+            // 如果死亡，设置死亡原因
+            if (oldHp > 0 && player.hp <= 0) {
+                player.deathReason = getDeathReason(source, damage, player);
+            }
+
             // 返回是否实际造成了伤害
             return oldHp > player.hp;
         }
+        function getDeathReason(source, damage, player) {
+                const playerName = player === gameState.player1 ?
+                    localStorage.getItem('username') || '玩家1' :
+                    localStorage.getItem('player2_username') || '玩家2';
 
+                const opponentName = player === gameState.player1 ?
+                    localStorage.getItem('player2_username') || '玩家2' :
+                    localStorage.getItem('username') || '玩家1';
+
+                switch (source) {
+                    case 'wall':
+                        return `${playerName}撞墙而死`;
+
+                    case 'headCollision':
+                        return `${playerName}蛇头相撞而死`;
+                    case 'bodyCollision':
+                        return `${playerName}蛇身相撞身亡`;
+
+                    case 'bullet':
+                        return `${playerName}被子弹击中`;
+
+                    case 'baseBullet':
+                        return `${playerName}被基地防御系统击杀`;
+
+                    case 'base':
+                        return `${playerName}在对方基地内被击毙`;
+
+                    case 'lava':
+                        return `${playerName}被岩浆烧死`;
+
+                    case 'bomb':
+                        return `${playerName}被炸弹炸死`;
+
+                    case 'dash':
+                        return `${playerName}俯冲过猛身亡`;
+
+                    case 'storm':
+                        return `${playerName}在暴风雪中冻死`;
+
+                    case 'magic':
+                        return `${playerName}被魔法效果致死`;
+
+                    default:
+                        return '被击败';
+                }
+            }
+    function recordDamageDealt(dealerKey, damage, targetKey, source) {
+        const dealer = gameState[dealerKey];
+
+        if (source === 'headCollision' || source === 'bodyCollision') {
+            dealer.stats.damageDealt.snakeCollision += damage;
+        } else if (source === 'bullet' || source === 'baseBullet') {
+            dealer.stats.damageDealt.bullet += damage;
+        } else if (source === 'bomb') {
+            dealer.stats.damageDealt.bomb += damage;
+        } else if (source === 'base') {
+            dealer.stats.damageDealt.baseDamage += damage;
+        }
+
+        // 总输出伤害（不包括对基地的伤害）
+        if (source !== 'base') {
+            dealer.stats.damageDealt.total += damage;
+        }
+    }
         // 检查基地交互
         // 检查基地交互 - 修复回血部分
         function checkBaseInteraction(playerKey) {
@@ -4622,6 +4868,9 @@
 
                     if (damageApplied) {
                         showDamageEffect(playerKey);
+                            if (data.owner && data.owner !== playerKey) {
+                            recordDamageDealt(data.owner, damageAmount, playerKey, data.type);
+                        }
                     }
 
                     gameState.scene.remove(bullet);
@@ -4884,6 +5133,21 @@
                     gameState.stormActive = false;
                 }
             }
+            // 在updateSnowStorm函数中添加
+            if (gameState.stormActive) {
+                // 对两个玩家造成伤害
+                ['player1', 'player2'].forEach(playerKey => {
+                    const player = gameState[playerKey];
+                    // 每2秒造成1点伤害
+                    if (performance.now() - (player.lastStormDamage || 0) > 2000) {
+                        const damageApplied = applyDamage(playerKey, 1, 'storm');
+                        if (damageApplied) {
+                            showDamageEffect(playerKey);
+                        }
+                        player.lastStormDamage = performance.now();
+                    }
+                });
+            }
         }
 
         // 添加蛇段
@@ -5031,8 +5295,20 @@
                             else if (distance < 10) damage = 1;
 
                             if (damage > 0) {
-                                applyDamage(targetKey, damage, 'bomb');
-                                showDamageEffect(targetKey);
+                                // 记录目标承受伤害
+                                const damageApplied = applyDamage(targetKey, damage, 'bomb');
+
+                                // 记录施法者输出伤害
+                                if (damageApplied) {
+                                    showDamageEffect(targetKey);
+                                    recordDamageDealt(playerKey, damage, targetKey, 'bomb');
+                                }
+                                                    // 设置死亡原因
+                                if (gameState[targetKey].hp <= 0) {
+                                    gameState[targetKey].deathReason = `被${playerKey === 'player1' ?
+                                        localStorage.getItem('username') || '玩家1' :
+                                        localStorage.getItem('player2_username') || '玩家2'}的炸弹炸死`;
+                                }
                             }
                         }
 
@@ -5051,6 +5327,10 @@
 
                             if (baseDamage > 0) {
                                 target.baseHp -= baseDamage;
+
+                                // 记录对基地的伤害
+                                player.stats.damageDealt.baseDamage += baseDamage;
+
                                 if (target.baseHp < 0) target.baseHp = 0;
 
                                 // 显示基地被攻击效果
@@ -5152,14 +5432,32 @@
             explosionGroup.userData = { lifeTime: 1 };
             gameState.explosions.push(explosionGroup);
             gameState.scene.add(explosionGroup);
+            
         }
 
         // 检查游戏结束
-        function checkGameEnd() {
-            if (gameState.player1.hp <= 0 || gameState.player2.hp <= 0) {
-                endGame();
+    function checkGameEnd() {
+        if (gameState.player1.hp <= 0 || gameState.player2.hp <= 0) {
+            // 设置具体的死亡原因
+            if (gameState.player1.hp <= 0 && !gameState.player1.deathReason) {
+                gameState.player1.deathReason = getDeathReason(
+                    gameState.player1.lastDamageSource || 'unknown',
+                    gameState.player1.lastDamageAmount || 0,
+                    gameState.player1
+                );
             }
+
+            if (gameState.player2.hp <= 0 && !gameState.player2.deathReason) {
+                gameState.player2.deathReason = getDeathReason(
+                    gameState.player2.lastDamageSource || 'unknown',
+                    gameState.player2.lastDamageAmount || 0,
+                    gameState.player2
+                );
+            }
+
+            endGame();
         }
+    }
             async function endGame() {
                 if (!gameState.running) return;
 
@@ -5231,30 +5529,31 @@
     </div>
     
     <!-- 失败者死亡原因 -->
-    ${loser ? `
-        <div class="death-cause" style="
-            margin: 15px auto;
-            padding: 10px;
-            background: ${loser === 'player1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
-            border-radius: 10px;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid ${loser === 'player1' ? '#FF5722' : '#2196F3'};
-        ">
-            <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-                <i class="fas fa-skull-crossbones"></i> 原因
-            </div>
-            <div style="font-size: 18px; font-weight: bold; color: white;">
-                ${loserName}${loserCause}
-            </div>
-            <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
-                血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
-            </div>
+<!-- 失败者死亡原因 -->
+${loser ? `
+    <div class="death-cause" id="death-cause" style="
+        margin: 15px auto;
+        padding: 10px;
+        background: ${loser === 'player1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
+        border-radius: 10px;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid ${loser === 'player1' ? '#FF5722' : '#2196F3'};
+    ">
+        <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
+            <i class="fas fa-skull-crossbones"></i> 原因
         </div>
-    ` : ''}
+        <div style="font-size: 18px; font-weight: bold; color: white;">
+            ${gameState[loser].deathReason || '被击败'}
+        </div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
+            最后血量: ${Math.max(0, gameState[loser].hp.toFixed(1))} | 最终分数: ${gameState[loser].score}
+        </div>
+    </div>
+` : ''}
     
     <!-- 详细统计 -->
-    <div class="stats-container">
+    <div class="stats-container" id="stats-container">
         <div class="player-stats player-1-stats">
             <div class="player-avatar">
                 <i class="fas fa-user" style="color: #FF5722;"></i>
@@ -5302,7 +5601,109 @@
         </div>
     </div>
     
+<div class="detailed-stats-container" id="detailed-stats-container" style="display: none;">
+    <div class="detailed-stats" style="
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    ">
+        <h3 style="color: #FFD700; text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-chart-bar"></i> 本局详细数据统计
+        </h3>
+
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <!-- 玩家1统计 -->
+            <div style="flex: 1;">
+                <h4 style="color: #FF7F00; text-align: center;">${localStorage.getItem("username") || "玩家1"}</h4>
+                <div style="font-size: 12px; color: #ccc; margin: 5px 0;">
+                    <i class="fas fa-road"></i> 总路程: ${Math.round(gameState.player1.stats.totalDistance)} 米
+                </div>
+                
+                <div style="background: rgba(255, 127, 0, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                    <div style="color: #FFA500; font-weight: bold; margin-bottom: 8px;">承受伤害统计:</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                        <div>撞墙伤害: ${Math.round(gameState.player1.stats.damageTaken.wall)}</div>
+                        <div>蛇碰撞伤害: ${Math.round(gameState.player1.stats.damageTaken.snakeCollision)}</div>
+                        <div>子弹伤害: ${Math.round(gameState.player1.stats.damageTaken.bullet)}</div>
+                        <div>基地伤害: ${Math.round(gameState.player1.stats.damageTaken.base)}</div>
+                        ${gameState.mapType === 'volcano' ? `<div>岩浆伤害: ${Math.round(gameState.player1.stats.damageTaken.lava)}</div>` : ''}
+                        <div>炸弹伤害: ${Math.round(gameState.player1.stats.damageTaken.bomb)}</div>
+                        <div style="color: #FF6B6B; font-weight: bold; margin-top: 5px;">
+                            总计: ${Math.round(gameState.player1.stats.damageTaken.total)}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 215, 0, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                    <div style="color: #FFD700; font-weight: bold; margin-bottom: 8px;">输出伤害统计:</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                        <div>蛇碰撞伤害: ${Math.round(gameState.player1.stats.damageDealt.snakeCollision)}</div>
+                        <div>子弹伤害: ${Math.round(gameState.player1.stats.damageDealt.bullet)}</div>
+                        <div>炸弹伤害: ${Math.round(gameState.player1.stats.damageDealt.bomb)}</div>
+                        <div>对基地伤害: ${Math.round(gameState.player1.stats.damageDealt.baseDamage)}</div>
+                        <div style="color: #00FF00; font-weight: bold; margin-top: 5px;">
+                            总输出伤害: ${Math.round(gameState.player1.stats.damageDealt.total)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 游戏总时间 -->
+            <div style="flex: 0.5; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="color: #FFD700; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div style="color: white; font-size: 1.8rem; font-weight: bold;">
+                    ${Math.floor(gameState.gameTime / 60)}:${Math.floor(gameState.gameTime % 60).toString().padStart(2, '0')}
+                </div>
+                <div style="color: #aaa; font-size: 12px; margin-top: 5px;">总游戏时间</div>
+            </div>
+            
+            <!-- 玩家2统计 -->
+            <div style="flex: 1;">
+                <h4 style="color: #4169E1; text-align: center;">${localStorage.getItem("player2_username") || "玩家2"}</h4>
+                <div style="font-size: 12px; color: #ccc; margin: 5px 0;">
+                    <i class="fas fa-road"></i> 总路程: ${Math.round(gameState.player2.stats.totalDistance)} 米
+                </div>
+                
+                <div style="background: rgba(65, 105, 225, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">承受伤害统计:</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                        <div>撞墙伤害: ${Math.round(gameState.player2.stats.damageTaken.wall)}</div>
+                        <div>蛇碰撞伤害: ${Math.round(gameState.player2.stats.damageTaken.snakeCollision)}</div>
+                        <div>子弹伤害: ${Math.round(gameState.player2.stats.damageTaken.bullet)}</div>
+                        <div>基地伤害: ${Math.round(gameState.player2.stats.damageTaken.base)}</div>
+                        ${gameState.mapType === 'volcano' ? `<div>岩浆伤害: ${Math.round(gameState.player2.stats.damageTaken.lava)}</div>` : ''}
+                        <div>炸弹伤害: ${Math.round(gameState.player2.stats.damageTaken.bomb)}</div>
+                        <div style="color: #FF6B6B; font-weight: bold; margin-top: 5px;">
+                            总计: ${Math.round(gameState.player2.stats.damageTaken.total)}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(135, 206, 235, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">输出伤害统计:</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                        <div>蛇碰撞伤害: ${Math.round(gameState.player2.stats.damageDealt.snakeCollision)}</div>
+                        <div>子弹伤害: ${Math.round(gameState.player2.stats.damageDealt.bullet)}</div>
+                        <div>炸弹伤害: ${Math.round(gameState.player2.stats.damageDealt.bomb)}</div>
+                        <div>对基地伤害: ${Math.round(gameState.player2.stats.damageDealt.baseDamage)}</div>
+                        <div style="color: #00FF00; font-weight: bold; margin-top: 5px;">
+                            总输出伤害: ${Math.round(gameState.player2.stats.damageDealt.total)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
     <div class="buttons-container">
+    <button class="restart-btn" id="show-game-stats" onclick="toggleGameStats()">
+        <i class="fas fa-chart-bar"></i> 显示本局数据
+    </button>
         <button class="restart-btn" id="play-again">
             <i class="fas fa-redo"></i> 再来一局
         </button>
@@ -5376,6 +5777,38 @@
                     }
                 });
             }
+            function toggleGameStats() {
+                    const statsContainer = document.getElementById('detailed-stats-container');
+                    const button = document.getElementById('show-game-stats');
+
+                    if (statsContainer.style.display === 'none') {
+                        // 显示数据统计
+                        statsContainer.style.display = 'block';
+                        button.innerHTML = '<i class="fas fa-chart-bar"></i> 隐藏本局数据';
+                        document.getElementById('death-cause').style.display = 'none';
+                        document.getElementById('stats-container').style.display = 'none';
+                        // 添加动画效果
+                        statsContainer.style.opacity = '0';
+                        statsContainer.style.transform = 'translateY(-20px)';
+                        statsContainer.style.transition = 'all 0.3s ease-out';
+
+                        setTimeout(() => {
+                            statsContainer.style.opacity = '1';
+                            statsContainer.style.transform = 'translateY(0)';
+                        }, 10);
+                    } else {
+                        // 隐藏数据统计
+                        statsContainer.style.opacity = '0';
+                        statsContainer.style.transform = 'translateY(-20px)';
+                        document.getElementById('death-cause').style.display = 'block';
+                        document.getElementById('stats-container').style.display = 'flex';
+                        setTimeout(() => {
+                            statsContainer.style.display = 'none';
+                            button.innerHTML = '<i class="fas fa-chart-bar"></i> 显示本局数据';
+                        }, 300);
+                    }
+                }
+
             function recordDeathCauses() {
                 if (gameState.player1.hp <= 0) {
                     if (gameState.player1.shield <= 0) {
@@ -5553,47 +5986,54 @@
             updateMagicBallsDisplay('player2');
         }
         // 更新魔法球显示
-        function updateMagicBallsDisplay(playerKey) {
-            const player = gameState[playerKey];
-            const ballsElement = document.getElementById(`${playerKey}-balls`);
+    function updateMagicBallsDisplay(playerKey) {
+        const player = gameState[playerKey];
+        const ballsElement = document.getElementById(`${playerKey}-balls`);
 
-            if (!ballsElement) return;
+        if (!ballsElement) return;
 
-            ballsElement.innerHTML = '';
+        ballsElement.innerHTML = '';
 
-            player.magicBalls.forEach((ballType, index) => {
-                const ballSlot = document.createElement('div');
-                ballSlot.className = `ball-slot ${ballType}`;
-
-                // 设置缩写
-                let abbreviation;
-                switch (ballType) {
-                    case 'invincible': abbreviation = '无'; break;
-                    case 'health': abbreviation = '血'; break;
-                    case 'reverse': abbreviation = '反'; break;
-                    case 'attack': abbreviation = '攻'; break;
-                    case 'bomb': abbreviation = '爆'; break;
-                    default: abbreviation = '?';
-                }
-
-                ballSlot.textContent = abbreviation;
-                ballSlot.title = getBallDescription(ballType);
-
-                // 添加点击事件
-                ballSlot.style.cursor = 'pointer';
-                ballSlot.onclick = () => useMagicBall(playerKey, index);
-
-                ballsElement.appendChild(ballSlot);
-            });
-
-            // 添加空槽位
-            for (let i = player.magicBalls.length; i < 5; i++) {
-                const emptySlot = document.createElement('div');
-                emptySlot.className = 'ball-slot';
-                emptySlot.textContent = '';
-                ballsElement.appendChild(emptySlot);
-            }
+        // 确保 magicBalls 存在
+        if (!player.magicBalls) {
+            player.magicBalls = [];
         }
+
+        // 安全地遍历
+        player.magicBalls.forEach((ballType, index) => {
+            const ballSlot = document.createElement('div');
+            ballSlot.className = `ball-slot ${ballType}`;
+
+            // 设置缩写
+            let abbreviation;
+            switch (ballType) {
+                case 'invincible': abbreviation = '无'; break;
+                case 'health': abbreviation = '血'; break;
+                case 'reverse': abbreviation = '反'; break;
+                case 'attack': abbreviation = '攻'; break;
+                case 'bomb': abbreviation = '爆'; break;
+                default: abbreviation = '?';
+            }
+
+            ballSlot.textContent = abbreviation;
+            ballSlot.title = getBallDescription(ballType);
+
+            // 添加点击事件
+            ballSlot.style.cursor = 'pointer';
+            ballSlot.onclick = () => useMagicBall(playerKey, index);
+
+            ballsElement.appendChild(ballSlot);
+        });
+
+        // 添加空槽位
+        const emptySlots = 5 - (player.magicBalls ? player.magicBalls.length : 0);
+        for (let i = 0; i < emptySlots; i++) {
+            const emptySlot = document.createElement('div');
+            emptySlot.className = 'ball-slot';
+            emptySlot.textContent = '';
+            ballsElement.appendChild(emptySlot);
+        }
+    }
         // 获取魔法球描述
         function getBallDescription(ballType) {
             switch (ballType) {
