@@ -2347,76 +2347,469 @@
             gameState.scene.add(fillLight);
         }
 
-        // 创建环境
-        function createEnvironment() {
-            // 天空盒
-            const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-            const skyMaterial = new THREE.MeshBasicMaterial({
-                color: 0x87CEEB,
-                side: THREE.BackSide
-            });
-            const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-            gameState.scene.add(sky);
+    // 创建环境
+    function createEnvironment() {
+        // 天空盒 - 移动到地图中心位置
+        const skyGeometry = new THREE.SphereGeometry(200, 32, 32); // 缩小半径以适应地图
+        const skyMaterial = new THREE.MeshBasicMaterial({
+            color: 0x87CEEB,
+            side: THREE.BackSide,
+            transparent: true,
+            opacity: 0.9
+        });
+        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
 
-            // 创建地面
-            createGround();
-        }
+        // 将天空盒定位在地图中心，并略微提高
+        sky.position.set(0, 50, 0); // 提高Y轴位置
+
+        gameState.scene.add(sky);
 
         // 创建地面
-        function createGround() {
-            const groundSize = 300;
-            const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 32, 32);
+        createGround();
+    }
 
-            // 创建网格地面纹理
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
+    // 创建自然平滑的草地地面
+    function createGround() {
+        // 创建地面组
+        const groundGroup = new THREE.Group();
 
-            // 绘制网格
-            ctx.fillStyle = '#2E7D32'; // 绿色背景
-            ctx.fillRect(0, 0, 512, 512);
+        // 地面尺寸
+        const groundSize = 300;
+        const tileSize = 6; // 减小平铺尺寸，让纹理更清晰
 
-            // 绘制网格线
-            ctx.strokeStyle = '#388E3C';
-            ctx.lineWidth = 2;
+        // 创建Canvas纹理 - 自然草地（更亮）
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
 
-            // 水平线
-            for (let i = 0; i <= 20; i++) {
-                const y = i * 25.6;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(512, y);
-                ctx.stroke();
+        // === 创建更亮的自然草地渐变 ===
+
+        // 使用更明亮的绿色调
+        const greens = [
+            '#6B8E45', // 亮深绿
+            '#7CA057', // 橄榄绿
+            '#8DB869', // 青绿
+            '#9ECD7B', // 亮绿
+            '#AFE28D'  // 浅黄绿
+        ];
+
+        // 创建径向渐变模拟自然过渡
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
+
+        // 更亮的径向渐变
+        const mainGradient = ctx.createRadialGradient(
+            centerX, centerY, maxRadius * 0.3,
+            centerX, centerY, maxRadius
+        );
+        mainGradient.addColorStop(0, greens[3]); // 中心更亮
+        mainGradient.addColorStop(0.5, greens[2]); // 中间
+        mainGradient.addColorStop(1, greens[1]); // 边缘
+
+        ctx.fillStyle = mainGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // === 添加明亮的草地纹理细节 ===
+
+        // 第一层：清晰的草叶纹理
+        ctx.globalAlpha = 0.25; // 增加透明度，让纹理更明显
+        for (let i = 0; i < 12000; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const length = Math.random() * 6 + 2; // 更长的草叶
+            const angle = Math.random() * Math.PI;
+            const brightness = Math.random() * 40 + 30;
+
+            // 更亮的草叶颜色
+            ctx.strokeStyle = `rgb(${100 - brightness}, ${150 - brightness}, ${80 - brightness})`;
+            ctx.lineWidth = Math.random() * 1.2 + 0.3; // 更粗的线条
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(
+                x + Math.cos(angle) * length,
+                y + Math.sin(angle) * length
+            );
+            ctx.stroke();
+        }
+
+        // 第二层：明亮的草地点状细节
+        ctx.globalAlpha = 0.3; // 增加透明度
+        for (let i = 0; i < 6000; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const size = Math.random() * 2 + 1; // 更大的点
+
+            // 更明亮的绿色调
+            const greenVariation = Math.random() * 50;
+            ctx.fillStyle = `rgb(${80 - greenVariation}, ${130 - greenVariation}, ${70 - greenVariation})`;
+
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 第三层：明亮的阳光照射效果
+        ctx.globalAlpha = 0.15; // 增加阳光效果
+        ctx.fillStyle = '#E8F5A0'; // 更亮的黄绿色
+        for (let i = 0; i < 2000; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const size = Math.random() * 4 + 2; // 更大的高光点
+
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // === 添加柔和的阴影效果 ===
+        ctx.globalAlpha = 0.06; // 更淡的阴影
+        ctx.fillStyle = '#3E5527'; // 稍亮的阴影色
+
+        // 创建柔和的阴影区域
+        for (let i = 0; i < 12; i++) {
+            const centerX = Math.random() * canvas.width;
+            const centerY = Math.random() * canvas.height;
+            const radius = Math.random() * 60 + 40;
+
+            // 创建柔和的圆形阴影
+            const shadowGradient = ctx.createRadialGradient(
+                centerX, centerY, 0,
+                centerX, centerY, radius
+            );
+            shadowGradient.addColorStop(0, 'rgba(62, 85, 39, 0.4)');
+            shadowGradient.addColorStop(1, 'rgba(62, 85, 39, 0)');
+
+            ctx.fillStyle = shadowGradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 创建纹理
+        const groundTexture = new THREE.CanvasTexture(canvas);
+        groundTexture.wrapS = THREE.RepeatWrapping;
+        groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set(groundSize / tileSize, groundSize / tileSize);
+        groundTexture.anisotropy = 16;
+        groundTexture.needsUpdate = true;
+
+        // === 创建地面几何体 ===
+        const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
+
+        // 轻微的法线变化（保持视觉平滑，实际无起伏）
+        const positions = groundGeometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+            const x = positions.getX(i);
+            const y = positions.getY(i);
+
+            // 轻微的海拔变化（几乎不可见，只影响光照）
+            const noise = (Math.sin(x * 0.015) * Math.sin(y * 0.015)) * 0.03;
+            positions.setZ(i, noise);
+        }
+        groundGeometry.computeVertexNormals(); // 重新计算法线
+
+        // 创建更明亮的地面材质
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            map: groundTexture,
+            color: 0x7CA057, // 更亮的基色
+            roughness: 0.8, // 减少粗糙度，增加光泽
+            metalness: 0.05,
+            side: THREE.DoubleSide,
+            displacementScale: 0, // 确保无实际起伏
+            emissive: 0x334422, // 微弱的自发光
+            emissiveIntensity: 0.1
+        });
+
+        // 创建地面网格
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0;
+        ground.receiveShadow = true;
+
+        groundGroup.add(ground);
+
+        // === 创建更明显的草地 ===
+        createGrassPatches(groundGroup);
+
+        // 将地面组添加到场景
+        gameState.scene.add(groundGroup);
+        createMapBoundaries() 
+        return groundGroup;
+        
+    }
+
+    // 创建明显的小草
+    function createGrassPatches(groundGroup) {
+        const grassGroup = new THREE.Group();
+        grassGroup.name = 'grass';
+
+        // 小草变体数量
+        const grassVariants = 4; // 增加变体
+
+        // 预创建小草几何体变体（更大的尺寸）
+        const grassGeometries = [];
+        for (let v = 0; v < grassVariants; v++) {
+            const geometry = new THREE.BufferGeometry();
+
+            // 每个小草4-8片叶子（更多叶子）
+            const leafCount = 4 + Math.floor(Math.random() * 5);
+            const vertices = [];
+
+            for (let i = 0; i < leafCount; i++) {
+                // 叶茎底部（地面位置）
+                const baseX = 0;
+                const baseY = 0;
+                const baseZ = 0;
+
+                // 叶茎顶部（更大、更明显）
+                const height = 1.2 + Math.random() * 1.0; // 更高的草
+                const bend = Math.random() * 0.5 - 0.25; // 更大的弯曲
+                const topX = baseX + bend;
+                const topY = baseY + height;
+                const topZ = baseZ + bend;
+
+                // 叶片宽度（更宽）
+                const leafWidth = 0.3 + Math.random() * 0.3;
+
+                // 创建更宽的三角形表示叶片
+                vertices.push(
+                    baseX - leafWidth / 2, baseY, baseZ,
+                    topX, topY, topZ,
+                    baseX + leafWidth / 2, baseY, baseZ
+                );
+
+                // 可选：添加第二个三角形让叶片更完整
+                if (Math.random() > 0.5) {
+                    vertices.push(
+                        topX, topY, topZ,
+                        topX + (Math.random() - 0.5) * leafWidth,
+                        topY * 0.7,
+                        topZ + (Math.random() - 0.5) * leafWidth,
+                        baseX + leafWidth / 2, baseY, baseZ
+                    );
+                }
             }
 
-            // 垂直线
-            for (let i = 0; i <= 20; i++) {
-                const x = i * 25.6;
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, 512);
-                ctx.stroke();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+            // 计算法线用于光照
+            geometry.computeVertexNormals();
+            grassGeometries.push(geometry);
+        }
+
+        // 小草材质（更明显，不透明）
+        const grassMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8FBC8F,
+            roughness: 0.9,
+            metalness: 0.1,
+            transparent: false, // 改为不透明，更明显
+            opacity: 1.0,
+            side: THREE.DoubleSide
+        });
+
+        // 创建大量小草（稍少但更大的草）
+        const grassCount = 1500; // 减少数量，但每个更大
+
+        for (let i = 0; i < grassCount; i++) {
+            // 随机位置（避免道路区域）
+            let x, z;
+            do {
+                x = Math.random() * 280 - 140; // 留出边缘
+                z = Math.random() * 280 - 140;
+            } while (Math.abs(x) < 40 && Math.abs(z) < 40); // 避开中心区域
+
+            // 随机选择小草变体
+            const variant = Math.floor(Math.random() * grassVariants);
+            const grassMesh = new THREE.Mesh(grassGeometries[variant], grassMaterial.clone());
+
+            // 更大的变换
+            grassMesh.position.set(x, 0.1, z); // 略高于地面
+            grassMesh.rotation.y = Math.random() * Math.PI * 2; // 随机旋转
+            const scale = 1.2 + Math.random() * 0.8; // 更大的尺寸
+            grassMesh.scale.setScalar(scale);
+
+            // 更丰富的颜色变化
+            const hueShift = Math.random() * 0.2 - 0.1;
+            grassMesh.material.color = new THREE.Color().setHSL(
+                0.3 + hueShift, // 绿色色调
+                0.6 + Math.random() * 0.3, // 饱和度
+                0.5 + Math.random() * 0.3  // 亮度
+            );
+
+            // 投射阴影，更真实
+            grassMesh.castShadow = true;
+            grassMesh.receiveShadow = true;
+
+            grassGroup.add(grassMesh);
+        }
+
+        // 创建明显的小草集群
+        for (let cluster = 0; cluster < 8; cluster++) {
+            const clusterX = Math.random() * 200 - 100;
+            const clusterZ = Math.random() * 200 - 100;
+            const clusterSize = Math.random() * 40 + 30;
+            const clusterCount = 80 + Math.floor(Math.random() * 80);
+
+            for (let i = 0; i < clusterCount; i++) {
+                const variant = Math.floor(Math.random() * grassVariants);
+                const grassMesh = new THREE.Mesh(grassGeometries[variant], grassMaterial.clone());
+
+                // 在集群范围内随机分布
+                const x = clusterX + (Math.random() - 0.5) * clusterSize;
+                const z = clusterZ + (Math.random() - 0.5) * clusterSize;
+
+                // 集群中的草更高
+                const scale = 1.4 + Math.random() * 1.0;
+
+                grassMesh.position.set(x, 0.1, z);
+                grassMesh.rotation.y = Math.random() * Math.PI * 2;
+                grassMesh.scale.setScalar(scale);
+
+                // 集群中颜色更深
+                grassMesh.material.color = new THREE.Color().setHSL(
+                    0.25 + Math.random() * 0.1,
+                    0.7 + Math.random() * 0.2,
+                    0.4 + Math.random() * 0.2
+                );
+
+                grassMesh.castShadow = true;
+                grassMesh.receiveShadow = true;
+
+                grassGroup.add(grassMesh);
+            }
+        }
+
+        // 创建明显的野花点缀
+        createWildflowers(grassGroup);
+
+        groundGroup.add(grassGroup);
+    }
+
+    // 创建明显的野花点缀
+    function createWildflowers(grassGroup) {
+        const flowerCount = 250; // 野花数量
+
+        // 预创建几种花类型
+        const flowerTypes = [
+            {
+                name: 'daisy',
+                centerColor: 0xFFD700, // 黄色花蕊
+                petalColor: 0xFFFFFF,  // 白色花瓣
+                size: 1.5
+            },
+            {
+                name: 'poppy',
+                centerColor: 0x000000, // 黑色花蕊
+                petalColor: 0xFF4500,  // 红色花瓣
+                size: 1.8
+            },
+            {
+                name: 'violet',
+                centerColor: 0xFFD700, // 黄色花蕊
+                petalColor: 0xEE82EE,  // 紫色花瓣
+                size: 1.3
+            },
+            {
+                name: 'sunflower',
+                centerColor: 0x8B4513, // 棕色花蕊
+                petalColor: 0xFFD700,  // 黄色花瓣
+                size: 2.0
+            }
+        ];
+
+        for (let i = 0; i < flowerCount; i++) {
+            // 随机位置
+            const x = Math.random() * 280 - 140;
+            const z = Math.random() * 280 - 140;
+
+            // 随机选择花类型
+            const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+
+            // 创建花朵组
+            const flowerGroup = new THREE.Group();
+
+            // 花蕊（更大）
+            const centerGeometry = new THREE.SphereGeometry(0.4, 12, 12);
+            const centerMaterial = new THREE.MeshBasicMaterial({
+                color: flowerType.centerColor
+            });
+            const center = new THREE.Mesh(centerGeometry, centerMaterial);
+            flowerGroup.add(center);
+
+            // 花瓣（更大更多）
+            const petalCount = 6 + Math.floor(Math.random() * 6); // 6-11片花瓣
+
+            for (let p = 0; p < petalCount; p++) {
+                // 使用锥形或平面几何体
+                let petalGeometry;
+                if (Math.random() > 0.5) {
+                    petalGeometry = new THREE.ConeGeometry(0.6, 0.8, 8);
+                } else {
+                    petalGeometry = new THREE.PlaneGeometry(0.8, 0.6);
+                }
+
+                const petalMaterial = new THREE.MeshBasicMaterial({
+                    color: flowerType.petalColor,
+                    transparent: true,
+                    opacity: 0.9,
+                    side: THREE.DoubleSide
+                });
+
+                const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+
+                // 花瓣围绕花蕊排列
+                const angle = (p / petalCount) * Math.PI * 2;
+                const distance = 0.8; // 离中心更远
+
+                petal.position.x = Math.cos(angle) * distance;
+                petal.position.z = Math.sin(angle) * distance;
+                petal.position.y = 0.2; // 稍微抬高
+
+                // 花瓣朝向花蕊
+                petal.lookAt(0, 0, 0);
+
+                // 随机旋转增加自然感
+                petal.rotation.y += Math.random() * 0.5 - 0.25;
+
+                flowerGroup.add(petal);
             }
 
-            const groundTexture = new THREE.CanvasTexture(canvas);
-            groundTexture.wrapS = THREE.RepeatWrapping;
-            groundTexture.wrapT = THREE.RepeatWrapping;
-            groundTexture.repeat.set(10, 10);
-
-            const groundMaterial = new THREE.MeshStandardMaterial({
-                map: groundTexture,
-                roughness: 0.9
+            // 花茎（更粗更高）
+            const stemGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 6);
+            const stemMaterial = new THREE.MeshBasicMaterial({
+                color: 0x458B00
             });
 
-            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            gameState.scene.add(ground);
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.y = -0.6; // 茎的中间位置
 
-            // 添加地图边界线
-            createMapBoundaries();
+            flowerGroup.add(stem);
+
+            // 设置花的位置和大小
+            flowerGroup.position.set(x, 0.1, z);
+            flowerGroup.scale.setScalar(flowerType.size);
+
+            // 随机旋转
+            flowerGroup.rotation.y = Math.random() * Math.PI * 2;
+
+            // 轻微随机倾斜，更自然
+            flowerGroup.rotation.x = Math.random() * 0.2 - 0.1;
+            flowerGroup.rotation.z = Math.random() * 0.2 - 0.1;
+
+            // 投射阴影
+            flowerGroup.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            grassGroup.add(flowerGroup);
         }
+    }
 
         // 创建地图边界线
         function createMapBoundaries() {
@@ -2989,112 +3382,290 @@
         }
 
         // 创建基地
-        function createBase(position, color) {
-            const baseGroup = new THREE.Group();
+    function createBase(position, color) {
+        const baseGroup = new THREE.Group();
 
-            // 基地底座
-            const baseGeometry = new THREE.BoxGeometry(30, 2, 30);
-            const baseMaterial = new THREE.MeshStandardMaterial({
+        // === 基地底座（半透明圆柱体）===
+        const baseGeometry = new THREE.CylinderGeometry(18, 22, 2, 16);
+        const baseMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            roughness: 0.7,
+            metalness: 0.4,
+            transparent: true,
+            opacity: 0.7, // 半透明
+            side: THREE.DoubleSide
+        });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 1;
+        base.receiveShadow = true;
+        baseGroup.add(base);
+
+        // === 基地主体（半透明圆顶）===
+        const domeGeometry = new THREE.ConeGeometry(15, 12, 16);
+        const domeMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color).multiplyScalar(1.2),
+            roughness: 0.6,
+            metalness: 0.5,
+            emissive: color,
+            emissiveIntensity: 0.1,
+            transparent: true,
+            opacity: 0.8 // 稍微透明
+        });
+        const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+        dome.position.y = 7;
+        dome.castShadow = true;
+        dome.receiveShadow = true;
+        baseGroup.add(dome);
+
+        // === 基地墙体（半透明圆柱体）===
+        const wallGeometry = new THREE.CylinderGeometry(14, 14, 8, 16);
+        const wallMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color).multiplyScalar(0.8),
+            roughness: 0.8,
+            metalness: 0.3,
+            transparent: true,
+            opacity: 0.6, // 更透明
+            side: THREE.DoubleSide
+        });
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall.position.y = 4;
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        baseGroup.add(wall);
+
+        // === 防护罩（半透明能量场）===
+        const shieldGeometry = new THREE.SphereGeometry(20, 24, 24);
+        const shieldMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.4, // 增加发光强度
+            transparent: true,
+            opacity: 0.25, // 更透明
+            side: THREE.DoubleSide,
+            roughness: 0.1,
+            metalness: 0.9
+        });
+        const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
+        shield.position.y = 8;
+        shield.castShadow = false;
+        baseGroup.add(shield);
+
+        // === 基地结构框架（实体，不透明）===
+        const createSupportBeam = (angle, height) => {
+            const beamGeometry = new THREE.BoxGeometry(0.8, height, 0.8);
+            const beamMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color).multiplyScalar(1.3),
+                roughness: 0.4,
+                metalness: 0.7
+            });
+            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+
+            // 位置
+            const radius = 13;
+            beam.position.set(
+                Math.cos(angle) * radius,
+                height / 2,
+                Math.sin(angle) * radius
+            );
+
+            beam.castShadow = true;
+            return beam;
+        };
+
+        // 添加8根支撑柱（实体，不透明）
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const beam = createSupportBeam(angle, 8);
+            baseGroup.add(beam);
+        }
+
+        // 顶部环状结构（实体）
+        const topRingGeometry = new THREE.TorusGeometry(13, 1.5, 8, 24);
+        const topRingMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color).multiplyScalar(1.5),
+            roughness: 0.3,
+            metalness: 0.8
+        });
+        const topRing = new THREE.Mesh(topRingGeometry, topRingMaterial);
+        topRing.position.y = 8;
+        topRing.rotation.x = Math.PI / 2;
+        topRing.castShadow = true;
+        baseGroup.add(topRing);
+
+        // === 基地入口（实体，不透明）===
+        const gateGeometry = new THREE.BoxGeometry(8, 6, 2);
+        const gateMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+        const gate = new THREE.Mesh(gateGeometry, gateMaterial);
+        gate.position.set(0, 3, -12);
+        gate.castShadow = true;
+        gate.receiveShadow = true;
+        baseGroup.add(gate);
+
+        // 门框装饰（实体）
+        const gateFrameGeometry = new THREE.BoxGeometry(8.5, 6.5, 0.5);
+        const gateFrameMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(color).multiplyScalar(1.5),
+            roughness: 0.3,
+            metalness: 0.8
+        });
+        const gateFrame = new THREE.Mesh(gateFrameGeometry, gateFrameMaterial);
+        gateFrame.position.set(0, 3, -12.3);
+        baseGroup.add(gateFrame);
+
+        // === 能量核心（半透明发光球体）===
+        const coreGeometry = new THREE.SphereGeometry(3.5, 16, 16);
+        const coreMaterial = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 1.0, // 强烈发光
+            roughness: 0.1,
+            metalness: 0.9,
+            transparent: true,
+            opacity: 0.8 // 稍微透明
+        });
+        const core = new THREE.Mesh(coreGeometry, coreMaterial);
+        core.position.y = 8;
+        baseGroup.add(core);
+
+        // 内核心（更小，更亮）
+        const innerCoreGeometry = new THREE.SphereGeometry(1.5, 12, 12);
+        const innerCoreMaterial = new THREE.MeshBasicMaterial({
+            color: 0xFFFFFF,
+            emissive: 0xFFFFFF,
+            emissiveIntensity: 1.0,
+            transparent: true,
+            opacity: 0.9
+        });
+        const innerCore = new THREE.Mesh(innerCoreGeometry, innerCoreMaterial);
+        innerCore.position.y = 8;
+        baseGroup.add(innerCore);
+
+        // === 能量光线（从核心到底座）===
+        const createEnergyBeam = (angle) => {
+            const beamLength = 7;
+            const beamGeometry = new THREE.CylinderGeometry(0.3, 0.5, beamLength, 6);
+            const beamMaterial = new THREE.MeshBasicMaterial({
                 color: color,
-                emissive: color,
-                emissiveIntensity: 0.3,
                 transparent: true,
                 opacity: 0.4,
                 side: THREE.DoubleSide
             });
-            const base = new THREE.Mesh(baseGeometry, baseMaterial);
-            base.position.y = 1;
-            base.receiveShadow = true;
-            baseGroup.add(base);
+            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
 
-            // 基地防护罩
-            const shieldGeometry = new THREE.SphereGeometry(18, 32, 32);
-            const shieldMaterial = new THREE.MeshStandardMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.2,
-                transparent: true,
-                opacity: 0.2,
-                side: THREE.DoubleSide,
-                wireframe: true
-            });
-            const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
-            shield.position.y = 8;
-            baseGroup.add(shield);
+            // 位置和方向
+            const radius = 5;
+            beam.position.set(
+                Math.cos(angle) * radius,
+                beamLength / 2 + 1,
+                Math.sin(angle) * radius
+            );
 
-            baseGroup.position.set(position.x, position.y, position.z);
-            baseGroup.userData = {
-                type: 'base',
-                safeRadius: 20,
-                color: color
-            };
+            // 朝向中心
+            beam.lookAt(0, 1, 0);
 
-            return baseGroup;
+            return beam;
+        };
+
+        // 添加4根能量光束
+        for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI * 2;
+            const beam = createEnergyBeam(angle);
+            baseGroup.add(beam);
         }
 
-
-        // 更新基地血量显示
-        function updateBaseHealthDisplay(playerKey) {
-            const player = gameState[playerKey];
-            if (!player || !player.baseHealthDisplay) {
-                return;
+        baseGroup.position.set(position.x, position.y, position.z);
+        baseGroup.userData = {
+            type: 'base',
+            safeRadius: 20,
+            color: color,
+            originalMaterials: {
+                base: baseMaterial,
+                dome: domeMaterial,
+                wall: wallMaterial,
+                shield: shieldMaterial,
+                core: coreMaterial
             }
+        };
 
-            const healthDisplay = player.baseHealthDisplay;
+        return baseGroup;
+    }
 
-            // 检查 healthDisplay 是否已被销毁
-            if (!healthDisplay.parent) {
-                player.baseHealthDisplay = null;
-                return;
-            }
+    function updateBaseHealthDisplay(playerKey) {
+        const player = gameState[playerKey];
+        if (!player || !player.baseHealthDisplay) {
+            return;
+        }
 
-            const healthBar = healthDisplay.userData.healthBar;
-            const sprite = healthDisplay.userData.textSprite;
-            const ctx = healthDisplay.userData.ctx;
-            const canvas = healthDisplay.userData.canvas;
+        const healthDisplay = player.baseHealthDisplay;
 
-            if (healthBar && healthBar.material) {
-                // 更新血量条宽度
-                const healthRatio = player.baseHp / 50;
-                healthBar.scale.x = Math.max(0, healthRatio);
+        // 检查 healthDisplay 是否已被销毁
+        if (!healthDisplay.parent) {
+            player.baseHealthDisplay = null;
+            return;
+        }
 
-                // 根据血量改变颜色
-                if (healthRatio > 0.5) {
-                    healthBar.material.color.set(playerKey === 'player1' ? 0x00FF00 : 0x00AAFF);
-                } else if (healthRatio > 0.25) {
-                    healthBar.material.color.set(0xFFFF00);
-                } else {
-                    healthBar.material.color.set(0xFF0000);
-                }
-            }
+        const healthBar = healthDisplay.userData.healthBar;
+        const sprite = healthDisplay.userData.textSprite;
+        const ctx = healthDisplay.userData.ctx;
+        const canvas = healthDisplay.userData.canvas;
 
-            if (sprite && ctx && canvas) {
-                // 更新血量数值
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (healthBar && healthBar.material) {
+            // 更新血量条宽度
+            const healthRatio = player.baseHp / 50;
+            healthBar.scale.x = Math.max(0.1, healthRatio); // 最小0.1，避免完全消失
 
-                // 绘制背景
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // 绘制血量数值
-                ctx.font = 'bold 40px Arial';
-                ctx.fillStyle = '#FFFFFF';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const displayHp = Math.max(0, Math.ceil(player.baseHp));
-                ctx.fillText(displayHp.toString(), 64, 32);
-
-                // 更新纹理
-                if (sprite.material && sprite.material.map) {
-                    sprite.material.map.needsUpdate = true;
-                }
-            }
-
-            // 基地被摧毁时移除显示
-            if (player.baseHp <= 0) {
-                // 不在这里移除，让 destroyBase 处理
+            // 根据血量改变颜色（更明显的颜色变化）
+            if (healthRatio > 0.7) {
+                healthBar.material.color.set(0x00FF00); // 绿色（健康）
+            } else if (healthRatio > 0.4) {
+                healthBar.material.color.set(0xFFFF00); // 黄色（警告）
+            } else if (healthRatio > 0.2) {
+                healthBar.material.color.set(0xFFA500); // 橙色（危险）
+            } else {
+                healthBar.material.color.set(0xFF0000); // 红色（危急）
             }
         }
+
+        if (sprite && ctx && canvas) {
+            // 更新血量数值
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制背景
+            const healthRatio = player.baseHp / 50;
+            if (healthRatio > 0.7) {
+                ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'; // 深绿背景
+            } else if (healthRatio > 0.4) {
+                ctx.fillStyle = 'rgba(100, 100, 0, 0.8)'; // 深黄背景
+            } else if (healthRatio > 0.2) {
+                ctx.fillStyle = 'rgba(100, 50, 0, 0.8)'; // 深橙背景
+            } else {
+                ctx.fillStyle = 'rgba(100, 0, 0, 0.8)'; // 深红背景
+            }
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制边框
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+            // 绘制血量数值
+            ctx.font = 'bold 36px Arial';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const displayHp = Math.max(0, Math.ceil(player.baseHp));
+            ctx.fillText(displayHp.toString(), 64, 32);
+
+            // 更新纹理
+            if (sprite.material && sprite.material.map) {
+                sprite.material.map.needsUpdate = true;
+            }
+        }
+    }
         function showBaseThreatWarning(position) {
             if (Math.random() > 0.1) return; // 降低频率
 
@@ -3359,33 +3930,6 @@
                 p2.position.z
             );
         }
-
-
-        function updateInvincibleParticles(playerKey, deltaTime) {
-            const player = gameState[playerKey];
-            if (!player.isInvincible || !player.invincibleParticles) return;
-
-            const particleGroup = player.invincibleParticles;
-            const position = player.position;
-
-            // 更新粒子组位置到蛇的位置
-            particleGroup.position.set(position.x, position.y + 2, position.z);
-
-            // 更新单个粒子的旋转和移动
-            particleGroup.children.forEach((particle, index) => {
-                if (particle.userData) {
-                    particle.userData.angle += particle.userData.speed * deltaTime;
-
-                    // 粒子围绕蛇旋转
-                    particle.position.x = Math.cos(particle.userData.angle) * particle.userData.radius;
-                    particle.position.z = Math.sin(particle.userData.angle) * particle.userData.radius;
-                    particle.position.y = Math.sin(particle.userData.angle + index) * 1.5;
-
-                    // 粒子闪烁效果
-                    particle.material.opacity = 0.3 + 0.4 * Math.sin(gameState.gameTime * 5 + index);
-                }
-            });
-        }
         // 更新游戏
         function update() {
             if (!clock) {
@@ -3495,20 +4039,6 @@
 
             player.magicBalls.push(ballType);
             updateMagicBallsDisplay(playerKey);
-        }
-        // 更新蛇的朝向（用于蛇头模型）
-        function updateSnakeOrientation(playerKey) {
-            const player = gameState[playerKey];
-            const snake = player.snake;
-            if (!snake) return;
-
-            // 根据方向旋转蛇头
-            const direction = player.direction;
-            if (direction.x !== 0 || direction.z !== 0) {
-                // 计算旋转角度
-                const angle = Math.atan2(direction.z, direction.x);
-                snake.rotation.y = -angle + Math.PI / 2;
-            }
         }
         function getClosestPointOnSegment(px, pz, x1, z1, x2, z2) {
             const A = px - x1;
@@ -4623,25 +5153,6 @@
                 damage: 0.5  // 伤害0.5
             };
             return bullet;
-        }
-
-        function getPlayerSpeed(playerKey) {
-            const player = gameState[playerKey];
-            let speed = 15; // 基础速度
-
-            if (player.type === 'speed') {
-                speed *= 1.5;
-            } else if (player.type === 'magic') {
-                speed *= 1.15;
-            }
-
-            speed *= player.speedMultiplier;
-
-            if (player.isDashing) {
-                speed *= 3;
-            }
-
-            return speed;
         }
         // 修改shootBaseBullet函数
         // 修改shootBaseBullet函数为批量发射
@@ -6209,78 +6720,6 @@ ${loser ? `
                 }
             });
         }
-        function handleShopControls(playerKey) {
-            const shop = shopState[playerKey];
-            if (!shop.open) return;
-
-            const items = shop.items;
-            let selectionChanged = false;
-
-            // 调试信息
-            console.log(`Handling shop controls for ${playerKey}`);
-            console.log(`Player1 shop open: ${shopState.player1.open}, Player2 shop open: ${shopState.player2.open}`);
-
-            // 玩家1商店控制
-            if (playerKey === 'player1') {
-                console.log(`Player1 keys - w:${gameState.keys['w']}, s:${gameState.keys['s']}, r:${gameState.keys['r']}`);
-
-                if (gameState.keys['w'] || gameState.keys['W']) {
-                    console.log("Player1 shop: W pressed");
-                    shop.selectedIndex = Math.max(0, shop.selectedIndex - 1);
-                    selectionChanged = true;
-                    // 不清除按键状态，让update函数继续处理
-                }
-                if (gameState.keys['s'] || gameState.keys['S']) {
-                    console.log("Player1 shop: S pressed");
-                    shop.selectedIndex = Math.min(items.length - 1, shop.selectedIndex + 1);
-                    selectionChanged = true;
-                    // 不清除按键状态，让update函数继续处理
-                }
-                if (gameState.keys['r'] || gameState.keys['R']) {
-                    console.log("Player1 shop: R pressed");
-                    // 购买选中的物品
-                    const selectedItem = items[shop.selectedIndex];
-                    if (selectedItem) {
-                        console.log(`Player1 buying: ${selectedItem.name}`);
-                        buyItem(playerKey, selectedItem.id);
-                    }
-                    // 不清除按键状态
-                }
-            }
-            // 玩家2商店控制
-            else if (playerKey === 'player2') {
-                console.log(`Player2 keys - ArrowUp:${gameState.keys['ArrowUp']}, ArrowDown:${gameState.keys['ArrowDown']}, Enter:${gameState.keys['Enter']}`);
-
-                if (gameState.keys['ArrowUp']) {
-                    console.log("Player2 shop: ArrowUp pressed");
-                    shop.selectedIndex = Math.max(0, shop.selectedIndex - 1);
-                    selectionChanged = true;
-                    // 不清除按键状态
-                }
-                if (gameState.keys['ArrowDown']) {
-                    console.log("Player2 shop: ArrowDown pressed");
-                    shop.selectedIndex = Math.min(items.length - 1, shop.selectedIndex + 1);
-                    selectionChanged = true;
-                    // 不清除按键状态
-                }
-                if (gameState.keys['Enter']) {
-                    console.log("Player2 shop: Enter pressed");
-                    // 购买选中的物品
-                    const selectedItem = items[shop.selectedIndex];
-                    if (selectedItem) {
-                        console.log(`Player2 buying: ${selectedItem.name}`);
-                        buyItem(playerKey, selectedItem.id);
-                    }
-                    // 不清除按键状态
-                }
-            }
-
-            if (selectionChanged) {
-                console.log(`Shop selection changed for ${playerKey} to index: ${shop.selectedIndex}`);
-                updateShopSelection(playerKey);
-            }
-        }
-
         // 购买物品
         function buyItem(playerKey, item) {
             const player = gameState[playerKey];
@@ -6410,20 +6849,6 @@ ${loser ? `
             if (player.pauseIndicator) {
                 gameState.scene.remove(player.pauseIndicator);
                 player.pauseIndicator = null;
-            }
-        }
-
-        // 检查是否所有玩家都暂停了
-        function checkAllPlayersPaused() {
-            const player1Paused = gameState.player1.paused;
-            const player2Paused = gameState.player2.paused;
-
-            // 如果两个玩家都暂停了，整体游戏暂停
-            gameState.paused = player1Paused && player2Paused;
-
-            if (gameState.paused) {
-                // 显示整体暂停提示
-            } else {
             }
         }
         // 事件处理
@@ -6586,7 +7011,6 @@ ${loser ? `
             if (!shopState.player1.open && !shopState.player2.open) {
                 // 速度蛇俯冲
                 if (e.key === ' ') {
-                    checkSpeedSnakeDash('player1');
                     e.preventDefault();
                 }
             }
