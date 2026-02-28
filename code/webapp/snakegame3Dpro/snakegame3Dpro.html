@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/config/serverUrl.js"></script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/styles_button.css">
     <script src="/js/script4_goBackOrHome.js"></script>
@@ -782,6 +782,7 @@
         .game-fullscreen .game-controls:hover {
             opacity: 1;
         }
+
         .homepage {
             position: fixed;
             top: 0;
@@ -807,6 +808,7 @@
                 opacity: 0;
                 transform: translateY(50px);
             }
+
             100% {
                 opacity: 1;
                 transform: translateY(0);
@@ -831,11 +833,12 @@
         @keyframes titleGlow {
             0% {
                 text-shadow: 0 0 20px rgba(255, 127, 0, 0.5),
-                            0 0 40px rgba(255, 215, 0, 0.3);
+                    0 0 40px rgba(255, 215, 0, 0.3);
             }
+
             100% {
                 text-shadow: 0 0 30px rgba(65, 105, 225, 0.5),
-                            0 0 60px rgba(147, 112, 219, 0.3);
+                    0 0 60px rgba(147, 112, 219, 0.3);
             }
         }
 
@@ -849,9 +852,12 @@
         }
 
         @keyframes subtitleFloat {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0);
             }
+
             50% {
                 transform: translateY(-10px);
             }
@@ -996,10 +1002,10 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, 
-                transparent 20%, 
-                rgba(255, 255, 255, 0.1) 50%, 
-                transparent 80%);
+            background: linear-gradient(45deg,
+                    transparent 20%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 80%);
             animation: buttonShine 3s infinite linear;
         }
 
@@ -1007,6 +1013,7 @@
             0% {
                 transform: translateX(-100%) translateY(-100%) rotate(45deg);
             }
+
             100% {
                 transform: translateX(100%) translateY(100%) rotate(45deg);
             }
@@ -1063,244 +1070,265 @@
         }
 
         /* 动画延迟类 */
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-        .delay-4 { animation-delay: 0.8s; } 
-/* 游戏结束界面样式 */
-.game-over {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s;
-    backdrop-filter: blur(5px);
-}
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
 
-.game-over.show {
-    opacity: 1;
-    pointer-events: all;
-}
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
 
-.game-over-content {
-    text-align: center;
-    max-width: 600px;
-    width: 90%;
-    animation: fadeInUp 0.8s;
-}
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
 
-.winner-container {
-    margin-bottom: 30px;
-}
+        .delay-4 {
+            animation-delay: 0.8s;
+        }
 
-.trophy-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    animation: bounce 1s infinite alternate;
-}
+        /* 游戏结束界面样式 */
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            backdrop-filter: blur(5px);
+        }
 
-.winner-banner {
-    font-size: 48px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 15px currentColor;
-    animation: pulse 2s infinite;
-}
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
 
-.stats-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 30px 0;
-    gap: 20px;
-}
+        .game-over-content {
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            animation: fadeInUp 0.8s;
+        }
 
-.player-stats {
-    flex: 1;
-    padding: 20px;
-    border-radius: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s;
-}
+        .winner-container {
+            margin-bottom: 30px;
+        }
 
-.player-stats:hover {
-    transform: translateY(-5px);
-}
+        .trophy-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
 
-.player-1-stats {
-    border: 2px solid #FF5722;
-    box-shadow: 0 0 15px rgba(255, 87, 34, 0.3);
-}
+        .winner-banner {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px currentColor;
+            animation: pulse 2s infinite;
+        }
 
-.player-2-stats {
-    border: 2px solid #2196F3;
-    box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
-}
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            gap: 20px;
+        }
 
-.player-avatar {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
+        .player-stats {
+            flex: 1;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
 
-.player-name {
-    font-size: 20px;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+        .player-stats:hover {
+            transform: translateY(-5px);
+        }
 
-.win-count {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 10px 0;
-}
+        .player-1-stats {
+            border: 2px solid #FF5722;
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.3);
+        }
 
-.progress-bar {
-    height: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 10px;
-}
+        .player-2-stats {
+            border: 2px solid #2196F3;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+        }
 
-.progress-fill {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 1s ease-out;
-}
+        .player-avatar {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
 
-.vs-text {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 10px;
-}
+        .player-name {
+            font-size: 20px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-.buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
-}
+        .win-count {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
 
-.restart-btn {
-    padding: 15px 30px;
-    border: none;
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
 
-.restart-btn i {
-    font-size: 20px;
-}
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1s ease-out;
+        }
 
-.restart-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
+        .vs-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
 
-.upload-btn {
-    background: linear-gradient(45deg, #4CAF50, #8BC34A);
-}
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
 
-.restart-btn:not(.upload-btn) {
-    background: linear-gradient(45deg, #2196F3, #00BCD4);
-}
+        .restart-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-/* 庆祝粒子效果 */
-.celebration-particle {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: celebrate linear forwards;
-    z-index: 101;
-}
+        .restart-btn i {
+            font-size: 20px;
+        }
 
-@keyframes celebrate {
-    to {
-        transform: translate(var(--tx), var(--ty));
-        opacity: 0;
-    }
-}
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .upload-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        }
 
-@keyframes bounce {
-    to {
-        transform: translateY(-20px);
-    }
-}
+        .restart-btn:not(.upload-btn) {
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+        }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-/* 游戏结束消息样式 */
-.game-over-message {
-    margin: 15px 0;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    text-align: center;
-    font-weight: bold;
-    transition: opacity 0.5s;
-}
+        /* 庆祝粒子效果 */
+        .celebration-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: celebrate linear forwards;
+            z-index: 101;
+        }
 
-/* 当前胜利次数提示 */
-.win-count .current-win {
-    color: #4CAF50;
-    font-weight: bold;
-    margin-left: 5px;
-    animation: pulse 1s infinite;
-}
+        @keyframes celebrate {
+            to {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
 
-/* 胜利次数样式 */
-.win-count {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
 
-.history-wins {
-    color: white;
-}
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-}
+        @keyframes bounce {
+            to {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* 游戏结束消息样式 */
+        .game-over-message {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            transition: opacity 0.5s;
+        }
+
+        /* 当前胜利次数提示 */
+        .win-count .current-win {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-left: 5px;
+            animation: pulse 1s infinite;
+        }
+
+        /* 胜利次数样式 */
+        .win-count {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-wins {
+            color: white;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
         /* 战绩查询模态框 */
         .modal {
             display: none;
@@ -1482,80 +1510,80 @@
         .view-records-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(65, 105, 225, 0.5);
-        }               
+        }
     </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <body>
-        <button class="view-records-btn" id="view-records">
-            <i class="fas fa-trophy"></i> 战绩查询
-        </button>
-<!-- 数据统计模态框 -->
-<div id="game-stats-modal" class="modal">
-    <div class="modal-content" style="max-width: 700px;">
-        <div class="modal-header">
-            <h2 class="modal-title">本局详细数据统计</h2>
-            <button class="close-modal" data-modal="game-stats-modal">&times;</button>
-        </div>
-        <div class="stats-details" id="stats-details">
-            <!-- 数据统计内容会动态生成 -->
+    <button class="view-records-btn" id="view-records">
+        <i class="fas fa-trophy"></i> 战绩查询
+    </button>
+    <!-- 数据统计模态框 -->
+    <div id="game-stats-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 class="modal-title">本局详细数据统计</h2>
+                <button class="close-modal" data-modal="game-stats-modal">&times;</button>
+            </div>
+            <div class="stats-details" id="stats-details">
+                <!-- 数据统计内容会动态生成 -->
+            </div>
         </div>
     </div>
-</div>        
-        <!-- 战绩查询模态框 -->
-        <div id="records-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">排行榜 & 战绩查询</h2>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="search-box">
-                    <input type="text" id="search-username" placeholder="搜索用户名...">
-                    <button id="refresh-records"><i class="fas fa-sync-alt"></i> 刷新</button>
-                </div>
-                <div id="records-container"></div>
+    <!-- 战绩查询模态框 -->
+    <div id="records-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">排行榜 & 战绩查询</h2>
+                <button class="close-modal">&times;</button>
             </div>
+            <div class="search-box">
+                <input type="text" id="search-username" placeholder="搜索用户名...">
+                <button id="refresh-records"><i class="fas fa-sync-alt"></i> 刷新</button>
+            </div>
+            <div id="records-container"></div>
         </div>
-        <div class="homepage" id="homepage">
-            <div class="background-particles" id="particles"></div>
-        
-            <div class="enter-animation">
-                <h1 class="game-title">3D第一视角贪吃蛇大作战</h1>
-                <div class="subtitle">双人对战 · 3D视角 · 魔法技能 · 基地攻防</div>
-            </div>
-        
-            <div class="rules-container enter-animation delay-1">
-                <h2 class="rules-title">游戏规则</h2>
-                <div class="controls-section">
-                    <h3 class="controls-title">🎮 控制说明</h3>
-        
-                    <div class="control-keys">
-                        <div class="key-item p1">
-                            <h4>玩家1 (橙色)</h4>
-                            <div>移动: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span
-                                    class="key">D</span></div>
-                            <div>魔法球: <span class="key">1-5</span></div>
-                            <div>商店: <span class="key">E</span> 购买: <span class="key">R</span></div>
-                            <div>暂停: <span class="key">Q</span></div>
-                        </div>
-        
-                        <div class="key-item p2">
-                            <h4>玩家2 (蓝色)</h4>
-                            <div>移动: <span class="key">↑</span><span class="key">↓</span><span class="key">←</span><span
-                                    class="key">→</span></div>
-                            <div>魔法球: <span class="key">6-0</span></div>
-                            <div>商店: <span class="key">+</span> 购买: <span class="key">Enter</span></div>
-                            <div>暂停: <span class="key">/</span></div>
-                        </div>
+    </div>
+    <div class="homepage" id="homepage">
+        <div class="background-particles" id="particles"></div>
+
+        <div class="enter-animation">
+            <h1 class="game-title">3D第一视角贪吃蛇大作战</h1>
+            <div class="subtitle">双人对战 · 3D视角 · 魔法技能 · 基地攻防</div>
+        </div>
+
+        <div class="rules-container enter-animation delay-1">
+            <h2 class="rules-title">游戏规则</h2>
+            <div class="controls-section">
+                <h3 class="controls-title">🎮 控制说明</h3>
+
+                <div class="control-keys">
+                    <div class="key-item p1">
+                        <h4>玩家1 (橙色)</h4>
+                        <div>移动: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span
+                                class="key">D</span></div>
+                        <div>魔法球: <span class="key">1-5</span></div>
+                        <div>商店: <span class="key">E</span> 购买: <span class="key">R</span></div>
+                        <div>暂停: <span class="key">Q</span></div>
+                    </div>
+
+                    <div class="key-item p2">
+                        <h4>玩家2 (蓝色)</h4>
+                        <div>移动: <span class="key">↑</span><span class="key">↓</span><span class="key">←</span><span
+                                class="key">→</span></div>
+                        <div>魔法球: <span class="key">6-0</span></div>
+                        <div>商店: <span class="key">+</span> 购买: <span class="key">Enter</span></div>
+                        <div>暂停: <span class="key">/</span></div>
                     </div>
                 </div>
             </div>
-        
-            <button class="start-home-btn enter-animation delay-2" id="start-home-btn">
-                开始游戏
-            </button>
-        </div> 
+        </div>
+
+        <button class="start-home-btn enter-animation delay-2" id="start-home-btn">
+            开始游戏
+        </button>
+    </div>
     <div class="selection-overlay" id="selection-overlay" style="display: none;">
         <div class="selection-content">
             <!-- 玩家1选择 -->
@@ -1832,24 +1860,24 @@
                 renderer: null, // 玩家2的渲染器
                 paused: false,
                 stats: {
-                totalDistance: 0,
-                damageTaken: {
-                    wall: 0,
-                    snakeCollision: 0,
-                    bullet: 0,
-                    base: 0,
-                    lava: 0,
-                    bomb: 0,
-                    total: 0
-                },
-                damageDealt: {
-                    snakeCollision: 0,
-                    bullet: 0,
-                    bomb: 0,
-                    baseDamage: 0,
-                    total: 0
+                    totalDistance: 0,
+                    damageTaken: {
+                        wall: 0,
+                        snakeCollision: 0,
+                        bullet: 0,
+                        base: 0,
+                        lava: 0,
+                        bomb: 0,
+                        total: 0
+                    },
+                    damageDealt: {
+                        snakeCollision: 0,
+                        bullet: 0,
+                        bomb: 0,
+                        baseDamage: 0,
+                        total: 0
+                    }
                 }
-        }
             },
             magicBalls: [], // 地图上的魔法球
             food: [], // 食物
@@ -1884,19 +1912,19 @@
             normal: true,
             effects: [] // 确保 effects 数组存在
         };
-    gameState.player1 = {
-        // ... 其他属性 ...
-        lastDamageSource: null,      // 最后受到的伤害来源
-        lastDamageAmount: 0,         // 最后受到的伤害量
-        deathReason: null            // 死亡原因
-    };
+        gameState.player1 = {
+            // ... 其他属性 ...
+            lastDamageSource: null,      // 最后受到的伤害来源
+            lastDamageAmount: 0,         // 最后受到的伤害量
+            deathReason: null            // 死亡原因
+        };
 
-    gameState.player2 = {
-        // ... 其他属性 ...
-        lastDamageSource: null,
-        lastDamageAmount: 0,
-        deathReason: null
-    };
+        gameState.player2 = {
+            // ... 其他属性 ...
+            lastDamageSource: null,
+            lastDamageAmount: 0,
+            deathReason: null
+        };
         // 重置玩家2  
         gameState.player2.status = {
             normal: true,
@@ -1965,46 +1993,46 @@
         document.getElementById('player1-selection-title').textContent = player1Name + '选择蛇类型';
         document.getElementById('player2-selection-title').textContent = player2Name + '选择蛇类型';
         let homepageState = {
-                visible: true,
-                animationComplete: false
-            };
+            visible: true,
+            animationComplete: false
+        };
 
-            // 创建背景粒子效果
-            function createParticles() {
-                const particlesContainer = document.getElementById('particles');
-                if (!particlesContainer) return;
+        // 创建背景粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
 
-                particlesContainer.innerHTML = '';
+            particlesContainer.innerHTML = '';
 
-                // 创建100个粒子
-                for (let i = 0; i < 100; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
+            // 创建100个粒子
+            for (let i = 0; i < 100; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
 
-                    // 随机位置
-                    const left = Math.random() * 100;
-                    const top = Math.random() * 100;
+                // 随机位置
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
 
-                    // 随机大小和透明度
-                    const size = 1 + Math.random() * 3;
-                    const opacity = 0.2 + Math.random() * 0.5;
+                // 随机大小和透明度
+                const size = 1 + Math.random() * 3;
+                const opacity = 0.2 + Math.random() * 0.5;
 
-                    // 随机颜色（金色或蓝色系）
-                    const colors = [
-                        'rgba(255, 215, 0, {opacity})',    // 金色
-                        'rgba(255, 127, 0, {opacity})',    // 橙色
-                        'rgba(65, 105, 225, {opacity})',   // 蓝色
-                        'rgba(147, 112, 219, {opacity})'   // 紫色
-                    ];
-                    const color = colors[Math.floor(Math.random() * colors.length)]
-                        .replace('{opacity}', opacity);
+                // 随机颜色（金色或蓝色系）
+                const colors = [
+                    'rgba(255, 215, 0, {opacity})',    // 金色
+                    'rgba(255, 127, 0, {opacity})',    // 橙色
+                    'rgba(65, 105, 225, {opacity})',   // 蓝色
+                    'rgba(147, 112, 219, {opacity})'   // 紫色
+                ];
+                const color = colors[Math.floor(Math.random() * colors.length)]
+                    .replace('{opacity}', opacity);
 
-                    // 随机动画时长
-                    const duration = 10 + Math.random() * 20;
-                    const delay = Math.random() * 5;
+                // 随机动画时长
+                const duration = 10 + Math.random() * 20;
+                const delay = Math.random() * 5;
 
-                    // 设置样式
-                    particle.style.cssText = `
+                // 设置样式
+                particle.style.cssText = `
             left: ${left}%;
             top: ${top}%;
             width: ${size}px;
@@ -2014,67 +2042,67 @@
             animation-delay: ${delay}s;
         `;
 
-                    particlesContainer.appendChild(particle);
-                }
+                particlesContainer.appendChild(particle);
             }
+        }
 
-            // 主页进入动画
-            function playHomepageAnimation() {
-                const homepage = document.getElementById('homepage');
-                if (!homepage) return;
+        // 主页进入动画
+        function playHomepageAnimation() {
+            const homepage = document.getElementById('homepage');
+            if (!homepage) return;
 
-                // 创建粒子效果
-                createParticles();
+            // 创建粒子效果
+            createParticles();
 
-                // 添加动画类
-                const animatedElements = homepage.querySelectorAll('.enter-animation');
-                animatedElements.forEach((el, index) => {
-                    el.style.animationDelay = `${index * 0.2}s`;
-                });
+            // 添加动画类
+            const animatedElements = homepage.querySelectorAll('.enter-animation');
+            animatedElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
 
-                // 设置主页状态
-                homepageState.visible = true;
-                homepageState.animationComplete = true;
+            // 设置主页状态
+            homepageState.visible = true;
+            homepageState.animationComplete = true;
+        }
+
+        // 切换到选择界面
+        function goToSelectionScreen() {
+            console.log(player2Name);
+            let storedPlayer2Name = localStorage.getItem('player2_username');
+            if (!storedPlayer2Name) {
+                loginPlayer2();
             }
+            const homepage = document.getElementById('homepage');
+            const selectionOverlay = document.getElementById('selection-overlay');
 
-            // 切换到选择界面
-            function goToSelectionScreen() {
-                console.log(player2Name);
-                let storedPlayer2Name = localStorage.getItem('player2_username');
-                if(!storedPlayer2Name) {
-                    loginPlayer2();
-                }
-                const homepage = document.getElementById('homepage');
-                const selectionOverlay = document.getElementById('selection-overlay');
+            if (!homepage || !selectionOverlay) return;
 
-                if (!homepage || !selectionOverlay) return;
+            // 主页淡出动画
+            homepage.style.opacity = '1';
+            homepage.style.transition = 'opacity 0.8s ease-out';
 
-                // 主页淡出动画
-                homepage.style.opacity = '1';
-                homepage.style.transition = 'opacity 0.8s ease-out';
+            setTimeout(() => {
+                homepage.style.opacity = '0';
 
                 setTimeout(() => {
-                    homepage.style.opacity = '0';
+                    // 隐藏主页
+                    homepage.style.display = 'none';
+
+                    // 显示选择界面
+                    selectionOverlay.style.display = 'flex';
+                    selectionOverlay.style.opacity = '0';
+                    selectionOverlay.style.transition = 'opacity 0.8s ease-in';
 
                     setTimeout(() => {
-                        // 隐藏主页
-                        homepage.style.display = 'none';
+                        selectionOverlay.style.opacity = '1';
+                    }, 50);
 
-                        // 显示选择界面
-                        selectionOverlay.style.display = 'flex';
-                        selectionOverlay.style.opacity = '0';
-                        selectionOverlay.style.transition = 'opacity 0.8s ease-in';
-
-                        setTimeout(() => {
-                            selectionOverlay.style.opacity = '1';
-                        }, 50);
-
-                        // 更新状态
-                        homepageState.visible = false;
-                        gameState.selectionMode = true;
-                    }, 800);
-                }, 100);
-            }
+                    // 更新状态
+                    homepageState.visible = false;
+                    gameState.selectionMode = true;
+                }, 800);
+            }, 100);
+        }
 
         function selectSnakeType(playerKey, type) {
             const player = gameState[playerKey];
@@ -2131,65 +2159,65 @@
         }
 
         // 使用选择开始游戏
-    function startGameWithSelections() {
-        const selectionOverlay = document.getElementById('selection-overlay');
-        const gameContainer = document.getElementById('game-container');
+        function startGameWithSelections() {
+            const selectionOverlay = document.getElementById('selection-overlay');
+            const gameContainer = document.getElementById('game-container');
 
-        if (selectionOverlay) {
-            // 淡出选择界面
-                    // 确保获取当前选中的蛇类型
-            const player1Selected = selectionOverlay.querySelector('.player-selection:nth-child(1) .snake-option.active');
-            const player2Selected = selectionOverlay.querySelector('.player-selection:nth-child(2) .snake-option.active');
-            selectionOverlay.style.opacity = '0';
-            selectionOverlay.style.transition = 'opacity 0.5s ease-out';
-            if (player1Selected) {
-                const player1Type = player1Selected.dataset.type;
-                gameState.player1.type = player1Type;
-                document.getElementById('player1-type').textContent = 
-                    player1Type === 'speed' ? '速度蛇' :
-                    player1Type === 'hard' ? '坚硬蛇' : '魔法蛇';
-            }
-
-            if (player2Selected) {
-                const player2Type = player2Selected.dataset.type;
-                gameState.player2.type = player2Type;
-                document.getElementById('player2-type').textContent = 
-                    player2Type === 'speed' ? '速度蛇' :
-                    player2Type === 'hard' ? '坚硬蛇' : '魔法蛇';
-            }
-            setTimeout(() => {
-                selectionOverlay.style.display = 'none';
-
-                // 显示游戏容器
-                if (gameContainer) {
-                    gameContainer.style.display = 'block';
-                    gameContainer.style.opacity = '0';
-                    gameContainer.style.transition = 'opacity 0.5s ease-in';
-
-                    setTimeout(() => {
-                        gameContainer.style.opacity = '1';
-                    }, 50);
+            if (selectionOverlay) {
+                // 淡出选择界面
+                // 确保获取当前选中的蛇类型
+                const player1Selected = selectionOverlay.querySelector('.player-selection:nth-child(1) .snake-option.active');
+                const player2Selected = selectionOverlay.querySelector('.player-selection:nth-child(2) .snake-option.active');
+                selectionOverlay.style.opacity = '0';
+                selectionOverlay.style.transition = 'opacity 0.5s ease-out';
+                if (player1Selected) {
+                    const player1Type = player1Selected.dataset.type;
+                    gameState.player1.type = player1Type;
+                    document.getElementById('player1-type').textContent =
+                        player1Type === 'speed' ? '速度蛇' :
+                            player1Type === 'hard' ? '坚硬蛇' : '魔法蛇';
                 }
 
-                // 初始化游戏
-                initGame();
-
-                // 开始游戏
-                gameState.running = true;
-                const startBtn = document.getElementById('start-btn');
-                if (startBtn) {
-                    startBtn.textContent = '游戏中';
-                    startBtn.disabled = true;
-                    startBtn.style.display = 'none';
+                if (player2Selected) {
+                    const player2Type = player2Selected.dataset.type;
+                    gameState.player2.type = player2Type;
+                    document.getElementById('player2-type').textContent =
+                        player2Type === 'speed' ? '速度蛇' :
+                            player2Type === 'hard' ? '坚硬蛇' : '魔法蛇';
                 }
+                setTimeout(() => {
+                    selectionOverlay.style.display = 'none';
 
-                if (clock) clock.start();
+                    // 显示游戏容器
+                    if (gameContainer) {
+                        gameContainer.style.display = 'block';
+                        gameContainer.style.opacity = '0';
+                        gameContainer.style.transition = 'opacity 0.5s ease-in';
 
-                // 设置选择模式为false
-                gameState.selectionMode = false;
-            }, 500);
+                        setTimeout(() => {
+                            gameContainer.style.opacity = '1';
+                        }, 50);
+                    }
+
+                    // 初始化游戏
+                    initGame();
+
+                    // 开始游戏
+                    gameState.running = true;
+                    const startBtn = document.getElementById('start-btn');
+                    if (startBtn) {
+                        startBtn.textContent = '游戏中';
+                        startBtn.disabled = true;
+                        startBtn.style.display = 'none';
+                    }
+
+                    if (clock) clock.start();
+
+                    // 设置选择模式为false
+                    gameState.selectionMode = false;
+                }, 500);
+            }
         }
-    }
 
         // 隐藏不必要的UI元素
         function hideUnnecessaryUI() {
@@ -2207,67 +2235,67 @@
         }
 
         // 重新开始游戏（返回选择界面）
-    function resetToSelection() {
-        const gameContainer = document.getElementById('game-container');
-        const selectionOverlay = document.getElementById('selection-overlay');
+        function resetToSelection() {
+            const gameContainer = document.getElementById('game-container');
+            const selectionOverlay = document.getElementById('selection-overlay');
 
-        if (gameState.running) {
-            gameState.running = false;
-        }
-
-        // 淡出游戏容器
-        if (gameContainer) {
-            gameContainer.style.opacity = '0';
-            gameContainer.style.transition = 'opacity 0.5s ease-out';
-
-            setTimeout(() => {
-                gameContainer.style.display = 'none';
-
-                // 显示选择界面
-                if (selectionOverlay) {
-                    selectionOverlay.style.display = 'flex';
-                    selectionOverlay.style.opacity = '0';
-                    selectionOverlay.style.transition = 'opacity 0.5s ease-in';
-
-                    setTimeout(() => {
-                        selectionOverlay.style.opacity = '1';
-                    }, 50);
-                }
-
-                // 退出全屏模式
-                document.body.classList.remove('game-fullscreen');
-
-                // 恢复UI元素
-                const elementsToShow = [
-                    '.game-controls button'
-                ];
-
-                elementsToShow.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => {
-                        el.style.display = '';
-                    });
-                });
-
-                // 设置选择模式为true
-                gameState.selectionMode = true;
-            }, 500);
-        }
-    }
-    document.addEventListener('DOMContentLoaded', function () {
-        // 主页开始游戏按钮
-        const startHomeBtn = document.getElementById('start-home-btn');
-        if (startHomeBtn) {
-            startHomeBtn.addEventListener('click', goToSelectionScreen);
-        }
-
-        // 窗口大小改变时重新生成粒子
-        window.addEventListener('resize', function () {
-            if (homepageState.visible) {
-                createParticles();
+            if (gameState.running) {
+                gameState.running = false;
             }
+
+            // 淡出游戏容器
+            if (gameContainer) {
+                gameContainer.style.opacity = '0';
+                gameContainer.style.transition = 'opacity 0.5s ease-out';
+
+                setTimeout(() => {
+                    gameContainer.style.display = 'none';
+
+                    // 显示选择界面
+                    if (selectionOverlay) {
+                        selectionOverlay.style.display = 'flex';
+                        selectionOverlay.style.opacity = '0';
+                        selectionOverlay.style.transition = 'opacity 0.5s ease-in';
+
+                        setTimeout(() => {
+                            selectionOverlay.style.opacity = '1';
+                        }, 50);
+                    }
+
+                    // 退出全屏模式
+                    document.body.classList.remove('game-fullscreen');
+
+                    // 恢复UI元素
+                    const elementsToShow = [
+                        '.game-controls button'
+                    ];
+
+                    elementsToShow.forEach(selector => {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            el.style.display = '';
+                        });
+                    });
+
+                    // 设置选择模式为true
+                    gameState.selectionMode = true;
+                }, 500);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // 主页开始游戏按钮
+            const startHomeBtn = document.getElementById('start-home-btn');
+            if (startHomeBtn) {
+                startHomeBtn.addEventListener('click', goToSelectionScreen);
+            }
+
+            // 窗口大小改变时重新生成粒子
+            window.addEventListener('resize', function () {
+                if (homepageState.visible) {
+                    createParticles();
+                }
+            });
         });
-    });
         // 修改reset按钮事件
         resetButton.addEventListener('click', resetToSelection);
 
@@ -2347,469 +2375,469 @@
             gameState.scene.add(fillLight);
         }
 
-    // 创建环境
-    function createEnvironment() {
-        // 天空盒 - 移动到地图中心位置
-        const skyGeometry = new THREE.SphereGeometry(200, 32, 32); // 缩小半径以适应地图
-        const skyMaterial = new THREE.MeshBasicMaterial({
-            color: 0x87CEEB,
-            side: THREE.BackSide,
-            transparent: true,
-            opacity: 0.9
-        });
-        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+        // 创建环境
+        function createEnvironment() {
+            // 天空盒 - 移动到地图中心位置
+            const skyGeometry = new THREE.SphereGeometry(200, 32, 32); // 缩小半径以适应地图
+            const skyMaterial = new THREE.MeshBasicMaterial({
+                color: 0x87CEEB,
+                side: THREE.BackSide,
+                transparent: true,
+                opacity: 0.9
+            });
+            const sky = new THREE.Mesh(skyGeometry, skyMaterial);
 
-        // 将天空盒定位在地图中心，并略微提高
-        sky.position.set(0, 50, 0); // 提高Y轴位置
+            // 将天空盒定位在地图中心，并略微提高
+            sky.position.set(0, 50, 0); // 提高Y轴位置
 
-        gameState.scene.add(sky);
+            gameState.scene.add(sky);
 
-        // 创建地面
-        createGround();
-    }
+            // 创建地面
+            createGround();
+        }
 
-    // 创建自然平滑的草地地面
-    function createGround() {
-        // 创建地面组
-        const groundGroup = new THREE.Group();
+        // 创建自然平滑的草地地面
+        function createGround() {
+            // 创建地面组
+            const groundGroup = new THREE.Group();
 
-        // 地面尺寸
-        const groundSize = 300;
-        const tileSize = 6; // 减小平铺尺寸，让纹理更清晰
+            // 地面尺寸
+            const groundSize = 300;
+            const tileSize = 6; // 减小平铺尺寸，让纹理更清晰
 
-        // 创建Canvas纹理 - 自然草地（更亮）
-        const canvas = document.createElement('canvas');
-        canvas.width = 1024;
-        canvas.height = 1024;
-        const ctx = canvas.getContext('2d');
+            // 创建Canvas纹理 - 自然草地（更亮）
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
 
-        // === 创建更亮的自然草地渐变 ===
+            // === 创建更亮的自然草地渐变 ===
 
-        // 使用更明亮的绿色调
-        const greens = [
-            '#6B8E45', // 亮深绿
-            '#7CA057', // 橄榄绿
-            '#8DB869', // 青绿
-            '#9ECD7B', // 亮绿
-            '#AFE28D'  // 浅黄绿
-        ];
+            // 使用更明亮的绿色调
+            const greens = [
+                '#6B8E45', // 亮深绿
+                '#7CA057', // 橄榄绿
+                '#8DB869', // 青绿
+                '#9ECD7B', // 亮绿
+                '#AFE28D'  // 浅黄绿
+            ];
 
-        // 创建径向渐变模拟自然过渡
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
+            // 创建径向渐变模拟自然过渡
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
 
-        // 更亮的径向渐变
-        const mainGradient = ctx.createRadialGradient(
-            centerX, centerY, maxRadius * 0.3,
-            centerX, centerY, maxRadius
-        );
-        mainGradient.addColorStop(0, greens[3]); // 中心更亮
-        mainGradient.addColorStop(0.5, greens[2]); // 中间
-        mainGradient.addColorStop(1, greens[1]); // 边缘
-
-        ctx.fillStyle = mainGradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // === 添加明亮的草地纹理细节 ===
-
-        // 第一层：清晰的草叶纹理
-        ctx.globalAlpha = 0.25; // 增加透明度，让纹理更明显
-        for (let i = 0; i < 12000; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            const length = Math.random() * 6 + 2; // 更长的草叶
-            const angle = Math.random() * Math.PI;
-            const brightness = Math.random() * 40 + 30;
-
-            // 更亮的草叶颜色
-            ctx.strokeStyle = `rgb(${100 - brightness}, ${150 - brightness}, ${80 - brightness})`;
-            ctx.lineWidth = Math.random() * 1.2 + 0.3; // 更粗的线条
-
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(
-                x + Math.cos(angle) * length,
-                y + Math.sin(angle) * length
+            // 更亮的径向渐变
+            const mainGradient = ctx.createRadialGradient(
+                centerX, centerY, maxRadius * 0.3,
+                centerX, centerY, maxRadius
             );
-            ctx.stroke();
-        }
+            mainGradient.addColorStop(0, greens[3]); // 中心更亮
+            mainGradient.addColorStop(0.5, greens[2]); // 中间
+            mainGradient.addColorStop(1, greens[1]); // 边缘
 
-        // 第二层：明亮的草地点状细节
-        ctx.globalAlpha = 0.3; // 增加透明度
-        for (let i = 0; i < 6000; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            const size = Math.random() * 2 + 1; // 更大的点
+            ctx.fillStyle = mainGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 更明亮的绿色调
-            const greenVariation = Math.random() * 50;
-            ctx.fillStyle = `rgb(${80 - greenVariation}, ${130 - greenVariation}, ${70 - greenVariation})`;
+            // === 添加明亮的草地纹理细节 ===
 
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
+            // 第一层：清晰的草叶纹理
+            ctx.globalAlpha = 0.25; // 增加透明度，让纹理更明显
+            for (let i = 0; i < 12000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const length = Math.random() * 6 + 2; // 更长的草叶
+                const angle = Math.random() * Math.PI;
+                const brightness = Math.random() * 40 + 30;
 
-        // 第三层：明亮的阳光照射效果
-        ctx.globalAlpha = 0.15; // 增加阳光效果
-        ctx.fillStyle = '#E8F5A0'; // 更亮的黄绿色
-        for (let i = 0; i < 2000; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            const size = Math.random() * 4 + 2; // 更大的高光点
+                // 更亮的草叶颜色
+                ctx.strokeStyle = `rgb(${100 - brightness}, ${150 - brightness}, ${80 - brightness})`;
+                ctx.lineWidth = Math.random() * 1.2 + 0.3; // 更粗的线条
 
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // === 添加柔和的阴影效果 ===
-        ctx.globalAlpha = 0.06; // 更淡的阴影
-        ctx.fillStyle = '#3E5527'; // 稍亮的阴影色
-
-        // 创建柔和的阴影区域
-        for (let i = 0; i < 12; i++) {
-            const centerX = Math.random() * canvas.width;
-            const centerY = Math.random() * canvas.height;
-            const radius = Math.random() * 60 + 40;
-
-            // 创建柔和的圆形阴影
-            const shadowGradient = ctx.createRadialGradient(
-                centerX, centerY, 0,
-                centerX, centerY, radius
-            );
-            shadowGradient.addColorStop(0, 'rgba(62, 85, 39, 0.4)');
-            shadowGradient.addColorStop(1, 'rgba(62, 85, 39, 0)');
-
-            ctx.fillStyle = shadowGradient;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // 创建纹理
-        const groundTexture = new THREE.CanvasTexture(canvas);
-        groundTexture.wrapS = THREE.RepeatWrapping;
-        groundTexture.wrapT = THREE.RepeatWrapping;
-        groundTexture.repeat.set(groundSize / tileSize, groundSize / tileSize);
-        groundTexture.anisotropy = 16;
-        groundTexture.needsUpdate = true;
-
-        // === 创建地面几何体 ===
-        const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
-
-        // 轻微的法线变化（保持视觉平滑，实际无起伏）
-        const positions = groundGeometry.attributes.position;
-        for (let i = 0; i < positions.count; i++) {
-            const x = positions.getX(i);
-            const y = positions.getY(i);
-
-            // 轻微的海拔变化（几乎不可见，只影响光照）
-            const noise = (Math.sin(x * 0.015) * Math.sin(y * 0.015)) * 0.03;
-            positions.setZ(i, noise);
-        }
-        groundGeometry.computeVertexNormals(); // 重新计算法线
-
-        // 创建更明亮的地面材质
-        const groundMaterial = new THREE.MeshStandardMaterial({
-            map: groundTexture,
-            color: 0x7CA057, // 更亮的基色
-            roughness: 0.8, // 减少粗糙度，增加光泽
-            metalness: 0.05,
-            side: THREE.DoubleSide,
-            displacementScale: 0, // 确保无实际起伏
-            emissive: 0x334422, // 微弱的自发光
-            emissiveIntensity: 0.1
-        });
-
-        // 创建地面网格
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = 0;
-        ground.receiveShadow = true;
-
-        groundGroup.add(ground);
-
-        // === 创建更明显的草地 ===
-        createGrassPatches(groundGroup);
-
-        // 将地面组添加到场景
-        gameState.scene.add(groundGroup);
-        createMapBoundaries() 
-        return groundGroup;
-        
-    }
-
-    // 创建明显的小草
-    function createGrassPatches(groundGroup) {
-        const grassGroup = new THREE.Group();
-        grassGroup.name = 'grass';
-
-        // 小草变体数量
-        const grassVariants = 4; // 增加变体
-
-        // 预创建小草几何体变体（更大的尺寸）
-        const grassGeometries = [];
-        for (let v = 0; v < grassVariants; v++) {
-            const geometry = new THREE.BufferGeometry();
-
-            // 每个小草4-8片叶子（更多叶子）
-            const leafCount = 4 + Math.floor(Math.random() * 5);
-            const vertices = [];
-
-            for (let i = 0; i < leafCount; i++) {
-                // 叶茎底部（地面位置）
-                const baseX = 0;
-                const baseY = 0;
-                const baseZ = 0;
-
-                // 叶茎顶部（更大、更明显）
-                const height = 1.2 + Math.random() * 1.0; // 更高的草
-                const bend = Math.random() * 0.5 - 0.25; // 更大的弯曲
-                const topX = baseX + bend;
-                const topY = baseY + height;
-                const topZ = baseZ + bend;
-
-                // 叶片宽度（更宽）
-                const leafWidth = 0.3 + Math.random() * 0.3;
-
-                // 创建更宽的三角形表示叶片
-                vertices.push(
-                    baseX - leafWidth / 2, baseY, baseZ,
-                    topX, topY, topZ,
-                    baseX + leafWidth / 2, baseY, baseZ
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x + Math.cos(angle) * length,
+                    y + Math.sin(angle) * length
                 );
-
-                // 可选：添加第二个三角形让叶片更完整
-                if (Math.random() > 0.5) {
-                    vertices.push(
-                        topX, topY, topZ,
-                        topX + (Math.random() - 0.5) * leafWidth,
-                        topY * 0.7,
-                        topZ + (Math.random() - 0.5) * leafWidth,
-                        baseX + leafWidth / 2, baseY, baseZ
-                    );
-                }
+                ctx.stroke();
             }
 
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            // 第二层：明亮的草地点状细节
+            ctx.globalAlpha = 0.3; // 增加透明度
+            for (let i = 0; i < 6000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 2 + 1; // 更大的点
 
-            // 计算法线用于光照
-            geometry.computeVertexNormals();
-            grassGeometries.push(geometry);
+                // 更明亮的绿色调
+                const greenVariation = Math.random() * 50;
+                ctx.fillStyle = `rgb(${80 - greenVariation}, ${130 - greenVariation}, ${70 - greenVariation})`;
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 第三层：明亮的阳光照射效果
+            ctx.globalAlpha = 0.15; // 增加阳光效果
+            ctx.fillStyle = '#E8F5A0'; // 更亮的黄绿色
+            for (let i = 0; i < 2000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 4 + 2; // 更大的高光点
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // === 添加柔和的阴影效果 ===
+            ctx.globalAlpha = 0.06; // 更淡的阴影
+            ctx.fillStyle = '#3E5527'; // 稍亮的阴影色
+
+            // 创建柔和的阴影区域
+            for (let i = 0; i < 12; i++) {
+                const centerX = Math.random() * canvas.width;
+                const centerY = Math.random() * canvas.height;
+                const radius = Math.random() * 60 + 40;
+
+                // 创建柔和的圆形阴影
+                const shadowGradient = ctx.createRadialGradient(
+                    centerX, centerY, 0,
+                    centerX, centerY, radius
+                );
+                shadowGradient.addColorStop(0, 'rgba(62, 85, 39, 0.4)');
+                shadowGradient.addColorStop(1, 'rgba(62, 85, 39, 0)');
+
+                ctx.fillStyle = shadowGradient;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 创建纹理
+            const groundTexture = new THREE.CanvasTexture(canvas);
+            groundTexture.wrapS = THREE.RepeatWrapping;
+            groundTexture.wrapT = THREE.RepeatWrapping;
+            groundTexture.repeat.set(groundSize / tileSize, groundSize / tileSize);
+            groundTexture.anisotropy = 16;
+            groundTexture.needsUpdate = true;
+
+            // === 创建地面几何体 ===
+            const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
+
+            // 轻微的法线变化（保持视觉平滑，实际无起伏）
+            const positions = groundGeometry.attributes.position;
+            for (let i = 0; i < positions.count; i++) {
+                const x = positions.getX(i);
+                const y = positions.getY(i);
+
+                // 轻微的海拔变化（几乎不可见，只影响光照）
+                const noise = (Math.sin(x * 0.015) * Math.sin(y * 0.015)) * 0.03;
+                positions.setZ(i, noise);
+            }
+            groundGeometry.computeVertexNormals(); // 重新计算法线
+
+            // 创建更明亮的地面材质
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                map: groundTexture,
+                color: 0x7CA057, // 更亮的基色
+                roughness: 0.8, // 减少粗糙度，增加光泽
+                metalness: 0.05,
+                side: THREE.DoubleSide,
+                displacementScale: 0, // 确保无实际起伏
+                emissive: 0x334422, // 微弱的自发光
+                emissiveIntensity: 0.1
+            });
+
+            // 创建地面网格
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = 0;
+            ground.receiveShadow = true;
+
+            groundGroup.add(ground);
+
+            // === 创建更明显的草地 ===
+            createGrassPatches(groundGroup);
+
+            // 将地面组添加到场景
+            gameState.scene.add(groundGroup);
+            createMapBoundaries()
+            return groundGroup;
+
         }
 
-        // 小草材质（更明显，不透明）
-        const grassMaterial = new THREE.MeshStandardMaterial({
-            color: 0x8FBC8F,
-            roughness: 0.9,
-            metalness: 0.1,
-            transparent: false, // 改为不透明，更明显
-            opacity: 1.0,
-            side: THREE.DoubleSide
-        });
+        // 创建明显的小草
+        function createGrassPatches(groundGroup) {
+            const grassGroup = new THREE.Group();
+            grassGroup.name = 'grass';
 
-        // 创建大量小草（稍少但更大的草）
-        const grassCount = 1500; // 减少数量，但每个更大
+            // 小草变体数量
+            const grassVariants = 4; // 增加变体
 
-        for (let i = 0; i < grassCount; i++) {
-            // 随机位置（避免道路区域）
-            let x, z;
-            do {
-                x = Math.random() * 280 - 140; // 留出边缘
-                z = Math.random() * 280 - 140;
-            } while (Math.abs(x) < 40 && Math.abs(z) < 40); // 避开中心区域
+            // 预创建小草几何体变体（更大的尺寸）
+            const grassGeometries = [];
+            for (let v = 0; v < grassVariants; v++) {
+                const geometry = new THREE.BufferGeometry();
 
-            // 随机选择小草变体
-            const variant = Math.floor(Math.random() * grassVariants);
-            const grassMesh = new THREE.Mesh(grassGeometries[variant], grassMaterial.clone());
+                // 每个小草4-8片叶子（更多叶子）
+                const leafCount = 4 + Math.floor(Math.random() * 5);
+                const vertices = [];
 
-            // 更大的变换
-            grassMesh.position.set(x, 0.1, z); // 略高于地面
-            grassMesh.rotation.y = Math.random() * Math.PI * 2; // 随机旋转
-            const scale = 1.2 + Math.random() * 0.8; // 更大的尺寸
-            grassMesh.scale.setScalar(scale);
+                for (let i = 0; i < leafCount; i++) {
+                    // 叶茎底部（地面位置）
+                    const baseX = 0;
+                    const baseY = 0;
+                    const baseZ = 0;
 
-            // 更丰富的颜色变化
-            const hueShift = Math.random() * 0.2 - 0.1;
-            grassMesh.material.color = new THREE.Color().setHSL(
-                0.3 + hueShift, // 绿色色调
-                0.6 + Math.random() * 0.3, // 饱和度
-                0.5 + Math.random() * 0.3  // 亮度
-            );
+                    // 叶茎顶部（更大、更明显）
+                    const height = 1.2 + Math.random() * 1.0; // 更高的草
+                    const bend = Math.random() * 0.5 - 0.25; // 更大的弯曲
+                    const topX = baseX + bend;
+                    const topY = baseY + height;
+                    const topZ = baseZ + bend;
 
-            // 投射阴影，更真实
-            grassMesh.castShadow = true;
-            grassMesh.receiveShadow = true;
+                    // 叶片宽度（更宽）
+                    const leafWidth = 0.3 + Math.random() * 0.3;
 
-            grassGroup.add(grassMesh);
-        }
+                    // 创建更宽的三角形表示叶片
+                    vertices.push(
+                        baseX - leafWidth / 2, baseY, baseZ,
+                        topX, topY, topZ,
+                        baseX + leafWidth / 2, baseY, baseZ
+                    );
 
-        // 创建明显的小草集群
-        for (let cluster = 0; cluster < 8; cluster++) {
-            const clusterX = Math.random() * 200 - 100;
-            const clusterZ = Math.random() * 200 - 100;
-            const clusterSize = Math.random() * 40 + 30;
-            const clusterCount = 80 + Math.floor(Math.random() * 80);
+                    // 可选：添加第二个三角形让叶片更完整
+                    if (Math.random() > 0.5) {
+                        vertices.push(
+                            topX, topY, topZ,
+                            topX + (Math.random() - 0.5) * leafWidth,
+                            topY * 0.7,
+                            topZ + (Math.random() - 0.5) * leafWidth,
+                            baseX + leafWidth / 2, baseY, baseZ
+                        );
+                    }
+                }
 
-            for (let i = 0; i < clusterCount; i++) {
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+                // 计算法线用于光照
+                geometry.computeVertexNormals();
+                grassGeometries.push(geometry);
+            }
+
+            // 小草材质（更明显，不透明）
+            const grassMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8FBC8F,
+                roughness: 0.9,
+                metalness: 0.1,
+                transparent: false, // 改为不透明，更明显
+                opacity: 1.0,
+                side: THREE.DoubleSide
+            });
+
+            // 创建大量小草（稍少但更大的草）
+            const grassCount = 1500; // 减少数量，但每个更大
+
+            for (let i = 0; i < grassCount; i++) {
+                // 随机位置（避免道路区域）
+                let x, z;
+                do {
+                    x = Math.random() * 280 - 140; // 留出边缘
+                    z = Math.random() * 280 - 140;
+                } while (Math.abs(x) < 40 && Math.abs(z) < 40); // 避开中心区域
+
+                // 随机选择小草变体
                 const variant = Math.floor(Math.random() * grassVariants);
                 const grassMesh = new THREE.Mesh(grassGeometries[variant], grassMaterial.clone());
 
-                // 在集群范围内随机分布
-                const x = clusterX + (Math.random() - 0.5) * clusterSize;
-                const z = clusterZ + (Math.random() - 0.5) * clusterSize;
-
-                // 集群中的草更高
-                const scale = 1.4 + Math.random() * 1.0;
-
-                grassMesh.position.set(x, 0.1, z);
-                grassMesh.rotation.y = Math.random() * Math.PI * 2;
+                // 更大的变换
+                grassMesh.position.set(x, 0.1, z); // 略高于地面
+                grassMesh.rotation.y = Math.random() * Math.PI * 2; // 随机旋转
+                const scale = 1.2 + Math.random() * 0.8; // 更大的尺寸
                 grassMesh.scale.setScalar(scale);
 
-                // 集群中颜色更深
+                // 更丰富的颜色变化
+                const hueShift = Math.random() * 0.2 - 0.1;
                 grassMesh.material.color = new THREE.Color().setHSL(
-                    0.25 + Math.random() * 0.1,
-                    0.7 + Math.random() * 0.2,
-                    0.4 + Math.random() * 0.2
+                    0.3 + hueShift, // 绿色色调
+                    0.6 + Math.random() * 0.3, // 饱和度
+                    0.5 + Math.random() * 0.3  // 亮度
                 );
 
+                // 投射阴影，更真实
                 grassMesh.castShadow = true;
                 grassMesh.receiveShadow = true;
 
                 grassGroup.add(grassMesh);
             }
+
+            // 创建明显的小草集群
+            for (let cluster = 0; cluster < 8; cluster++) {
+                const clusterX = Math.random() * 200 - 100;
+                const clusterZ = Math.random() * 200 - 100;
+                const clusterSize = Math.random() * 40 + 30;
+                const clusterCount = 80 + Math.floor(Math.random() * 80);
+
+                for (let i = 0; i < clusterCount; i++) {
+                    const variant = Math.floor(Math.random() * grassVariants);
+                    const grassMesh = new THREE.Mesh(grassGeometries[variant], grassMaterial.clone());
+
+                    // 在集群范围内随机分布
+                    const x = clusterX + (Math.random() - 0.5) * clusterSize;
+                    const z = clusterZ + (Math.random() - 0.5) * clusterSize;
+
+                    // 集群中的草更高
+                    const scale = 1.4 + Math.random() * 1.0;
+
+                    grassMesh.position.set(x, 0.1, z);
+                    grassMesh.rotation.y = Math.random() * Math.PI * 2;
+                    grassMesh.scale.setScalar(scale);
+
+                    // 集群中颜色更深
+                    grassMesh.material.color = new THREE.Color().setHSL(
+                        0.25 + Math.random() * 0.1,
+                        0.7 + Math.random() * 0.2,
+                        0.4 + Math.random() * 0.2
+                    );
+
+                    grassMesh.castShadow = true;
+                    grassMesh.receiveShadow = true;
+
+                    grassGroup.add(grassMesh);
+                }
+            }
+
+            // 创建明显的野花点缀
+            createWildflowers(grassGroup);
+
+            groundGroup.add(grassGroup);
         }
 
         // 创建明显的野花点缀
-        createWildflowers(grassGroup);
+        function createWildflowers(grassGroup) {
+            const flowerCount = 250; // 野花数量
 
-        groundGroup.add(grassGroup);
-    }
+            // 预创建几种花类型
+            const flowerTypes = [
+                {
+                    name: 'daisy',
+                    centerColor: 0xFFD700, // 黄色花蕊
+                    petalColor: 0xFFFFFF,  // 白色花瓣
+                    size: 1.5
+                },
+                {
+                    name: 'poppy',
+                    centerColor: 0x000000, // 黑色花蕊
+                    petalColor: 0xFF4500,  // 红色花瓣
+                    size: 1.8
+                },
+                {
+                    name: 'violet',
+                    centerColor: 0xFFD700, // 黄色花蕊
+                    petalColor: 0xEE82EE,  // 紫色花瓣
+                    size: 1.3
+                },
+                {
+                    name: 'sunflower',
+                    centerColor: 0x8B4513, // 棕色花蕊
+                    petalColor: 0xFFD700,  // 黄色花瓣
+                    size: 2.0
+                }
+            ];
 
-    // 创建明显的野花点缀
-    function createWildflowers(grassGroup) {
-        const flowerCount = 250; // 野花数量
+            for (let i = 0; i < flowerCount; i++) {
+                // 随机位置
+                const x = Math.random() * 280 - 140;
+                const z = Math.random() * 280 - 140;
 
-        // 预创建几种花类型
-        const flowerTypes = [
-            {
-                name: 'daisy',
-                centerColor: 0xFFD700, // 黄色花蕊
-                petalColor: 0xFFFFFF,  // 白色花瓣
-                size: 1.5
-            },
-            {
-                name: 'poppy',
-                centerColor: 0x000000, // 黑色花蕊
-                petalColor: 0xFF4500,  // 红色花瓣
-                size: 1.8
-            },
-            {
-                name: 'violet',
-                centerColor: 0xFFD700, // 黄色花蕊
-                petalColor: 0xEE82EE,  // 紫色花瓣
-                size: 1.3
-            },
-            {
-                name: 'sunflower',
-                centerColor: 0x8B4513, // 棕色花蕊
-                petalColor: 0xFFD700,  // 黄色花瓣
-                size: 2.0
-            }
-        ];
+                // 随机选择花类型
+                const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
 
-        for (let i = 0; i < flowerCount; i++) {
-            // 随机位置
-            const x = Math.random() * 280 - 140;
-            const z = Math.random() * 280 - 140;
+                // 创建花朵组
+                const flowerGroup = new THREE.Group();
 
-            // 随机选择花类型
-            const flowerType = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+                // 花蕊（更大）
+                const centerGeometry = new THREE.SphereGeometry(0.4, 12, 12);
+                const centerMaterial = new THREE.MeshBasicMaterial({
+                    color: flowerType.centerColor
+                });
+                const center = new THREE.Mesh(centerGeometry, centerMaterial);
+                flowerGroup.add(center);
 
-            // 创建花朵组
-            const flowerGroup = new THREE.Group();
+                // 花瓣（更大更多）
+                const petalCount = 6 + Math.floor(Math.random() * 6); // 6-11片花瓣
 
-            // 花蕊（更大）
-            const centerGeometry = new THREE.SphereGeometry(0.4, 12, 12);
-            const centerMaterial = new THREE.MeshBasicMaterial({
-                color: flowerType.centerColor
-            });
-            const center = new THREE.Mesh(centerGeometry, centerMaterial);
-            flowerGroup.add(center);
+                for (let p = 0; p < petalCount; p++) {
+                    // 使用锥形或平面几何体
+                    let petalGeometry;
+                    if (Math.random() > 0.5) {
+                        petalGeometry = new THREE.ConeGeometry(0.6, 0.8, 8);
+                    } else {
+                        petalGeometry = new THREE.PlaneGeometry(0.8, 0.6);
+                    }
 
-            // 花瓣（更大更多）
-            const petalCount = 6 + Math.floor(Math.random() * 6); // 6-11片花瓣
+                    const petalMaterial = new THREE.MeshBasicMaterial({
+                        color: flowerType.petalColor,
+                        transparent: true,
+                        opacity: 0.9,
+                        side: THREE.DoubleSide
+                    });
 
-            for (let p = 0; p < petalCount; p++) {
-                // 使用锥形或平面几何体
-                let petalGeometry;
-                if (Math.random() > 0.5) {
-                    petalGeometry = new THREE.ConeGeometry(0.6, 0.8, 8);
-                } else {
-                    petalGeometry = new THREE.PlaneGeometry(0.8, 0.6);
+                    const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+
+                    // 花瓣围绕花蕊排列
+                    const angle = (p / petalCount) * Math.PI * 2;
+                    const distance = 0.8; // 离中心更远
+
+                    petal.position.x = Math.cos(angle) * distance;
+                    petal.position.z = Math.sin(angle) * distance;
+                    petal.position.y = 0.2; // 稍微抬高
+
+                    // 花瓣朝向花蕊
+                    petal.lookAt(0, 0, 0);
+
+                    // 随机旋转增加自然感
+                    petal.rotation.y += Math.random() * 0.5 - 0.25;
+
+                    flowerGroup.add(petal);
                 }
 
-                const petalMaterial = new THREE.MeshBasicMaterial({
-                    color: flowerType.petalColor,
-                    transparent: true,
-                    opacity: 0.9,
-                    side: THREE.DoubleSide
+                // 花茎（更粗更高）
+                const stemGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 6);
+                const stemMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x458B00
                 });
 
-                const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+                const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+                stem.position.y = -0.6; // 茎的中间位置
 
-                // 花瓣围绕花蕊排列
-                const angle = (p / petalCount) * Math.PI * 2;
-                const distance = 0.8; // 离中心更远
+                flowerGroup.add(stem);
 
-                petal.position.x = Math.cos(angle) * distance;
-                petal.position.z = Math.sin(angle) * distance;
-                petal.position.y = 0.2; // 稍微抬高
+                // 设置花的位置和大小
+                flowerGroup.position.set(x, 0.1, z);
+                flowerGroup.scale.setScalar(flowerType.size);
 
-                // 花瓣朝向花蕊
-                petal.lookAt(0, 0, 0);
+                // 随机旋转
+                flowerGroup.rotation.y = Math.random() * Math.PI * 2;
 
-                // 随机旋转增加自然感
-                petal.rotation.y += Math.random() * 0.5 - 0.25;
+                // 轻微随机倾斜，更自然
+                flowerGroup.rotation.x = Math.random() * 0.2 - 0.1;
+                flowerGroup.rotation.z = Math.random() * 0.2 - 0.1;
 
-                flowerGroup.add(petal);
+                // 投射阴影
+                flowerGroup.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                grassGroup.add(flowerGroup);
             }
-
-            // 花茎（更粗更高）
-            const stemGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 6);
-            const stemMaterial = new THREE.MeshBasicMaterial({
-                color: 0x458B00
-            });
-
-            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
-            stem.position.y = -0.6; // 茎的中间位置
-
-            flowerGroup.add(stem);
-
-            // 设置花的位置和大小
-            flowerGroup.position.set(x, 0.1, z);
-            flowerGroup.scale.setScalar(flowerType.size);
-
-            // 随机旋转
-            flowerGroup.rotation.y = Math.random() * Math.PI * 2;
-
-            // 轻微随机倾斜，更自然
-            flowerGroup.rotation.x = Math.random() * 0.2 - 0.1;
-            flowerGroup.rotation.z = Math.random() * 0.2 - 0.1;
-
-            // 投射阴影
-            flowerGroup.traverse((child) => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
-
-            grassGroup.add(flowerGroup);
         }
-    }
 
         // 创建地图边界线
         function createMapBoundaries() {
@@ -2843,53 +2871,53 @@
 
         }
 
-            function initGame() {
-                // 清除场景
-                clearScene();
-                hideUnnecessaryUI();
+        function initGame() {
+            // 清除场景
+            clearScene();
+            hideUnnecessaryUI();
 
-                // 重置游戏状态
-                resetGameState();
+            // 重置游戏状态
+            resetGameState();
 
-                // 重置游戏统计
-                gameStats = {
-                    startTime: performance.now(),
-                    endTime: 0,
-                    deathCauses: {
-                        player1: null,
-                        player2: null
-                    }
-                };
+            // 重置游戏统计
+            gameStats = {
+                startTime: performance.now(),
+                endTime: 0,
+                deathCauses: {
+                    player1: null,
+                    player2: null
+                }
+            };
 
-                // 根据地图类型创建环境
-                createMapEnvironment();
+            // 根据地图类型创建环境
+            createMapEnvironment();
 
-                // 创建基地
-                createBases();
+            // 创建基地
+            createBases();
 
-                // 创建蛇
-                createSnakes();
+            // 创建蛇
+            createSnakes();
 
-                // 生成食物
-                generateFood();
+            // 生成食物
+            generateFood();
 
-                // 生成魔法球
-                generateMagicBalls();
+            // 生成魔法球
+            generateMagicBalls();
 
-                // 更新相机初始位置
-                updateCameras();
+            // 更新相机初始位置
+            updateCameras();
 
-                // 更新UI
-                updateUI();
-                clock = new THREE.Clock();
+            // 更新UI
+            updateUI();
+            clock = new THREE.Clock();
 
-                // 隐藏商店和游戏结束界面
-                shop1Overlay.style.display = 'none';
-                shop2Overlay.style.display = 'none';
-                gameOverScreen.style.display = 'none';
-            }
-                    // 战绩查询相关函数
-                        document.getElementById('view-records').addEventListener('click', showAllRecords);
+            // 隐藏商店和游戏结束界面
+            shop1Overlay.style.display = 'none';
+            shop2Overlay.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+        }
+        // 战绩查询相关函数
+        document.getElementById('view-records').addEventListener('click', showAllRecords);
         // 清除场景
         function clearScene() {
             // 移除所有游戏对象
@@ -2912,153 +2940,153 @@
         }
 
         // 重置游戏状态
-    function resetGameState() {
-        gameState.running = false;
-        gameState.paused = false;
-        gameState.gameTime = 0;
+        function resetGameState() {
+            gameState.running = false;
+            gameState.paused = false;
+            gameState.gameTime = 0;
 
-        // 重置玩家1 - 保留蛇类型，只重置状态
-        gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
-        gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
-        gameState.player1.shield = 0;
-        gameState.player1.score = 0;
-        gameState.player1.magicBalls = [];
-        gameState.player1.isInvincible = false;
-        gameState.player1.isReversed = false;
-        gameState.player1.isAttacking = false;
-        gameState.player1.invincibleTime = 0;
-        gameState.player1.reversedTime = 0;
-        gameState.player1.attackTime = 0;
-        gameState.player1.speedMultiplier = 1;
-        gameState.player1.hardUpgrades = 0;
-        gameState.player1.magicUpgrades = 0;
-        gameState.player1.segments = [];
-        gameState.player1.baseHp = 50;
-        gameState.player1.position = { x: -80, y: 1.5, z: -80 };
-        gameState.player1.direction = { x: 1, y: 0, z: 0 };
-        gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
-        gameState.player1.rotationAngle = 0;
-        gameState.player1.paused = false;
+            // 重置玩家1 - 保留蛇类型，只重置状态
+            gameState.player1.hp = gameState.player1.type === 'hard' ? 15 : 10;
+            gameState.player1.maxHp = gameState.player1.type === 'hard' ? 15 : 10;
+            gameState.player1.shield = 0;
+            gameState.player1.score = 0;
+            gameState.player1.magicBalls = [];
+            gameState.player1.isInvincible = false;
+            gameState.player1.isReversed = false;
+            gameState.player1.isAttacking = false;
+            gameState.player1.invincibleTime = 0;
+            gameState.player1.reversedTime = 0;
+            gameState.player1.attackTime = 0;
+            gameState.player1.speedMultiplier = 1;
+            gameState.player1.hardUpgrades = 0;
+            gameState.player1.magicUpgrades = 0;
+            gameState.player1.segments = [];
+            gameState.player1.baseHp = 50;
+            gameState.player1.position = { x: -80, y: 1.5, z: -80 };
+            gameState.player1.direction = { x: 1, y: 0, z: 0 };
+            gameState.player1.targetDirection = { x: 1, y: 0, z: 0 };
+            gameState.player1.rotationAngle = 0;
+            gameState.player1.paused = false;
 
-        // 死亡原因相关字段 - 确保不会覆盖类型
-        if (!gameState.player1.lastDamageSource) gameState.player1.lastDamageSource = null;
-        if (!gameState.player1.lastDamageAmount) gameState.player1.lastDamageAmount = 0;
-        if (!gameState.player1.deathReason) gameState.player1.deathReason = null;
+            // 死亡原因相关字段 - 确保不会覆盖类型
+            if (!gameState.player1.lastDamageSource) gameState.player1.lastDamageSource = null;
+            if (!gameState.player1.lastDamageAmount) gameState.player1.lastDamageAmount = 0;
+            if (!gameState.player1.deathReason) gameState.player1.deathReason = null;
 
-        // 统计字段 - 确保不会覆盖类型
-        if (!gameState.player1.stats) {
-            gameState.player1.stats = {
-                totalDistance: 0,
-                damageTaken: {
-                    wall: 0,
-                    snakeCollision: 0,
-                    bullet: 0,
-                    base: 0,
-                    lava: 0,
-                    bomb: 0,
-                    total: 0
-                },
-                damageDealt: {
-                    snakeCollision: 0,
-                    bullet: 0,
-                    bomb: 0,
-                    baseDamage: 0,
-                    total: 0
-                }
-            };
-        } else {
-            // 重置统计但不覆盖整个对象
-            gameState.player1.stats.totalDistance = 0;
-            gameState.player1.stats.damageTaken.wall = 0;
-            gameState.player1.stats.damageTaken.snakeCollision = 0;
-            gameState.player1.stats.damageTaken.bullet = 0;
-            gameState.player1.stats.damageTaken.base = 0;
-            gameState.player1.stats.damageTaken.lava = 0;
-            gameState.player1.stats.damageTaken.bomb = 0;
-            gameState.player1.stats.damageTaken.total = 0;
-            gameState.player1.stats.damageDealt.snakeCollision = 0;
-            gameState.player1.stats.damageDealt.bullet = 0;
-            gameState.player1.stats.damageDealt.bomb = 0;
-            gameState.player1.stats.damageDealt.baseDamage = 0;
-            gameState.player1.stats.damageDealt.total = 0;
+            // 统计字段 - 确保不会覆盖类型
+            if (!gameState.player1.stats) {
+                gameState.player1.stats = {
+                    totalDistance: 0,
+                    damageTaken: {
+                        wall: 0,
+                        snakeCollision: 0,
+                        bullet: 0,
+                        base: 0,
+                        lava: 0,
+                        bomb: 0,
+                        total: 0
+                    },
+                    damageDealt: {
+                        snakeCollision: 0,
+                        bullet: 0,
+                        bomb: 0,
+                        baseDamage: 0,
+                        total: 0
+                    }
+                };
+            } else {
+                // 重置统计但不覆盖整个对象
+                gameState.player1.stats.totalDistance = 0;
+                gameState.player1.stats.damageTaken.wall = 0;
+                gameState.player1.stats.damageTaken.snakeCollision = 0;
+                gameState.player1.stats.damageTaken.bullet = 0;
+                gameState.player1.stats.damageTaken.base = 0;
+                gameState.player1.stats.damageTaken.lava = 0;
+                gameState.player1.stats.damageTaken.bomb = 0;
+                gameState.player1.stats.damageTaken.total = 0;
+                gameState.player1.stats.damageDealt.snakeCollision = 0;
+                gameState.player1.stats.damageDealt.bullet = 0;
+                gameState.player1.stats.damageDealt.bomb = 0;
+                gameState.player1.stats.damageDealt.baseDamage = 0;
+                gameState.player1.stats.damageDealt.total = 0;
+            }
+
+            // 重置玩家2 - 同样保留蛇类型
+            gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
+            gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;
+            gameState.player2.shield = 0;
+            gameState.player2.score = 0;
+            gameState.player2.magicBalls = [];
+            gameState.player2.isInvincible = false;
+            gameState.player2.isReversed = false;
+            gameState.player2.isAttacking = false;
+            gameState.player2.invincibleTime = 0;
+            gameState.player2.reversedTime = 0;
+            gameState.player2.attackTime = 0;
+            gameState.player2.speedMultiplier = 1;
+            gameState.player2.hardUpgrades = 0;
+            gameState.player2.magicUpgrades = 0;
+            gameState.player2.segments = [];
+            gameState.player2.baseHp = 50;
+            gameState.player2.position = { x: 80, y: 1.5, z: 80 };
+            gameState.player2.direction = { x: -1, y: 0, z: 0 };
+            gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
+            gameState.player2.rotationAngle = Math.PI;
+            gameState.player2.paused = false;
+
+            // 死亡原因相关字段
+            if (!gameState.player2.lastDamageSource) gameState.player2.lastDamageSource = null;
+            if (!gameState.player2.lastDamageAmount) gameState.player2.lastDamageAmount = 0;
+            if (!gameState.player2.deathReason) gameState.player2.deathReason = null;
+
+            // 统计字段
+            if (!gameState.player2.stats) {
+                gameState.player2.stats = {
+                    totalDistance: 0,
+                    damageTaken: {
+                        wall: 0,
+                        snakeCollision: 0,
+                        bullet: 0,
+                        base: 0,
+                        lava: 0,
+                        bomb: 0,
+                        total: 0
+                    },
+                    damageDealt: {
+                        snakeCollision: 0,
+                        bullet: 0,
+                        bomb: 0,
+                        baseDamage: 0,
+                        total: 0
+                    }
+                };
+            } else {
+                gameState.player2.stats.totalDistance = 0;
+                gameState.player2.stats.damageTaken.wall = 0;
+                gameState.player2.stats.damageTaken.snakeCollision = 0;
+                gameState.player2.stats.damageTaken.bullet = 0;
+                gameState.player2.stats.damageTaken.base = 0;
+                gameState.player2.stats.damageTaken.lava = 0;
+                gameState.player2.stats.damageTaken.bomb = 0;
+                gameState.player2.stats.damageTaken.total = 0;
+                gameState.player2.stats.damageDealt.snakeCollision = 0;
+                gameState.player2.stats.damageDealt.bullet = 0;
+                gameState.player2.stats.damageDealt.bomb = 0;
+                gameState.player2.stats.damageDealt.baseDamage = 0;
+                gameState.player2.stats.damageDealt.total = 0;
+            }
+
+            // 重置其他状态
+            gameState.magicBalls = [];
+            gameState.food = [];
+            gameState.walls = [];
+            gameState.bullets = [];
+            gameState.explosions = [];
+            gameState.volcanoes = [];
+            gameState.stormDirection = null;
+            gameState.stormActive = false;
+            gameState.stormWarning = false;
         }
-
-        // 重置玩家2 - 同样保留蛇类型
-        gameState.player2.hp = gameState.player2.type === 'hard' ? 15 : 10;
-        gameState.player2.maxHp = gameState.player2.type === 'hard' ? 15 : 10;
-        gameState.player2.shield = 0;
-        gameState.player2.score = 0;
-        gameState.player2.magicBalls = [];
-        gameState.player2.isInvincible = false;
-        gameState.player2.isReversed = false;
-        gameState.player2.isAttacking = false;
-        gameState.player2.invincibleTime = 0;
-        gameState.player2.reversedTime = 0;
-        gameState.player2.attackTime = 0;
-        gameState.player2.speedMultiplier = 1;
-        gameState.player2.hardUpgrades = 0;
-        gameState.player2.magicUpgrades = 0;
-        gameState.player2.segments = [];
-        gameState.player2.baseHp = 50;
-        gameState.player2.position = { x: 80, y: 1.5, z: 80 };
-        gameState.player2.direction = { x: -1, y: 0, z: 0 };
-        gameState.player2.targetDirection = { x: -1, y: 0, z: 0 };
-        gameState.player2.rotationAngle = Math.PI;
-        gameState.player2.paused = false;
-
-        // 死亡原因相关字段
-        if (!gameState.player2.lastDamageSource) gameState.player2.lastDamageSource = null;
-        if (!gameState.player2.lastDamageAmount) gameState.player2.lastDamageAmount = 0;
-        if (!gameState.player2.deathReason) gameState.player2.deathReason = null;
-
-        // 统计字段
-        if (!gameState.player2.stats) {
-            gameState.player2.stats = {
-                totalDistance: 0,
-                damageTaken: {
-                    wall: 0,
-                    snakeCollision: 0,
-                    bullet: 0,
-                    base: 0,
-                    lava: 0,
-                    bomb: 0,
-                    total: 0
-                },
-                damageDealt: {
-                    snakeCollision: 0,
-                    bullet: 0,
-                    bomb: 0,
-                    baseDamage: 0,
-                    total: 0
-                }
-            };
-        } else {
-            gameState.player2.stats.totalDistance = 0;
-            gameState.player2.stats.damageTaken.wall = 0;
-            gameState.player2.stats.damageTaken.snakeCollision = 0;
-            gameState.player2.stats.damageTaken.bullet = 0;
-            gameState.player2.stats.damageTaken.base = 0;
-            gameState.player2.stats.damageTaken.lava = 0;
-            gameState.player2.stats.damageTaken.bomb = 0;
-            gameState.player2.stats.damageTaken.total = 0;
-            gameState.player2.stats.damageDealt.snakeCollision = 0;
-            gameState.player2.stats.damageDealt.bullet = 0;
-            gameState.player2.stats.damageDealt.bomb = 0;
-            gameState.player2.stats.damageDealt.baseDamage = 0;
-            gameState.player2.stats.damageDealt.total = 0;
-        }
-
-        // 重置其他状态
-        gameState.magicBalls = [];
-        gameState.food = [];
-        gameState.walls = [];
-        gameState.bullets = [];
-        gameState.explosions = [];
-        gameState.volcanoes = [];
-        gameState.stormDirection = null;
-        gameState.stormActive = false;
-        gameState.stormWarning = false;
-    }
         // 创建地图环境
         function createMapEnvironment() {
             switch (gameState.mapType) {
@@ -3075,87 +3103,87 @@
         }
 
         // 创建经典地图
-    function createClassicMap() {
-        // 确保基地位置已初始化
-        if (!gameState.player1.basePosition) {
-            gameState.player1.basePosition = { x: -80, y: 0, z: -80 };
-        }
-        if (!gameState.player2.basePosition) {
-            gameState.player2.basePosition = { x: 80, y: 0, z: 80 };
-        }
-
-        const player1Base = gameState.player1.basePosition;
-        const player2Base = gameState.player2.basePosition;
-
-        // 设置边界和基地的安全区域
-        const boundaryMargin = 15;
-        const baseSafeRadius = 25;
-
-        // 生成更多墙（增加到30个）
-        const wallCount = 20;
-
-        for (let i = 0; i < wallCount; i++) {
-            let validPosition = false;
-            let startX, startZ, endX, endZ;
-
-            // 尝试生成有效的位置
-            for (let attempts = 0; attempts < 10; attempts++) {
-                // 随机生成起点
-                startX = Math.random() * 180 - 90;
-                startZ = Math.random() * 180 - 90;
-
-                // 随机生成长度和方向
-                const length = 5 + Math.random() * 15;
-                const angle = Math.random() * Math.PI * 2;
-
-                // 计算终点
-                endX = startX + Math.cos(angle) * length;
-                endZ = startZ + Math.sin(angle) * length;
-
-                // 检查起点和终点是否都在边界内
-                if (Math.abs(startX) > 100 - boundaryMargin || Math.abs(startZ) > 100 - boundaryMargin ||
-                    Math.abs(endX) > 100 - boundaryMargin || Math.abs(endZ) > 100 - boundaryMargin) {
-                    continue;
-                }
-
-                // 计算到两个基地的距离
-                const distToBase1Start = Math.sqrt(Math.pow(startX - player1Base.x, 2) + Math.pow(startZ - player1Base.z, 2));
-                const distToBase2Start = Math.sqrt(Math.pow(startX - player2Base.x, 2) + Math.pow(startZ - player2Base.z, 2));
-                const distToBase1End = Math.sqrt(Math.pow(endX - player1Base.x, 2) + Math.pow(endZ - player1Base.z, 2));
-                const distToBase2End = Math.sqrt(Math.pow(endX - player2Base.x, 2) + Math.pow(endZ - player2Base.z, 2));
-
-                // 确保墙的起点和终点都不在基地安全区域内
-                if (distToBase1Start < baseSafeRadius || distToBase2Start < baseSafeRadius ||
-                    distToBase1End < baseSafeRadius || distToBase2End < baseSafeRadius) {
-                    continue;
-                }
-
-                // 检查墙的中点是否太靠近基地
-                const midX = (startX + endX) / 2;
-                const midZ = (startZ + endZ) / 2;
-                const distToBase1Mid = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
-                const distToBase2Mid = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
-
-                if (distToBase1Mid < baseSafeRadius || distToBase2Mid < baseSafeRadius) {
-                    continue;
-                }
-
-                validPosition = true;
-                break;
+        function createClassicMap() {
+            // 确保基地位置已初始化
+            if (!gameState.player1.basePosition) {
+                gameState.player1.basePosition = { x: -80, y: 0, z: -80 };
+            }
+            if (!gameState.player2.basePosition) {
+                gameState.player2.basePosition = { x: 80, y: 0, z: 80 };
             }
 
-            if (!validPosition) {
-                continue;
+            const player1Base = gameState.player1.basePosition;
+            const player2Base = gameState.player2.basePosition;
+
+            // 设置边界和基地的安全区域
+            const boundaryMargin = 15;
+            const baseSafeRadius = 25;
+
+            // 生成更多墙（增加到30个）
+            const wallCount = 20;
+
+            for (let i = 0; i < wallCount; i++) {
+                let validPosition = false;
+                let startX, startZ, endX, endZ;
+
+                // 尝试生成有效的位置
+                for (let attempts = 0; attempts < 10; attempts++) {
+                    // 随机生成起点
+                    startX = Math.random() * 180 - 90;
+                    startZ = Math.random() * 180 - 90;
+
+                    // 随机生成长度和方向
+                    const length = 5 + Math.random() * 15;
+                    const angle = Math.random() * Math.PI * 2;
+
+                    // 计算终点
+                    endX = startX + Math.cos(angle) * length;
+                    endZ = startZ + Math.sin(angle) * length;
+
+                    // 检查起点和终点是否都在边界内
+                    if (Math.abs(startX) > 100 - boundaryMargin || Math.abs(startZ) > 100 - boundaryMargin ||
+                        Math.abs(endX) > 100 - boundaryMargin || Math.abs(endZ) > 100 - boundaryMargin) {
+                        continue;
+                    }
+
+                    // 计算到两个基地的距离
+                    const distToBase1Start = Math.sqrt(Math.pow(startX - player1Base.x, 2) + Math.pow(startZ - player1Base.z, 2));
+                    const distToBase2Start = Math.sqrt(Math.pow(startX - player2Base.x, 2) + Math.pow(startZ - player2Base.z, 2));
+                    const distToBase1End = Math.sqrt(Math.pow(endX - player1Base.x, 2) + Math.pow(endZ - player1Base.z, 2));
+                    const distToBase2End = Math.sqrt(Math.pow(endX - player2Base.x, 2) + Math.pow(endZ - player2Base.z, 2));
+
+                    // 确保墙的起点和终点都不在基地安全区域内
+                    if (distToBase1Start < baseSafeRadius || distToBase2Start < baseSafeRadius ||
+                        distToBase1End < baseSafeRadius || distToBase2End < baseSafeRadius) {
+                        continue;
+                    }
+
+                    // 检查墙的中点是否太靠近基地
+                    const midX = (startX + endX) / 2;
+                    const midZ = (startZ + endZ) / 2;
+                    const distToBase1Mid = Math.sqrt(Math.pow(midX - player1Base.x, 2) + Math.pow(midZ - player1Base.z, 2));
+                    const distToBase2Mid = Math.sqrt(Math.pow(midX - player2Base.x, 2) + Math.pow(midZ - player2Base.z, 2));
+
+                    if (distToBase1Mid < baseSafeRadius || distToBase2Mid < baseSafeRadius) {
+                        continue;
+                    }
+
+                    validPosition = true;
+                    break;
+                }
+
+                if (!validPosition) {
+                    continue;
+                }
+
+                const wall = createWall(startX, startZ, endX, endZ);
+                gameState.walls.push(wall);
+                gameState.scene.add(wall);
             }
 
-            const wall = createWall(startX, startZ, endX, endZ);
-            gameState.walls.push(wall);
-            gameState.scene.add(wall);
+            // 添加一些固定方向的墙来增加多样性（可选）
+            addDirectionalWalls();
         }
-
-        // 添加一些固定方向的墙来增加多样性（可选）
-        addDirectionalWalls();
-    }
         function addDirectionalWalls() {
             // 水平和垂直墙
             const directionalWalls = [
@@ -3382,290 +3410,290 @@
         }
 
         // 创建基地
-    function createBase(position, color) {
-        const baseGroup = new THREE.Group();
+        function createBase(position, color) {
+            const baseGroup = new THREE.Group();
 
-        // === 基地底座（半透明圆柱体）===
-        const baseGeometry = new THREE.CylinderGeometry(18, 22, 2, 16);
-        const baseMaterial = new THREE.MeshStandardMaterial({
-            color: color,
-            roughness: 0.7,
-            metalness: 0.4,
-            transparent: true,
-            opacity: 0.7, // 半透明
-            side: THREE.DoubleSide
-        });
-        const base = new THREE.Mesh(baseGeometry, baseMaterial);
-        base.position.y = 1;
-        base.receiveShadow = true;
-        baseGroup.add(base);
-
-        // === 基地主体（半透明圆顶）===
-        const domeGeometry = new THREE.ConeGeometry(15, 12, 16);
-        const domeMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(color).multiplyScalar(1.2),
-            roughness: 0.6,
-            metalness: 0.5,
-            emissive: color,
-            emissiveIntensity: 0.1,
-            transparent: true,
-            opacity: 0.8 // 稍微透明
-        });
-        const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-        dome.position.y = 7;
-        dome.castShadow = true;
-        dome.receiveShadow = true;
-        baseGroup.add(dome);
-
-        // === 基地墙体（半透明圆柱体）===
-        const wallGeometry = new THREE.CylinderGeometry(14, 14, 8, 16);
-        const wallMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(color).multiplyScalar(0.8),
-            roughness: 0.8,
-            metalness: 0.3,
-            transparent: true,
-            opacity: 0.6, // 更透明
-            side: THREE.DoubleSide
-        });
-        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-        wall.position.y = 4;
-        wall.castShadow = true;
-        wall.receiveShadow = true;
-        baseGroup.add(wall);
-
-        // === 防护罩（半透明能量场）===
-        const shieldGeometry = new THREE.SphereGeometry(20, 24, 24);
-        const shieldMaterial = new THREE.MeshStandardMaterial({
-            color: color,
-            emissive: color,
-            emissiveIntensity: 0.4, // 增加发光强度
-            transparent: true,
-            opacity: 0.25, // 更透明
-            side: THREE.DoubleSide,
-            roughness: 0.1,
-            metalness: 0.9
-        });
-        const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
-        shield.position.y = 8;
-        shield.castShadow = false;
-        baseGroup.add(shield);
-
-        // === 基地结构框架（实体，不透明）===
-        const createSupportBeam = (angle, height) => {
-            const beamGeometry = new THREE.BoxGeometry(0.8, height, 0.8);
-            const beamMaterial = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(color).multiplyScalar(1.3),
-                roughness: 0.4,
-                metalness: 0.7
-            });
-            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
-
-            // 位置
-            const radius = 13;
-            beam.position.set(
-                Math.cos(angle) * radius,
-                height / 2,
-                Math.sin(angle) * radius
-            );
-
-            beam.castShadow = true;
-            return beam;
-        };
-
-        // 添加8根支撑柱（实体，不透明）
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const beam = createSupportBeam(angle, 8);
-            baseGroup.add(beam);
-        }
-
-        // 顶部环状结构（实体）
-        const topRingGeometry = new THREE.TorusGeometry(13, 1.5, 8, 24);
-        const topRingMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(color).multiplyScalar(1.5),
-            roughness: 0.3,
-            metalness: 0.8
-        });
-        const topRing = new THREE.Mesh(topRingGeometry, topRingMaterial);
-        topRing.position.y = 8;
-        topRing.rotation.x = Math.PI / 2;
-        topRing.castShadow = true;
-        baseGroup.add(topRing);
-
-        // === 基地入口（实体，不透明）===
-        const gateGeometry = new THREE.BoxGeometry(8, 6, 2);
-        const gateMaterial = new THREE.MeshStandardMaterial({
-            color: 0x333333,
-            roughness: 0.9,
-            metalness: 0.1
-        });
-        const gate = new THREE.Mesh(gateGeometry, gateMaterial);
-        gate.position.set(0, 3, -12);
-        gate.castShadow = true;
-        gate.receiveShadow = true;
-        baseGroup.add(gate);
-
-        // 门框装饰（实体）
-        const gateFrameGeometry = new THREE.BoxGeometry(8.5, 6.5, 0.5);
-        const gateFrameMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(color).multiplyScalar(1.5),
-            roughness: 0.3,
-            metalness: 0.8
-        });
-        const gateFrame = new THREE.Mesh(gateFrameGeometry, gateFrameMaterial);
-        gateFrame.position.set(0, 3, -12.3);
-        baseGroup.add(gateFrame);
-
-        // === 能量核心（半透明发光球体）===
-        const coreGeometry = new THREE.SphereGeometry(3.5, 16, 16);
-        const coreMaterial = new THREE.MeshStandardMaterial({
-            color: color,
-            emissive: color,
-            emissiveIntensity: 1.0, // 强烈发光
-            roughness: 0.1,
-            metalness: 0.9,
-            transparent: true,
-            opacity: 0.8 // 稍微透明
-        });
-        const core = new THREE.Mesh(coreGeometry, coreMaterial);
-        core.position.y = 8;
-        baseGroup.add(core);
-
-        // 内核心（更小，更亮）
-        const innerCoreGeometry = new THREE.SphereGeometry(1.5, 12, 12);
-        const innerCoreMaterial = new THREE.MeshBasicMaterial({
-            color: 0xFFFFFF,
-            emissive: 0xFFFFFF,
-            emissiveIntensity: 1.0,
-            transparent: true,
-            opacity: 0.9
-        });
-        const innerCore = new THREE.Mesh(innerCoreGeometry, innerCoreMaterial);
-        innerCore.position.y = 8;
-        baseGroup.add(innerCore);
-
-        // === 能量光线（从核心到底座）===
-        const createEnergyBeam = (angle) => {
-            const beamLength = 7;
-            const beamGeometry = new THREE.CylinderGeometry(0.3, 0.5, beamLength, 6);
-            const beamMaterial = new THREE.MeshBasicMaterial({
+            // === 基地底座（半透明圆柱体）===
+            const baseGeometry = new THREE.CylinderGeometry(18, 22, 2, 16);
+            const baseMaterial = new THREE.MeshStandardMaterial({
                 color: color,
+                roughness: 0.7,
+                metalness: 0.4,
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.7, // 半透明
                 side: THREE.DoubleSide
             });
-            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = 1;
+            base.receiveShadow = true;
+            baseGroup.add(base);
 
-            // 位置和方向
-            const radius = 5;
-            beam.position.set(
-                Math.cos(angle) * radius,
-                beamLength / 2 + 1,
-                Math.sin(angle) * radius
-            );
+            // === 基地主体（半透明圆顶）===
+            const domeGeometry = new THREE.ConeGeometry(15, 12, 16);
+            const domeMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color).multiplyScalar(1.2),
+                roughness: 0.6,
+                metalness: 0.5,
+                emissive: color,
+                emissiveIntensity: 0.1,
+                transparent: true,
+                opacity: 0.8 // 稍微透明
+            });
+            const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+            dome.position.y = 7;
+            dome.castShadow = true;
+            dome.receiveShadow = true;
+            baseGroup.add(dome);
 
-            // 朝向中心
-            beam.lookAt(0, 1, 0);
+            // === 基地墙体（半透明圆柱体）===
+            const wallGeometry = new THREE.CylinderGeometry(14, 14, 8, 16);
+            const wallMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color).multiplyScalar(0.8),
+                roughness: 0.8,
+                metalness: 0.3,
+                transparent: true,
+                opacity: 0.6, // 更透明
+                side: THREE.DoubleSide
+            });
+            const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+            wall.position.y = 4;
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            baseGroup.add(wall);
 
-            return beam;
-        };
+            // === 防护罩（半透明能量场）===
+            const shieldGeometry = new THREE.SphereGeometry(20, 24, 24);
+            const shieldMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.4, // 增加发光强度
+                transparent: true,
+                opacity: 0.25, // 更透明
+                side: THREE.DoubleSide,
+                roughness: 0.1,
+                metalness: 0.9
+            });
+            const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
+            shield.position.y = 8;
+            shield.castShadow = false;
+            baseGroup.add(shield);
 
-        // 添加4根能量光束
-        for (let i = 0; i < 4; i++) {
-            const angle = (i / 4) * Math.PI * 2;
-            const beam = createEnergyBeam(angle);
-            baseGroup.add(beam);
-        }
+            // === 基地结构框架（实体，不透明）===
+            const createSupportBeam = (angle, height) => {
+                const beamGeometry = new THREE.BoxGeometry(0.8, height, 0.8);
+                const beamMaterial = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(color).multiplyScalar(1.3),
+                    roughness: 0.4,
+                    metalness: 0.7
+                });
+                const beam = new THREE.Mesh(beamGeometry, beamMaterial);
 
-        baseGroup.position.set(position.x, position.y, position.z);
-        baseGroup.userData = {
-            type: 'base',
-            safeRadius: 20,
-            color: color,
-            originalMaterials: {
-                base: baseMaterial,
-                dome: domeMaterial,
-                wall: wallMaterial,
-                shield: shieldMaterial,
-                core: coreMaterial
+                // 位置
+                const radius = 13;
+                beam.position.set(
+                    Math.cos(angle) * radius,
+                    height / 2,
+                    Math.sin(angle) * radius
+                );
+
+                beam.castShadow = true;
+                return beam;
+            };
+
+            // 添加8根支撑柱（实体，不透明）
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const beam = createSupportBeam(angle, 8);
+                baseGroup.add(beam);
             }
-        };
 
-        return baseGroup;
-    }
+            // 顶部环状结构（实体）
+            const topRingGeometry = new THREE.TorusGeometry(13, 1.5, 8, 24);
+            const topRingMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color).multiplyScalar(1.5),
+                roughness: 0.3,
+                metalness: 0.8
+            });
+            const topRing = new THREE.Mesh(topRingGeometry, topRingMaterial);
+            topRing.position.y = 8;
+            topRing.rotation.x = Math.PI / 2;
+            topRing.castShadow = true;
+            baseGroup.add(topRing);
 
-    function updateBaseHealthDisplay(playerKey) {
-        const player = gameState[playerKey];
-        if (!player || !player.baseHealthDisplay) {
-            return;
+            // === 基地入口（实体，不透明）===
+            const gateGeometry = new THREE.BoxGeometry(8, 6, 2);
+            const gateMaterial = new THREE.MeshStandardMaterial({
+                color: 0x333333,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const gate = new THREE.Mesh(gateGeometry, gateMaterial);
+            gate.position.set(0, 3, -12);
+            gate.castShadow = true;
+            gate.receiveShadow = true;
+            baseGroup.add(gate);
+
+            // 门框装饰（实体）
+            const gateFrameGeometry = new THREE.BoxGeometry(8.5, 6.5, 0.5);
+            const gateFrameMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color).multiplyScalar(1.5),
+                roughness: 0.3,
+                metalness: 0.8
+            });
+            const gateFrame = new THREE.Mesh(gateFrameGeometry, gateFrameMaterial);
+            gateFrame.position.set(0, 3, -12.3);
+            baseGroup.add(gateFrame);
+
+            // === 能量核心（半透明发光球体）===
+            const coreGeometry = new THREE.SphereGeometry(3.5, 16, 16);
+            const coreMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 1.0, // 强烈发光
+                roughness: 0.1,
+                metalness: 0.9,
+                transparent: true,
+                opacity: 0.8 // 稍微透明
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            core.position.y = 8;
+            baseGroup.add(core);
+
+            // 内核心（更小，更亮）
+            const innerCoreGeometry = new THREE.SphereGeometry(1.5, 12, 12);
+            const innerCoreMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFFFFF,
+                emissive: 0xFFFFFF,
+                emissiveIntensity: 1.0,
+                transparent: true,
+                opacity: 0.9
+            });
+            const innerCore = new THREE.Mesh(innerCoreGeometry, innerCoreMaterial);
+            innerCore.position.y = 8;
+            baseGroup.add(innerCore);
+
+            // === 能量光线（从核心到底座）===
+            const createEnergyBeam = (angle) => {
+                const beamLength = 7;
+                const beamGeometry = new THREE.CylinderGeometry(0.3, 0.5, beamLength, 6);
+                const beamMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.4,
+                    side: THREE.DoubleSide
+                });
+                const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+
+                // 位置和方向
+                const radius = 5;
+                beam.position.set(
+                    Math.cos(angle) * radius,
+                    beamLength / 2 + 1,
+                    Math.sin(angle) * radius
+                );
+
+                // 朝向中心
+                beam.lookAt(0, 1, 0);
+
+                return beam;
+            };
+
+            // 添加4根能量光束
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const beam = createEnergyBeam(angle);
+                baseGroup.add(beam);
+            }
+
+            baseGroup.position.set(position.x, position.y, position.z);
+            baseGroup.userData = {
+                type: 'base',
+                safeRadius: 20,
+                color: color,
+                originalMaterials: {
+                    base: baseMaterial,
+                    dome: domeMaterial,
+                    wall: wallMaterial,
+                    shield: shieldMaterial,
+                    core: coreMaterial
+                }
+            };
+
+            return baseGroup;
         }
 
-        const healthDisplay = player.baseHealthDisplay;
+        function updateBaseHealthDisplay(playerKey) {
+            const player = gameState[playerKey];
+            if (!player || !player.baseHealthDisplay) {
+                return;
+            }
 
-        // 检查 healthDisplay 是否已被销毁
-        if (!healthDisplay.parent) {
-            player.baseHealthDisplay = null;
-            return;
-        }
+            const healthDisplay = player.baseHealthDisplay;
 
-        const healthBar = healthDisplay.userData.healthBar;
-        const sprite = healthDisplay.userData.textSprite;
-        const ctx = healthDisplay.userData.ctx;
-        const canvas = healthDisplay.userData.canvas;
+            // 检查 healthDisplay 是否已被销毁
+            if (!healthDisplay.parent) {
+                player.baseHealthDisplay = null;
+                return;
+            }
 
-        if (healthBar && healthBar.material) {
-            // 更新血量条宽度
-            const healthRatio = player.baseHp / 50;
-            healthBar.scale.x = Math.max(0.1, healthRatio); // 最小0.1，避免完全消失
+            const healthBar = healthDisplay.userData.healthBar;
+            const sprite = healthDisplay.userData.textSprite;
+            const ctx = healthDisplay.userData.ctx;
+            const canvas = healthDisplay.userData.canvas;
 
-            // 根据血量改变颜色（更明显的颜色变化）
-            if (healthRatio > 0.7) {
-                healthBar.material.color.set(0x00FF00); // 绿色（健康）
-            } else if (healthRatio > 0.4) {
-                healthBar.material.color.set(0xFFFF00); // 黄色（警告）
-            } else if (healthRatio > 0.2) {
-                healthBar.material.color.set(0xFFA500); // 橙色（危险）
-            } else {
-                healthBar.material.color.set(0xFF0000); // 红色（危急）
+            if (healthBar && healthBar.material) {
+                // 更新血量条宽度
+                const healthRatio = player.baseHp / 50;
+                healthBar.scale.x = Math.max(0.1, healthRatio); // 最小0.1，避免完全消失
+
+                // 根据血量改变颜色（更明显的颜色变化）
+                if (healthRatio > 0.7) {
+                    healthBar.material.color.set(0x00FF00); // 绿色（健康）
+                } else if (healthRatio > 0.4) {
+                    healthBar.material.color.set(0xFFFF00); // 黄色（警告）
+                } else if (healthRatio > 0.2) {
+                    healthBar.material.color.set(0xFFA500); // 橙色（危险）
+                } else {
+                    healthBar.material.color.set(0xFF0000); // 红色（危急）
+                }
+            }
+
+            if (sprite && ctx && canvas) {
+                // 更新血量数值
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 绘制背景
+                const healthRatio = player.baseHp / 50;
+                if (healthRatio > 0.7) {
+                    ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'; // 深绿背景
+                } else if (healthRatio > 0.4) {
+                    ctx.fillStyle = 'rgba(100, 100, 0, 0.8)'; // 深黄背景
+                } else if (healthRatio > 0.2) {
+                    ctx.fillStyle = 'rgba(100, 50, 0, 0.8)'; // 深橙背景
+                } else {
+                    ctx.fillStyle = 'rgba(100, 0, 0, 0.8)'; // 深红背景
+                }
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 绘制边框
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+                // 绘制血量数值
+                ctx.font = 'bold 36px Arial';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const displayHp = Math.max(0, Math.ceil(player.baseHp));
+                ctx.fillText(displayHp.toString(), 64, 32);
+
+                // 更新纹理
+                if (sprite.material && sprite.material.map) {
+                    sprite.material.map.needsUpdate = true;
+                }
             }
         }
-
-        if (sprite && ctx && canvas) {
-            // 更新血量数值
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 绘制背景
-            const healthRatio = player.baseHp / 50;
-            if (healthRatio > 0.7) {
-                ctx.fillStyle = 'rgba(0, 100, 0, 0.8)'; // 深绿背景
-            } else if (healthRatio > 0.4) {
-                ctx.fillStyle = 'rgba(100, 100, 0, 0.8)'; // 深黄背景
-            } else if (healthRatio > 0.2) {
-                ctx.fillStyle = 'rgba(100, 50, 0, 0.8)'; // 深橙背景
-            } else {
-                ctx.fillStyle = 'rgba(100, 0, 0, 0.8)'; // 深红背景
-            }
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // 绘制边框
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
-
-            // 绘制血量数值
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = '#FFFFFF';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            const displayHp = Math.max(0, Math.ceil(player.baseHp));
-            ctx.fillText(displayHp.toString(), 64, 32);
-
-            // 更新纹理
-            if (sprite.material && sprite.material.map) {
-                sprite.material.map.needsUpdate = true;
-            }
-        }
-    }
         function showBaseThreatWarning(position) {
             if (Math.random() > 0.1) return; // 降低频率
 
@@ -4185,7 +4213,7 @@
                 if (applyDamage(otherPlayerKey, damage, 'headCollision')) {
                     showDamageEffect(otherPlayerKey);
                 }
-                
+
                 recordDamageDealt(playerKey, damage, otherPlayerKey, 'headCollision');
                 recordDamageDealt(otherPlayerKey, damage, playerKey, 'headCollision');
                 if (gameState[playerKey].hp <= 0) {
@@ -4218,7 +4246,7 @@
                     const damage = 1;
                     if (applyDamage(playerKey, damage, 'bodyCollision')) {
                         showDamageEffect(playerKey);
-                                        // 设置死亡原因
+                        // 设置死亡原因
                         if (gameState[playerKey].hp <= 0) {
                             gameState[playerKey].deathReason = `撞到${otherPlayerKey === 'player1' ?
                                 localStorage.getItem('username') || '玩家1' :
@@ -4766,69 +4794,69 @@
             return oldHp > player.hp;
         }
         function getDeathReason(source, damage, player) {
-                const playerName = player === gameState.player1 ?
-                    localStorage.getItem('username') || '玩家1' :
-                    localStorage.getItem('player2_username') || '玩家2';
+            const playerName = player === gameState.player1 ?
+                localStorage.getItem('username') || '玩家1' :
+                localStorage.getItem('player2_username') || '玩家2';
 
-                const opponentName = player === gameState.player1 ?
-                    localStorage.getItem('player2_username') || '玩家2' :
-                    localStorage.getItem('username') || '玩家1';
+            const opponentName = player === gameState.player1 ?
+                localStorage.getItem('player2_username') || '玩家2' :
+                localStorage.getItem('username') || '玩家1';
 
-                switch (source) {
-                    case 'wall':
-                        return `${playerName}撞墙而死`;
+            switch (source) {
+                case 'wall':
+                    return `${playerName}撞墙而死`;
 
-                    case 'headCollision':
-                        return `${playerName}蛇头相撞而死`;
-                    case 'bodyCollision':
-                        return `${playerName}蛇身相撞身亡`;
+                case 'headCollision':
+                    return `${playerName}蛇头相撞而死`;
+                case 'bodyCollision':
+                    return `${playerName}蛇身相撞身亡`;
 
-                    case 'bullet':
-                        return `${playerName}被子弹击中`;
+                case 'bullet':
+                    return `${playerName}被子弹击中`;
 
-                    case 'baseBullet':
-                        return `${playerName}被基地防御系统击杀`;
+                case 'baseBullet':
+                    return `${playerName}被基地防御系统击杀`;
 
-                    case 'base':
-                        return `${playerName}在对方基地内被击毙`;
+                case 'base':
+                    return `${playerName}在对方基地内被击毙`;
 
-                    case 'lava':
-                        return `${playerName}被岩浆烧死`;
+                case 'lava':
+                    return `${playerName}被岩浆烧死`;
 
-                    case 'bomb':
-                        return `${playerName}被炸弹炸死`;
+                case 'bomb':
+                    return `${playerName}被炸弹炸死`;
 
-                    case 'dash':
-                        return `${playerName}俯冲过猛身亡`;
+                case 'dash':
+                    return `${playerName}俯冲过猛身亡`;
 
-                    case 'storm':
-                        return `${playerName}在暴风雪中冻死`;
+                case 'storm':
+                    return `${playerName}在暴风雪中冻死`;
 
-                    case 'magic':
-                        return `${playerName}被魔法效果致死`;
+                case 'magic':
+                    return `${playerName}被魔法效果致死`;
 
-                    default:
-                        return '被击败';
-                }
+                default:
+                    return '被击败';
             }
-    function recordDamageDealt(dealerKey, damage, targetKey, source) {
-        const dealer = gameState[dealerKey];
-
-        if (source === 'headCollision' || source === 'bodyCollision') {
-            dealer.stats.damageDealt.snakeCollision += damage;
-        } else if (source === 'bullet' || source === 'baseBullet') {
-            dealer.stats.damageDealt.bullet += damage;
-        } else if (source === 'bomb') {
-            dealer.stats.damageDealt.bomb += damage;
-        } else if (source === 'base') {
-            dealer.stats.damageDealt.baseDamage += damage;
         }
+        function recordDamageDealt(dealerKey, damage, targetKey, source) {
+            const dealer = gameState[dealerKey];
 
-        // 总输出伤害（不包括对基地的伤害）
-        if (source !== 'base') {
-            dealer.stats.damageDealt.total += damage;
+            if (source === 'headCollision' || source === 'bodyCollision') {
+                dealer.stats.damageDealt.snakeCollision += damage;
+            } else if (source === 'bullet' || source === 'baseBullet') {
+                dealer.stats.damageDealt.bullet += damage;
+            } else if (source === 'bomb') {
+                dealer.stats.damageDealt.bomb += damage;
+            } else if (source === 'base') {
+                dealer.stats.damageDealt.baseDamage += damage;
+            }
+
+            // 总输出伤害（不包括对基地的伤害）
+            if (source !== 'base') {
+                dealer.stats.damageDealt.total += damage;
+            }
         }
-    }
         // 检查基地交互
         // 检查基地交互 - 修复回血部分
         function checkBaseInteraction(playerKey) {
@@ -5379,7 +5407,7 @@
 
                     if (damageApplied) {
                         showDamageEffect(playerKey);
-                            if (data.owner && data.owner !== playerKey) {
+                        if (data.owner && data.owner !== playerKey) {
                             recordDamageDealt(data.owner, damageAmount, playerKey, data.type);
                         }
                     }
@@ -5814,7 +5842,7 @@
                                     showDamageEffect(targetKey);
                                     recordDamageDealt(playerKey, damage, targetKey, 'bomb');
                                 }
-                                                    // 设置死亡原因
+                                // 设置死亡原因
                                 if (gameState[targetKey].hp <= 0) {
                                     gameState[targetKey].deathReason = `被${playerKey === 'player1' ?
                                         localStorage.getItem('username') || '玩家1' :
@@ -5943,84 +5971,84 @@
             explosionGroup.userData = { lifeTime: 1 };
             gameState.explosions.push(explosionGroup);
             gameState.scene.add(explosionGroup);
-            
+
         }
 
         // 检查游戏结束
-    function checkGameEnd() {
-        if (gameState.player1.hp <= 0 || gameState.player2.hp <= 0) {
-            // 设置具体的死亡原因
-            if (gameState.player1.hp <= 0 && !gameState.player1.deathReason) {
-                gameState.player1.deathReason = getDeathReason(
-                    gameState.player1.lastDamageSource || 'unknown',
-                    gameState.player1.lastDamageAmount || 0,
-                    gameState.player1
-                );
-            }
-
-            if (gameState.player2.hp <= 0 && !gameState.player2.deathReason) {
-                gameState.player2.deathReason = getDeathReason(
-                    gameState.player2.lastDamageSource || 'unknown',
-                    gameState.player2.lastDamageAmount || 0,
-                    gameState.player2
-                );
-            }
-
-            endGame();
-        }
-    }
-            async function endGame() {
-                if (!gameState.running) return;
-
-                gameState.running = false;
-                startButton.textContent = '开始游戏';
-                startButton.disabled = false;
-                document.getElementById('view-records').style.display = 'block';
-                // 记录死亡原因
-                recordDeathCauses();
-
-                // 计算胜者
-                let winner;
-                let loser;
-                let currentWin1 = 0;
-                let currentWin2 = 0;
-
-                if (gameState.player1.hp > 0 && gameState.player2.hp <= 0) {
-                    winner = 'player1';
-                    loser = 'player2';
-                    currentWin1 = 1;
-                    currentWin2 = 0;
-                } else if (gameState.player2.hp > 0 && gameState.player1.hp <= 0) {
-                    winner = 'player2';
-                    loser = 'player1';
-                    currentWin1 = 0;
-                    currentWin2 = 1;
-                } else {
-                    winner = 'draw';
-                    currentWin1 = 0;
-                    currentWin2 = 0;
+        function checkGameEnd() {
+            if (gameState.player1.hp <= 0 || gameState.player2.hp <= 0) {
+                // 设置具体的死亡原因
+                if (gameState.player1.hp <= 0 && !gameState.player1.deathReason) {
+                    gameState.player1.deathReason = getDeathReason(
+                        gameState.player1.lastDamageSource || 'unknown',
+                        gameState.player1.lastDamageAmount || 0,
+                        gameState.player1
+                    );
                 }
 
-                // 获取服务器数据并显示
-                getServerRecords().then(serverData => {
-                    let player1Wins = serverData?.player1Wins || 0;
-                    let player2Wins = serverData?.player2Wins || 0;
+                if (gameState.player2.hp <= 0 && !gameState.player2.deathReason) {
+                    gameState.player2.deathReason = getDeathReason(
+                        gameState.player2.lastDamageSource || 'unknown',
+                        gameState.player2.lastDamageAmount || 0,
+                        gameState.player2
+                    );
+                }
 
-                    const deathAnalysis = generateDeathAnalysis();
-                    const loserName = loser === 'player1' ?
-                        localStorage.getItem('username') || '玩家1' :
-                        localStorage.getItem('player2_username') || '玩家2';
-                    const loserCause = gameStats.deathCauses[loser] || '未知原因';
+                endGame();
+            }
+        }
+        async function endGame() {
+            if (!gameState.running) return;
 
-                    const currentTime = performance.now();
-                    const totalTime = Math.floor((currentTime - gameStats.startTime) / 1000);
-                    gameStats.endTime = performance.now();
-                    const minutes = Math.floor(totalTime / 60);
-                    const seconds = totalTime % 60;
-                    const timeString = `${minutes}分${seconds}秒`;
+            gameState.running = false;
+            startButton.textContent = '开始游戏';
+            startButton.disabled = false;
+            document.getElementById('view-records').style.display = 'block';
+            // 记录死亡原因
+            recordDeathCauses();
 
-                    // 创建游戏结束界面
-                    gameOverScreen.innerHTML = `
+            // 计算胜者
+            let winner;
+            let loser;
+            let currentWin1 = 0;
+            let currentWin2 = 0;
+
+            if (gameState.player1.hp > 0 && gameState.player2.hp <= 0) {
+                winner = 'player1';
+                loser = 'player2';
+                currentWin1 = 1;
+                currentWin2 = 0;
+            } else if (gameState.player2.hp > 0 && gameState.player1.hp <= 0) {
+                winner = 'player2';
+                loser = 'player1';
+                currentWin1 = 0;
+                currentWin2 = 1;
+            } else {
+                winner = 'draw';
+                currentWin1 = 0;
+                currentWin2 = 0;
+            }
+
+            // 获取服务器数据并显示
+            getServerRecords().then(serverData => {
+                let player1Wins = serverData?.player1Wins || 0;
+                let player2Wins = serverData?.player2Wins || 0;
+
+                const deathAnalysis = generateDeathAnalysis();
+                const loserName = loser === 'player1' ?
+                    localStorage.getItem('username') || '玩家1' :
+                    localStorage.getItem('player2_username') || '玩家2';
+                const loserCause = gameStats.deathCauses[loser] || '未知原因';
+
+                const currentTime = performance.now();
+                const totalTime = Math.floor((currentTime - gameStats.startTime) / 1000);
+                gameStats.endTime = performance.now();
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = totalTime % 60;
+                const timeString = `${minutes}分${seconds}秒`;
+
+                // 创建游戏结束界面
+                gameOverScreen.innerHTML = `
 <div class="game-over-content">
     <div class="winner-container">
         ${winner === 'draw' ? `
@@ -6072,8 +6100,8 @@ ${loser ? `
             <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
             <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
                 ${gameState.player1.type === 'speed' ? '⚡ 速度蛇' :
-                            gameState.player1.type === 'hard' ? '🛡️ 坚硬蛇' :
-                                gameState.player1.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                        gameState.player1.type === 'hard' ? '🛡️ 坚硬蛇' :
+                            gameState.player1.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
             </div>
             <div class="win-count">
                 <span class="history-wins">${player1Wins}</span>
@@ -6096,8 +6124,8 @@ ${loser ? `
             <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
             <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
                 ${gameState.player2.type === 'speed' ? '⚡ 速度蛇' :
-                            gameState.player2.type === 'hard' ? '🛡️ 坚硬蛇' :
-                                gameState.player2.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                        gameState.player2.type === 'hard' ? '🛡️ 坚硬蛇' :
+                            gameState.player2.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
             </div>
             <div class="win-count">
                 <span class="history-wins">${player2Wins}</span>
@@ -6225,200 +6253,200 @@ ${loser ? `
 </div>
                 `;
 
-                    // 再来一局按钮事件
-                    document.getElementById('play-again').addEventListener('click', () => {
-                        gameOverScreen.style.display = 'none';
-                        setTimeout(() => {
-                            resetToSelection();
-                        }, 300);
-                    });
-
-                    // 保存战绩按钮事件
-                    document.getElementById('save-record').addEventListener('click', () => {
-                        // 禁用按钮防止重复点击
-                        const saveBtn = document.getElementById('save-record');
-                        saveBtn.disabled = true;
-                        saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 保存中...`;
-
-                        // 上传本次比赛结果
-                        uploadGameRecord(currentWin1, currentWin2).then(() => {
-                            // 上传成功后更新显示
-                            const historyWins1 = document.querySelector('.player-1-stats .history-wins');
-                            const historyWins2 = document.querySelector('.player-2-stats .history-wins');
-
-                            if (historyWins1 && historyWins2) {
-                                // 更新显示为历史战绩+本次结果
-                                historyWins1.textContent = player1Wins + currentWin1;
-                                historyWins2.textContent = player2Wins + currentWin2;
-
-                                // 隐藏+1提示
-                                const currentWinElements = document.querySelectorAll('.current-win');
-                                currentWinElements.forEach(el => el.remove());
-
-                                // 更新进度条
-                                const progress1 = document.querySelector('.player-1-stats .progress-fill');
-                                const progress2 = document.querySelector('.player-2-stats .progress-fill');
-                                if (progress1 && progress2) {
-                                    progress1.style.width = `${calculateWinPercentage(player1Wins + currentWin1, player2Wins + currentWin2)}%`;
-                                    progress2.style.width = `${calculateWinPercentage(player2Wins + currentWin2, player1Wins + currentWin1)}%`;
-                                }
-
-                                // 显示保存成功提示
-                                showGameOverMessage('战绩保存成功!', '#4CAF50');
-
-                                // 更新按钮状态
-                                saveBtn.innerHTML = `<i class="fas fa-check"></i> 已保存`;
-                            }
-                        }).catch(error => {
-                            console.error('保存战绩失败:', error);
-                            showGameOverMessage('保存失败: ' + error.message, '#FF5722');
-
-                            // 恢复按钮状态
-                            saveBtn.disabled = false;
-                            saveBtn.innerHTML = `<i class="fas fa-save"></i> 保存战绩`;
-                        });
-                    });
-
-                    // 显示游戏结束界面
-                    gameOverScreen.style.display = 'flex';
-                    gameOverScreen.classList.add('show');
-                    // 添加庆祝效果
-                    if (winner !== 'draw') {
-                        createCelebrationEffect(winner === 'player1' ? '#FF5722' : '#2196F3');
-                    }
+                // 再来一局按钮事件
+                document.getElementById('play-again').addEventListener('click', () => {
+                    gameOverScreen.style.display = 'none';
+                    setTimeout(() => {
+                        resetToSelection();
+                    }, 300);
                 });
-            }
-            function toggleGameStats() {
-                    const statsContainer = document.getElementById('detailed-stats-container');
-                    const button = document.getElementById('show-game-stats');
 
-                    if (statsContainer.style.display === 'none') {
-                        // 显示数据统计
-                        statsContainer.style.display = 'block';
-                        button.innerHTML = '<i class="fas fa-chart-bar"></i> 隐藏本局数据';
-                        document.getElementById('death-cause').style.display = 'none';
-                        document.getElementById('stats-container').style.display = 'none';
-                        // 添加动画效果
-                        statsContainer.style.opacity = '0';
-                        statsContainer.style.transform = 'translateY(-20px)';
-                        statsContainer.style.transition = 'all 0.3s ease-out';
+                // 保存战绩按钮事件
+                document.getElementById('save-record').addEventListener('click', () => {
+                    // 禁用按钮防止重复点击
+                    const saveBtn = document.getElementById('save-record');
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 保存中...`;
 
-                        setTimeout(() => {
-                            statsContainer.style.opacity = '1';
-                            statsContainer.style.transform = 'translateY(0)';
-                        }, 10);
-                    } else {
-                        // 隐藏数据统计
-                        statsContainer.style.opacity = '0';
-                        statsContainer.style.transform = 'translateY(-20px)';
-                        document.getElementById('death-cause').style.display = 'block';
-                        document.getElementById('stats-container').style.display = 'flex';
-                        setTimeout(() => {
-                            statsContainer.style.display = 'none';
-                            button.innerHTML = '<i class="fas fa-chart-bar"></i> 显示本局数据';
-                        }, 300);
-                    }
+                    // 上传本次比赛结果
+                    uploadGameRecord(currentWin1, currentWin2).then(() => {
+                        // 上传成功后更新显示
+                        const historyWins1 = document.querySelector('.player-1-stats .history-wins');
+                        const historyWins2 = document.querySelector('.player-2-stats .history-wins');
+
+                        if (historyWins1 && historyWins2) {
+                            // 更新显示为历史战绩+本次结果
+                            historyWins1.textContent = player1Wins + currentWin1;
+                            historyWins2.textContent = player2Wins + currentWin2;
+
+                            // 隐藏+1提示
+                            const currentWinElements = document.querySelectorAll('.current-win');
+                            currentWinElements.forEach(el => el.remove());
+
+                            // 更新进度条
+                            const progress1 = document.querySelector('.player-1-stats .progress-fill');
+                            const progress2 = document.querySelector('.player-2-stats .progress-fill');
+                            if (progress1 && progress2) {
+                                progress1.style.width = `${calculateWinPercentage(player1Wins + currentWin1, player2Wins + currentWin2)}%`;
+                                progress2.style.width = `${calculateWinPercentage(player2Wins + currentWin2, player1Wins + currentWin1)}%`;
+                            }
+
+                            // 显示保存成功提示
+                            showGameOverMessage('战绩保存成功!', '#4CAF50');
+
+                            // 更新按钮状态
+                            saveBtn.innerHTML = `<i class="fas fa-check"></i> 已保存`;
+                        }
+                    }).catch(error => {
+                        console.error('保存战绩失败:', error);
+                        showGameOverMessage('保存失败: ' + error.message, '#FF5722');
+
+                        // 恢复按钮状态
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = `<i class="fas fa-save"></i> 保存战绩`;
+                    });
+                });
+
+                // 显示游戏结束界面
+                gameOverScreen.style.display = 'flex';
+                gameOverScreen.classList.add('show');
+                // 添加庆祝效果
+                if (winner !== 'draw') {
+                    createCelebrationEffect(winner === 'player1' ? '#FF5722' : '#2196F3');
                 }
+            });
+        }
+        function toggleGameStats() {
+            const statsContainer = document.getElementById('detailed-stats-container');
+            const button = document.getElementById('show-game-stats');
 
-            function recordDeathCauses() {
-                if (gameState.player1.hp <= 0) {
-                    if (gameState.player1.shield <= 0) {
-                        gameStats.deathCauses.player1 = '被击败';
-                    } else {
-                        gameStats.deathCauses.player1 = '护盾耗尽';
-                    }
-                }
+            if (statsContainer.style.display === 'none') {
+                // 显示数据统计
+                statsContainer.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-chart-bar"></i> 隐藏本局数据';
+                document.getElementById('death-cause').style.display = 'none';
+                document.getElementById('stats-container').style.display = 'none';
+                // 添加动画效果
+                statsContainer.style.opacity = '0';
+                statsContainer.style.transform = 'translateY(-20px)';
+                statsContainer.style.transition = 'all 0.3s ease-out';
 
-                if (gameState.player2.hp <= 0) {
-                    if (gameState.player2.shield <= 0) {
-                        gameStats.deathCauses.player2 = '被击败';
-                    } else {
-                        gameStats.deathCauses.player2 = '护盾耗尽';
-                    }
+                setTimeout(() => {
+                    statsContainer.style.opacity = '1';
+                    statsContainer.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                // 隐藏数据统计
+                statsContainer.style.opacity = '0';
+                statsContainer.style.transform = 'translateY(-20px)';
+                document.getElementById('death-cause').style.display = 'block';
+                document.getElementById('stats-container').style.display = 'flex';
+                setTimeout(() => {
+                    statsContainer.style.display = 'none';
+                    button.innerHTML = '<i class="fas fa-chart-bar"></i> 显示本局数据';
+                }, 300);
+            }
+        }
+
+        function recordDeathCauses() {
+            if (gameState.player1.hp <= 0) {
+                if (gameState.player1.shield <= 0) {
+                    gameStats.deathCauses.player1 = '被击败';
+                } else {
+                    gameStats.deathCauses.player1 = '护盾耗尽';
                 }
             }
 
-            // 生成死亡分析
-            function generateDeathAnalysis() {
-                return {
-                    player1: {
-                        health: gameState.player1.hp,
-                        score: gameState.player1.score,
-                        cause: gameStats.deathCauses.player1
-                    },
-                    player2: {
-                        health: gameState.player2.hp,
-                        score: gameState.player2.score,
-                        cause: gameStats.deathCauses.player2
-                    }
-                };
+            if (gameState.player2.hp <= 0) {
+                if (gameState.player2.shield <= 0) {
+                    gameStats.deathCauses.player2 = '被击败';
+                } else {
+                    gameStats.deathCauses.player2 = '护盾耗尽';
+                }
             }
+        }
 
-            // 显示游戏结束消息
-            function showGameOverMessage(message, color) {
-                const messageEl = document.createElement('div');
-                messageEl.className = 'game-over-message';
-                messageEl.textContent = message;
-                messageEl.style.color = color;
+        // 生成死亡分析
+        function generateDeathAnalysis() {
+            return {
+                player1: {
+                    health: gameState.player1.hp,
+                    score: gameState.player1.score,
+                    cause: gameStats.deathCauses.player1
+                },
+                player2: {
+                    health: gameState.player2.hp,
+                    score: gameState.player2.score,
+                    cause: gameStats.deathCauses.player2
+                }
+            };
+        }
 
-                const buttonsContainer = document.querySelector('.buttons-container');
-                if (buttonsContainer) {
-                    buttonsContainer.insertAdjacentElement('beforebegin', messageEl);
+        // 显示游戏结束消息
+        function showGameOverMessage(message, color) {
+            const messageEl = document.createElement('div');
+            messageEl.className = 'game-over-message';
+            messageEl.textContent = message;
+            messageEl.style.color = color;
 
-                    // 3秒后淡出
+            const buttonsContainer = document.querySelector('.buttons-container');
+            if (buttonsContainer) {
+                buttonsContainer.insertAdjacentElement('beforebegin', messageEl);
+
+                // 3秒后淡出
+                setTimeout(() => {
+                    messageEl.style.opacity = '0';
                     setTimeout(() => {
-                        messageEl.style.opacity = '0';
-                        setTimeout(() => {
-                            messageEl.remove();
-                        }, 500);
-                    }, 3000);
-                }
+                        messageEl.remove();
+                    }, 500);
+                }, 3000);
             }
+        }
 
-            // 计算胜率百分比
-            function calculateWinPercentage(wins, opponentWins) {
-                const total = wins + opponentWins;
-                return total > 0 ? Math.round((wins / total) * 100) : 50;
+        // 计算胜率百分比
+        function calculateWinPercentage(wins, opponentWins) {
+            const total = wins + opponentWins;
+            return total > 0 ? Math.round((wins / total) * 100) : 50;
+        }
+
+        // 创建庆祝效果
+        function createCelebrationEffect(color) {
+            const colors = [color, '#FFFFFF', '#FFD700'];
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'celebration-particle';
+
+                // 随机属性
+                const size = 5 + Math.random() * 10;
+                const duration = 1 + Math.random() * 2;
+                const delay = Math.random() * 0.5;
+                const distance = 50 + Math.random() * 100;
+                const angle = Math.random() * Math.PI * 2;
+
+                // 设置样式
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+
+                // 设置初始位置
+                particle.style.left = '50%';
+                particle.style.top = '30%';
+
+                // 设置动画终点
+                particle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+                particle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+
+                gameOverScreen.appendChild(particle);
+
+                // 动画结束后移除
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
             }
-
-            // 创建庆祝效果
-            function createCelebrationEffect(color) {
-                const colors = [color, '#FFFFFF', '#FFD700'];
-
-                for (let i = 0; i < 50; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'celebration-particle';
-
-                    // 随机属性
-                    const size = 5 + Math.random() * 10;
-                    const duration = 1 + Math.random() * 2;
-                    const delay = Math.random() * 0.5;
-                    const distance = 50 + Math.random() * 100;
-                    const angle = Math.random() * Math.PI * 2;
-
-                    // 设置样式
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    particle.style.animationDuration = `${duration}s`;
-                    particle.style.animationDelay = `${delay}s`;
-
-                    // 设置初始位置
-                    particle.style.left = '50%';
-                    particle.style.top = '30%';
-
-                    // 设置动画终点
-                    particle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
-                    particle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
-
-                    gameOverScreen.appendChild(particle);
-
-                    // 动画结束后移除
-                    setTimeout(() => {
-                        particle.remove();
-                    }, duration * 1000);
-                }
-            }
+        }
         // 显示统计数据
         function displayStats() {
             const stats = `
@@ -6497,54 +6525,54 @@ ${loser ? `
             updateMagicBallsDisplay('player2');
         }
         // 更新魔法球显示
-    function updateMagicBallsDisplay(playerKey) {
-        const player = gameState[playerKey];
-        const ballsElement = document.getElementById(`${playerKey}-balls`);
+        function updateMagicBallsDisplay(playerKey) {
+            const player = gameState[playerKey];
+            const ballsElement = document.getElementById(`${playerKey}-balls`);
 
-        if (!ballsElement) return;
+            if (!ballsElement) return;
 
-        ballsElement.innerHTML = '';
+            ballsElement.innerHTML = '';
 
-        // 确保 magicBalls 存在
-        if (!player.magicBalls) {
-            player.magicBalls = [];
-        }
-
-        // 安全地遍历
-        player.magicBalls.forEach((ballType, index) => {
-            const ballSlot = document.createElement('div');
-            ballSlot.className = `ball-slot ${ballType}`;
-
-            // 设置缩写
-            let abbreviation;
-            switch (ballType) {
-                case 'invincible': abbreviation = '无'; break;
-                case 'health': abbreviation = '血'; break;
-                case 'reverse': abbreviation = '反'; break;
-                case 'attack': abbreviation = '攻'; break;
-                case 'bomb': abbreviation = '爆'; break;
-                default: abbreviation = '?';
+            // 确保 magicBalls 存在
+            if (!player.magicBalls) {
+                player.magicBalls = [];
             }
 
-            ballSlot.textContent = abbreviation;
-            ballSlot.title = getBallDescription(ballType);
+            // 安全地遍历
+            player.magicBalls.forEach((ballType, index) => {
+                const ballSlot = document.createElement('div');
+                ballSlot.className = `ball-slot ${ballType}`;
 
-            // 添加点击事件
-            ballSlot.style.cursor = 'pointer';
-            ballSlot.onclick = () => useMagicBall(playerKey, index);
+                // 设置缩写
+                let abbreviation;
+                switch (ballType) {
+                    case 'invincible': abbreviation = '无'; break;
+                    case 'health': abbreviation = '血'; break;
+                    case 'reverse': abbreviation = '反'; break;
+                    case 'attack': abbreviation = '攻'; break;
+                    case 'bomb': abbreviation = '爆'; break;
+                    default: abbreviation = '?';
+                }
 
-            ballsElement.appendChild(ballSlot);
-        });
+                ballSlot.textContent = abbreviation;
+                ballSlot.title = getBallDescription(ballType);
 
-        // 添加空槽位
-        const emptySlots = 5 - (player.magicBalls ? player.magicBalls.length : 0);
-        for (let i = 0; i < emptySlots; i++) {
-            const emptySlot = document.createElement('div');
-            emptySlot.className = 'ball-slot';
-            emptySlot.textContent = '';
-            ballsElement.appendChild(emptySlot);
+                // 添加点击事件
+                ballSlot.style.cursor = 'pointer';
+                ballSlot.onclick = () => useMagicBall(playerKey, index);
+
+                ballsElement.appendChild(ballSlot);
+            });
+
+            // 添加空槽位
+            const emptySlots = 5 - (player.magicBalls ? player.magicBalls.length : 0);
+            for (let i = 0; i < emptySlots; i++) {
+                const emptySlot = document.createElement('div');
+                emptySlot.className = 'ball-slot';
+                emptySlot.textContent = '';
+                ballsElement.appendChild(emptySlot);
+            }
         }
-    }
         // 获取魔法球描述
         function getBallDescription(ballType) {
             switch (ballType) {
@@ -7080,22 +7108,22 @@ ${loser ? `
         });
 
         // 加载Three.js并初始化
-    function loadThreeJS() {
-        if (typeof THREE === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-            script.onload = function () {
+        function loadThreeJS() {
+            if (typeof THREE === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+                script.onload = function () {
+                    initScene();
+                    // 延迟显示主页动画
+                    setTimeout(playHomepageAnimation, 500);
+                };
+                document.head.appendChild(script);
+            } else {
                 initScene();
                 // 延迟显示主页动画
                 setTimeout(playHomepageAnimation, 500);
-            };
-            document.head.appendChild(script);
-        } else {
-            initScene();
-            // 延迟显示主页动画
-            setTimeout(playHomepageAnimation, 500);
+            }
         }
-    }
 
         // 初始化魔法球显示
         setTimeout(() => {
@@ -7104,335 +7132,335 @@ ${loser ? `
         }, 100);
 
         loadThreeJS();
-function loginPlayer2() {
-        document.getElementById('confirm-start-btn').style.display = 'none';
-    swal({
-        title: "玩家2登录",
-        text: "请输入用户名和密码",
-        type: "input",
-        inputType: "text",
-        inputPlaceholder: "请输入用户名",
-        showCancelButton: true,
-        cancelButtonText: "取消",
-        confirmButtonText: "下一步",
-        closeOnConfirm: false
-    }, function(username) {
-        if (username === false) return false;
-        if (!username) {
-            swal.showInputError("请输入用户名");
-            return false;
-        }
-        
-        // 检查是否与玩家1用户名相同
-        const player1Username = localStorage.getItem('username');
-        if (player1Username && username === player1Username) {
-            swal.showInputError("用户名不能与玩家1相同");
-            return false;
-        }
-        
-        // 第二步：询问密码
-        swal({
-            title: "玩家2登录",
-            text: "请输入密码",
-            type: "input",
-            inputType: "password",
-            inputPlaceholder: "请输入密码",
-            showCancelButton: true,
-            cancelButtonText: "上一步",
-            confirmButtonText: "登录",
-            closeOnConfirm: false
-        }, function(password) {
-            if (password === false) {
-                // 点击取消返回上一步
-                loginPlayer2();
-                return false;
-            }
-            if (!password) {
-                swal.showInputError("请输入密码");
-                return false;
-            }
-            
-            // 发送登录请求
-            fetch(`${serverurl}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                })
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.includes('<h1>登录成功</h1>')) {
-                    localStorage.setItem('player2_username', username);
-                    fetch(`${serverurl}/get-user-id-by-username`, {
-                                method: 'POST', // 指定请求方法
-                                headers: {
-                                    'Content-Type': 'application/json' // 设置请求头
-                                },
-                                body: JSON.stringify({ username: username }) // 请求体
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json(); // 解析JSON数据
-                                })
-                                .then(data => {
-                                    // 处理返回的数据
-                                    if (data.success) {
-                                        // 假设data.data中包含userId
-                                        const userId = data.data.userId;
-                                        localStorage.setItem("player2_userid",userId);
-                                        document.getElementById('player1-panel-name').textContent = player1Name;
-                                        document.getElementById('player2-panel-name').textContent = player2Name;
-                                        document.getElementById('player1-selection-title').textContent = player1Name + '选择蛇类型';
-                                        player1Name = localStorage.getItem('username') || '玩家1';
-                                        player2Name = localStorage.getItem('player2_username') || '玩家2';
-                                        document.getElementById('player2-selection-title').textContent = player2Name + '选择蛇类型';
-                                        document.getElementById('player2-base-name').textContent = player2Name + '基地';
-                                        document.getElementById('player2-panel-name').textContent = player2Name;
-                                        document.getElementById('confirm-start-btn').style.display = 'block';
-                                        swal("登录成功", "玩家2已登录", "success");
-                                    } else {
-                                        // 显示错误信息
-                                        console.log(data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    // 处理请求过程中的错误
-                                    console.error('Fetch error:', error);
-                                });
-                } else if (data.includes('登录失败')) {
-                    swal("登录失败", '用户名或密码错误', 'error');
-                    document.getElementById('confirm-start-btn').style.display = "none";
+        function loginPlayer2() {
+            document.getElementById('confirm-start-btn').style.display = 'none';
+            swal({
+                title: "玩家2登录",
+                text: "请输入用户名和密码",
+                type: "input",
+                inputType: "text",
+                inputPlaceholder: "请输入用户名",
+                showCancelButton: true,
+                cancelButtonText: "取消",
+                confirmButtonText: "下一步",
+                closeOnConfirm: false
+            }, function (username) {
+                if (username === false) return false;
+                if (!username) {
+                    swal.showInputError("请输入用户名");
+                    return false;
                 }
-            })
-            .catch(error => {
-                console.error(error);
-                swal("请求失败", "请稍后重试", "error");
-            });
-        });
-    });
-}      
-            async function getServerRecords() {
-                try {
-                    const userId = localStorage.getItem("userid");
-                    const player2UserId = localStorage.getItem("player2_userid");
-                    const currentUsername = localStorage.getItem("username");
-                    const player2Username = localStorage.getItem("player2_username");
 
-                    if (!userId || !player2UserId || !currentUsername || !player2Username) {
-                        return null;
+                // 检查是否与玩家1用户名相同
+                const player1Username = localStorage.getItem('username');
+                if (player1Username && username === player1Username) {
+                    swal.showInputError("用户名不能与玩家1相同");
+                    return false;
+                }
+
+                // 第二步：询问密码
+                swal({
+                    title: "玩家2登录",
+                    text: "请输入密码",
+                    type: "input",
+                    inputType: "password",
+                    inputPlaceholder: "请输入密码",
+                    showCancelButton: true,
+                    cancelButtonText: "上一步",
+                    confirmButtonText: "登录",
+                    closeOnConfirm: false
+                }, function (password) {
+                    if (password === false) {
+                        // 点击取消返回上一步
+                        loginPlayer2();
+                        return false;
+                    }
+                    if (!password) {
+                        swal.showInputError("请输入密码");
+                        return false;
                     }
 
-                    // 获取当前用户的记录
-                    const currentUserData = await getUserCustomData(userId);
-                    const player2Data = await getUserCustomData(player2UserId);
-
-                    let player1Wins = 0;
-                    let player2Wins = 0;
-
-                    // 从当前用户数据中解析
-                    if (currentUserData) {
-                        const records = currentUserData.split(';');
-                        for (const record of records) {
-                            if (record.startsWith(`snakegame_record3D_with_${player2Username}`)) {
-                                const parts = record.split(':')[1].split(',');
-                                player1Wins += parseInt(parts[0]) || 0;
-                                player2Wins += parseInt(parts[1]) || 0;
+                    // 发送登录请求
+                    fetch(`${serverurl}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data.includes('<h1>登录成功</h1>')) {
+                                localStorage.setItem('player2_username', username);
+                                fetch(`${serverurl}/get-user-id-by-username`, {
+                                    method: 'POST', // 指定请求方法
+                                    headers: {
+                                        'Content-Type': 'application/json' // 设置请求头
+                                    },
+                                    body: JSON.stringify({ username: username }) // 请求体
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        return response.json(); // 解析JSON数据
+                                    })
+                                    .then(data => {
+                                        // 处理返回的数据
+                                        if (data.success) {
+                                            // 假设data.data中包含userId
+                                            const userId = data.data.userId;
+                                            localStorage.setItem("player2_userid", userId);
+                                            document.getElementById('player1-panel-name').textContent = player1Name;
+                                            document.getElementById('player2-panel-name').textContent = player2Name;
+                                            document.getElementById('player1-selection-title').textContent = player1Name + '选择蛇类型';
+                                            player1Name = localStorage.getItem('username') || '玩家1';
+                                            player2Name = localStorage.getItem('player2_username') || '玩家2';
+                                            document.getElementById('player2-selection-title').textContent = player2Name + '选择蛇类型';
+                                            document.getElementById('player2-base-name').textContent = player2Name + '基地';
+                                            document.getElementById('player2-panel-name').textContent = player2Name;
+                                            document.getElementById('confirm-start-btn').style.display = 'block';
+                                            swal("登录成功", "玩家2已登录", "success");
+                                        } else {
+                                            // 显示错误信息
+                                            console.log(data.message);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        // 处理请求过程中的错误
+                                        console.error('Fetch error:', error);
+                                    });
+                            } else if (data.includes('登录失败')) {
+                                swal("登录失败", '用户名或密码错误', 'error');
+                                document.getElementById('confirm-start-btn').style.display = "none";
                             }
-                        }
-                    }
-                    return {
-                        player1Wins,
-                        player2Wins
-                    };
-                } catch (error) {
-                    console.error('获取服务器记录失败:', error);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            swal("请求失败", "请稍后重试", "error");
+                        });
+                });
+            });
+        }
+        async function getServerRecords() {
+            try {
+                const userId = localStorage.getItem("userid");
+                const player2UserId = localStorage.getItem("player2_userid");
+                const currentUsername = localStorage.getItem("username");
+                const player2Username = localStorage.getItem("player2_username");
+
+                if (!userId || !player2UserId || !currentUsername || !player2Username) {
                     return null;
                 }
+
+                // 获取当前用户的记录
+                const currentUserData = await getUserCustomData(userId);
+                const player2Data = await getUserCustomData(player2UserId);
+
+                let player1Wins = 0;
+                let player2Wins = 0;
+
+                // 从当前用户数据中解析
+                if (currentUserData) {
+                    const records = currentUserData.split(';');
+                    for (const record of records) {
+                        if (record.startsWith(`snakegame_record3D_with_${player2Username}`)) {
+                            const parts = record.split(':')[1].split(',');
+                            player1Wins += parseInt(parts[0]) || 0;
+                            player2Wins += parseInt(parts[1]) || 0;
+                        }
+                    }
+                }
+                return {
+                    player1Wins,
+                    player2Wins
+                };
+            } catch (error) {
+                console.error('获取服务器记录失败:', error);
+                return null;
+            }
+        }
+
+        // 上传游戏记录
+        let hasUploaded = false;
+        async function uploadGameRecord(player1Wins, player2Wins) {
+            if (hasUploaded) {
+                throw new Error('战绩已保存，请勿重复提交');
             }
 
-            // 上传游戏记录
-            let hasUploaded = false;
-            async function uploadGameRecord(player1Wins, player2Wins) {
-                if (hasUploaded) {
-                    throw new Error('战绩已保存，请勿重复提交');
+            try {
+                const userId = localStorage.getItem("userid");
+                const player2UserId = localStorage.getItem("player2_userid");
+                const currentUsername = localStorage.getItem("username");
+                const player2Username = localStorage.getItem("player2_username");
+
+                if (!userId || !player2UserId || !currentUsername || !player2Username) {
+                    throw new Error('用户信息不完整');
                 }
 
-                try {
-                    const userId = localStorage.getItem("userid");
-                    const player2UserId = localStorage.getItem("player2_userid");
-                    const currentUsername = localStorage.getItem("username");
-                    const player2Username = localStorage.getItem("player2_username");
+                // 准备上传的数据
+                const recordForCurrentUser = `snakegame_record3D_with_${player2Username}:${player1Wins},${player2Wins}`;
+                const recordForPlayer2 = `snakegame_record3D_with_${currentUsername}:${player2Wins},${player1Wins}`;
 
-                    if (!userId || !player2UserId || !currentUsername || !player2Username) {
-                        throw new Error('用户信息不完整');
-                    }
+                // 获取当前用户的现有数据
+                const currentUserData = await getUserCustomData(userId);
+                const player2Data = await getUserCustomData(player2UserId);
 
-                    // 准备上传的数据
-                    const recordForCurrentUser = `snakegame_record3D_with_${player2Username}:${player1Wins},${player2Wins}`;
-                    const recordForPlayer2 = `snakegame_record3D_with_${currentUsername}:${player2Wins},${player1Wins}`;
+                // 更新数据
+                const updatedCurrentUserData = updateRecord(currentUserData, recordForCurrentUser);
+                const updatedPlayer2Data = updateRecord(player2Data, recordForPlayer2);
 
-                    // 获取当前用户的现有数据
-                    const currentUserData = await getUserCustomData(userId);
-                    const player2Data = await getUserCustomData(player2UserId);
+                // 上传更新后的数据
+                await Promise.all([
+                    updateUserCustomData(userId, updatedCurrentUserData),
+                    updateUserCustomData(player2UserId, updatedPlayer2Data)
+                ]);
 
-                    // 更新数据
-                    const updatedCurrentUserData = updateRecord(currentUserData, recordForCurrentUser);
-                    const updatedPlayer2Data = updateRecord(player2Data, recordForPlayer2);
-
-                    // 上传更新后的数据
-                    await Promise.all([
-                        updateUserCustomData(userId, updatedCurrentUserData),
-                        updateUserCustomData(player2UserId, updatedPlayer2Data)
-                    ]);
-
-                    hasUploaded = true;
-                    return true;
-                } catch (error) {
-                    console.error('上传战绩失败:', error);
-                    throw error;
-                }
+                hasUploaded = true;
+                return true;
+            } catch (error) {
+                console.error('上传战绩失败:', error);
+                throw error;
             }
+        }
 
-            // 获取用户自定义数据
-            async function getUserCustomData(userId) {
-                try {
-                    const response = await fetch(`${serverurl}/get-custom-data-by-id`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId: userId
-                        })
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                        return data.data.customData || '';
-                    }
-                    throw new Error(data.message || '获取用户数据失败');
-                } catch (error) {
-                    console.error('获取用户数据失败:', error);
-                    throw error;
-                }
-            }
-
-            // 更新记录
-            function updateRecord(currentData, newRecord) {
-                if (!currentData) return newRecord;
-
-                const recordKey = newRecord.split(':')[0];
-                const records = currentData.split(';');
-                let found = false;
-
-                const updatedRecords = records.map(record => {
-                    if (record.startsWith(recordKey)) {
-                        found = true;
-                        const [oldP1Wins, oldP2Wins] = record.split(':')[1].split(',').map(Number);
-                        const [newP1Wins, newP2Wins] = newRecord.split(':')[1].split(',').map(Number);
-                        return `${recordKey}:${oldP1Wins + newP1Wins},${oldP2Wins + newP2Wins}`;
-                    }
-                    return record;
+        // 获取用户自定义数据
+        async function getUserCustomData(userId) {
+            try {
+                const response = await fetch(`${serverurl}/get-custom-data-by-id`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId
+                    })
                 });
 
-                if (!found) {
-                    updatedRecords.push(newRecord);
+                const data = await response.json();
+                if (data.success) {
+                    return data.data.customData || '';
                 }
+                throw new Error(data.message || '获取用户数据失败');
+            } catch (error) {
+                console.error('获取用户数据失败:', error);
+                throw error;
+            }
+        }
 
-                return updatedRecords.filter(r => r).join(';');
+        // 更新记录
+        function updateRecord(currentData, newRecord) {
+            if (!currentData) return newRecord;
+
+            const recordKey = newRecord.split(':')[0];
+            const records = currentData.split(';');
+            let found = false;
+
+            const updatedRecords = records.map(record => {
+                if (record.startsWith(recordKey)) {
+                    found = true;
+                    const [oldP1Wins, oldP2Wins] = record.split(':')[1].split(',').map(Number);
+                    const [newP1Wins, newP2Wins] = newRecord.split(':')[1].split(',').map(Number);
+                    return `${recordKey}:${oldP1Wins + newP1Wins},${oldP2Wins + newP2Wins}`;
+                }
+                return record;
+            });
+
+            if (!found) {
+                updatedRecords.push(newRecord);
             }
 
-            // 更新用户自定义数据
-            async function updateUserCustomData(userId, customData) {
-                try {
-                    const response = await fetch(`${serverurl}/update-custom-data`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId: userId,
-                            customData: customData
-                        })
-                    });
+            return updatedRecords.filter(r => r).join(';');
+        }
 
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '更新数据失败');
-                    }
-                } catch (error) {
-                    console.error('更新用户数据失败:', error);
-                    throw error;
+        // 更新用户自定义数据
+        async function updateUserCustomData(userId, customData) {
+            try {
+                const response = await fetch(`${serverurl}/update-custom-data`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        customData: customData
+                    })
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || '更新数据失败');
                 }
+            } catch (error) {
+                console.error('更新用户数据失败:', error);
+                throw error;
             }
+        }
 
-            // 显示所有战绩记录
-            async function showAllRecords() {
-                try {
-                    const modal = document.getElementById('records-modal');
-                    const container = document.getElementById('records-container');
-
-                    // 显示加载中
-                    container.innerHTML = '<div class="loading">加载中...</div>';
-                    modal.style.display = 'block';
-
-                    // 获取所有用户数据
-                    const response = await fetch(`${serverurl}/get-all-custom-data`);
-                    const data = await response.json();
-
-                    if (!data.success) {
-                        throw new Error('获取数据失败');
-                    }
-
-                    // 处理并显示数据
-                    displayRecords(data.data);
-
-                    // 添加搜索功能
-                    document.getElementById('search-username').addEventListener('input', (e) => {
-                        filterRecords(e.target.value, data.data);
-                    });
-
-                    // 刷新按钮
-                    document.getElementById('refresh-records').addEventListener('click', showAllRecords);
-
-                } catch (error) {
-                    console.error('获取战绩失败:', error);
-                    document.getElementById('records-container').innerHTML =
-                        `<div class="error">获取战绩失败: ${error.message}</div>`;
-                }
-            }
-
-            // 显示战绩记录
-            function displayRecords(users) {
+        // 显示所有战绩记录
+        async function showAllRecords() {
+            try {
+                const modal = document.getElementById('records-modal');
                 const container = document.getElementById('records-container');
-                container.innerHTML = '';
 
-                if (!users || users.length === 0) {
-                    container.innerHTML = '<div class="no-data">暂无战绩数据</div>';
-                    return;
+                // 显示加载中
+                container.innerHTML = '<div class="loading">加载中...</div>';
+                modal.style.display = 'block';
+
+                // 获取所有用户数据
+                const response = await fetch(`${serverurl}/get-all-custom-data`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error('获取数据失败');
                 }
 
-                // 处理每个用户的记录
-                users.forEach(user => {
-                    if (!user.customData) return;
+                // 处理并显示数据
+                displayRecords(data.data);
 
-                    // 解析对战记录
-                    const records = parseRecords(user.customData);
-                    if (records.length === 0) return;
+                // 添加搜索功能
+                document.getElementById('search-username').addEventListener('input', (e) => {
+                    filterRecords(e.target.value, data.data);
+                });
 
-                    // 计算总胜率
-                    const stats = calculateStats(records);
+                // 刷新按钮
+                document.getElementById('refresh-records').addEventListener('click', showAllRecords);
 
-                    // 创建记录元素
-                    const recordElement = document.createElement('div');
-                    recordElement.className = 'record-item';
-                    recordElement.innerHTML = `
+            } catch (error) {
+                console.error('获取战绩失败:', error);
+                document.getElementById('records-container').innerHTML =
+                    `<div class="error">获取战绩失败: ${error.message}</div>`;
+            }
+        }
+
+        // 显示战绩记录
+        function displayRecords(users) {
+            const container = document.getElementById('records-container');
+            container.innerHTML = '';
+
+            if (!users || users.length === 0) {
+                container.innerHTML = '<div class="no-data">暂无战绩数据</div>';
+                return;
+            }
+
+            // 处理每个用户的记录
+            users.forEach(user => {
+                if (!user.customData) return;
+
+                // 解析对战记录
+                const records = parseRecords(user.customData);
+                if (records.length === 0) return;
+
+                // 计算总胜率
+                const stats = calculateStats(records);
+
+                // 创建记录元素
+                const recordElement = document.createElement('div');
+                recordElement.className = 'record-item';
+                recordElement.innerHTML = `
                     <div class="record-details">
                         <div class="record-username">${user.username}</div>
                         <div class="record-stats">
@@ -7452,101 +7480,101 @@ function loginPlayer2() {
                     </div>
                 `;
 
-                    container.appendChild(recordElement);
-                });
-            }
+                container.appendChild(recordElement);
+            });
+        }
 
-            // 过滤记录
-            function filterRecords(searchTerm, allUsers) {
-                const filteredUsers = allUsers.filter(user => {
-                    // 检查用户名是否匹配
-                    if (user.username.toLowerCase().includes(searchTerm.toLowerCase())) {
-                        return true;
-                    }
+        // 过滤记录
+        function filterRecords(searchTerm, allUsers) {
+            const filteredUsers = allUsers.filter(user => {
+                // 检查用户名是否匹配
+                if (user.username.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    return true;
+                }
 
-                    // 检查对战记录中是否包含搜索词
-                    if (user.customData && user.customData.toLowerCase().includes(searchTerm.toLowerCase())) {
-                        return true;
-                    }
+                // 检查对战记录中是否包含搜索词
+                if (user.customData && user.customData.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    return true;
+                }
 
-                    return false;
-                });
+                return false;
+            });
 
-                displayRecords(filteredUsers);
-            }
+            displayRecords(filteredUsers);
+        }
 
-            // 解析记录数据
-            function parseRecords(customData) {
-                if (!customData) return [];
+        // 解析记录数据
+        function parseRecords(customData) {
+            if (!customData) return [];
 
-                const records = [];
-                const recordStrings = customData.split(';');
+            const records = [];
+            const recordStrings = customData.split(';');
 
-                recordStrings.forEach(str => {
-                    if (!str.startsWith('snakegame_record3D_with_')) return;
+            recordStrings.forEach(str => {
+                if (!str.startsWith('snakegame_record3D_with_')) return;
 
-                    const parts = str.split(':');
-                    if (parts.length !== 2) return;
+                const parts = str.split(':');
+                if (parts.length !== 2) return;
 
-                    const opponentName = parts[0].replace('snakegame_record3D_with_', '');
-                    const [wins, losses] = parts[1].split(',').map(Number);
+                const opponentName = parts[0].replace('snakegame_record3D_with_', '');
+                const [wins, losses] = parts[1].split(',').map(Number);
 
-                    if (isNaN(wins) || isNaN(losses)) return;
+                if (isNaN(wins) || isNaN(losses)) return;
 
-                    const total = wins + losses;
-                    const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+                const total = wins + losses;
+                const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
 
-                    records.push({
-                        opponentName,
-                        wins,
-                        losses,
-                        winRate,
-                        opponentAvatar: `${serverurl}/get-icon-by-id?username=${encodeURIComponent(opponentName)}`
-                    });
-                });
-
-                return records;
-            }
-
-            // 计算统计数据
-            function calculateStats(records) {
-                let totalWins = 0;
-                let totalLosses = 0;
-
-                records.forEach(record => {
-                    totalWins += record.wins;
-                    totalLosses += record.losses;
-                });
-
-                const totalMatches = totalWins + totalLosses;
-                const winRate = totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0;
-
-                return {
-                    totalMatches,
-                    totalWins,
-                    totalLosses,
-                    winRate
-                };
-            }
-
-            // 关闭模态框
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const modalId = this.getAttribute('data-modal') || 'records-modal';
-                    document.getElementById(modalId).style.display = 'none';
+                records.push({
+                    opponentName,
+                    wins,
+                    losses,
+                    winRate,
+                    opponentAvatar: `${serverurl}/get-icon-by-id?username=${encodeURIComponent(opponentName)}`
                 });
             });
 
-            // 点击外部关闭
-            window.addEventListener('click', function (event) {
-                const modals = ['records-modal'];
-                modals.forEach(modalId => {
-                    const modal = document.getElementById(modalId);
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            });  
+            return records;
+        }
+
+        // 计算统计数据
+        function calculateStats(records) {
+            let totalWins = 0;
+            let totalLosses = 0;
+
+            records.forEach(record => {
+                totalWins += record.wins;
+                totalLosses += record.losses;
+            });
+
+            const totalMatches = totalWins + totalLosses;
+            const winRate = totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0;
+
+            return {
+                totalMatches,
+                totalWins,
+                totalLosses,
+                winRate
+            };
+        }
+
+        // 关闭模态框
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const modalId = this.getAttribute('data-modal') || 'records-modal';
+                document.getElementById(modalId).style.display = 'none';
+            });
+        });
+
+        // 点击外部关闭
+        window.addEventListener('click', function (event) {
+            const modals = ['records-modal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });  
     </script>
 </body>
 
