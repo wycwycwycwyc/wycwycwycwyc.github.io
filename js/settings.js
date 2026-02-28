@@ -134,10 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
         isDarkMode = darkModeToggle.checked;
         localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
         if (lightModeBgUrlInput.value == '' || darkModeBgUrlInput.value == '') {
-            lightModeBgUrlInput.value = 'https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark';
-            localStorage.setItem('backgroundImage', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
-            localStorage.setItem('lightModeBgUrl1', "https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark");
-            localStorage.setItem('lightModeBgUrl', "url('https://pic.vjshi.com/2021-12-30/35b7a7a382df4ef387873d042575802a/00001.jpg?x-oss-process=style/watermark')");
+            lightModeBgUrlInput.value = 'https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg';
+            localStorage.setItem('backgroundImage', "url('https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg')");
+            localStorage.setItem('lightModeBgUrl1', "https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg");
+            localStorage.setItem('lightModeBgUrl', "url('https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg')");
             darkModeBgUrlInput.value = 'https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg';
             localStorage.setItem('backgroundImage', "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')");
             localStorage.setItem('darkModeBgUrl1', "https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg");

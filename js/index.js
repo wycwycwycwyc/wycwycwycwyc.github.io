@@ -15,7 +15,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // 背景图片路径
     var lightModeBackground = localStorage.getItem('lightModeBgUrl');
     var darkModeBackground = localStorage.getItem('darkModeBgUrl');
-    
+    if(lightModeBackground=="url('')"){
+        lightModeBackground = "url('https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg')";
+    }
+    if(darkModeBackground=="url('')"){
+        darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
+    }
     // 获取设置
     var followSystem = localStorage.getItem('followSystem');
     var isDarkMode = localStorage.getItem('darkMode') === 'enabled';

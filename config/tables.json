@@ -98,7 +98,7 @@
     "tool1": {
       "name": "计算器",
       "Introduction": "简单的网页计算器",
-      "note": "支持基本运算，科学运算，函数画图等这些功能，不需要下载，是网页计算的不错选择",
+      "note": "支持基本运算，科学运算，函数画图等这些功能，不需下载，是网页计算的不错选择",
       "view": "/code/webapp/calculator"
     },
     "tool2": {
@@ -130,6 +130,12 @@
       "Introduction": "一个网页版的3D双人版贪吃蛇",
       "note": "可以在线游玩，无需下载，记录分数",
       "view": "/code/webapp/snakegame3Dpro/snakegame3Dpro.html"
-    }
+    },
+    "tool7": {
+      "name": "旧版网站",
+      "Introduction": "旧版网站的查看器",
+      "note": "可以预览旧版网站，回忆网站发展历程",
+      "view": "/code/webapp/oldwebsite"
+    }    
   }
 }
