@@ -1,0 +1,339 @@
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f3f0;
+      /* 浅色基调 */
+      color: #2c2c2c;
+      transition: background-color 0.3s ease, color 0.2s ease;
+      padding: 1.5rem;
+      margin: 0;
+    }
+
+    /* 深色模式 —— 只需在外层容器或body添加 .dark-mode 类 */
+    body.dark-mode {
+      background-color: #1a1c1e;
+      color: #e9e9ea;
+    }
+
+    /* 主面板 — 承载标题与按钮 */
+    .time-portal {
+      max-width: 780px;
+      width: 100%;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      border-radius: 3.5rem;
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.03) inset;
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.2s;
+      border: 1px solid rgba(200, 200, 200, 0.3);
+      animation: floatIn 0.9s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      transform-origin: center;
+    }
+
+    /* 深色模式下的主面板 */
+    body.dark-mode .time-portal {
+      background: rgba(30, 32, 34, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    }
+
+    /* 进入动画 */
+    @keyframes floatIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+        filter: blur(8px);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(1.01) translateY(-2px);
+        filter: blur(2px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    /* 主标题 —— 带着怀旧闪烁 */
+    .retro-title {
+      font-size: clamp(2.2rem, 12vw, 4.2rem) !important;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      background: linear-gradient(145deg, #3a3a3a, #1f1f1f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1);
+      transition: text-shadow 0.3s, background 0.3s;
+      animation: glitchPulse 2.8s infinite alternate ease-in-out;
+    }
+
+    /* 深色模式标题发光 */
+    body.dark-mode .retro-title {
+      background: linear-gradient(145deg, #f0e6d0, #c0b7a8);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px #ffdfa0, 0 0 20px #b77f2c;
+    }
+
+    /* 轻微故障闪烁 (不影响可读性) */
+    @keyframes glitchPulse {
+      0% {
+        letter-spacing: -0.02em;
+        opacity: 0.95;
+      }
+
+      95% {
+        letter-spacing: -0.02em;
+        opacity: 1;
+      }
+
+      100% {
+        letter-spacing: 0.01em;
+        opacity: 1;
+        text-shadow: 5px 5px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    body.dark-mode .retro-title {
+      animation: glitchPulseDark 3s infinite;
+    }
+
+    @keyframes glitchPulseDark {
+      0% {
+        text-shadow: 0 0 6px #f0c48b, 0 0 15px #b28448;
+      }
+
+      100% {
+        text-shadow: 2px 0 10px #ffb96b, -2px 0 15px #a5763e;
+      }
+    }
+
+    /* 副标题 / 装饰短语 */
+    .sub-head {
+      font-size: 1.1rem;
+      opacity: 0.7;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+      backdrop-filter: blur(2px);
+      padding: 0.2rem 1rem;
+      display: inline-block;
+      border-radius: 60px;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    body.dark-mode .sub-head {
+      opacity: 0.6;
+      color: #cdc8bc;
+    }
+
+    /* 按钮群组 双大按钮 */
+    .button-duo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      justify-content: center;
+      margin: 1.8rem 0 1rem;
+    }
+
+    /* 大按钮通用样式 */
+    .time-button {
+      flex: 1 1 240px;
+      min-width: 220px;
+      padding: 1.6rem 1.2rem;
+      border: none;
+      background: #fefcf8;
+      border-radius: 50px;
+      font-size: 1.6rem;
+      font-weight: 560;
+      letter-spacing: 0.02em;
+      color: #26221c;
+      cursor: pointer;
+      box-shadow: 0 15px 25px -8px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.05),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.05);
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transform: translateY(0);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 伪元素动画：光效扫过 */
+    .time-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 245, 200, 0.6), transparent);
+      transition: left 0.7s ease;
+      pointer-events: none;
+    }
+
+    .time-button:hover::after {
+      left: 100%;
+    }
+
+    /* 深色模式按钮 */
+    body.dark-mode .time-button {
+      background: #2f3135;
+      color: #f0e7da;
+      border: 1px solid #5b4f41;
+      box-shadow: 0 15px 25px -8px #0b0b0b, 0 4px 10px rgba(255, 215, 140, 0.08) inset, 0 -2px 0 #3a362e inset;
+    }
+
+    /* 悬停动画 */
+    .time-button:hover {
+      transform: scale(1.05) translateY(-4px);
+      box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px #b39d7a inset;
+      background: #ffffff;
+    }
+
+    body.dark-mode .time-button:hover {
+      background: #3e3b36;
+      box-shadow: 0 25px 35px -12px black, 0 0 0 1px #caa86b inset;
+      color: #fef7e9;
+    }
+
+    /* 按钮点击瞬间微反馈 */
+    .time-button:active {
+      transform: scale(0.97) translateY(2px);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+      transition: 0.05s;
+    }
+
+    /* 按钮内的小图标装饰 */
+    .button-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+      transition: transform 0.2s;
+    }
+
+    .time-button:hover .button-icon {
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    /* 下方微小的提示 */
+    .footer-note {
+      margin-top: 2.5rem;
+      font-size: 0.9rem;
+      opacity: 0.4;
+      letter-spacing: 0.3px;
+      border-top: 1px dashed currentColor;
+      padding-top: 1.2rem;
+      width: 70%;
+      margin-left: auto;
+      margin-right: auto;
+      transition: opacity 0.2s;
+    }
+
+    body.dark-mode .footer-note {
+      opacity: 0.25;
+    }
+
+    /* 响应式微调 */
+    @media (max-width: 520px) {
+      .time-portal {
+        padding: 2rem 1rem;
+      }
+
+      .time-button {
+        min-width: 180px;
+        font-size: 1.4rem;
+        padding: 1.2rem 0.8rem;
+      }
+    }
+
+    /* 说明容器：复古警示面板，置于按钮下方，与上下内容自然衔接 */
+    .legacy-notice {
+      max-width: 780px;
+      width: 100%;
+      margin: 2rem auto 1.5rem;
+      /* 上边距与按钮组分开，下边距留给footer */
+      padding: 1.2rem 1.8rem;
+      background: rgba(230, 225, 215, 0.5);
+      backdrop-filter: blur(4px);
+      border-radius: 2.5rem;
+      border: 1px solid rgba(160, 140, 120, 0.25);
+      box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.15);
+      transition: background 0.3s, border-color 0.2s;
+      text-align: left;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    /* 深色模式下说明容器 */
+    body.dark-mode .legacy-notice {
+      background: rgba(40, 38, 35, 0.7);
+      border-color: rgba(200, 170, 130, 0.2);
+      box-shadow: 0 8px 18px -8px #0a0a0a;
+    }
+
+    /* 每一条说明项目 */
+    .notice-item {
+      padding: 0.35rem 0 0.35rem 1.8rem;
+      /* 左内缩进为图标留出视觉空间 */
+      color: #3e3a34;
+      border-bottom: 1px dashed rgba(120, 100, 80, 0.15);
+      margin-bottom: 0.3rem;
+      background: transparent;
+      transition: color 0.2s;
+      word-break: break-word;
+      /* 防止长文本溢出 */
+    }
+
+    .notice-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    /* 深色模式下的文字颜色 */
+    body.dark-mode .notice-item {
+      color: #cfc9c0;
+      border-bottom-color: rgba(210, 180, 140, 0.15);
+    }
+
+    /* 第一条的图标微调 */
+    .notice-item:first-child {
+      padding-top: 0.1rem;
+    }
+
+    /* 响应式：小屏时缩小内边距 */
+    @media (max-width: 520px) {
+      .legacy-notice {
+        padding: 1rem 1.2rem;
+        font-size: 0.85rem;
+        border-radius: 1.8rem;
+      }
+
+      .notice-item {
+        padding-left: 1.2rem;
+      }
+    }
