@@ -1,122 +1,254 @@
 const urlParams = new URLSearchParams(window.location.search);
 const isPreview = urlParams.has('preview');
 
-document.addEventListener('DOMContentLoaded', function () {
-    var body = document.body;
-    var darkModeToggle = document.getElementById('darkModeToggle');
-    var mainImage = document.getElementById('main-image');
-    var opacitySelect = document.getElementById('opacitySelect');
-    var blurSelect = document.getElementById('blurSelect');
+// ==================== 主题管理模块 ====================
+const ThemeManager = {
+    // 初始化主题
+    init: function() {
+        // 设置默认值
+        if (localStorage.getItem('followSystem') === null) {
+            localStorage.setItem('followSystem', 'true');
+        }
+        if (localStorage.getItem('darkMode') === null) {
+            localStorage.setItem('darkMode', 'disabled');
+        }
+        if (localStorage.getItem('opacity') === null) {
+            localStorage.setItem('opacity', '0.3');
+        }
+        if (localStorage.getItem('blur') === null) {
+            localStorage.setItem('blur', '30');
+        }
+        
+        // 如果跟随系统，同步当前系统主题到 darkMode
+        if (localStorage.getItem('followSystem') === 'true') {
+            const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            localStorage.setItem('darkMode', systemIsDark ? 'enabled' : 'disabled');
+        }
+        
+        // 初始化 favicon（标签页图标）- 始终跟随系统
+        this.updateFavicon();
+        
+        // 应用主题
+        this.applyTheme();
+        
+        // 设置监听器
+        this.setupListeners();
+    },
     
-    // Logo图片路径
-    var lightModeLogoSrc = '/icons/logo.svg';
-    var darkModeLogoSrc = '/icons/logo_dark.svg';
-
-    // 背景图片路径
-    var lightModeBackground = localStorage.getItem('lightModeBgUrl');
-    var darkModeBackground = localStorage.getItem('darkModeBgUrl');
-    if(lightModeBackground=="url('')"){
-        lightModeBackground = "url('https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg')";
-    }
-    if(darkModeBackground=="url('')"){
-        darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
-    }
-    // 获取设置
-    var followSystem = localStorage.getItem('followSystem');
-    var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+    // 更新 favicon（标签页图标）- 根据系统深色模式
+    updateFavicon: function() {
+        const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // 查找现有的 favicon
+        let favicon = document.querySelector('link[rel="icon"]');
+        
+        // 如果不存在，创建一个
+        if (!favicon) {
+            favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/svg+xml';
+            document.head.appendChild(favicon);
+        }
+        
+        // 设置正确的图标
+        favicon.href = systemIsDark ? '/icons/logo_dark.svg' : '/icons/logo.svg';
+        
+        // 同时更新 apple-touch-icon（如果有）
+        const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+        if (appleIcon) {
+            appleIcon.href = systemIsDark ? '/icons/logo_dark.svg' : '/icons/logo.svg';
+        }
+        
+        console.log('Favicon updated to:', systemIsDark ? 'dark' : 'light', 'mode');
+    },
     
-    // 如果followSystem为空，设置为true
-    if (followSystem === null) {
-        localStorage.setItem('followSystem', 'true');
-        followSystem = 'true';
-    }
-
-    // 从 localStorage 中获取透明度设置
-    var selectedOpacity = localStorage.getItem('opacity') || '0.3';
-    var selectedblur = localStorage.getItem('blur') || '30';
-    if(followSystem==='true'){
-        if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            localStorage.setItem('darkMode','enabled');
-        } else {
-            localStorage.setItem('darkMode','disabled');
-        };
-    }
-    // 初始化页面主题
-    function initTheme() {
-        // 如果跟随系统
-        if (followSystem === 'true') {
-            // 检测系统颜色偏好
-            var systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // 应用主题
+    applyTheme: function() {
+        const followSystem = localStorage.getItem('followSystem') === 'true';
+        const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        
+        // 背景图片路径
+        let lightModeBackground = localStorage.getItem('lightModeBgUrl');
+        let darkModeBackground = localStorage.getItem('darkModeBgUrl');
+        
+        if(lightModeBackground === "url('')" || !lightModeBackground) {
+            lightModeBackground = "url('https://cdn.pixabay.com/photo/2023/06/16/21/13/landscape-8068793_1280.jpg')";
+        }
+        if(darkModeBackground === "url('')" || !darkModeBackground) {
+            darkModeBackground = "url('https://img1.wallspic.com/previews/7/4/9/3947/3947-ye_wan_de_tian_kong-wai_ceng_kong_jian-ming_xing-tian_wen_xue_dui_xiang-tian_kong-x750.jpg')";
+        }
+        
+        // Logo图片路径（这是页面中的主logo，不是标签页图标）
+        const lightModeLogoSrc = '/icons/logo.svg';
+        const darkModeLogoSrc = '/icons/logo_dark.svg';
+        
+        // 获取页面元素
+        const body = document.body;
+        const mainImage = document.getElementById('main-image');
+        
+        if (followSystem) {
+            // 跟随系统
+            const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            // 应用系统主题
-            body.style.backgroundImage = systemIsDark ? darkModeBackground : lightModeBackground;
-            mainImage.src = systemIsDark ? darkModeLogoSrc : lightModeLogoSrc;
-            body.classList.toggle('dark-mode', systemIsDark);
+            if (body) {
+                body.style.backgroundImage = systemIsDark ? darkModeBackground : lightModeBackground;
+                body.classList.toggle('dark-mode', systemIsDark);
+            }
+            
+            if (mainImage) {
+                mainImage.src = systemIsDark ? darkModeLogoSrc : lightModeLogoSrc;
+            }
+            
+            // 更新表格容器的深色模式类
+            const tablesContainer = document.getElementById('tables-container');
+            if (tablesContainer) {
+                tablesContainer.classList.toggle('dark-mode', systemIsDark);
+            }
             
             // 禁用切换按钮
+            const darkModeToggle = document.getElementById('darkModeToggle');
             if (darkModeToggle) {
                 darkModeToggle.style.opacity = '0.5';
                 darkModeToggle.title = '跟随系统主题时无法手动切换';
             }
         } else {
-            // 不跟随系统，使用用户手动设置
-            var storedBackgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+            // 手动模式
+            if (body) {
+                body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
+                body.classList.toggle('dark-mode', isDarkMode);
+            }
             
-            // 初始化页面的背景、Logo和深色模式类
-            body.style.backgroundImage = storedBackgroundImage;
-            mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-            body.classList.toggle('dark-mode', isDarkMode);
+            if (mainImage) {
+                mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
+            }
+            
+            // 更新表格容器的深色模式类
+            const tablesContainer = document.getElementById('tables-container');
+            if (tablesContainer) {
+                tablesContainer.classList.toggle('dark-mode', isDarkMode);
+            }
             
             // 启用切换按钮
+            const darkModeToggle = document.getElementById('darkModeToggle');
             if (darkModeToggle) {
                 darkModeToggle.style.opacity = '1';
+                darkModeToggle.style.pointerEvents = 'auto';
                 darkModeToggle.style.cursor = 'pointer';
                 darkModeToggle.title = '切换深色/浅色模式';
             }
         }
-
-        // 初始化透明度设置
-        if (opacitySelect) {
-            opacitySelect.value = selectedOpacity;
-        }
-        if (blurSelect) {
-            blurSelect.value = selectedblur;
-        }
         
         // 应用透明度和模糊效果
-        var currentIsDarkMode = followSystem === 'true'|| followSystem === null? 
-            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : isDarkMode;
+        const opacity = localStorage.getItem('opacity') || '0.3';
+        const blur = localStorage.getItem('blur') || '30';
+        const currentIsDark = this.getCurrentDarkMode();
+        
+        this.setElementsOpacity(opacity, currentIsDark);
+        this.setElementsBlur(blur, currentIsDark);
+        
+        // 注意：不在这里更新 favicon，因为 favicon 只跟随系统，不跟随网页主题
+    },
+    
+    // 获取当前是否为深色模式
+    getCurrentDarkMode: function() {
+        const followSystem = localStorage.getItem('followSystem') === 'true';
+        if (followSystem) {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } else {
+            return localStorage.getItem('darkMode') === 'enabled';
+        }
+    },
+    
+    // 设置元素透明度
+    setElementsOpacity: function(opacity, isDarkMode) {
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+        
+        elements.forEach(function(element) {
+            if (isDarkMode) {
+                element.style.backgroundColor = `rgba(16, 16, 16, ${opacity})`;
+            } else {
+                element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
+            }
+        });
+    },
+    
+    // 设置元素模糊效果
+    setElementsBlur: function(blur, isDarkMode) {
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+        
+        elements.forEach(function(element) {
+            element.style.backdropFilter = `blur(${blur}px)`;
+            element.style.webkitBackdropFilter = `blur(${blur}px)`;
+        });
+    },
+    
+    // 设置监听器
+    setupListeners: function() {
+        // 监听 storage 事件（跨页面通信的关键！）
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'followSystem' || e.key === 'darkMode' || e.key === 'opacity' || e.key === 'blur') {
+                console.log('Theme changed in another page:', e.key, e.newValue);
+                this.applyTheme();
+            }
+        });
+        
+        // 重写 localStorage.setItem 以在同一页面内也能响应
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            originalSetItem.call(this, key, value);
             
-        setElementsOpacity(selectedOpacity, currentIsDarkMode);
-        setElementsblur(selectedblur, currentIsDarkMode);
-    }
-
-    // 切换深色模式的函数
-    function toggleDarkMode() {
-        // 如果跟随系统，不允许手动切换
-        if (followSystem === 'true') {
-            Qmsg.error("当前设置为跟随系统，无法手动切换深色模式");
+            // 触发自定义事件
+            const event = new CustomEvent('localStorageChange', {
+                detail: { key: key, newValue: value }
+            });
+            window.dispatchEvent(event);
+        };
+        
+        // 监听自定义事件
+        window.addEventListener('localStorageChange', (e) => {
+            if (e.detail.key === 'followSystem' || e.detail.key === 'darkMode' || 
+                e.detail.key === 'opacity' || e.detail.key === 'blur') {
+                console.log('Theme changed in this page:', e.detail.key, e.detail.newValue);
+                this.applyTheme();
+            }
+        });
+        
+        // 监听系统主题变化（这个会影响 favicon！）
+        if (window.matchMedia) {
+            const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+            systemThemeMedia.addEventListener('change', (e) => {
+                console.log('System theme changed:', e.matches ? 'dark' : 'light');
+                
+                // 系统主题变化时，始终更新 favicon
+                this.updateFavicon();
+                
+                // 如果当前是跟随系统模式，也要更新网页主题
+                if (localStorage.getItem('followSystem') === 'true') {
+                    localStorage.setItem('darkMode', e.matches ? 'enabled' : 'disabled');
+                    this.applyTheme();
+                }
+            });
+        }
+    },
+    
+    // 切换深色模式
+    toggleDarkMode: function() {
+        if (localStorage.getItem('followSystem') === 'true') {
+            Qmsg.error("当前设置为跟随系统，无法手动切换深浅色模式");
             return;
         }
-
-        // 切换深色模式状态
-        isDarkMode = !isDarkMode;
-
-        // 切换背景图片和Logo
-        body.style.backgroundImage = isDarkMode ? darkModeBackground : lightModeBackground;
-        mainImage.src = isDarkMode ? darkModeLogoSrc : lightModeLogoSrc;
-
-        // 切换深色模式类
-        body.classList.toggle('dark-mode', isDarkMode);
-
-        // 更新localStorage中的状态和背景图片
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        localStorage.setItem('backgroundImage', body.style.backgroundImage);
-
-        // 设置元素的背景颜色
-        setElementsOpacity(selectedOpacity, isDarkMode);
-
+        
+        const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        localStorage.setItem('darkMode', isDarkMode ? 'disabled' : 'enabled');
+        
         // 创建全屏涟漪效果
+        this.createRippleEffect(!isDarkMode);
+        
+        // 注意：不更新 favicon，因为 favicon 始终跟随系统
+    },
+    
+    // 创建涟漪效果
+    createRippleEffect: function(isDark) {
         var ripple = document.createElement('div');
         ripple.classList.add('ripple');
         ripple.style.position = 'fixed';
@@ -125,416 +257,390 @@ document.addEventListener('DOMContentLoaded', function () {
         ripple.style.width = '100%';
         ripple.style.height = '100%';
         ripple.style.opacity = '0.5';
-        ripple.style.backgroundColor = isDarkMode ? 'black' : 'white';
+        ripple.style.backgroundColor = isDark ? 'black' : 'white';
         ripple.style.borderRadius = '50%';
         ripple.style.animation = 'rippleEffect 1s ease-out forwards';
         ripple.style.pointerEvents = 'none';
+        ripple.style.zIndex = '9999';
 
-        // 将涟漪效果添加到body
         document.body.appendChild(ripple);
 
-        // 动画结束后移除涟漪效果
-        setTimeout(function () {
-            ripple.remove();
+        setTimeout(function() {
+            if (ripple.parentNode) {
+                ripple.remove();
+            }
         }, 1000);
     }
+};
 
+// ==================== DOM 加载完成后初始化 ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化主题管理器
+    ThemeManager.init();
+    
+    var body = document.body;
+    var darkModeToggle = document.getElementById('darkModeToggle');
+    var mainImage = document.getElementById('main-image');
+    var opacitySelect = document.getElementById('opacitySelect');
+    var blurSelect = document.getElementById('blurSelect');
+    
     // 为深色模式切换按钮添加事件监听器
     if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', toggleDarkMode);
+        darkModeToggle.addEventListener('click', function() {
+            ThemeManager.toggleDarkMode();
+        });
     }
 
     // 监听透明度选择的变化
     if (opacitySelect) {
-        opacitySelect.addEventListener('change', function () {
-            selectedOpacity = opacitySelect.value;
-            localStorage.setItem('opacity', selectedOpacity);
-            
-            var currentIsDarkMode = followSystem === 'true' ? 
-                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : 
-                isDarkMode;
-                
-            setElementsOpacity(selectedOpacity, currentIsDarkMode);
+        opacitySelect.value = localStorage.getItem('opacity') || '0.3';
+        
+        opacitySelect.addEventListener('change', function() {
+            localStorage.setItem('opacity', opacitySelect.value);
+            // ThemeManager.applyTheme 会被 storage 事件触发
         });
     }
     
+    // 监听模糊选择的变化
     if (blurSelect) {
-        blurSelect.addEventListener('change', function () {
-            selectedblur = blurSelect.value;
-            localStorage.setItem('blur', selectedblur);
+        blurSelect.value = localStorage.getItem('blur') || '30';
+        
+        blurSelect.addEventListener('change', function() {
+            localStorage.setItem('blur', blurSelect.value);
+            // ThemeManager.applyTheme 会被 storage 事件触发
+        });
+    }
+    
+// 预览模式处理
+if (isPreview) {
+    if (mainImage) {
+        mainImage.style.width = '30%';
+    }
+    
+    // 创建一个示例表格用于预览
+    const tablesContainer = document.getElementById('tables-container');
+    if (tablesContainer) {
+        tablesContainer.innerHTML = `
+            <div class="table-wrapper" style="display: block;">
+                <table class="main-table" style="animation: slideUp 1.5s forwards, blurIn 1.5s forwards;">
+                    <thead>
+                        <tr>
+                            <th>脚本名</th>
+                            <th>简介</th>
+                            <th>备注</th>
+                            <th>查看</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>示例脚本 1</td>
+                            <td>这是一个示例脚本的简介</td>
+                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
+                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td>示例脚本 2</td>
+                            <td>这是一个示例脚本的简介</td>
+                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
+                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td>示例脚本 3</td>
+                            <td>这是一个示例脚本的简介</td>
+                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
+                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    document.getElementById('settingsButton').remove();
+    document.getElementById('loginStatus').remove();
+    document.getElementById('busuanzi_container_site_pv').style.fontSize = '16px';
+    document.getElementById('busuanzi_container_site_pv').innerHTML = "当前为预览模式<br>无访问量运行时间数据";
+    document.getElementById('time_now').innerHTML = '当前时间：正在预览模式';
+    document.getElementById('date_now').innerHTML = '当前日期：正在预览模式';
+    return;
+}
+    // ==================== 站点运行时间 ====================
+    var startDate = new Date('2024-01-18');
+    var currentDate = new Date();
+    var diffTime = Math.abs(currentDate - startDate);
+    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const script = document.createElement('script');
+    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    document.head.appendChild(script);
+    var busuanziElement = document.getElementById('busuanzi_container_site_pv');
+    if (busuanziElement) {
+        busuanziElement.innerHTML = "本站总访问量<span id='busuanzi_value_site_pv'></span>次<br>主站运行总时间:" + diffDays + "天";
+    }
+    
+    // ==================== 登录状态处理 ====================
+    var loginStatusElement = document.getElementById('loginStatus');
+    var logoutButton = document.getElementById('logoutButton');
+    var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    var menuVisible = false;
+
+    if (!isLoggedIn) {
+        if (logoutButton) logoutButton.style.display = 'none';
+        if (loginStatusElement) {
+            loginStatusElement.onclick = function() {
+                var loginUrl = '/account/Login.html?redirect=/index.html';
+                window.location.href = loginUrl;
+            };
+        }
+    } else {
+        if (loginStatusElement) {
+            loginStatusElement.querySelector('.login-status').textContent = '正在加载';
+            var user = localStorage.getItem('username');
+            let userId = localStorage.getItem('userid');
+            const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+            loginStatusElement.style.backgroundImage = `url('${imageUrl}')`;
             
-            var currentIsDarkMode = followSystem === 'true' ? 
-                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : 
-                isDarkMode;
-                
-            setElementsblur(selectedblur, currentIsDarkMode);
+            // 获取用户名
+            fetch(`${serverurl}/get-username-by-id`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('用户名:', data.data.username);
+                    localStorage.setItem('username', data.data.username);
+                    if (loginStatusElement) {
+                        loginStatusElement.querySelector('.login-status').textContent = '';
+                    }
+                } else {
+                    console.error(data.message);
+                    showLoginError();
+                }
+            })
+            .catch(error => {
+                showLoginError();
+            });
+
+            loginStatusElement.onclick = function(event) {
+                event.stopPropagation();
+                toggleMenu();
+            };
+
+            document.addEventListener('click', function() {
+                if (!menuVisible) return;
+                hideMenu();
+            });
+        }
+    }
+
+    // 登录错误处理函数
+    function showLoginError() {
+        swal({
+            title: "找不到该用户，是否尝试重新登录？",
+            text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是",
+            cancelButtonText: "否",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm) {
+            if (isConfirm) {
+                swal("正在跳转!", "正在跳转");
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('usertype');
+                localStorage.removeItem('userid');
+                localStorage.removeItem('developerOptionsEnabled');
+                window.location.href = '/account/Login.html';
+            } else {
+                window.location.reload();
+            }
         });
     }
 
-    // 设置系统主题变化监听
-    function setupSystemThemeListener() {
-        if (window.matchMedia && followSystem === 'true') {
-            const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-            
-            const systemThemeChangeHandler = function(e) {
-                const currentFollowSystem = localStorage.getItem('followSystem');
-                if (currentFollowSystem === 'true') {
-                    
-                    // 更新背景图片和Logo
-                    body.style.backgroundImage = e.matches ? darkModeBackground : lightModeBackground;
-                    mainImage.src = e.matches ? darkModeLogoSrc : lightModeLogoSrc;
-                    
-                    // 切换深色模式类
-                    body.classList.toggle('dark-mode', e.matches);
-                    
-                    // 更新透明度和模糊效果
-                    setElementsOpacity(selectedOpacity, e.matches);
-                    setElementsblur(selectedblur, e.matches);
-                }
-            };
-            
-            systemThemeMedia.addEventListener('change', systemThemeChangeHandler);
-        }
+    // 退出登录函数
+    function logout() {
+        swal({
+            title: "您确定要退出登录吗？",
+            text: "这将清除你本地的登录信息",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是",
+            cancelButtonText: "否",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm) {
+            if (isConfirm) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('usertype');
+                localStorage.removeItem('userid');
+                localStorage.removeItem('developerOptionsEnabled');
+                swal("退出成功！", "已退出登录", "success");
+                location.reload();
+            } else {
+                swal("已取消", "", "info");
+            }
+        });
     }
 
-    // 监听followSystem设置变化
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'followSystem') {
-            location.reload(); // 简单处理：重新加载页面应用新设置
-        }
-    });
-
-    // 初始化主题和监听器
-    initTheme();
-    setupSystemThemeListener();
-});
-
-function setElementsOpacity(opacity, isDarkMode) {
-    var elements = document.querySelectorAll('th,table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
-
-    if (elements.length === 0) {
-        return;
+    // 切换账号函数
+    function sa() {
+        swal({
+            title: "您确定要切换账号吗",
+            text: "这将清除你现在的登录信息",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是",
+            cancelButtonText: "否",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm) {
+            if (isConfirm) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('usertype');
+                localStorage.removeItem('userid');
+                localStorage.removeItem('developerOptionsEnabled');
+                window.location.href = '/account/Login.html';
+            } else {
+                swal("已取消", "", "info");
+            }
+        });
     }
 
-    elements.forEach(function (element) {
-        if (isDarkMode) {
-            element.style.backgroundColor = `rgba(16, 16, 16, ${opacity})`;
+    // 菜单显示/隐藏函数
+    function toggleMenu() {
+        if (menuVisible) {
+            hideMenu();
         } else {
-            element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
+            showMenu();
         }
-    });
-}
-
-function setElementsblur(blur, isDarkMode) {
-    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
-
-    if (elements.length === 0) {
-        return;
     }
 
-    elements.forEach(function(element) {
-        // 设置背景模糊（backdrop-filter）
-        element.style.backdropFilter = `blur(${blur}px)`;
-        element.style.webkitBackdropFilter = `blur(${blur}px)`; // 兼容 Safari
-    });
-}
-            document.addEventListener('DOMContentLoaded', function () {
-                if (isPreview) {
-                    document.getElementById('main-image').style.width = '30%';
-                        return;
-                    }
-                var loginStatusElement = document.getElementById('loginStatus');
-                var logoutButton = document.getElementById('logoutButton');
-                var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-                var isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-                var menuVisible = false;
+    function showMenu() {
+        var menu = document.createElement('ul');
+        isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+        menu.style.position = 'absolute';
+        menu.style.listStyle = 'none';  // 修改这里：去掉列表样式
+        menu.style.padding = '2px 0';   // 修改这里：减小上下内边距
+        menu.style.margin = '0';        // 添加：移除默认外边距
+        menu.style.width = '200px';
+        menu.style.height = 'auto';
+        menu.style.backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+        menu.style.color = isDarkMode ? 'white' : 'black';
+        menu.style.border = '1px solid #ccc';
+        menu.style.borderRadius = '10px'; // 添加：圆角边框
+        menu.style.boxShadow = '2px 2px 5px rgba(0, 0, 0, 0.3)';
+        menu.style.zIndex = '1000';
+        menu.style.top = '100%';
+        menu.style.left = '0';
+        menu.style.opacity = '0';
+        menu.style.transform = 'translateY(-20px)';
+        menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
 
-                if (!isLoggedIn) {
-                    logoutButton.style.display = 'none';
-                    loginStatusElement.onclick = function () {
-                        var loginUrl = '/account/Login.html?redirect=/index.html'; // 替换为您的登录页面URL
-                        window.location.href = loginUrl;
-                    };
-                } else {
+        var menuItems = [
+            { text: '账户设置', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
+            { text: '切换账号', action: function () { sa(); } },
+            { text: '退出登录', action: function () { logout(); } }
+        ];
 
-                    loginStatusElement.querySelector('.login-status').textContent = '正在加载';
-                    var user = localStorage.getItem('username');
-                    // 假设有一个按钮或其他元素，用户点击后触发获取用户名的操作
-                    // 假设用户ID存储在某个变量中
-                    let userId = localStorage.getItem('userid');
-                    const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
-                    document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
-                    // 使用fetch发送POST请求到后端接口
-                    fetch(`${serverurl}/get-username-by-id`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ id: userId })
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                // 显示用户名
-                                console.log('用户名:', data.data.username);
-                                localStorage.setItem('username', data.data.username);
-                                loginStatusElement.querySelector('.login-status').textContent = '';
-                            } else {
-                                // 显示错误信息
-                                console.error(data.message);
-                                swal({
-                                    title: "找不到该用户，是否尝试重新登录？",
-                                    text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                                    type: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonColor: "#DD6B55",
-                                    confirmButtonText: "是",
-                                    cancelButtonText: "否",
-                                    closeOnConfirm: false,
-                                    closeOnCancel: false
-                                }), function (isConfirm) {
-                                    if (isConfirm) {
-                                        swal("正在跳转!", "正在跳转");
-                                        localStorage.removeItem('isLoggedIn');
-                                        localStorage.removeItem('username');
-                                        localStorage.removeItem('usertype');
-                                        localStorage.removeItem('userid');
-                                        localStorage.removeItem('developerOptionsEnabled');
-                                        window.location.href = '/account/Login.html';
+        menuItems.forEach(function (item, index) {
+            if (index > 0) {
+                var separator = document.createElement('li');
+                separator.className = 'menu-separator';
+                separator.style.height = '1px';           // 添加：分隔线高度
+                separator.style.backgroundColor = '#ccc';  // 添加：分隔线颜色
+                separator.style.margin = '4px 0';          // 添加：分隔线上下间距
+                separator.style.padding = '0';             // 添加：移除内边距
+                menu.appendChild(separator);
+            }
 
-                                    } else {
-                                        window.location.reload();
-                                    }
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            swal({
-                                title: "找不到该用户，是否尝试重新登录？",
-                                text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                                type: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#DD6B55",
-                                confirmButtonText: "是",
-                                cancelButtonText: "否",
-                                closeOnConfirm: false,
-                                closeOnCancel: false
-                            }, function (isConfirm) {
-                                if (isConfirm) {
-                                    swal("正在跳转!", "正在跳转");
-                                    localStorage.removeItem('isLoggedIn');
-                                    localStorage.removeItem('username');
-                                    localStorage.removeItem('usertype');
-                                    localStorage.removeItem('userid');
-                                    localStorage.removeItem('developerOptionsEnabled');
-                                    window.location.href = '/account/Login.html';
-                                } else {
-                                    window.location.reload();
-                                }
-                            })
-                        });
+            var menuItem = document.createElement('li');
+            menuItem.className = 'menu-item';
+            menuItem.textContent = item.text;
+            menuItem.style.padding = '8px 15px';          // 修改这里：减小菜单项内边距
+            menuItem.style.cursor = 'pointer';
+            menuItem.style.fontSize = '14px';              // 添加：设置字体大小
+            menuItem.onmouseover = function() {
+                this.style.backgroundColor = isDarkMode ? '#333' : '#f0f0f0';
+            };
+            menuItem.onmouseout = function() {
+                this.style.backgroundColor = 'transparent';
+            };
+            menuItem.onclick = function () {
+                item.action();
+                hideMenu();
+            };
+            menu.appendChild(menuItem);
+        });
 
-
-
-                    loginStatusElement.onclick = function (event) {
-                        event.stopPropagation(); // 阻止事件冒泡
-                        toggleMenu();
-                    };
-
-                    document.addEventListener('click', function () {
-                        if (!menuVisible) return;
-                        hideMenu();
-                    });
+        loginStatusElement.appendChild(menu);
+        setTimeout(function () {
+            menu.style.opacity = '1';
+            menu.style.transform = 'translateY(0)';
+            menuVisible = true;
+        }, 10);
+    }
+    function hideMenu() {
+        if (!loginStatusElement) return;
+        
+        var menu = loginStatusElement.querySelector('ul');
+        if (menu) {
+            menu.style.opacity = '0';
+            menu.style.transform = 'translateY(-20px)';
+            setTimeout(function() {
+                if (menu.parentNode === loginStatusElement) {
+                    loginStatusElement.removeChild(menu);
+                    menuVisible = false;
                 }
+            }, 500);
+        }
+    }
+    // ==================== 日期时间更新 ====================
+    function updateLocalDateTime() {
+        const nowUtc = new Date();
+        const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
+        const year = nowUtcAdjusted.getFullYear();
+        const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0');
+        const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
+        const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
+        const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
+        const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
 
-                function logout() {
-                    swal({
-                        title: "您确定要退出登录吗？",
-                        text: "这将清除你本地的登录信息",
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "是",
-                        cancelButtonText: "否",
-                        closeOnConfirm: false,
-                        closeOnCancel: false
-                    }, function (isConfirm) {
-                        if (isConfirm) {
-                            localStorage.removeItem('isLoggedIn');
-                            localStorage.removeItem('username');
-                            localStorage.removeItem('usertype');
-                            localStorage.removeItem('userid');
-                            localStorage.removeItem('developerOptionsEnabled');
-                            // 重定向到登录页面
-                            swal("退出成功成功！", "已退出登录", "success");
-                            location.reload();
-                        }
-                        else {
-                            swal({
-                                title: "正在取消",
-                                text: "正在取消",
-                                timer: 0,
-                                showConfirmButton: false
-                            })
-                        }
-                    })
-                }
-                function sa() {
-                    swal({
-                        title: "您确定要切换账号吗",
-                        text: "这将清除你现在的登录信息",
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "是",
-                        cancelButtonText: "否",
-                        closeOnConfirm: false,
-                        closeOnCancel: false
-                    }, function (isConfirm) {
-                        if (isConfirm) {
-                            localStorage.removeItem('isLoggedIn');
-                            localStorage.removeItem('username');
-                            localStorage.removeItem('usertype');
-                            localStorage.removeItem('userid');
-                            localStorage.removeItem('developerOptionsEnabled');
-                            window.location.href = '/account/Login.html';
-                        }
-                        else {
-                            swal({
-                                title: "正在取消",
-                                text: "正在取消",
-                                timer: 0,
-                                showConfirmButton: false
-                            })
-                        }
-                    })
-                }
+        var timeNow = document.getElementById('time_now');
+        var dateNow = document.getElementById('date_now');
+        
+        if (timeNow) timeNow.textContent = '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
+        if (dateNow) dateNow.textContent = '本地日期：' + year + '-' + month + '-' + day;
+    }
 
-                function toggleMenu() {
-                    if (menuVisible) {
-                        hideMenu();
-                    } else {
-                        showMenu();
-                    }
-                }
+    updateLocalDateTime();
+    setInterval(updateLocalDateTime, 1000);
 
-                function showMenu() {
-                    var menu = document.createElement('ul');
-                    menu.style.position = 'absolute';
-                    menu.style.listStyle = '1px';
-                    menu.style.padding = '10px';
-                    menu.style.width = '200px';
-                    menu.style.height = 'auto';
-                    menu.style.backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-                    menu.style.color = isDarkMode ? 'white' : 'black';
-                    menu.style.border = '1px solid #ccc';
-                    menu.style.boxShadow = '2px 2px 5px rgba(0, 0, 0, 0.3)';
-                    menu.style.zIndex = '1000';
-                    menu.style.top = '100%';
-                    menu.style.left = '0';
-                    menu.style.opacity = '0';
-                    menu.style.transform = 'translateY(-20px)';
-                    menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    // 动画监听
+    var timeElement = document.getElementById('time');
+    var settingsButton = document.getElementById('settingsButton');
 
-                    var menuItems = [
-                        { text: '账户设置', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
-                        { text: '切换账号', action: function () { sa(); } },
-                        { text: '退出登录', action: function () { logout(); } }
-                    ];
+    if (timeElement && settingsButton) {
+        timeElement.addEventListener('animationstart', function() {
+            settingsButton.style.right = '250px';
+        });
 
-                    menuItems.forEach(function (item, index) {
-                        if (index > 0) {
-                            var separator = document.createElement('li');
-                            separator.className = 'menu-separator';
-                            menu.appendChild(separator);
-                        }
+        timeElement.addEventListener('animationend', function() {
+            settingsButton.style.right = '250px';
+        });
+    }
 
-                        var menuItem = document.createElement('li');
-                        menuItem.className = 'menu-item';
-                        menuItem.textContent = item.text;
-                        menuItem.onclick = function () {
-                            item.action();
-                            hideMenu();
-                        };
-                        menu.appendChild(menuItem);
-                    });
-
-                    loginStatusElement.appendChild(menu);
-                    setTimeout(function () {
-                        menu.style.opacity = '1';
-                        menu.style.transform = 'translateY(0)';
-                        menuVisible = true;
-                    }, 10);
-                }
-                function hideMenu() {
-                    var menu = loginStatusElement.querySelector('ul');
-                    if (menu) {
-                        menu.style.opacity = '0';
-                        menu.style.transform = 'translateY(-20px)';
-                        setTimeout(function () {
-                            if (menu.parentNode) { // 确保menu仍然有父节点
-                                loginStatusElement.removeChild(menu);
-                                menuVisible = false;
-                            }
-                        }, 500);
-                    }
-                }
-            });
-                document.addEventListener('DOMContentLoaded', function () {
-                    var startDate = new Date('2024-01-18'); // 站点开始运行的日期
-                    var currentDate = new Date(); // 当前日期
-                    var diffTime = Math.abs(currentDate - startDate); // 两个日期之间的差异（毫秒）
-                    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 转换为天数并向上取整
-
-                    // 更新访问量元素的文本内容，添加运行时间，并在它们之间添加换行符
-                    document.getElementById('busuanzi_container_site_pv').innerHTML = "本站总访问量<span id='busuanzi_value_site_pv'></span>次<br>主站运行总时间:" + diffDays + "天";
-                });
-            // 假设这是你的openPage函数
-            function openPage(url) {
-                window.location.href = url;
-}
-            document.addEventListener('DOMContentLoaded', function () {
-                function updateLocalDateTime() {
-                    const nowUtc = new Date();
-                    const nowUtcAdjusted = new Date(nowUtc.getTime() + (0));
-                    const year = nowUtcAdjusted.getFullYear();
-                    const month = (nowUtcAdjusted.getMonth() + 1).toString().padStart(2, '0');
-                    const day = nowUtcAdjusted.getDate().toString().padStart(2, '0');
-                    const hoursUtc = nowUtcAdjusted.getHours().toString().padStart(2, '0');
-                    const minutesUtc = nowUtcAdjusted.getMinutes().toString().padStart(2, '0');
-                    const secondsUtc = nowUtcAdjusted.getSeconds().toString().padStart(2, '0');
-
-                    document.getElementById('time_now').textContent = '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
-                    document.getElementById('date_now').textContent = '本地日期：' + year + '-' + month + '-' + day;
-                }
-
-                updateLocalDateTime();
-                setInterval(updateLocalDateTime, 1000);
-
-                // 监听动画进行事件
-                var timeElement = document.getElementById('time');
-                var settingsButton = document.getElementById('settingsButton');
-
-                timeElement.addEventListener('animationstart', function () {
-                    // 在动画开始时设置按钮的位置
-                    settingsButton.style.right = '250px';
-                });
-
-                timeElement.addEventListener('animationend', function () {
-                    // 在动画结束时重新定位设置按钮
-                    settingsButton.style.right = '250px';
-                });
-            });
-    document.addEventListener('DOMContentLoaded', function () {
-        // 获取容器
-        const tablesContainer = document.getElementById('tables-container');
-        const navigationButtons = document.getElementById('navigation-buttons');
-        systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // ==================== 表格加载 ====================
+    const tablesContainer = document.getElementById('tables-container');
+    const navigationButtons = document.getElementById('navigation-buttons');
+    
+    if (tablesContainer) {
         // 存储所有表格和表格信息
         const tables = [];
         const tableNames = [];
@@ -544,16 +650,12 @@ function setElementsblur(blur, isDarkMode) {
         fetch('/config/tables.json')
             .then(response => response.json())
             .then(data => {
-                // 先收集所有表格名称
                 Object.keys(data).forEach(tableType => {
                     tableNames.push(tableType);
                 });
 
-                // 然后动态创建表格和导航
                 createTablesFromJSON(data);
                 createNavigationButtons();
-
-                // 初始化显示第一个表格
                 showTable(0);
             })
             .catch(error => {
@@ -563,43 +665,30 @@ function setElementsblur(blur, isDarkMode) {
 
         // 根据JSON数据创建表格
         function createTablesFromJSON(data) {
-            // 清空容器
             tablesContainer.innerHTML = '';
 
-            // 遍历JSON中的每个表格类型
             Object.entries(data).forEach(([tableType, tableData], index) => {
-                // 创建表格元素
                 const tableWrapper = document.createElement('div');
                 tableWrapper.className = 'table-wrapper';
                 tableWrapper.style.display = 'none';
 
-                // 创建表格元素
                 const table = document.createElement('table');
                 table.className = 'main-table';
-                if (localStorage.getItem('followSystem') === 'true'|| localStorage.getItem('followSystem') === null) {
-                    systemIsDark ? document.getElementById("tables-container").classList.add('dark-mode') : document.getElementById("tables-container").classList.remove('dark-mode');
-                }
                 table.style.animation = 'slideUp 1.5s forwards, blurIn 1.5s forwards';
 
-                // 创建表头
                 const thead = document.createElement('thead');
                 const headerRow = document.createElement('tr');
 
-                // 获取表头字段
                 const headers = Object.keys(tableData.row1 || {});
 
-                // 创建表头单元格
                 headers.forEach((header, headerIndex) => {
                     const th = document.createElement('th');
 
-                    // 只在第一个表头单元格中添加表格选择器（当有多个表格时）
                     if (headerIndex === 0 && tableNames.length > 1) {
-                        // 创建选择器
                         const tableSelector = document.createElement('select');
                         tableSelector.className = 'table-selector';
                         tableSelector.onchange = (e) => showTable(parseInt(e.target.value));
 
-                        // 填充选择器选项（使用完整的tableNames数组）
                         tableNames.forEach((name, idx) => {
                             const option = document.createElement('option');
                             option.value = idx;
@@ -608,7 +697,6 @@ function setElementsblur(blur, isDarkMode) {
                             tableSelector.appendChild(option);
                         });
 
-                        // 创建包含文本和选择器的容器
                         const container = document.createElement('div');
                         container.style.display = 'flex';
                         container.style.alignItems = 'center';
@@ -621,7 +709,6 @@ function setElementsblur(blur, isDarkMode) {
                         container.appendChild(tableSelector);
                         th.appendChild(container);
                     } else {
-                        // 其他表头单元格正常显示
                         const headerDisplayNames = {
                             'name': '脚本名',
                             'Introduction': '简介',
@@ -631,7 +718,6 @@ function setElementsblur(blur, isDarkMode) {
                             'version': '版本',
                             'date': '日期'
                         };
-
                         th.textContent = headerDisplayNames[header] || header;
                     }
 
@@ -641,10 +727,8 @@ function setElementsblur(blur, isDarkMode) {
                 thead.appendChild(headerRow);
                 table.appendChild(thead);
 
-                // 创建表格主体
                 const tbody = document.createElement('tbody');
 
-                // 添加数据行
                 Object.entries(tableData).forEach(([rowKey, rowData]) => {
                     if (rowKey === 'row1') return;
 
@@ -665,11 +749,11 @@ function setElementsblur(blur, isDarkMode) {
                                 const title = urlParams.get('title');
                                 const file = urlParams.get('file');
 
-                                button.onclick = function () {
+                                button.onclick = function() {
                                     openPage(`/code.html?title=${encodeURIComponent(title)}&file=${encodeURIComponent(file)}`);
                                 };
                             } else {
-                                button.onclick = function () {
+                                button.onclick = function() {
                                     openPage(viewUrl);
                                 };
                             }
@@ -692,14 +776,14 @@ function setElementsblur(blur, isDarkMode) {
             });
         }
 
-        // 剩下的代码保持不变...
-        // 创建导航按钮（左右箭头）
+        // 创建导航按钮
         function createNavigationButtons() {
+            if (!navigationButtons) return;
+            
             navigationButtons.innerHTML = '';
 
             if (tables.length <= 1) return;
 
-            // 左侧导航按钮
             const prevButton = document.createElement('button');
             prevButton.className = 'more-button left';
             prevButton.innerHTML = '&lt;';
@@ -709,7 +793,6 @@ function setElementsblur(blur, isDarkMode) {
             prevButton.onclick = () => showTable(currentTableIndex - 1);
             navigationButtons.appendChild(prevButton);
 
-            // 右侧导航按钮
             const nextButton = document.createElement('button');
             nextButton.className = 'more-button';
             nextButton.innerHTML = '&gt;';
@@ -721,27 +804,22 @@ function setElementsblur(blur, isDarkMode) {
         }
 
         // 显示指定索引的表格
-        function showTable(index) { 
+        function showTable(index) {
             if (index < 0) index = 0;
             if (index >= tables.length) index = tables.length - 1;
 
-            // 隐藏所有表格
             tables.forEach(table => {
                 table.style.display = 'none';
             });
 
-            // 显示当前表格
             tables[index].style.display = 'block';
             currentTableIndex = index;
 
-            // 更新所有选择器的选中状态
             updateAllSelectors();
-
-            // 更新导航按钮状态
             updateNavigationButtons();
         }
 
-        // 更新所有表格内的选择器
+        // 更新所有选择器
         function updateAllSelectors() {
             const allSelectors = document.querySelectorAll('.table-selector');
             allSelectors.forEach((selector) => {
@@ -749,7 +827,7 @@ function setElementsblur(blur, isDarkMode) {
             });
         }
 
-        // 更新导航按钮显示状态
+        // 更新导航按钮
         function updateNavigationButtons() {
             const prevButtons = document.querySelectorAll('.more-button.left');
             const nextButtons = document.querySelectorAll('.more-button:not(.left)');
@@ -762,5 +840,5 @@ function setElementsblur(blur, isDarkMode) {
                 button.style.display = currentTableIndex < tables.length - 1 ? 'block' : 'none';
             });
         }
-    });             
-                                            
+    }
+});

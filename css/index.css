@@ -190,7 +190,7 @@
             }
 
             .bottom-bar {
-              width: 60%;
+              width: 30%;
               background-color: rgba(255, 255, 255, 0.3);
               padding: 0px;
               text-align: center;
@@ -621,3 +621,31 @@
               border-color: #1e90ff;
               box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.25);
             }
+/* 登录后的下拉菜单样式 */
+.user-menu-dropdown {
+  /* 原来的样式 */
+  min-width: 120px;
+  /* 减小最小宽度 */
+  padding: 4px 0;
+  /* 减小上下内边距 */
+}
+
+.user-menu-dropdown .menu-item {
+  padding: 6px 16px;
+  /* 原来是 padding: 12px 20px，减小上下内边距 */
+  font-size: 14px;
+  /* 稍微减小字体大小 */
+  line-height: 1.2;
+  /* 减小行高 */
+}
+
+.user-menu-dropdown .menu-item:not(:last-child) {
+  margin-bottom: 2px;
+  /* 减小菜单项之间的间距 */
+}
+
+/* 如果菜单项之间有分割线 */
+.user-menu-dropdown .divider {
+  margin: 4px 0;
+  /* 减小分割线上下间距 */
+}
