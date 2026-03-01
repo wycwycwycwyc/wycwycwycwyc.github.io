@@ -128,21 +128,290 @@
               box-sizing: border-box;
             }
 
-            table {
-              width: 90%;
-              max-width: 1200px;
-              table-layout: fixed;
-              margin: 20px auto;
-              border-collapse: collapse;
-              position: relative;
-              border-spacing: 0;
-              background-color: rgba(255, 255, 255, 0.8);
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-              border-radius: 15px;
-              max-height: 500px;
-              display: block;
-              overflow-y: auto;
-            }
+/* 只在桌面端应用的样式 */
+@media only screen and (min-width: 769px) {
+
+  /* 表格基础样式修改 */
+  table {
+    width: 100%;
+    max-width: 1200px;
+    table-layout: fixed;
+    /* 使用fixed布局，让列宽可控 */
+    margin: 20px auto;
+    border-collapse: collapse;
+    position: relative;
+    border-spacing: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    max-height: 500px;
+    display: block;
+    overflow-y: auto;
+  }
+
+  /* 表格列宽度设置 - 使用百分比分配 */
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    border-radius: 0;
+    white-space: nowrap;
+    /* 桌面端默认不换行 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
+  }
+
+  /* 当表格容器宽度小于阈值时，允许换行 */
+  @media screen and (max-width: 1200px) {
+
+    table th,
+    table td {
+      white-space: normal;
+      /* 宽度不够时允许换行 */
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow: visible;
+      text-overflow: clip;
+    }
+  }
+
+  /* 自定义按钮样式 */
+  .custom-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+    /* 按钮文字始终不换行 */
+    min-width: 60px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 最后一列（查看按钮列）特殊处理 */
+  table td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    /* 按钮列始终保持不换行 */
+  }
+
+  /* 当宽度不够时，按钮列可以稍微缩小 */
+  @media screen and (max-width: 800px) {
+    table td:last-child {
+      white-space: normal;
+      /* 极端宽度下允许按钮换行 */
+    }
+
+    .custom-button {
+      padding: 6px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+      /* 按钮文字仍然不换行 */
+    }
+  }
+
+  /* 列宽分配策略 - 平均分配 */
+  table th:nth-child(1),
+  table td:nth-child(1),
+  table th:nth-child(2),
+  table td:nth-child(2),
+  table th:nth-child(3),
+  table td:nth-child(3),
+  table th:nth-child(4),
+  table td:nth-child(4) {
+    width: 25%;
+    /* 平均分配四列 */
+    min-width: 120px;
+    /* 设置一个合理的最小宽度 */
+  }
+
+  /* 简介列可以稍微宽一些（可选） */
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    width: 30%;
+    /* 简介列稍宽 */
+  }
+
+  table th:nth-child(1),
+  table td:nth-child(1),
+  table th:nth-child(3),
+  table td:nth-child(3) {
+    width: 22%;
+    /* 脚本名和备注稍窄 */
+  }
+
+  table th:nth-child(4),
+  table td:nth-child(4) {
+    width: 26%;
+    /* 查看按钮列吸收剩余宽度 */
+  }
+
+  /* 表格容器样式 */
+  .table-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+}
+
+/* 移动端样式 - 完全保持不变 */
+@media only screen and (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .centered-title {
+    margin: 10px 0;
+  }
+
+  table {
+    width: 100%;
+    max-width: none;
+    font-size: 12px;
+    /* 恢复移动端原有的table样式 */
+    table-layout: auto;
+    margin: 20px auto;
+    border-collapse: collapse;
+    position: relative;
+    border-spacing: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    max-height: 500px;
+    display: block;
+    overflow-y: auto;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    /* 恢复移动端原有的单元格样式 */
+    border: 1px solid #ddd;
+    text-align: left;
+    border-radius: 0;
+    white-space: normal;
+    /* 移动端允许换行 */
+    word-wrap: break-word;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .main-image {
+    max-width: 50%;
+  }
+
+  .login-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .logout-btn {
+    top: 50px;
+    right: 5px;
+    padding: 5px 10px;
+  }
+
+  #busuanzi-container,
+  #tips,
+  #time {
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  .more-button {
+    font-size: 40px;
+  }
+
+  .custom-button {
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+
+  .bottom-bar {
+    padding: 0px;
+  }
+
+  /* 菜单项悬停效果 */
+  .menu-item:hover {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  /* 暗色模式下悬停效果 */
+  .dark-mode .menu-item:hover {
+    background-color: #333;
+    color: #f0f0f0;
+  }
+
+  /* 分隔线样式 */
+  .menu-separator {
+    border-bottom: 1px solid #ccc;
+    margin: 5px 0;
+  }
+
+  /* 暗色模式下的分隔线颜色 */
+  .dark-mode .menu-separator {
+    border-bottom: 1px solid #666;
+  }
+
+  /* 移动端表格列宽 - 保持原有分配 */
+  table th:nth-child(1),
+  table td:nth-child(1) {
+    width: 20%;
+    min-width: auto;
+  }
+
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    width: 40%;
+    min-width: auto;
+  }
+
+  table th:nth-child(3),
+  table td:nth-child(3) {
+    width: 25%;
+    min-width: auto;
+  }
+
+  table th:nth-child(4),
+  table td:nth-child(4) {
+    width: 15%;
+    min-width: auto;
+  }
+}
+
+/* 极端小宽度下的移动端处理 - 保持原有 */
+@media only screen and (max-width: 480px) {
+
+  table th:nth-child(1),
+  table td:nth-child(1) {
+    width: 18%;
+  }
+
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    width: 42%;
+  }
+
+  table th:nth-child(3),
+  table td:nth-child(3) {
+    width: 25%;
+  }
+
+  table th:nth-child(4),
+  table td:nth-child(4) {
+    width: 15%;
+  }
+
+  .custom-button {
+    padding: 4px 6px;
+    font-size: 10px;
+    min-width: 40px;
+  }
+}
 
             /* 为所有表格设置滚动条样式 */
             table::-webkit-scrollbar {

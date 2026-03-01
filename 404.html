@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>脚本存放站</title>
-<script src="/config/serverUrl.js"></script>
-
-    <script src="/js/script4_goBackOrHome.js"></script>  
-    <script src="/js/script6_setFontSize.js"></script>
+    <title>脚本存放站 · 404深色适配</title>
+    <!-- 外部资源 (保持原结构不变) -->
+    <script src="/config/serverUrl.js"></script>
     <link rel="stylesheet" href="/css/styles_button.css">
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script3_darkMode.js"></script>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script5_setAnimations.js"></script>
+    <script src="/js/script6_setFontSize.js"></script>
+    <script src="/js/script7_setOpacityandBlur.js"></script>
+    <script src="/js/script8_setEyeCare.js"></script>
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="/js/script11_setHighlight.js"></script>
+    <link rel="stylesheet" href="/css/styles_button.css">
+
     <style>
+        /* 基础样式 */
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
@@ -19,25 +34,66 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            transition: background-color 0.3s ease, color 0.2s ease;
         }
+
         .container {
             text-align: center;
+            animation: fadeSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            background-color: transparent;
+            padding: 2rem;
+            border-radius: 24px;
+            max-width: 480px;
+            width: 90%;
         }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
+            transition: color 0.2s ease;
         }
+
         p {
             color: #666;
             margin-bottom: 30px;
+            transition: color 0.2s ease;
+        }
+
+
+        /* ---------- 深色模式适配：当body有dark-mode类时 ---------- */
+        body.dark-mode {
+            background-color: #1a1e24;
+        }
+
+        body.dark-mode h1 {
+            color: #e3e6eb;
+        }
+
+        body.dark-mode p {
+            color: #9aa5b5;
+        }
+
+        /* 进入动画 */
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>404 - 页面未找到</h1>
         <p>哎呀，你想要的页面似乎不存在。</p>
-<button class="custom-button" onclick="goBackOrHome()">返回首页</button>
+        <button class="custom-button" onclick="goBackOrHome()">返回首页</button>
     </div>
 </body>
+
 </html>

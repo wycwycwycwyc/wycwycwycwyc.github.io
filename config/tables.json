@@ -45,7 +45,7 @@
     "script7": {
       "name": "电脑锁定系统",
       "Introduction": "锁定电脑，防破解，密码解锁",
-      "note": "本程序有一键锁定电脑，有动态密码验证，防止暴力破解，普通应用启动",
+      "note": "本程序有一键锁定电脑，动态密码验证，防止暴力破解，普通应用启动",
       "view": "/code.html?title=电脑锁定系统&file=/code/python/lockpc.py"
     },
     "script8": {
@@ -71,7 +71,7 @@
     },
     "script1": {
       "name": "多功能智能排序系统",
-      "Introduction": "智能排序：一键排序，支持多种算法，文件导入",
+      "Introduction": "一键排序，支持多种算法，文件导入",
       "note": "本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。",
       "view": "/code.html?title=多功能智能排序系统&file=/code/cpp/paixv.cpp"
     },
@@ -98,7 +98,7 @@
     "tool1": {
       "name": "计算器",
       "Introduction": "简单的网页计算器",
-      "note": "支持基本运算，科学运算，函数画图等这些功能，不需下载，是网页计算的不错选择",
+      "note": "支持基本运算，科学运算，函数画图等功能，不需下载，是网页计算的不错选择",
       "view": "/code/webapp/calculator"
     },
     "tool2": {

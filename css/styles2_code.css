@@ -366,3 +366,158 @@ body.dark-mode code {
     background-color: rgba(18, 18, 18, 0.6);
     color: #f4f4f4;
 }
+/* ================= 移动端字体优化 - 调整字间距 ================= */
+
+/* 检测移动设备 - 触屏且无法悬停的设备 */
+@media (hover: none) and (pointer: coarse) {
+
+    /* 1. 基础字体设置 */
+    html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    body {
+        font-size: 28px;
+        line-height: 1.5;
+        /* 稍微减小行高 */
+        letter-spacing: -0.02em;
+        /* 减小字间距 */
+    }
+
+    /* 2. 标题优化 */
+    .title {
+        font-size: 48px;
+        margin: 20px 0;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: -0.03em;
+        /* 标题字间距更紧凑 */
+    }
+
+    .subtitle {
+        font-size: 36px;
+        margin: 20px 0 15px 15px;
+        letter-spacing: -0.02em;
+    }
+
+    /* 3. 代码框字体 */
+    #sourceCode,
+    #sourceCode code,
+    pre code,
+    .hljs {
+        font-size: 28px;
+        line-height: 1.6;
+        font-family: 'Consolas', 'Courier New', monospace;
+        letter-spacing: -0.02em;
+        /* 代码字间距紧凑 */
+    }
+
+    /* 4. 按钮文字 */
+    .custom-button,
+    button {
+        font-size: 28px;
+        padding: 15px 30px;
+        letter-spacing: -0.02em;
+    }
+
+    /* 5. 复制按钮 */
+    #copyCodeBtn {
+        font-size: 26px;
+        padding: 12px 25px;
+        letter-spacing: -0.02em;
+    }
+
+    /* 6. 底部提示文字 */
+    #tips {
+        font-size: 32px;
+        padding: 18px;
+        line-height: 1.5;
+        font-weight: bold;
+        background-color: rgba(0, 0, 0, 0.85);
+        border-top: 3px solid #ffaa00;
+        letter-spacing: -0.02em;
+    }
+
+    /* 7. 提示文字颜色 */
+    #tips span {
+        font-size: 32px;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+    }
+
+    /* 8. 确保所有文字都应用字间距 */
+    p,
+    span,
+    div,
+    pre,
+    code,
+    a,
+    li {
+        letter-spacing: -0.02em;
+    }
+
+    /* 9. 代码框容器 */
+    .content {
+        padding: 20px;
+    }
+
+    /* 10. 保持代码格式 */
+    #sourceCode {
+        white-space: pre;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: 65vh;
+    }
+}
+
+/* 针对不同尺寸微调 */
+@media (hover: none) and (pointer: coarse) and (max-width: 400px) {
+    body {
+        font-size: 26px;
+    }
+
+    .title {
+        font-size: 44px;
+        letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+        font-size: 34px;
+    }
+
+    #tips {
+        font-size: 30px;
+    }
+}
+
+/* 针对大屏手机 */
+@media (hover: none) and (pointer: coarse) and (min-width: 401px) {
+    body {
+        font-size: 30px;
+    }
+
+    .title {
+        font-size: 52px;
+    }
+
+    .subtitle {
+        font-size: 38px;
+    }
+
+    #tips {
+        font-size: 34px;
+    }
+}
+
+/* 横屏调整 */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+    .title {
+        font-size: 42px;
+    }
+
+    #tips {
+        font-size: 28px;
+        padding: 12px;
+    }
+}
