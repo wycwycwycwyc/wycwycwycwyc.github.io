@@ -1,6 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('myForm').action =
     function initSwalTheme() {
     if (typeof Swal === 'undefined') {
         // 如果 Swal 还没加载，等待它加载
