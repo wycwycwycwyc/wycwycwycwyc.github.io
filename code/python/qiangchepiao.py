@@ -12,7 +12,7 @@ import psutil
 driver = webdriver.Edge()  # 或者使用webdriver.Firefox()，取决于你使用的浏览器驱动程序  
 driver.maximize_window()    
 # 登录账号  
-driver.get("https://kyfw.12306.cn/otn/resources/login.html")  
+driver.get("https://kyfw.12306.cn/otn/resources/Login")  
 time.sleep(60)  #等待用户登录
 driver.get("https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc&fs=%E6%B8%A0%E5%8E%BF,QRW&ts=%E9%87%8D%E5%BA%86%E5%8C%97,CUW&date=2024-01-31&flag=N,N,Y")           
 while True:  

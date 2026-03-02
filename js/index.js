@@ -31,8 +31,140 @@ const ThemeManager = {
         // 应用主题
         this.applyTheme();
         
+        // 初始化 SweetAlert2
+        this.initSwal();
+        
         // 设置监听器
         this.setupListeners();
+    },
+    
+    // 初始化 SweetAlert2
+    initSwal: function() {
+        if (typeof Swal === 'undefined') {
+            // 如果 Swal 还没加载，等待它加载
+            const checkSwal = setInterval(() => {
+                if (typeof Swal !== 'undefined') {
+                    clearInterval(checkSwal);
+                    this.overrideSwalFire();
+                }
+            }, 100);
+            return;
+        }
+        
+        this.overrideSwalFire();
+    },
+    
+    // 重写 Swal.fire 方法
+    overrideSwalFire: function() {
+        if (!Swal || !Swal.fire) {
+            console.error('SweetAlert2 对象不完整');
+            return;
+        }
+        
+        console.log('SweetAlert2 版本:', Swal.version || '未知');
+        
+        // 保存原始的 fire 方法
+        const originalFire = Swal.fire;
+        const self = this;
+        
+        // 重写 fire 方法
+        Swal.fire = function() {
+            const args = arguments;
+            const shouldUseDark = self.getCurrentDarkMode();
+            
+            // 处理字符串参数形式: Swal.fire('title', 'text', 'icon')
+            if (args.length >= 1 && typeof args[0] === 'string') {
+                const options = {
+                    title: args[0],
+                    text: args[1],
+                    icon: args[2],
+                    theme: shouldUseDark ? 'dark' : 'light'
+                };
+                return originalFire.call(this, options);
+            }
+            
+            // 处理对象形式: Swal.fire({...})
+            if (args.length === 1 && args[0] && typeof args[0] === 'object') {
+                const options = { ...args[0] };
+                options.theme = shouldUseDark ? 'dark' : 'light';
+                return originalFire.call(this, options);
+            }
+            
+            // 其他情况（很少见）
+            return originalFire.apply(this, args);
+        };
+        
+        // 同时重写 Swal 本身（用于 Swal('title') 这种调用）
+        if (window.Swal !== Swal.fire) {
+            const originalSwal = window.Swal;
+            window.Swal = function() {
+                const args = arguments;
+                const shouldUseDark = self.getCurrentDarkMode();
+                
+                if (args.length === 1 && typeof args[0] === 'string') {
+                    return originalSwal.fire({
+                        title: args[0],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    });
+                } else if (args.length === 2) {
+                    return originalSwal.fire({
+                        title: args[0],
+                        text: args[1],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    });
+                } else if (args.length === 3) {
+                    return originalSwal.fire({
+                        title: args[0],
+                        text: args[1],
+                        icon: args[2],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    });
+                } else if (args.length === 1 && typeof args[0] === 'object') {
+                    return originalSwal.fire({
+                        ...args[0],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    });
+                }
+                return originalSwal.apply(this, args);
+            };
+            
+            // 复制所有静态方法
+            Object.assign(window.Swal, originalSwal);
+        }
+        
+        // 处理 mixin
+        if (Swal.mixin) {
+            const originalMixin = Swal.mixin;
+            Swal.mixin = function(options) {
+                const mixin = originalMixin.call(this, options);
+                const originalMixinFire = mixin.fire;
+                
+                mixin.fire = function() {
+                    const args = arguments;
+                    const shouldUseDark = self.getCurrentDarkMode();
+                    
+                    if (args.length === 1 && typeof args[0] === 'object') {
+                        return originalMixinFire.call(this, {
+                            ...args[0],
+                            theme: shouldUseDark ? 'dark' : 'light'
+                        });
+                    } else if (args.length >= 1 && typeof args[0] === 'string') {
+                        const options = {
+                            title: args[0],
+                            text: args[1],
+                            icon: args[2],
+                            theme: shouldUseDark ? 'dark' : 'light'
+                        };
+                        return originalMixinFire.call(this, options);
+                    }
+                    return originalMixinFire.apply(this, args);
+                };
+                
+                return mixin;
+            };
+        }
+        
+        console.log('SweetAlert2 已通过重写 fire 方法设置主题跟随');
     },
     
     // 更新 favicon（标签页图标）- 根据系统深色模式
@@ -189,6 +321,10 @@ const ThemeManager = {
             if (e.key === 'followSystem' || e.key === 'darkMode' || e.key === 'opacity' || e.key === 'blur') {
                 console.log('Theme changed in another page:', e.key, e.newValue);
                 this.applyTheme();
+                // 重新应用 SweetAlert 主题
+                if (typeof Swal !== 'undefined') {
+                    this.overrideSwalFire();
+                }
             }
         });
         
@@ -210,6 +346,10 @@ const ThemeManager = {
                 e.detail.key === 'opacity' || e.detail.key === 'blur') {
                 console.log('Theme changed in this page:', e.detail.key, e.detail.newValue);
                 this.applyTheme();
+                // 重新应用 SweetAlert 主题
+                if (typeof Swal !== 'undefined') {
+                    this.overrideSwalFire();
+                }
             }
         });
         
@@ -226,6 +366,10 @@ const ThemeManager = {
                 if (localStorage.getItem('followSystem') === 'true') {
                     localStorage.setItem('darkMode', e.matches ? 'enabled' : 'disabled');
                     this.applyTheme();
+                    // 重新应用 SweetAlert 主题
+                    if (typeof Swal !== 'undefined') {
+                        this.overrideSwalFire();
+                    }
                 }
             });
         }
@@ -243,6 +387,11 @@ const ThemeManager = {
         
         // 创建全屏涟漪效果
         this.createRippleEffect(!isDarkMode);
+        
+        // 重新应用 SweetAlert 主题
+        if (typeof Swal !== 'undefined') {
+            this.overrideSwalFire();
+        }
         
         // 注意：不更新 favicon，因为 favicon 始终跟随系统
     },
@@ -386,7 +535,7 @@ if (isPreview) {
         if (logoutButton) logoutButton.style.display = 'none';
         if (loginStatusElement) {
             loginStatusElement.onclick = function() {
-                var loginUrl = '/account/Login.html?redirect=/index.html';
+                var loginUrl = '/account/Login/index.html?redirect=/index.html';
                 window.location.href = loginUrl;
             };
         }
@@ -434,84 +583,79 @@ if (isPreview) {
     }
 
     // 登录错误处理函数
-    function showLoginError() {
-        swal({
-            title: "找不到该用户，是否尝试重新登录？",
-            text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "是",
-            cancelButtonText: "否",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }, function(isConfirm) {
-            if (isConfirm) {
-                swal("正在跳转!", "正在跳转");
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('usertype');
-                localStorage.removeItem('userid');
-                localStorage.removeItem('developerOptionsEnabled');
-                window.location.href = '/account/Login.html';
-            } else {
-                window.location.reload();
-            }
-        });
-    }
+function showLoginError() {
+    Swal.fire({
+        title: "找不到该用户，是否尝试重新登录？",
+        text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "是",
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: "正在跳转!",
+                text: "正在跳转",
+                icon: "info",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('usertype');
+            localStorage.removeItem('userid');
+            localStorage.removeItem('developerOptionsEnabled');
+            window.location.href = '/account/Login/index.html';
+        } else {
+            window.location.reload();
+        }
+    });
+}
 
     // 退出登录函数
-    function logout() {
-        swal({
-            title: "您确定要退出登录吗？",
-            text: "这将清除你本地的登录信息",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "是",
-            cancelButtonText: "否",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }, function(isConfirm) {
-            if (isConfirm) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('usertype');
-                localStorage.removeItem('userid');
-                localStorage.removeItem('developerOptionsEnabled');
-                swal("退出成功！", "已退出登录", "success");
-                location.reload();
-            } else {
-                swal("已取消", "", "info");
-            }
-        });
-    }
+function logout() {
+    Swal.fire({
+        title: "您确定要退出登录吗？",
+        text: "这将清除你本地的登录信息",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "是",
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('usertype');
+            localStorage.removeItem('userid');
+            localStorage.removeItem('developerOptionsEnabled');
+            Swal.fire("退出成功！", "已退出登录", "success");
+            location.reload();
+        }
+    });
+}
 
-    // 切换账号函数
-    function sa() {
-        swal({
-            title: "您确定要切换账号吗",
-            text: "这将清除你现在的登录信息",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "是",
-            cancelButtonText: "否",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }, function(isConfirm) {
-            if (isConfirm) {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('username');
-                localStorage.removeItem('usertype');
-                localStorage.removeItem('userid');
-                localStorage.removeItem('developerOptionsEnabled');
-                window.location.href = '/account/Login.html';
-            } else {
-                swal("已取消", "", "info");
-            }
-        });
-    }
+function sa() {
+    Swal.fire({
+        title: "您确定要切换账号吗",
+        text: "这将清除你现在的登录信息",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "是",
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('usertype');
+            localStorage.removeItem('userid');
+            localStorage.removeItem('developerOptionsEnabled');
+            window.location.href = '/account/Login/index.html';
+        }
+    });
+}
 
     // 菜单显示/隐藏函数
     function toggleMenu() {

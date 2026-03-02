@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 构建重定向URL，包含完整路径和所有原始参数
             var redirectUrl = encodeURIComponent(fullPath + searchParams + (searchParams ? '&' : '?') + 'autoDownload=true');
-            window.location.href = '/account/Login.html?redirect=' + redirectUrl;
+            window.location.href = '/account/Login/index.html?redirect=' + redirectUrl;
         }
     });
 

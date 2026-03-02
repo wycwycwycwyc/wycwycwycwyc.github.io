@@ -1,0 +1,290 @@
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f7f7f7;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+              /* 隐藏滚动条 */
+            }
+
+            .login-container {
+              width: 400px;
+              margin: 50px auto;
+              padding: 30px;
+              background-color: #fff;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+              border-radius: 20px;
+            }
+
+            .login-container h2 {
+              text-align: center;
+              color: #333;
+              font-size: 24px;
+            }
+
+            .form-group {
+              margin-bottom: 20px;
+            }
+
+            .form-group label {
+              display: block;
+              color: #666;
+              font-size: 18px;
+            }
+
+            .form-group input {
+              width: 96%;
+              padding: 15px;
+              border: 1px solid #ddd;
+              border-radius: 20px;
+              font-size: 16px;
+              /* 增加输入框字体大小 */
+            }
+
+            .form-group button {
+              width: 100%;
+              padding: 15px;
+              border: none;
+              border-radius: 20px;
+              background-color: #5cb85c;
+              color: white;
+              cursor: pointer;
+              font-size: 16px;
+              /* 增加按钮字体大小 */
+            }
+
+            .form-group button:hover {
+              background-color: #4cae4c;
+            }
+
+            .error {
+              color: red;
+              margin-top: 10px;
+              display: none;
+            }
+
+            /* 添加返回按钮的样式 */
+            .back-btn {
+              display: inline-block;
+              padding: 5px 10px;
+              color: #5cb85c;
+              text-decoration: none;
+              font-size: 16px;
+              cursor: pointer;
+              background-color: #f7f7f7;
+              border: 1px solid #ddd;
+              border-radius: 20px;
+            }
+
+            .back-btn:hover {
+              color: #4cae4c;
+              background-color: #e7e7e7;
+              border-color: #ccc;
+            }
+
+            /* 深色模式基础样式 */
+            body.dark-mode {
+              background-color: #1a1a1a;
+              color: #ffffff;
+            }
+
+            /* 深色模式下登录容器样式 */
+            body.dark-mode .login-container {
+              background-color: #272727;
+              box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            }
+
+            /* 深色模式下文本和按钮样式 */
+            body.dark-mode .login-container h2,
+            body.dark-mode .form-group label {
+              color: #ffffff;
+            }
+
+            /* 深色模式下输入框的背景色调整 */
+            .dark-mode .form-group input {
+              background-color: #333;
+              border-color: #444;
+              color: #fff;
+            }
+
+            body.dark-mode .form-group button {
+              background-color: #4caf50;
+              color: white;
+            }
+
+            body.dark-mode .form-group button:hover {
+              background-color: #45a049;
+            }
+
+            /* 深色模式下错误消息样式 */
+            body.dark-mode .error {
+              color: #ff5555;
+            }
+
+            /* 返回按钮的样式 */
+            .back-btn {
+              display: inline-block;
+              padding: 5px 10px;
+              color: #5cb85c;
+              text-decoration: none;
+              font-size: 16px;
+              cursor: pointer;
+              background-color: #f7f7f7;
+              border: 1px solid #ddd;
+              border-radius: 20px;
+            }
+
+            .back-btn:hover {
+              color: #4cae4c;
+              background-color: #e7e7e7;
+              border-color: #ccc;
+            }
+
+            /* 深色模式下返回按钮的样式 */
+            body.dark-mode .back-btn {
+              color: #4caf50;
+              background-color: #333333;
+              border-color: #555555;
+            }
+
+            body.dark-mode .back-btn:hover {
+              color: #45a049;
+              background-color: #303030;
+              border-color: #3c3c3c;
+            }
+
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            /* 应用动画到登录容器 */
+            .login-container {
+              opacity: 1;
+              transform: translateY(0%);
+              animation: slideUp 0.8s ease-out forwards;
+            }
+
+            /* 正在验证的提示样式 */
+            .verifying {
+              color: #666;
+              margin-top: 10px;
+              display: none;
+            }
+
+            /* 移动端设备检测 - 只改大小和布局 */
+            @media (hover: none) and (pointer: coarse),
+            (max-width: 768px) {
+              body {
+                padding: 0;
+                overflow: hidden;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+
+              .container {
+                width: 95vw;
+                max-width: 95vw;
+                margin: 0 auto;
+                padding: 6vw 5vw;
+                box-sizing: border-box;
+                max-height: 98vh;
+                overflow-y: auto;
+              }
+
+              h2 {
+                font-size: 7vw;
+                margin: 3vw 0 5vw 0;
+              }
+
+              label {
+                font-size: 4.8vw;
+                margin-bottom: 2vw;
+              }
+
+              input[type="text"],
+              input[type="email"],
+              input[type="password"],
+              input[type="verification_code"],
+              select {
+                width: 100%;
+                padding: 4vw;
+                margin-bottom: 4vw;
+                box-sizing: border-box;
+                font-size: 4.8vw;
+              }
+
+              input[type="verification_code"] {
+                width: 65%;
+              }
+
+              .verification-code-button {
+                padding: 4vw 0;
+                font-size: 4.2vw;
+                margin-left: 2vw;
+                width: 33%;
+              }
+
+              input[type="submit"] {
+                width: 100%;
+                padding: 4.5vw;
+                font-size: 5vw;
+                margin: 4vw 0 2vw 0;
+              }
+
+              .back-button {
+                padding: 2vw 4vw;
+                font-size: 4.5vw;
+              }
+
+              .error {
+                font-size: 4vw;
+              }
+            }
+
+            /* 针对更小的设备优化 */
+            @media (hover: none) and (pointer: coarse) and (max-width: 480px),
+            (max-width: 480px) {
+              .container {
+                padding: 5vw 4vw;
+              }
+
+              h2 {
+                font-size: 6.5vw;
+                margin: 2vw 0 4vw 0;
+              }
+
+              input[type="text"],
+              input[type="email"],
+              input[type="password"],
+              input[type="verification_code"],
+              select {
+                padding: 3.8vw;
+                font-size: 4.5vw;
+                margin-bottom: 3.5vw;
+              }
+
+              input[type="verification_code"] {
+                width: 63%;
+              }
+
+              .verification-code-button {
+                padding: 3.8vw 0;
+                font-size: 4vw;
+                width: 35%;
+              }
+
+              input[type="submit"] {
+                padding: 4vw;
+                font-size: 4.8vw;
+              }
+            }

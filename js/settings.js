@@ -1,5 +1,147 @@
 
 document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('myForm').action =
+    function initSwalTheme() {
+    if (typeof Swal === 'undefined') {
+        // 如果 Swal 还没加载，等待它加载
+        const checkSwal = setInterval(function() {
+            if (typeof Swal !== 'undefined') {
+                clearInterval(checkSwal);
+                overrideSwalFire();
+            }
+        }, 100);
+        return;
+    }
+    
+    overrideSwalFire();
+}
+
+// 重写 Swal.fire 方法
+function overrideSwalFire() {
+    if (!Swal || !Swal.fire) {
+        console.error('SweetAlert2 对象不完整');
+        return;
+    }
+    
+    console.log('SweetAlert2 版本:', Swal.version || '未知');
+    
+    // 保存原始的 fire 方法
+    const originalFire = Swal.fire;
+    
+    // 重写 fire 方法
+    Swal.fire = function() {
+        const args = arguments;
+        const shouldUseDark = shouldUseDarkMode();
+        
+        // 处理字符串参数形式: Swal.fire('title', 'text', 'icon')
+        if (args.length >= 1 && typeof args[0] === 'string') {
+            const options = {
+                title: args[0],
+                text: args[1],
+                icon: args[2],
+                theme: shouldUseDark ? 'dark' : 'light'
+            };
+            return originalFire.call(this, options);
+        }
+        
+        // 处理对象形式: Swal.fire({...})
+        if (args.length === 1 && args[0] && typeof args[0] === 'object') {
+            const options = { ...args[0] };
+            options.theme = shouldUseDark ? 'dark' : 'light';
+            return originalFire.call(this, options);
+        }
+        
+        // 其他情况（很少见）
+        return originalFire.apply(this, args);
+    };
+    
+    // 同时重写 Swal 本身（用于 Swal('title') 这种调用）
+    if (window.Swal !== Swal.fire) {
+        const originalSwal = window.Swal;
+        window.Swal = function() {
+            const args = arguments;
+            const shouldUseDark = shouldUseDarkMode();
+            
+            if (args.length === 1 && typeof args[0] === 'string') {
+                return originalSwal.fire({
+                    title: args[0],
+                    theme: shouldUseDark ? 'dark' : 'light'
+                });
+            } else if (args.length === 2) {
+                return originalSwal.fire({
+                    title: args[0],
+                    text: args[1],
+                    theme: shouldUseDark ? 'dark' : 'light'
+                });
+            } else if (args.length === 3) {
+                return originalSwal.fire({
+                    title: args[0],
+                    text: args[1],
+                    icon: args[2],
+                    theme: shouldUseDark ? 'dark' : 'light'
+                });
+            } else if (args.length === 1 && typeof args[0] === 'object') {
+                return originalSwal.fire({
+                    ...args[0],
+                    theme: shouldUseDark ? 'dark' : 'light'
+                });
+            }
+            return originalSwal.apply(this, args);
+        };
+        
+        // 复制所有静态方法
+        Object.assign(window.Swal, originalSwal);
+    }
+    
+    // 处理 mixin
+    if (Swal.mixin) {
+        const originalMixin = Swal.mixin;
+        Swal.mixin = function(options) {
+            const mixin = originalMixin.call(this, options);
+            const originalMixinFire = mixin.fire;
+            
+            mixin.fire = function() {
+                const args = arguments;
+                const shouldUseDark = shouldUseDarkMode();
+                
+                if (args.length === 1 && typeof args[0] === 'object') {
+                    return originalMixinFire.call(this, {
+                        ...args[0],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    });
+                } else if (args.length >= 1 && typeof args[0] === 'string') {
+                    const options = {
+                        title: args[0],
+                        text: args[1],
+                        icon: args[2],
+                        theme: shouldUseDark ? 'dark' : 'light'
+                    };
+                    return originalMixinFire.call(this, options);
+                }
+                return originalMixinFire.apply(this, args);
+            };
+            
+            return mixin;
+        };
+    }
+    
+    console.log('SweetAlert2 已通过重写 fire 方法设置主题跟随');
+}
+
+// 判断应该使用深色模式还是浅色模式
+function shouldUseDarkMode() {
+    const followSystem = localStorage.getItem('followSystem') === 'true';
+    const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+    
+    if (followSystem) {
+        // 跟随系统
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        // 手动模式
+        return isDarkMode;
+    }
+}
+initSwalTheme();
     if (navigator.userAgent.match(/Mobile/i)) {
         // 移动设备
     
@@ -248,8 +390,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginStatus = document.createElement('loginStatus');
     const email = document.getElementById('email');
     if (isLoggedIn) {
-        usernameElement.innerHTML = '用户名: <a href="/account/UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
-        email.innerHTML = '用户名: <a href="/account/UpdateUsername.html" class="user-name-text"><span>' + '正在加载' + '</span></a>';
+        usernameElement.innerHTML = '用户名: <a href="/account/UpdateUsername" class="user-name-text"><span>' + '正在加载' + '</span></a>';
+        email.innerHTML = '用户名: <a href="/account/UpdateUsername" class="user-name-text"><span>' + '正在加载' + '</span></a>';
         let userId = localStorage.getItem('userid');
         const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
         document.getElementById('loginStatus').style.backgroundImage = `url('${imageUrl}')`;
@@ -272,29 +414,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     // 显示用户名
                     console.log('用户名:', data.data.username);
                     localStorage.setItem('username', data.data.username);
-                    usernameElement.innerHTML = '用户名: <a href="/account/UpdateUsername.html" class="user-name-text"><span>' + username + '</span></a>';
+                    usernameElement.innerHTML = '用户名: <a href="/account/UpdateUsername" class="user-name-text"><span>' + username + '</span></a>';
                 } else {
                     // 显示错误信息
                     console.error(data.message);
-                    swal({
+                    Swal.fire({
                         title: "找不到该用户，是否尝试重新登录？",
                         text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                        type: "warning",
+                        icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#DD6B55",
                         confirmButtonText: "是",
-                        cancelButtonText: "否",
-                        closeOnConfirm: false,
-                        closeOnCancel: false
-                    }, function (isConfirm) {
-                        if (isConfirm) {
-                            swal("正在跳转!", "正在跳转");
+                        cancelButtonText: "否"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire("正在跳转!", "正在跳转", "info");
                             localStorage.removeItem('isLoggedIn');
                             localStorage.removeItem('username');
                             localStorage.removeItem('usertype');
                             localStorage.removeItem('userid');
                             localStorage.removeItem('developerOptionsEnabled');
-                            window.location.href = '/account/Login.html?redirect=/settings.html';
+                            window.location.href = '/account/Login/index.html?redirect=/settings.html';
                         } else {
                             window.location.reload();
                         }
@@ -303,29 +443,27 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                swal({
+                Swal.fire({
                     title: "找不到该用户，是否尝试重新登录？",
                     text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                    type: "warning",
+                    icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#DD6B55",
                     confirmButtonText: "是",
-                    cancelButtonText: "否",
-                    closeOnConfirm: false,
-                    closeOnCancel: false
-                }, function (isConfirm) {
-                    if (isConfirm) {
-                        swal("正在跳转!", "正在跳转");
+                    cancelButtonText: "否"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire("正在跳转!", "正在跳转", "info");
                         localStorage.removeItem('isLoggedIn');
                         localStorage.removeItem('username');
                         localStorage.removeItem('usertype');
                         localStorage.removeItem('userid');
                         localStorage.removeItem('developerOptionsEnabled');
-                        window.location.href = '/account/Login.html?redirect=/settings.html';
+                        window.location.href = '/account/Login/index.html?redirect=/settings.html';
                     } else {
                         window.location.reload();
                     }
-                })
+                });
             });
         fetch(`${serverurl}/get-email-by-userid`, {
             method: 'POST',
@@ -337,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    email.innerHTML = '邮箱: <a href="/account/UpdateEmail.html" class="user-name-text"><span>' + data.data.email + '</span></a>';
+                    email.innerHTML = '邮箱: <a href="/account/UpdateEmail" class="user-name-text"><span>' + data.data.email + '</span></a>';
                 }
             })
             .catch(error => {
@@ -348,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 添加更改密码的链接
         const resetPasswordLink = document.createElement('a');
-        resetPasswordLink.href = '/account/resetpassword.html';
+        resetPasswordLink.href = '/account/resetpassword';
         resetPasswordLink.textContent = '更改密码';
         resetPasswordLink.className = 'password-link';
         passwordLink.appendChild(resetPasswordLink);
@@ -371,36 +509,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 添加退出登录按钮的点击事件
         logoutButton.onclick = function () {
-            swal({
-                title: "您确定要退出登录吗？",
-                text: "这将清除你本地的登录信息",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "是",
-                cancelButtonText: "否",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('username');
-                    localStorage.removeItem('usertype');
-                    localStorage.removeItem('userid');
-                    localStorage.removeItem('developerOptionsEnabled');
-                    // 重定向到登录页面
-                    swal("退出成功成功！", "已退出登录", "success");
-                    location.reload();
-                }
-                else {
-                    swal({
-                        title: "正在取消",
-                        text: "正在取消",
-                        timer: 0,
-                        showConfirmButton: false
-                    })
-                }
-            })
+        Swal.fire({
+            title: "您确定要退出登录吗？",
+            text: "这将清除你本地的登录信息",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是",
+            cancelButtonText: "否"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('usertype');
+                localStorage.removeItem('userid');
+                localStorage.removeItem('developerOptionsEnabled');
+                Swal.fire("退出成功！", "已退出登录", "success");
+                location.reload();
+            }
+
+        })
         };
     } else {
         usernameElement.style.display = 'none';
@@ -410,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function () {
         logout.style.display = 'none';
         // 如果未登录，设置点击事件以跳转到登录页面
         loginButton.onclick = function () {
-            var loginUrl = '/account/Login.html?redirect=/settings.html#account'; // 替换为您的登录页面URL
+            var loginUrl = '/account/Login/index.html?redirect=/settings.html#account'; // 替换为您的登录页面URL
             openPage(loginUrl); // 使用openPage函数进行跳转
         };
     }
@@ -551,288 +679,186 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSystemThemeListener();
 });
 function clearDarkMode() {
-    swal({
+    Swal.fire({
         title: "确定要清除深色模式设置吗？",
         text: "确定要清除深色模式设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('darkMode');
             localStorage.removeItem('backgroundImage');
-            swal("清除成功！", "深色模式设置已清除", "success");
+            Swal.fire("清除成功！", "深色模式设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearAnimation() {
-    swal({
+    Swal.fire({
         title: "确定要清除动画设置吗？",
         text: "确定要清除动画设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('animation');
-            swal("清除成功！", "动画设置已清除", "success");
+            Swal.fire("清除成功！", "动画设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearglowToggle() {
-    swal({
+    Swal.fire({
         title: "确定要清除泛光设置吗？",
         text: "确定要清除泛光设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('glowEnabled');
-            swal("清除成功！", "泛光设置已清除", "success");
+            Swal.fire("清除成功！", "泛光设置已清除", "success");
             location.reload();
         }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
-        }
     })
-
 }
 
 function clearcode() {
-    swal({
+    Swal.fire({
         title: "确定要清除更好的代码显示设置吗？",
         text: "确定要清除更好的代码显示设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('isCodeVisible');
-            swal("清除成功！", "更好的代码显示设置已清除", "success");
+            Swal.fire("清除成功！", "更好的代码显示设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearVisibility() {
-    swal({
+    Swal.fire({
         title: "确定要清除可见度设置吗？",
         text: "确定要清除可见度设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('opacity');
-            swal("清除成功！", "可见度设置已清除", "success");
+            Swal.fire("清除成功！", "可见度设置已清除", "success");
             location.reload();
         }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
-        }
     })
-
 }
 
 function clearFontSize() {
-    swal({
+    Swal.fire({
         title: "确定要清除字体大小设置吗？",
         text: "确定要清除字体大小设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('fontSize');
-            swal("清除成功！", "字体大小设置已清除", "success");
+            Swal.fire("清除成功！", "字体大小设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearEyeCare() {
-    swal({
+    Swal.fire({
         title: "确定要清除护眼模式设置吗？",
         text: "确定要清除护眼模式设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('eyeCareMode');
-            swal("清除成功！", "护眼模式设置已清除", "success");
+            Swal.fire("清除成功！", "护眼模式设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearBrightness() {
-    swal({
+    Swal.fire({
         title: "确定要清除亮度设置吗？",
         text: "确定要清除亮度设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('brightness');
-            swal("清除成功！", "亮度设置已清除", "success");
+            Swal.fire("清除成功！", "亮度设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearLoginInfo() {
-    swal({
+    Swal.fire({
         title: "确定要清除登录信息吗？",
         text: "确定要清除登录信息吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             localStorage.removeItem('usertype');
             localStorage.removeItem('userid');
             localStorage.removeItem('developerOptionsEnabled');
-            swal("清除成功！", "登录信息已清除", "success");
+            Swal.fire("清除成功！", "登录信息已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
 
 function clearAllSettings() {
-    swal({
+    Swal.fire({
         title: "确定要清除所有设置吗？",
         text: "确定要清除所有设置吗？",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.clear();
-            swal("清除成功！", "所有设置已清除", "success");
+            Swal.fire("清除成功！", "所有设置已清除", "success");
             location.reload();
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 }
@@ -841,31 +867,29 @@ document.addEventListener('DOMContentLoaded', function () {
     // 这里可以添加其他DOM加载完成后的初始化代码
 });
 function logout() {
-    swal({
+    Swal.fire({
         title: "确定要注销此用户吗？",
         text: "这将永久删除此用户在服务器和本地的所有记录。",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             userId = localStorage.getItem('userid');
             fetch(`${serverurl}/delete-user`, {
-                method: 'POST', // 指定请求方法为POST
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: userId }) // 请求体，包含要删除的用户ID
+                body: JSON.stringify({ id: userId })
             })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.json(); // 解析JSON响应体
+                    return response.json();
                 })
                 .then(data => {
                     if (data.success) {
@@ -874,26 +898,18 @@ function logout() {
                         localStorage.removeItem('userid');
                         localStorage.removeItem('developerOptionsEnabled');
                         newtable();
-                        swal("用户删除成功", "此用户将不能登录", "success");
+                        Swal.fire("用户删除成功", "此用户将不能登录", "success");
 
                     } else {
-                        swal("用户删除失败", data.message, "error");
+                        Swal.fire("用户删除失败", data.message, "error");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    swal("用户删除失败", "删除用户时发生错误，请稍后重试。", "error");
+                    Swal.fire("用户删除失败", "删除用户时发生错误，请稍后重试。", "error");
                 });
-        } else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
-
 }
 // 假设这是你的openPage函数
 function openPage(url) {
@@ -913,68 +929,47 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function sa() {
-    swal({
+    Swal.fire({
         title: "您确定要切换账号吗",
         text: "这将清除你现在的登录信息",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('username');
             localStorage.removeItem('usertype');
             localStorage.removeItem('userid');
             localStorage.removeItem('developerOptionsEnabled');
-            window.location.href = '/account/Login.html?redirect=/settings.html#account';
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
+            window.location.href = '/account/Login/index.html?redirect=/settings.html#account';
         }
     })
 }
 function exitdev() {
-    swal({
+    Swal.fire({
         title: "您确定要退出开发者模式吗",
         text: "这将关闭你的开发者操作",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('developerOptionsEnabled');
-            swal("退出成功！", "您已退出开发者模式", "success");
+            Swal.fire("退出成功！", "您已退出开发者模式", "success");
             if (navigator.userAgent.match(/Mobile/i)) {
                 document.getElementById('sidebar').style.display = 'block';
             }
-            document.getElementById('developer-link').style.pointerEvents = 'none'; // 设置链接可点击
+            document.getElementById('developer-link').style.pointerEvents = 'none';
             document.getElementById('developers').style.display = 'none';
             document.getElementById('developer').style.display = 'none';
         }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
-        }
     })
 }
-
 // 定义一个全局变量来跟踪点击次数
 let clickCount = 0; // 确保全局变量在脚本开始时就已定义
 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -1072,30 +1067,28 @@ document.addEventListener('DOMContentLoaded', function () {
                         .catch(error => {
                             // 网络或JSON解析错误
                             console.error('获取用户类型失败:', error);
-                            swal("获取用户类型失败，请稍后重试。", "获取用户类型失败，请稍后重试。", "error");
+                            Swal.fire("获取用户类型失败，请稍后重试。", "获取用户类型失败，请稍后重试。", "error");
                         });
                 } else {
                     // 显示错误信息
                     console.error(data.message);
-                    swal({
+                    Swal.fire({
                         title: "找不到该用户，是否尝试重新登录？",
                         text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                        type: "warning",
+                        icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#DD6B55",
                         confirmButtonText: "是",
-                        cancelButtonText: "否",
-                        closeOnConfirm: false,
-                        closeOnCancel: false
-                    }, function (isConfirm) {
-                        if (isConfirm) {
-                            swal("正在跳转!", "正在跳转");
+                        cancelButtonText: "否"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire("正在跳转!", "正在跳转", "info");
                             localStorage.removeItem('isLoggedIn');
                             localStorage.removeItem('username');
                             localStorage.removeItem('usertype');
                             localStorage.removeItem('userid');
                             localStorage.removeItem('developerOptionsEnabled');
-                            window.location.href = '/account/Login.html?redirect=/settings.html';
+                            window.location.href = '/account/Login/index.html?redirect=/settings.html';
                         } else {
                             window.location.reload();
                         }
@@ -1104,29 +1097,27 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                swal({
-                    title: "找不到该用户，是否尝试重新登录？",
-                    text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "是",
-                    cancelButtonText: "否",
-                    closeOnConfirm: false,
-                    closeOnCancel: false
-                }, function (isConfirm) {
-                    if (isConfirm) {
-                        swal("正在跳转!", "正在跳转");
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('username');
-                        localStorage.removeItem('usertype');
-                        localStorage.removeItem('userid');
-                        localStorage.removeItem('developerOptionsEnabled');
-                        window.location.href = '/account/Login.html?redirect=/settings.html';
-                    } else {
-                        window.location.reload();
-                    }
-                })
+                    Swal.fire({
+                        title: "找不到该用户，是否尝试重新登录？",
+                        text: "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "是",
+                        cancelButtonText: "否"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire("正在跳转!", "正在跳转", "info");
+                            localStorage.removeItem('isLoggedIn');
+                            localStorage.removeItem('username');
+                            localStorage.removeItem('usertype');
+                            localStorage.removeItem('userid');
+                            localStorage.removeItem('developerOptionsEnabled');
+                            window.location.href = '/account/Login/index.html?redirect=/settings.html';
+                        } else {
+                            window.location.reload();
+                        }
+                    })
             });
     }
 
@@ -1315,7 +1306,7 @@ function createRow(user, index, users, isicon, input) {
         customLink.style.color = 'grey';
         customLink.onclick = function (event) {
             event.preventDefault(); // 阻止链接的默认行为
-            swal("错误:拒绝访问", "错误:拒绝访问", "error");
+            Swal.fire("错误:拒绝访问", "错误:拒绝访问", "error");
         };
     } else {
         customLink.className = 'custom-link';
@@ -1325,56 +1316,56 @@ function createRow(user, index, users, isicon, input) {
         // 将当前用户类型和要更改的用户类型添加到 updatedUserInfo 对象中
         customLink.onclick = function () {
 
-            swal({
-                title: "确定要删除该用户吗？",
-                text: "这个用户将无法登录",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "是",
-                cancelButtonText: "否",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    swal('正在删除');
-                    userId = user.id;
-                    fetch(`${serverurl}/delete-user`, {
-                        method: 'POST', // 指定请求方法为POST
-                        headers: {
-                            'Content-Type': 'application/json' // 设置请求头，表明发送的是JSON数据
-                        },
-                        body: JSON.stringify({ id: userId, currentType: currentType, newType: newType }) // 请求体，包含要删除的用户ID
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json(); // 解析JSON响应体
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                newtable();
-                                swal("用户删除成功", "此用户将不能登录", "success");
+Swal.fire({
+    title: "确定要删除该用户吗？",
+    text: "这个用户将无法登录",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "是",
+    cancelButtonText: "否"
+}).then((result) => {
+    if (result.isConfirmed) {
+        Swal.fire({
+            title: '正在删除',
+            text: '请稍候...',
+            icon: 'info',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-                            } else {
-                                swal("用户删除失败:", data.message, "error");
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            swal("删除用户时发生错误，请稍后重试。", "删除用户时发生错误，请稍后重试。", "error");
-                        });
-                }
-                else {
-                    swal({
-                        title: "正在取消",
-                        text: "正在取消",
-                        timer: 0,
-                        showConfirmButton: false
-                    })
-                }
-            })
+        userId = user.id;
+        fetch(`${serverurl}/delete-user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: userId, currentType: currentType, newType: newType })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                newtable();
+                Swal.fire("用户删除成功", "此用户将不能登录", "success");
+            } else {
+                Swal.fire("用户删除失败", data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire("删除用户时发生错误，请稍后重试。", "删除用户时发生错误，请稍后重试。", "error");
+        });
+    }
+    // else 部分已完全移除 - 用户点击取消时不执行任何操作
+})
         };
     }
     editTd.appendChild(customLink);
@@ -1485,10 +1476,10 @@ function uploadImage(user) {
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    swal('图片上传成功', '你的账号头像已更新', 'success');
+                    Swal.fire('图片上传成功', '你的账号头像已更新', 'success');
                     newtable();
                 } else {
-                    swal('图片上传失败: ', xhr.statusText, 'error');
+                    Swal.fire('图片上传失败: ', xhr.statusText, 'error');
                 }
             };
 
@@ -1505,25 +1496,23 @@ function storeUserId(index, users, currentUser) {
     const targetUserId = users[index].id;
     const targetUserType = users[index].type;
     const username = users[index].username;
-    swal({
-        title: "确定切换到" + username + "吗？",
-        text: "可能会导致一些不可预测的问题",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: false
-    }, function (isConfirm) {
-        if (isConfirm) {
+Swal.fire({
+    title: "确定切换到" + username + "吗？",
+    text: "可能会导致一些不可预测的问题",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "是",
+    cancelButtonText: "否"
+}).then((result) => {
+    if (result.isConfirmed) {
             // 如果当前用户是superadmin，则直接切换
             if (currentUserType === 'superadmin') {
                 localStorage.setItem('userid', targetUserId);
                 localStorage.setItem('username', username);
                 localStorage.setItem('usertype', targetUserType);
                 newtable();
-                swal("用户已更新", "当前用户已更新为: " + username, "success");
+                Swal.fire("用户已更新", "当前用户已更新为: " + username, "success");
                 location.reload();
             }
             // 如果当前用户是admin，需要进一步检查
@@ -1537,7 +1526,7 @@ function storeUserId(index, users, currentUser) {
                     localStorage.setItem('username', username);
                     localStorage.setItem('usertype', targetUserType);
                     newtable();
-                    swal("用户已更新", "当前用户已更新为: " + username, "success");
+                    Swal.fire("用户已更新", "当前用户已更新为: " + username, "success");
                 }
             } else if (currentUserType === 'user') {
                 if (targetUserType === 'superadmin' || targetUserType === 'admin') {
@@ -1548,21 +1537,13 @@ function storeUserId(index, users, currentUser) {
                     localStorage.setItem('username', username);
                     localStorage.setItem('usertype', targetUserType);
                     newtable();
-                    swal("用户已更新", "当前用户已更新为: " + username, "success");
+                    Swal.fire("用户已更新", "当前用户已更新为: " + username, "success");
                 }
 
             }
             else {
-                swal("权限不足", "您没有权限执行此操作", "error");
+                Swal.fire("权限不足", "您没有权限执行此操作", "error");
             }
-        }
-        else {
-            swal({
-                title: "正在取消",
-                text: "正在取消",
-                timer: 0,
-                showConfirmButton: false
-            })
         }
     })
 
@@ -1570,33 +1551,47 @@ function storeUserId(index, users, currentUser) {
 
 // 密码确认函数
 function confirmPassword(targetUserId, username, targetUserType) {
-    swal({
+    Swal.fire({
         title: "输入" + username + "的密码以继续",
         text: "请输入" + username + "的密码:",
-        type: "input",
+        icon: "question",
+        input: "password",
+        inputPlaceholder: "请输入密码",
         showCancelButton: true,
-        closeOnConfirm: false,
-        animation: "slide-from-top",
-        inputPlaceholder: "请输入密码"
-    }, function (inputValue) {
-        if (!inputValue) {
-            swal.showInputError("密码不能为空");
-            return false;
+        confirmButtonText: "验证",
+        cancelButtonText: "取消",
+        inputValidator: (value) => {
+            if (!value) {
+                return "密码不能为空！";
+            }
         }
-        swal('正在验证');
-        // 发送密码到后端API进行验证
-        fetch(`${serverurl}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: inputValue
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            // 显示验证中
+            Swal.fire({
+                title: '正在验证',
+                text: '请稍候...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // 发送密码到后端API进行验证
+            fetch(`${serverurl}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: result.value
+                })
             })
-        })
             .then(response => {
-                return response.text(); // 这里使用text()，因为我们预期服务器返回的是HTML文本
+                return response.text();
             })
             .then(data => {
                 if (data.includes('<h1>登录成功</h1>')) {
@@ -1604,16 +1599,48 @@ function confirmPassword(targetUserId, username, targetUserType) {
                     localStorage.setItem('username', username);
                     localStorage.setItem('usertype', targetUserType);
                     newtable();
-                    swal("密码正确，用户已更新", "当前用户已更新为: " + username, "success");
-                    location.reload();
+                    Swal.fire({
+                        title: "密码正确",
+                        text: "当前用户已更新为: " + username,
+                        icon: "success"
+                    }).then(() => {
+                        location.reload();
+                    });
                 } else if (data.includes('登录失败')) {
-                    swal("密码错误", '请输入正确的密码', 'error');
+                    Swal.fire({
+                        title: "密码错误",
+                        text: "请输入正确的密码",
+                        icon: "error"
+                    }).then(() => {
+                        // 重新打开密码输入框
+                        confirmPassword(targetUserId, username, targetUserType);
+                    });
+                } else {
+                    Swal.fire({
+                        title: "验证失败",
+                        text: "服务器返回异常结果",
+                        icon: "error"
+                    });
                 }
             })
             .catch(error => {
-                alert(error);
-                swal("请求失败", "请稍后重试", "error");
+                console.error('Error:', error);
+                Swal.fire({
+                    title: "请求失败",
+                    text: "请稍后重试",
+                    icon: "error"
+                });
             });
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // 用户点击取消，不做任何操作
+            Swal.fire({
+                title: "已取消",
+                text: "操作已取消",
+                icon: "info",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
     });
 }
 
@@ -1676,30 +1703,26 @@ function editUser(index, users) {
     } else {
         editButton.textContent = '提交';
         editButton.onclick = function () {
-            swal({
-                title: "确定要更改此用户信息吗",
-                text: "确定要更改此用户信息吗",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "是",
-                cancelButtonText: "否",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    swal('正在更新');
-                    submitChanges(index, users);
-                }
-                else {
-                    swal({
-                        title: "正在取消",
-                        text: "正在取消",
-                        timer: 0,
-                        showConfirmButton: false
-                    })
-                }
-            })
+        Swal.fire({
+            title: "确定要更改此用户信息吗",
+            text: "确定要更改此用户信息吗",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "是",
+            cancelButtonText: "否"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: '正在更新',
+                    text: '请稍候...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                });
+                submitChanges(index, users);
+            }
+        })
         };
     }
 }
@@ -1729,7 +1752,7 @@ function submitChanges(index, users) {
 
     // 在发送请求之前检查updatedUserInfo是否包含null值
     if (Object.values(updatedUserInfo).some(value => value === null)) {
-        swal("更新失败：请确保所有字段都已填写。", "更新失败：请确保所有字段都已填写。", "error");
+        Swal.fire("更新失败：请确保所有字段都已填写。", "更新失败：请确保所有字段都已填写。", "error");
         return; // 如果有null值，终止函数执行
     }
 
@@ -1754,14 +1777,14 @@ function submitChanges(index, users) {
         .then(data => {
             console.log('Success:', data);
             if (data.error === '用户名已被占用') {
-                swal("更改失败", "用户名已被占用", "error");
+                Swal.fire("更改失败", "用户名已被占用", "error");
             } else if (data.error === '邮箱已被占用') {
-                swal("更改失败", "邮箱已被占用", "error");
+                Swal.fire("更改失败", "邮箱已被占用", "error");
             } else {
                 const editButton = document.getElementById(`editButton-${user.username}`);
                 editButton.textContent = '编辑';
                 editButton.onclick = function () { editUser(index, users); };
-                swal("用户数据更新成功", "用户数据更新成功", "success");
+                    
                 newtable();
             }
             // 这里可以添加代码来处理成功的响应，例如更新表格或显示消息
@@ -1769,7 +1792,7 @@ function submitChanges(index, users) {
             // 例如：updateTableRow(row, data.data);
         })
         .catch(error => {
-            swal("更改失败", error, "error");
+            Swal.fire("更改失败", error, "error");
             // 处理错误情况，例如显示错误消息
         });
 }
@@ -1778,22 +1801,22 @@ function registerUserBydev() {
         {
             title: "创建新用户",
             placeholder: "用户名",
-            type: "input"
+            inputType: "text"
         },
         {
             title: "邮箱",
             placeholder: "邮箱",
-            type: "input"
+            inputType: "email"
         },
         {
             title: "密码",
             placeholder: "密码",
-            type: "input"
+            inputType: "password"
         },
         {
             title: "用户类型",
             placeholder: "用户类型（user）",
-            type: "input"
+            inputType: "text"
         }
     ];
 
@@ -1802,29 +1825,41 @@ function registerUserBydev() {
 
     function showStep() {
         var step = steps[currentStep];
-        swal({
+        
+        Swal.fire({
             title: step.title,
-            type: step.type,
+            text: `请输入${step.placeholder}`,
+            input: step.inputType,
             inputPlaceholder: step.placeholder,
             showCancelButton: true,
-            closeOnConfirm: false,
-            confirmButtonText: currentStep === steps.length - 1 ? "注册" : "继续",
-            cancelButtonText: currentStep > 0 ? "上一步" : "取消"
-        }, function (inputValue) {
-            if (inputValue === false) {
-                return false;
+            confirmButtonText: currentStep === steps.length - 1 ? "注册" : "下一步",
+            cancelButtonText: currentStep > 0 ? "上一步" : "取消",
+            inputValidator: (value) => {
+                if (!value) {
+                    return step.placeholder + "不能为空！";
+                }
             }
-            if (inputValue === "") {
-                swal.showInputError(step.placeholder + "不能为空！");
-                return false;
-            }
-            inputs.push(inputValue);
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                showStep();
-            } else {
-                swal("正在创建");
-                registerUser();
+        }).then((result) => {
+            if (result.isConfirmed) {
+                inputs.push(result.value);
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    showStep();
+                } else {
+                    Swal.fire({
+                        title: '正在创建',
+                        text: '请稍候...',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        timerProgressBar: true
+                    });
+                    registerUser();
+                }
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep();
+                }
             }
         });
     }
@@ -1833,13 +1868,20 @@ function registerUserBydev() {
         var username = inputs[0];
         var email = inputs[1];
         var password = inputs[2];
-        var type = inputs[3]; // 默认用户类型
-        if (type !== ('user' || 'admin')) {
-            swal("用户类型只能为user", '由于JavaScript玄学问题,你不能创建其他用户类型，如确实需要，请在创建后更改用户类型，敬请谅解', 'error');
-            return false;
+        var type = inputs[3];
+
+        if (type !== 'user' && type !== 'admin') {
+            Swal.fire({
+                title: "用户类型只能为user或admin",
+                text: '请重新输入',
+                icon: "error"
+            }).then(() => {
+                currentStep = 3; // 回到用户类型步骤
+                showStep();
+            });
+            return;
         }
 
-        // 使用 AJAX 发送数据到服务器
         var xhr = new XMLHttpRequest();
         xhr.open("POST", `${serverurl}/register`, true);
         xhr.setRequestHeader("Content-type", "application/json");
@@ -1847,18 +1889,18 @@ function registerUserBydev() {
             if (xhr.readyState === 4) {
                 var status = xhr.status;
                 if (status === 201) {
-                    swal({
+                    Swal.fire({
                         title: "新建成功！",
                         text: "成功新建" + username + "用户",
-                        type: "success"
+                        icon: "success"
                     });
                     newtable();
                 } else if (status === 409) {
-                    swal("注册失败", "用户名已存在", "error");
+                    Swal.fire("注册失败", "用户名已存在", "error");
                 } else if (status === 408) {
-                    swal("注册失败", "邮箱已被注册", "error");
+                    Swal.fire("注册失败", "邮箱已被注册", "error");
                 } else {
-                    swal("注册失败", "请重试", "error");
+                    Swal.fire("注册失败", "请重试", "error");
                 }
             }
         };
@@ -1866,45 +1908,49 @@ function registerUserBydev() {
     }
 
     showStep();
-};
+}
 document.addEventListener('DOMContentLoaded', () => {
   // ====== 重启服务器按钮 ======
   const restartBtn = document.getElementById('restartSystemBtn');
   if (restartBtn) {
-    restartBtn.addEventListener('click', () => {
-      swal({
+restartBtn.addEventListener('click', () => {
+    Swal.fire({
         title: "确定要重启服务器吗？",
         text: "这将关闭服务器上所有正在运行的程序。",
-        type: "warning",
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: "是",
-        cancelButtonText: "否",
-        closeOnConfirm: false,
-        closeOnCancel: true
-      }, (isConfirm) => {
-        if (!isConfirm) return;
+        cancelButtonText: "否"
+    }).then((result) => {
+        if (!result.isConfirmed) return;
 
-        swal({ title: "正在执行", text: "正在发送重启指令…", type: "info", showConfirmButton: false });
+        Swal.fire({
+            title: "正在执行",
+            text: "正在发送重启指令…",
+            icon: "info",
+            showConfirmButton: false,
+            timerProgressBar: true
+        });
 
         fetch(`${serverurl}/restart-server`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ operation: 'restart_system' })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ operation: 'restart_system' })
         })
-          .then(r => r.json())
-          .then(data => {
-            if (data.success) {
-              swal('已发送重启指令', '服务器将重启', "success");
-            } else {
-              swal('操作失败', data.message || '未知错误', "error");
-            }
-          })
-          .catch(err => {
-            swal('请求失败', String(err), "error");
-          });
-      });
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('已发送重启指令', '服务器将重启', "success");
+                } else {
+                    Swal.fire('操作失败', data.message || '未知错误', "error");
+                }
+            })
+            .catch(err => {
+                Swal.fire('请求失败', String(err), "error");
+            });
     });
+});
   }
 
   // ====== 权限显示 server 区块 ======

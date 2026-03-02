@@ -6366,113 +6366,128 @@ document.querySelector('.map-selection .start-game-btn').addEventListener('click
 
         // 添加玩家2登录功能
 function loginPlayer2() {
-        document.querySelector('.map-selection .start-game-btn').style.display = 'none';
-    swal({
+    document.querySelector('.map-selection .start-game-btn').style.display = 'none';
+    
+    // 第一步：询问用户名
+    Swal.fire({
         title: "玩家2登录",
-        text: "请输入用户名和密码",
-        type: "input",
-        inputType: "text",
+        text: "请输入用户名",
+        input: "text",
         inputPlaceholder: "请输入用户名",
         showCancelButton: true,
         cancelButtonText: "取消",
         confirmButtonText: "下一步",
-        closeOnConfirm: false
-    }, function(username) {
-        if (username === false) return false;
-        if (!username) {
-            swal.showInputError("请输入用户名");
-            return false;
-        }
-        
-        // 检查是否与玩家1用户名相同
-        const player1Username = localStorage.getItem('username');
-        if (player1Username && username === player1Username) {
-            swal.showInputError("用户名不能与玩家1相同");
-            return false;
-        }
-        
-        // 第二步：询问密码
-        swal({
-            title: "玩家2登录",
-            text: "请输入密码",
-            type: "input",
-            inputType: "password",
-            inputPlaceholder: "请输入密码",
-            showCancelButton: true,
-            cancelButtonText: "上一步",
-            confirmButtonText: "登录",
-            closeOnConfirm: false
-        }, function(password) {
-            if (password === false) {
-                // 点击取消返回上一步
-                loginPlayer2();
-                return false;
-            }
-            if (!password) {
-                swal.showInputError("请输入密码");
+        showLoaderOnConfirm: true,
+        preConfirm: (username) => {
+            if (!username) {
+                Swal.showValidationMessage("请输入用户名");
                 return false;
             }
             
-            // 发送登录请求
-            fetch(`${serverurl}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+            // 检查是否与玩家1用户名相同
+            const player1Username = localStorage.getItem('username');
+            if (player1Username && username === player1Username) {
+                Swal.showValidationMessage("用户名不能与玩家1相同");
+                return false;
+            }
+            
+            return username;
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const username = result.value;
+            
+            // 第二步：询问密码
+            Swal.fire({
+                title: "玩家2登录",
+                text: "请输入密码",
+                input: "password",
+                inputPlaceholder: "请输入密码",
+                showCancelButton: true,
+                cancelButtonText: "上一步",
+                confirmButtonText: "登录",
+                showLoaderOnConfirm: true,
+                preConfirm: (password) => {
+                    if (!password) {
+                        Swal.showValidationMessage("请输入密码");
+                        return false;
+                    }
+                    
+                    // 发送登录请求
+                    return fetch(`${serverurl}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        if (data.includes('<h1>登录成功</h1>')) {
+                            return { username, password };
+                        } else if (data.includes('登录失败')) {
+                            throw new Error('用户名或密码错误');
+                        } else {
+                            throw new Error('登录失败，请重试');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(error.message);
+                    });
                 },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                })
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.includes('<h1>登录成功</h1>')) {
-                    localStorage.setItem('player2_username', username);
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const username = result.value.username;
+                    
+                    // 获取用户ID
                     fetch(`${serverurl}/get-user-id-by-username`, {
-                                method: 'POST', // 指定请求方法
-                                headers: {
-                                    'Content-Type': 'application/json' // 设置请求头
-                                },
-                                body: JSON.stringify({ username: username }) // 请求体
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json(); // 解析JSON数据
-                                })
-                                .then(data => {
-                                    // 处理返回的数据
-                                    if (data.success) {
-                                        // 假设data.data中包含userId
-                                        const userId = data.data.userId;
-                                        localStorage.setItem("player2_userid",userId);
-                                        document.getElementById('player2-name').textContent = username + ': ';
-                                        document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)";
-                                        document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)";
-                                        document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:";
-                                        document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:";
-                                        document.querySelector('.map-selection .start-game-btn').style.display = "block";               
-                                        swal("登录成功", "玩家2已登录", "success");
-                                    } else {
-                                        // 显示错误信息
-                                        console.log(data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    // 处理请求过程中的错误
-                                    console.error('Fetch error:', error);
-                                });
-                } else if (data.includes('登录失败')) {
-                    swal("登录失败", '用户名或密码错误', 'error');
-                    document.querySelector('.start-game-btn').style.display = "none";
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username: username })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            const userId = data.data.userId;
+                            localStorage.setItem('player2_username', username);
+                            localStorage.setItem('player2_userid', userId);
+                            
+                            // 更新界面
+                            document.getElementById('player2-name').textContent = username + ': ';
+                            document.getElementById('player-label1').textContent = localStorage.getItem('username') + '(橙色)';
+                            document.getElementById('player-label2').textContent = localStorage.getItem('player2_username') + '(蓝色)';
+                            document.getElementById('storage-title1').textContent = localStorage.getItem('username') + '储存:';
+                            document.getElementById('storage-title2').textContent = localStorage.getItem('player2_username') + '储存:';
+                            document.querySelector('.map-selection .start-game-btn').style.display = 'block';
+                            
+                            Swal.fire('登录成功', '玩家2已登录', 'success');
+                        } else {
+                            console.log(data.message);
+                            Swal.fire('错误', '获取用户信息失败', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        Swal.fire('错误', '获取用户信息时发生错误', 'error');
+                    });
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // 点击上一步，返回用户名输入
+                    loginPlayer2();
                 }
-            })
-            .catch(error => {
-                console.error(error);
-                swal("请求失败", "请稍后重试", "error");
             });
-        });
+        }
     });
 }
 // 蛇类详细数据

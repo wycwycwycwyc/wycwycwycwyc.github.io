@@ -1,0 +1,156 @@
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+          background-color: #f4f4f4;
+        }
+
+        .container {
+          width: 400px;
+          margin: 50px auto;
+          padding: 30px;
+          background-color: #fff;
+          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+          border-radius: 20px;
+        }
+
+        h2 {
+          text-align: center;
+        }
+
+        p {
+          margin: 10px 0;
+        }
+
+        input[type="text"] {
+          width: 96%;
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          font-size: 16px;
+        }
+
+        button {
+          width: 100%;
+          padding: 15px;
+          border: none;
+          border-radius: 20px;
+          background-color: #5cb85c;
+          color: white;
+          cursor: pointer;
+          font-size: 16px;
+        }
+
+        .back-btn {
+          display: inline-block;
+          width: auto;
+          padding: 5px 10px;
+          color: #5cb85c;
+          text-decoration: none;
+          font-size: 16px;
+          cursor: pointer;
+          background-color: #f7f7f7;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+        }
+
+        .back-btn:hover {
+          color: #4cae4c;
+          background-color: #e7e7e7;
+          border-color: #ccc;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .container {
+          opacity: 1;
+          transform: translateY(0%);
+          animation: slideUp 0.8s ease-out forwards;
+        }
+
+        /* ===== 深色模式基础样式 ===== */
+        body.dark-mode {
+          background-color: #121212;
+          /* 更深的背景，减少视觉疲劳 */
+          color: #e0e0e0;
+          /* 柔和的浅灰色文字 */
+        }
+
+        /* ===== 深色模式下的容器 ===== */
+        body.dark-mode .container {
+          background-color: #1e1e1e;
+          /* 比 body 稍亮，保持层次感 */
+          box-shadow: 0 5px 20px rgba(255, 255, 255, 0.05);
+          /* 浅色阴影，避免刺眼 */
+          border: 1px solid #333;
+          /* 添加边框增强轮廓 */
+        }
+
+        /* ===== 深色模式下的标题 ===== */
+        body.dark-mode h2 {
+          color: #ffffff;
+          /* 纯白标题，提高可读性 */
+        }
+
+        /* ===== 深色模式下的输入框 ===== */
+        body.dark-mode input[type="text"] {
+          background-color: #2d2d2d;
+          /* 深灰背景 */
+          border-color: #444;
+          /* 深色边框 */
+          color: #ffffff;
+          /* 白色文字 */
+        }
+
+        body.dark-mode input[type="text"]:focus {
+          border-color: #5cb85c;
+          /* 保持品牌绿色 */
+          outline: none;
+          /* 移除默认高亮 */
+        }
+
+        /* ===== 深色模式下的按钮 ===== */
+        body.dark-mode button {
+          background-color: #5cb85c;
+          /* 保持品牌绿色 */
+          color: white;
+        }
+
+        body.dark-mode button:hover {
+          background-color: #4cae4c;
+          /* 深一点的绿色 */
+        }
+
+        /* ===== 深色模式下的返回按钮 ===== */
+        body.dark-mode .back-btn {
+          background-color: #2d2d2d;
+          /* 和输入框一致 */
+          border-color: #444;
+          /* 深色边框 */
+          color: #5cb85c;
+          /* 品牌绿色文字 */
+        }
+
+        body.dark-mode .back-btn:hover {
+          background-color: #333;
+          /* 悬停时稍亮 */
+          border-color: #555;
+          color: #4cae4c;
+          /* 深一点的绿色 */
+        }
+
+        /* ===== 其他细节优化 ===== */
+        body.dark-mode ::placeholder {
+          color: #888;
+          /* 占位符文字变暗 */
+        }

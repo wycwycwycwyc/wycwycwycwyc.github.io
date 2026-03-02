@@ -17,8 +17,8 @@
     <script src="/js/script9_setbrightness.js"></script>
     <script src="/js/script10_setGlow.js"></script>
     <script src="https://hcaptcha.com/1/api.js" async defer></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -222,6 +222,10 @@ body.dark-mode select option {
 }
     </style>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 设置表单的 action 属性
+            document.getElementById('registration_form').action = `${serverurl}/register`;
+        });
         let lastSendTime = 0; // 上次发送验证码的时间
         let countdown = 60; // 倒计时时间
 
@@ -280,7 +284,7 @@ body.dark-mode select option {
 
             // 检查是否超过1分钟
             if (currentTime - lastSendTime < 60000) {
-                swal("请1分钟后再尝试发送验证码。", '请1分钟后再尝试发送验证码。', 'error');
+                Swal.fire("请1分钟后再尝试发送验证码。", '请1分钟后再尝试发送验证码。', 'error');
                 return;
             }
 
@@ -298,7 +302,7 @@ body.dark-mode select option {
                     return response.text();
                 })
                 .then(data => {
-                    swal('验证码发送成功', "请查收您的邮箱", "success");
+                    Swal.fire('验证码发送成功', "请查收您的邮箱", "success");
                     sendButton.innerText = "发送成功";
                     lastSendTime = Date.now(); // 更新发送时间
                     disableSendButton();
@@ -307,7 +311,7 @@ body.dark-mode select option {
                     console.error('Error:', error);
                     sendButton.disabled = false;
                     sendButton.innerText = "发送验证码";
-                    swal('验证码发送失败', '请检查你的邮箱地址，或稍后重试。', 'error');
+                    Swal.fire('验证码发送失败', '请检查你的邮箱地址，或稍后重试。', 'error');
                 });
         }
 
@@ -373,10 +377,9 @@ body.dark-mode select option {
 
 <body>
     <div class="container">
-        <a href="/account/Login.html" class="back-button">返回</a>
+        <a href="/account/Login/index.html" class="back-button">返回</a>
         <h2>用户注册</h2>
-        <form id="registration_form" action=`${serverurl}/register` method="post"
-            onsubmit="return validateForm(event)">
+        <form id="registration_form" action="1312" method="post" onsubmit="return validateForm(event)">
             <label for="username">用户名:</label>
             <input type="text" id="username" name="username" required maxlength="10">
 

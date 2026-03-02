@@ -1,0 +1,302 @@
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f7f7f7;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+            }
+
+            .container {
+              width: 400px;
+              margin: 50px auto;
+              padding: 30px;
+              background-color: #fff;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+              border-radius: 20px;
+              position: relative;
+            }
+
+            h2 {
+              text-align: center;
+              color: #333;
+            }
+
+            label {
+              display: block;
+              margin-bottom: 5px;
+            }
+
+            input[type="email"],
+            input[type="password"],
+            input[type="verification_code"],
+            input[type="submit"] {
+              width: calc(100% - 22px);
+              padding: 10px;
+              margin-bottom: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            }
+
+            input[type="verification_code"] {
+              width: 65%;
+            }
+
+            input[type="submit"] {
+              width: 100%;
+              padding: 15px;
+              border: none;
+              border-radius: 20px;
+              background-color: #5cb85c;
+              color: white;
+              cursor: pointer;
+              font-size: 16px;
+              display: block;
+              /* 初始不显示 */
+            }
+
+            input[type="submit"]:hover {
+              background-color: #4cae4c;
+            }
+
+            .error {
+              color: red;
+              margin-bottom: 10px;
+            }
+
+            .back-button {
+              display: inline-block;
+              padding: 5px 10px;
+              color: #5cb85c;
+              text-decoration: none;
+              font-size: 16px;
+              cursor: pointer;
+              background-color: #f7f7f7;
+              border: 1px solid #ddd;
+              border-radius: 20px;
+            }
+
+            .back-button:hover {
+              background-color: #e7e7e7;
+            }
+
+            /* 发送验证码按钮样式 */
+            .verification-code-button {
+              background-color: #4caf50;
+              color: white;
+              border: none;
+              padding: 8px 15px;
+              margin-left: 10px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+
+            .verification-code-button:disabled {
+              background-color: #cccccc;
+              cursor: not-allowed;
+            }
+
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            .container {
+              opacity: 1;
+              transform: translateY(0%);
+              animation: slideUp 0.8s ease-out forwards;
+            }
+
+            /* 深色模式基础样式 */
+            body.dark-mode {
+              background-color: #1a1a1a;
+              color: #ffffff;
+            }
+
+            /* 深色模式下容器样式 */
+            body.dark-mode .container {
+              background-color: #272727;
+              box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            }
+
+            /* 深色模式下标题和标签样式 */
+            body.dark-mode h2,
+            body.dark-mode label {
+              color: #ffffff;
+            }
+
+            /* 深色模式下输入框样式 */
+            body.dark-mode input[type="email"],
+            body.dark-mode input[type="password"],
+            body.dark-mode input[type="verification_code"] {
+              background-color: #333;
+              border-color: #444;
+              color: #fff;
+            }
+
+            /* 深色模式下提交按钮样式 */
+            body.dark-mode input[type="submit"] {
+              background-color: #4caf50;
+              color: white;
+            }
+
+            body.dark-mode input[type="submit"]:hover {
+              background-color: #45a049;
+            }
+
+            /* 深色模式下错误消息样式 */
+            body.dark-mode .error {
+              color: #ff5555;
+            }
+
+            /* 深色模式下返回按钮样式 */
+            body.dark-mode .back-button {
+              color: #4caf50;
+              background-color: #333;
+              border-color: #555;
+            }
+
+            body.dark-mode .back-button:hover {
+              color: #45a049;
+              background-color: #303030;
+              border-color: #3c3c3c;
+            }
+
+            /* 深色模式下验证码按钮样式 */
+            body.dark-mode .verification-code-button {
+              background-color: #4caf50;
+              color: white;
+            }
+
+            body.dark-mode .verification-code-button:disabled {
+              background-color: #555;
+              color: #999;
+            }
+
+            /* 手机端适配 - 屏幕宽度小于600px */
+            @media screen and (max-width: 600px) {
+              body {
+                padding: 10px !important;
+                overflow: hidden !important;
+                height: 100vh !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 !important;
+              }
+
+              .container {
+                width: 100% !important;
+                max-width: 380px !important;
+                margin: 0 auto !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+                max-height: 90vh !important;
+                overflow-y: auto !important;
+                position: relative !important;
+                transform: none !important;
+              }
+
+              input[type="email"],
+              input[type="password"],
+              input[type="verification_code"] {
+                width: 100% !important;
+                padding: 12px !important;
+                box-sizing: border-box !important;
+                margin-bottom: 12px !important;
+                font-size: 16px !important;
+              }
+
+              /* 验证码输入框和按钮的布局 */
+              .form-group,
+              div:has(> input[type="verification_code"]) {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+              }
+
+              input[type="verification_code"] {
+                flex: 1 !important;
+                min-width: 0 !important;
+                /* 防止flex溢出 */
+              }
+
+              .verification-code-button {
+                padding: 12px 15px !important;
+                font-size: 14px !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+                height: fit-content !important;
+              }
+
+              input[type="submit"] {
+                width: 100% !important;
+                padding: 12px !important;
+                font-size: 16px !important;
+                box-sizing: border-box !important;
+                margin-top: 10px !important;
+              }
+
+              h2 {
+                font-size: 22px !important;
+                margin: 10px 0 15px 0 !important;
+              }
+
+              label {
+                font-size: 14px !important;
+                margin-bottom: 3px !important;
+                display: block !important;
+              }
+
+              .back-button {
+                padding: 5px 12px !important;
+                font-size: 14px !important;
+                margin-bottom: 10px !important;
+                display: inline-block !important;
+              }
+
+              #submit_message {
+                margin: 10px 0 !important;
+                font-size: 14px !important;
+              }
+            }
+
+            /* 更小屏幕的额外优化 - 屏幕宽度小于400px */
+            @media screen and (max-width: 400px) {
+              .container {
+                padding: 15px !important;
+                max-height: 95vh !important;
+              }
+
+              input[type="email"],
+              input[type="password"],
+              input[type="verification_code"] {
+                padding: 10px !important;
+                margin-bottom: 10px !important;
+              }
+
+              .verification-code-button {
+                padding: 10px 12px !important;
+                font-size: 13px !important;
+              }
+
+              h2 {
+                font-size: 20px !important;
+                margin: 5px 0 12px 0 !important;
+              }
+
+              /* 验证码行在小屏幕上的间距调整 */
+              .form-group,
+              div:has(> input[type="verification_code"]) {
+                gap: 5px !important;
+              }
+            }

@@ -1,0 +1,184 @@
+            body {
+              font-family: Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+            }
+
+            .form-container {
+              width: 400px;
+              margin: 50px auto;
+              padding: 30px;
+              background-color: #fff;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+              border-radius: 20px;
+              text-align: center;
+            }
+
+            input[type="file"] {
+              display: none;
+              /* 隐藏文件输入框 */
+            }
+
+            img.upload-preview {
+              display: inline-block;
+              max-width: 40%;
+              height: auto;
+              margin-top: 10px;
+              border: 1px solid #ddd;
+              padding: 5px;
+              background-color: #fff;
+            }
+
+            .upload-preview {
+              display: inline-block;
+              /* 让图片预览元素水平排列 */
+              margin-right: 10px;
+              /* 两个图片之间的间距 */
+            }
+
+            button {
+              width: 100%;
+              padding: 15px;
+              border: none;
+              border-radius: 20px;
+              background-color: #5cb85c;
+              color: white;
+              cursor: pointer;
+              font-size: 16px;
+            }
+
+            progress {
+              width: 100%;
+              margin-top: 5px;
+            }
+
+            .progress-info {
+              font-size: 0.8em;
+            }
+
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            .form-container {
+              opacity: 1;
+              transform: translateY(0%);
+              animation: slideUp 0.8s ease-out forwards;
+            }
+
+            #crop-area {
+              position: relative;
+              width: 400px;
+              /* 裁剪区域的宽度 */
+              height: 400px;
+              /* 裁剪区域的高度 */
+              overflow: hidden;
+              border: 1px solid #000;
+              margin-top: 20px;
+            }
+
+            #crop-area img {
+              position: absolute;
+              max-width: 100%;
+              max-height: 100%;
+              margin: auto;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+            }
+
+            #crop-circle {
+              position: absolute;
+              cursor: move;
+              border: 1px solid #fff;
+              border-radius: 50%;
+            }
+
+            /* ===== 深色模式基础样式 ===== */
+            body.dark-mode {
+              background-color: #121212;
+              color: #e0e0e0;
+            }
+
+            /* ===== 表单容器 ===== */
+            body.dark-mode .form-container {
+              background-color: #1e1e1e;
+              box-shadow: 0 5px 20px rgba(255, 255, 255, 0.05);
+              border: 1px solid #333;
+            }
+
+            /* ===== 图片预览区域 ===== */
+            body.dark-mode img.upload-preview {
+              border-color: #444;
+              background-color: #2d2d2d;
+              /* 与输入框一致 */
+            }
+
+            /* ===== 按钮 ===== */
+            body.dark-mode button {
+              background-color: #5cb85c;
+              color: white;
+            }
+
+            body.dark-mode button:hover {
+              background-color: #4cae4c;
+            }
+
+            /* ===== 进度条 ===== */
+            body.dark-mode progress {
+              background-color: #333;
+              border: 1px solid #444;
+            }
+
+            body.dark-mode progress::-webkit-progress-bar {
+              background-color: #333;
+            }
+
+            body.dark-mode progress::-webkit-progress-value {
+              background-color: #5cb85c;
+              /* 品牌绿色 */
+            }
+
+            body.dark-mode progress::-moz-progress-bar {
+              background-color: #5cb85c;
+            }
+
+            /* ===== 裁剪区域 ===== */
+            body.dark-mode #crop-area {
+              border-color: #444;
+              background-color: #2d2d2d;
+            }
+
+            body.dark-mode #crop-circle {
+              border-color: rgba(255, 255, 255, 0.8);
+              box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+              /* 外围遮罩加深 */
+            }
+
+            /* ===== 文字提示 ===== */
+            body.dark-mode .progress-info {
+              color: #aaa;
+            }
+
+            /* ===== 文件上传标签（如果存在自定义样式）===== */
+            body.dark-mode .file-upload-label {
+              background-color: #333;
+              color: #5cb85c;
+              border: 1px dashed #444;
+            }
+
+            body.dark-mode .file-upload-label:hover {
+              background-color: #3a3a3a;
+            }

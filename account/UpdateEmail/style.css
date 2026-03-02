@@ -1,0 +1,120 @@
+            .container {
+              width: 400px;
+              margin: 50px auto;
+              padding: 30px;
+              background-color: #fff;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+              border-radius: 20px;
+              position: relative;
+              /* 添加相对定位 */
+            }
+
+            h2 {
+              text-align: center;
+              color: #333;
+            }
+
+            label {
+              display: block;
+              margin-top: 10px;
+            }
+
+            input[type="password"],
+            input[type="email"],
+            input[type="text"] {
+              width: calc(100% - 22px);
+              padding: 10px;
+              margin-bottom: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            }
+
+            button {
+              background-color: #4caf50;
+              color: white;
+              border: none;
+              padding: 8px 15px;
+              margin-left: 10px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 14px;
+            }
+
+            #sendCodeBtn:disabled {
+              background-color: #cccccc;
+              cursor: not-allowed;
+            }
+
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            .container {
+              opacity: 1;
+              transform: translateY(0%);
+              animation: slideUp 0.8s ease-out forwards;
+            }
+
+            /* 深色模式基础样式 */
+            body.dark-mode {
+              background-color: #1a1a1a;
+              color: #ffffff;
+            }
+
+            /* 深色模式下容器样式 */
+            body.dark-mode .container {
+              background-color: #272727;
+              box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            }
+
+            /* 深色模式下标题和标签样式 */
+            body.dark-mode .container h2,
+            body.dark-mode label {
+              color: #ffffff;
+            }
+
+            /* 深色模式下输入框样式 */
+            body.dark-mode input[type="password"],
+            body.dark-mode input[type="email"],
+            body.dark-mode input[type="text"] {
+              background-color: #333;
+              border-color: #444;
+              color: #fff;
+            }
+
+            /* 深色模式下按钮样式 */
+            body.dark-mode button {
+              background-color: #4caf50;
+              color: white;
+            }
+
+            body.dark-mode button:hover {
+              background-color: #45a049;
+            }
+
+            /* 深色模式下禁用按钮样式 */
+            body.dark-mode #sendCodeBtn:disabled {
+              background-color: #555;
+              color: #aaa;
+            }
+
+            /* 深色模式下返回按钮样式（如果需要） */
+            body.dark-mode .back-btn {
+              color: #4caf50;
+              background-color: #333;
+              border-color: #555;
+            }
+
+            body.dark-mode .back-btn:hover {
+              color: #45a049;
+              background-color: #303030;
+              border-color: #3c3c3c;
+            }

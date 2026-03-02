@@ -98,18 +98,28 @@ document.addEventListener('DOMContentLoaded', function () {
           // 如果本地分数高于服务器记录，提示上传
           if (localHighScore > serverHighScore) {
             setTimeout(() => {
-              swal({
+            Swal.fire({
                 title: "发现更高分数",
                 text: `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
-                type: "info",
+                icon: "info",
                 showCancelButton: true,
                 confirmButtonText: "上传",
-                cancelButtonText: "不上传",
-                closeOnConfirm: false,
-                showLoaderOnConfirm: true
-              }, function () {
-                uploadScore(localHighScore);
-              });
+                cancelButtonText: "不上传"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: '正在上传',
+                        text: '请稍候...',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                            uploadScore(localHighScore);
+                        }
+                    });
+                }
+            });
             }, 0); // 延迟0秒显示
           }
         }
@@ -749,17 +759,27 @@ function updateLeaderboard() {
           // 如果本地分数高于服务器记录，提示上传
           if (localHighScore > serverHighScore) {
             setTimeout(() => {
-              swal({
-                title: "新纪录！d",
-                text: `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
-                type: "info",
-                showCancelButton: true,
-                confirmButtonText: "上传",
-                cancelButtonText: "不上传",
-                closeOnConfirm: false,
-                showLoaderOnConfirm: true
-              }, function () {
-                uploadScore(localHighScore);
+              Swal.fire({
+                  title: "新纪录！",
+                  text: `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
+                  icon: "info",
+                  showCancelButton: true,
+                  confirmButtonText: "上传",
+                  cancelButtonText: "不上传"
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      Swal.fire({
+                          title: '正在上传',
+                          text: '请稍候...',
+                          icon: 'info',
+                          showConfirmButton: false,
+                          allowOutsideClick: false,
+                          didOpen: () => {
+                              Swal.showLoading();
+                              uploadScore(localHighScore);
+                          }
+                      });
+                  }
               });
             }, 0); // 延迟0秒显示
           }
@@ -775,7 +795,7 @@ function updateLeaderboard() {
     const userId = localStorage.getItem('userid');
     
     if (!userId) {
-      swal("上传失败", "请先登录", "error");
+      Swal.fire("上传失败", "请先登录", "error");
       return;
     }
     
@@ -805,7 +825,7 @@ function updateLeaderboard() {
       .then(data => {
         if (data && data.success) {
           localStorage.setItem('uploadedHighScore', score);
-          swal("上传成功", "你的分数已记录到排行榜", "success");
+          Swal.fire("上传成功", "你的分数已记录到排行榜", "success");
           updateLeaderboard();
         } else {
           throw new Error(data?.message || "未知错误");
@@ -822,7 +842,7 @@ function updateLeaderboard() {
           errorMsg = "网络连接失败，请检查网络设置";
         }
         
-        swal("上传失败", errorMsg, "error");
+        Swal.fire("上传失败", errorMsg, "error");
       });
   }
         

@@ -1,0 +1,158 @@
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f7f7f7;
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+              /* 隐藏滚动条 */
+            }
+
+            .container {
+              width: 400px;
+              margin: 50px auto;
+              padding: 30px;
+              background-color: #fff;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+              border-radius: 20px;
+              position: relative;
+              /* 添加相对定位 */
+            }
+
+            h1 {
+              text-align: center;
+              color: #333;
+            }
+
+            .input-group {
+              margin-bottom: 15px;
+            }
+
+            .input-group label {
+              display: block;
+              margin-bottom: 5px;
+            }
+
+            .input-group input[type="password"] {
+              width: 100%;
+              padding: 10px;
+              margin-bottom: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              box-sizing: border-box;
+            }
+
+            button[type="button"] {
+              width: 100%;
+              padding: 15px;
+              border: none;
+              border-radius: 20px;
+              background-color: #5cb85c;
+              color: white;
+              cursor: pointer;
+              font-size: 16px;
+            }
+
+            button[type="button"]:hover {
+              background-color: #4cae4c;
+            }
+
+            .loading-text {
+              color: #666;
+              font-size: 14px;
+              margin-top: 10px;
+              display: none;
+            }
+
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+                opacity: 0;
+              }
+
+              to {
+                transform: translateY(0);
+                opacity: 1;
+              }
+            }
+
+            .back-btn {
+              display: inline-block;
+              padding: 5px 10px;
+              color: #5cb85c;
+              text-decoration: none;
+              font-size: 16px;
+              cursor: pointer;
+              background-color: #f7f7f7;
+              border: 1px solid #ddd;
+              border-radius: 20px;
+            }
+
+            .container {
+              opacity: 1;
+              transform: translateY(0%);
+              animation: slideUp 0.8s ease-out forwards;
+            }
+
+            /* 深色模式基础样式 */
+            body.dark-mode {
+              background-color: #1a1a1a;
+              color: #ffffff;
+            }
+
+            /* 深色模式下容器样式 */
+            body.dark-mode .container {
+              background-color: #272727;
+              box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+            }
+
+            /* 深色模式下标题样式 */
+            body.dark-mode h1 {
+              color: #ffffff;
+            }
+
+            /* 深色模式下输入组标签 */
+            body.dark-mode .input-group label {
+              color: #dddddd;
+            }
+
+            /* 深色模式下密码输入框 */
+            body.dark-mode .input-group input[type="password"] {
+              background-color: #333;
+              border-color: #444;
+              color: #ffffff;
+            }
+
+            /* 深色模式下按钮 */
+            body.dark-mode button[type="button"] {
+              background-color: #4caf50;
+              color: white;
+            }
+
+            body.dark-mode button[type="button"]:hover {
+              background-color: #45a049;
+            }
+
+            /* 深色模式下加载文本 */
+            body.dark-mode .loading-text {
+              color: #aaaaaa;
+            }
+
+            /* 深色模式下返回按钮 */
+            body.dark-mode .back-btn {
+              color: #4caf50;
+              background-color: #333;
+              border-color: #555;
+            }
+
+            body.dark-mode .back-btn:hover {
+              color: #45a049;
+              background-color: #303030;
+              border-color: #3c3c3c;
+            }
+
+            /* 深色模式下输入框聚焦状态 */
+            body.dark-mode .input-group input[type="password"]:focus {
+              border-color: #4caf50;
+              outline: none;
+              box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            }

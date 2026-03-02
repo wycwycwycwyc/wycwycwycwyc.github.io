@@ -8,15 +8,16 @@ document.addEventListener('DOMContentLoaded', function () {
     var currentPageUrl = getCurrentPageFullUrl();
 
     if (!isLoggedIn) {
-        swal({
+        Swal.fire({
             title: "你还未登录",
             text: "请登录后使用",
-            type: "warning",
+            icon: "warning",
             showCancelButton: false,
-            confirmButtonText: "确定",
-            closeOnConfirm: true
-        }, function () {
-            location.href = `/account/Login.html?redirect=${encodeURIComponent(currentPageUrl)}`;
+            confirmButtonText: "确定"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.href = `/account/Login/index.html?redirect=${encodeURIComponent(currentPageUrl)}`;
+            }
         });
     }
 });
