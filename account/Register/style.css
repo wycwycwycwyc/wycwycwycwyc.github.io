@@ -1,0 +1,200 @@
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* 隐藏滚动条 */
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            position: relative;
+            /* 添加相对定位 */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="verification_code"],
+        select,
+        input[type="submit"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="verification_code"] {
+            width: 65%;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: #5cb85c;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 5px 10px;
+            color: #5cb85c;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #e7e7e7;
+        }
+
+        /* 发送验证码按钮样式 */
+        .verification-code-button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .verification-code-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            opacity: 1;
+            transform: translateY(0%);
+            animation: slideUp 0.8s ease-out forwards;
+        }
+        /* 深色模式基础样式 */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+/* 深色模式下容器样式 */
+body.dark-mode .container {
+    background-color: #272727;
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+}
+
+/* 深色模式下文字颜色 */
+body.dark-mode h2 {
+    color: #ffffff;
+}
+
+body.dark-mode label {
+    color: #dddddd;
+}
+
+/* 深色模式下输入框样式 */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="verification_code"],
+body.dark-mode select {
+    background-color: #333;
+    border-color: #444;
+    color: #fff;
+}
+
+/* 深色模式下提交按钮 */
+body.dark-mode input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+}
+
+body.dark-mode input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* 深色模式下错误提示 */
+body.dark-mode .error {
+    color: #ff5555;
+}
+
+/* 深色模式下返回按钮 */
+body.dark-mode .back-button {
+    color: #4caf50;
+    background-color: #333;
+    border-color: #555;
+}
+
+body.dark-mode .back-button:hover {
+    color: #45a049;
+    background-color: #303030;
+    border-color: #3c3c3c;
+}
+
+/* 深色模式下验证码按钮 */
+body.dark-mode .verification-code-button {
+    background-color: #4caf50;
+    color: white;
+}
+
+body.dark-mode .verification-code-button:disabled {
+    background-color: #555;
+    color: #999;
+}
+
+/* 深色模式下下拉选择框 */
+body.dark-mode select {
+    background-color: #333;
+    color: white;
+    border-color: #444;
+}
+
+/* 深色模式下下拉选项 */
+body.dark-mode select option {
+    background-color: #333;
+    color: white;
+}
