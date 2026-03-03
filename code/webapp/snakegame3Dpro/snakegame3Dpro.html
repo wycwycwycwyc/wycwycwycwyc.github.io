@@ -15,19 +15,20 @@
     <link href="/css/message.min.css" rel="stylesheet" />
     <script src="/js/message.min.js"></script>
     <link rel="stylesheet" href="./style.css">
-    <title>3D第一视角贪吃蛇大作战</title>
+    <script src="/js/script14_setLanguage.js"></script>
+    <title data-en="3D First-Person Snake Battle">3D第一视角贪吃蛇大作战</title>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <body>
     <button class="view-records-btn" id="view-records">
-        <i class="fas fa-trophy"></i> 战绩查询
+        <i class="fas fa-trophy"></i> <span data-en="Records">战绩查询</span>
     </button>
     <!-- 数据统计模态框 -->
     <div id="game-stats-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
-                <h2 class="modal-title">本局详细数据统计</h2>
+                <h2 class="modal-title" data-en="Game Statistics">本局详细数据统计</h2>
                 <button class="close-modal" data-modal="game-stats-modal">&times;</button>
             </div>
             <div class="stats-details" id="stats-details">
@@ -39,12 +40,12 @@
     <div id="records-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">排行榜 & 战绩查询</h2>
+                <h2 class="modal-title" data-en="Leaderboard & Records">排行榜 & 战绩查询</h2>
                 <button class="close-modal">&times;</button>
             </div>
             <div class="search-box">
-                <input type="text" id="search-username" placeholder="搜索用户名...">
-                <button id="refresh-records"><i class="fas fa-sync-alt"></i> 刷新</button>
+                <input type="text" id="search-username" placeholder="搜索用户名..." data-en-placeholder="Search username...">
+                <button id="refresh-records"><i class="fas fa-sync-alt"></i> <span data-en="Refresh">刷新</span></button>
             </div>
             <div id="records-container"></div>
         </div>
@@ -53,38 +54,41 @@
         <div class="background-particles" id="particles"></div>
 
         <div class="enter-animation">
-            <h1 class="game-title">3D第一视角贪吃蛇大作战</h1>
-            <div class="subtitle">双人对战 · 3D视角 · 魔法技能 · 基地攻防</div>
+            <h1 class="game-title" data-en="3D First-Person Snake Battle">3D第一视角贪吃蛇大作战</h1>
+            <div class="subtitle" data-en="Two-Player · 3D View · Magic Skills · Base Attack">双人对战 · 3D视角 · 魔法技能 · 基地攻防
+            </div>
         </div>
 
         <div class="rules-container enter-animation delay-1">
-            <h2 class="rules-title">游戏规则</h2>
+            <h2 class="rules-title" data-en="Game Rules">游戏规则</h2>
             <div class="controls-section">
-                <h3 class="controls-title">🎮 控制说明</h3>
+                <h3 class="controls-title" data-en="🎮 Controls">🎮 控制说明</h3>
 
                 <div class="control-keys">
                     <div class="key-item p1">
-                        <h4>玩家1 (橙色)</h4>
-                        <div>移动: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span
-                                class="key">D</span></div>
-                        <div>魔法球: <span class="key">1-5</span></div>
-                        <div>商店: <span class="key">E</span> 购买: <span class="key">R</span></div>
-                        <div>暂停: <span class="key">Q</span></div>
+                        <h4 data-en="Player 1 (Orange)">玩家1 (橙色)</h4>
+                        <div><span data-en="Move: ">移动: </span><span class="key">W</span><span class="key">A</span><span
+                                class="key">S</span><span class="key">D</span></div>
+                        <div><span data-en="Magic Balls: ">魔法球: </span><span class="key">1-5</span></div>
+                        <div><span data-en="Shop: ">商店: </span><span class="key">E</span> <span data-en="Buy: ">购买:
+                            </span><span class="key">R</span></div>
+                        <div><span data-en="Pause: ">暂停: </span><span class="key">Q</span></div>
                     </div>
 
                     <div class="key-item p2">
-                        <h4>玩家2 (蓝色)</h4>
-                        <div>移动: <span class="key">↑</span><span class="key">↓</span><span class="key">←</span><span
-                                class="key">→</span></div>
-                        <div>魔法球: <span class="key">6-0</span></div>
-                        <div>商店: <span class="key">+</span> 购买: <span class="key">Enter</span></div>
-                        <div>暂停: <span class="key">/</span></div>
+                        <h4 data-en="Player 2 (Blue)">玩家2 (蓝色)</h4>
+                        <div><span data-en="Move: ">移动: </span><span class="key">↑</span><span class="key">↓</span><span
+                                class="key">←</span><span class="key">→</span></div>
+                        <div><span data-en="Magic Balls: ">魔法球: </span><span class="key">6-0</span></div>
+                        <div><span data-en="Shop: ">商店: </span><span class="key">+</span> <span data-en="Buy: ">购买:
+                            </span><span class="key">Enter</span></div>
+                        <div><span data-en="Pause: ">暂停: </span><span class="key">/</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <button class="start-home-btn enter-animation delay-2" id="start-home-btn">
+        <button class="start-home-btn enter-animation delay-2" id="start-home-btn" data-en="Start Game">
             开始游戏
         </button>
     </div>
@@ -92,85 +96,85 @@
         <div class="selection-content">
             <!-- 玩家1选择 -->
             <div class="player-selection">
-                <h3 id="player1-selection-title">玩家1选择蛇类型</h3>
+                <h3 id="player1-selection-title" data-en="Player 1 Choose Snake Type">玩家1选择蛇类型</h3>
                 <div class="snake-options">
                     <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player1', 'speed')">
                         <div class="snake-preview" style="background: #FFA500;"></div>
-                        <h4>速度蛇</h4>
-                        <p>生命: ★★★☆☆</p>
-                        <p>速度: ★★★★★</p>
-                        <p>特点: 双击方向键俯冲加速</p>
+                        <h4 data-en="Speed Snake">速度蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★☆☆</p>
+                        <p><span data-en="Speed: ">速度: </span>★★★★★</p>
+                        <p data-en="Feature: Double tap direction keys to dash">特点: 双击方向键俯冲加速</p>
                     </div>
                     <div class="snake-option" data-type="hard" onclick="selectSnakeType('player1', 'hard')">
                         <div class="snake-preview" style="background: #C0C0C0;"></div>
-                        <h4>坚硬蛇</h4>
-                        <p>生命: ★★★★★</p>
-                        <p>速度: ★★☆☆☆</p>
-                        <p>特点: 伤害减半，50%子弹免疫</p>
+                        <h4 data-en="Hard Snake">坚硬蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★★★</p>
+                        <p><span data-en="Speed: ">速度: </span>★★☆☆☆</p>
+                        <p data-en="Feature: Half damage, 50% bullet immunity">特点: 伤害减半，50%子弹免疫</p>
                     </div>
                     <div class="snake-option" data-type="magic" onclick="selectSnakeType('player1', 'magic')">
                         <div class="snake-preview" style="background: #9370DB;"></div>
-                        <h4>魔法蛇</h4>
-                        <p>生命: ★★★☆☆</p>
-                        <p>速度: ★★★☆☆</p>
-                        <p>特点: 效果时间延长，自动生成魔法球</p>
+                        <h4 data-en="Magic Snake">魔法蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★☆☆</p>
+                        <p><span data-en="Speed: ">速度: </span>★★★☆☆</p>
+                        <p data-en="Feature: Extended effect duration, auto-generate magic balls">特点: 效果时间延长，自动生成魔法球</p>
                     </div>
                 </div>
             </div>
 
             <!-- 玩家2选择 -->
             <div class="player-selection">
-                <h3 id="player2-selection-title">玩家2选择蛇类型</h3>
+                <h3 id="player2-selection-title" data-en="Player 2 Choose Snake Type">玩家2选择蛇类型</h3>
                 <div class="snake-options">
                     <div class="snake-option active" data-type="speed" onclick="selectSnakeType('player2', 'speed')">
                         <div class="snake-preview" style="background: #4169E1;"></div>
-                        <h4>速度蛇</h4>
-                        <p>生命: ★★★☆☆</p>
-                        <p>速度: ★★★★★</p>
-                        <p>特点: 双击方向键俯冲加速</p>
+                        <h4 data-en="Speed Snake">速度蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★☆☆</p>
+                        <p><span data-en="Speed: ">速度: </span>★★★★★</p>
+                        <p data-en="Feature: Double tap direction keys to dash">特点: 双击方向键俯冲加速</p>
                     </div>
                     <div class="snake-option" data-type="hard" onclick="selectSnakeType('player2', 'hard')">
                         <div class="snake-preview" style="background: #C0C0C0;"></div>
-                        <h4>坚硬蛇</h4>
-                        <p>生命: ★★★★★</p>
-                        <p>速度: ★★☆☆☆</p>
-                        <p>特点: 伤害减半，50%子弹免疫</p>
+                        <h4 data-en="Hard Snake">坚硬蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★★★</p>
+                        <p><span data-en="Speed: ">速度: </span>★★☆☆☆</p>
+                        <p data-en="Feature: Half damage, 50% bullet immunity">特点: 伤害减半，50%子弹免疫</p>
                     </div>
                     <div class="snake-option" data-type="magic" onclick="selectSnakeType('player2', 'magic')">
                         <div class="snake-preview" style="background: #9370DB;"></div>
-                        <h4>魔法蛇</h4>
-                        <p>生命: ★★★☆☆</p>
-                        <p>速度: ★★★☆☆</p>
-                        <p>特点: 效果时间延长，自动生成魔法球</p>
+                        <h4 data-en="Magic Snake">魔法蛇</h4>
+                        <p><span data-en="Health: ">生命: </span>★★★☆☆</p>
+                        <p><span data-en="Speed: ">速度: </span>★★★☆☆</p>
+                        <p data-en="Feature: Extended effect duration, auto-generate magic balls">特点: 效果时间延长，自动生成魔法球</p>
                     </div>
                 </div>
             </div>
 
             <!-- 地图选择 -->
             <div class="map-selection">
-                <h3>选择地图类型</h3>
+                <h3 data-en="Choose Map Type">选择地图类型</h3>
                 <div class="map-options">
                     <div class="map-option active" data-map="classic" onclick="selectMapType('classic')">
                         <div class="map-preview classic-map"></div>
-                        <h4>经典地图</h4>
-                        <p>标准对战地图，随机墙壁</p>
+                        <h4 data-en="Classic Map">经典地图</h4>
+                        <p data-en="Standard battle map, random walls">标准对战地图，随机墙壁</p>
                     </div>
                     <div class="map-option" data-map="snow" onclick="selectMapType('snow')">
                         <div class="map-preview snow-map"></div>
-                        <h4>雪山地图</h4>
-                        <p>暴风雪机制，减速冻结效果</p>
+                        <h4 data-en="Snow Map">雪山地图</h4>
+                        <p data-en="Blizzard mechanics, slow and freeze effects">暴风雪机制，减速冻结效果</p>
                     </div>
                     <div class="map-option" data-map="volcano" onclick="selectMapType('volcano')">
                         <div class="map-preview volcano-map"></div>
-                        <h4>火山地图</h4>
-                        <p>火山喷发，岩浆区域伤害</p>
+                        <h4 data-en="Volcano Map">火山地图</h4>
+                        <p data-en="Volcanic eruptions, lava area damage">火山喷发，岩浆区域伤害</p>
                     </div>
                 </div>
             </div>
 
             <!-- 开始游戏按钮 -->
             <div class="start-game-section">
-                <button id="confirm-start-btn" onclick="startGameWithSelections()">开始游戏</button>
+                <button id="confirm-start-btn" onclick="startGameWithSelections()" data-en="Start Game">开始游戏</button>
             </div>
         </div>
     </div>
@@ -198,47 +202,47 @@
             <!-- 玩家1面板 -->
             <div class="player-panel" id="player1-panel">
                 <div class="player-header">
-                    <span id="player1-panel-name">玩家1</span>
-                    <span class="snake-type speed-snake" id="player1-type">未选择</span>
+                    <span id="player1-panel-name" data-en="Player 1">玩家1</span>
+                    <span class="snake-type speed-snake" id="player1-type" data-en="Not selected">未选择</span>
                 </div>
-                <div>生命值: <span id="player1-hp">10</span>/<span id="player1-max-hp">10</span></div>
+                <div><span data-en="Health: ">生命值: </span><span id="player1-hp">10</span>/<span
+                        id="player1-max-hp">10</span></div>
                 <div class="health-bar">
                     <div class="health-fill" id="player1-health" style="width: 100%"></div>
                 </div>
-                <div>魔法球:</div>
+                <div><span data-en="Magic Balls: ">魔法球:</span></div>
                 <div class="magic-balls" id="player1-balls"></div>
-                <div>护盾: <span id="player1-shield">0</span></div>
-                <div>分数: <span id="player1-score">0</span></div>
+                <div><span data-en="Shield: ">护盾: </span><span id="player1-shield">0</span></div>
+                <div><span data-en="Score: ">分数: </span><span id="player1-score">0</span></div>
             </div>
 
             <!-- 玩家2面板 -->
             <div class="player-panel" id="player2-panel">
                 <div class="player-header">
-                    <span id="player2-panel-name">玩家2</span>
-                    <span class="snake-type magic-snake" id="player2-type">未选择</span>
+                    <span id="player2-panel-name" data-en="Player 2">玩家2</span>
+                    <span class="snake-type magic-snake" id="player2-type" data-en="Not selected">未选择</span>
                 </div>
-                <div>生命值: <span id="player2-hp">10</span>/<span id="player2-max-hp">10</span></div>
+                <div><span data-en="Health: ">生命值: </span><span id="player2-hp">10</span>/<span
+                        id="player2-max-hp">10</span></div>
                 <div class="health-bar">
                     <div class="health-fill" id="player2-health" style="width: 100%"></div>
                 </div>
-                <div>魔法球:</div>
+                <div><span data-en="Magic Balls: ">魔法球:</span></div>
                 <div class="magic-balls" id="player2-balls"></div>
-                <div>护盾: <span id="player2-shield">0</span></div>
-                <div>分数: <span id="player2-score">0</span></div>
+                <div><span data-en="Shield: ">护盾: </span><span id="player2-shield">0</span></div>
+                <div><span data-en="Score: ">分数: </span><span id="player2-score">0</span></div>
             </div>
 
             <!-- 分数显示 -->
             <div class="score-display">
-                游戏时间: <span id="game-time">00:00</span>
+                <span data-en="Game Time: ">游戏时间: </span><span id="game-time">00:00</span>
             </div>
-
-
 
             <!-- 游戏控制按钮 -->
             <div class="game-controls">
-                <button id="start-btn">开始游戏</button>
-                <button id="reset-btn">重新开始</button>
-                <button id="map-btn">切换地图</button>
+                <button id="start-btn" data-en="Start Game">开始游戏</button>
+                <button id="reset-btn" data-en="Restart">重新开始</button>
+                <button id="map-btn" data-en="Switch Map">切换地图</button>
             </div>
 
             <!-- 玩家1商店界面 -->
@@ -259,16 +263,16 @@
                 </div>
             </div>
             <div class="base-info" id="player1-base">
-                <div id="player1-base-name">玩家1基地</div>
-                <div>生命值<span id="base1-hp">50</span></div>
+                <div id="player1-base-name" data-en="Player 1 Base">玩家1基地</div>
+                <div><span data-en="Health: ">生命值</span><span id="base1-hp">50</span></div>
                 <div class="base-health">
                     <div class="base-health-fill" id="base1-health" style="width: 100%"></div>
                 </div>
             </div>
 
             <div class="base-info" id="player2-base">
-                <div id="player2-base-name">玩家2基地</div>
-                <div>生命值<span id="base2-hp">50</span></div>
+                <div id="player2-base-name" data-en="Player 2 Base">玩家2基地</div>
+                <div><span data-en="Health: ">生命值</span><span id="base2-hp">50</span></div>
                 <div class="base-health">
                     <div class="base-health-fill" id="base2-health" style="width: 100%"></div>
                 </div>
@@ -276,12 +280,12 @@
 
             <!-- 游戏结束界面 -->
             <div class="game-over" id="game-over">
-                <div id="winner-text">游戏结束</div>
+                <div id="winner-text" data-en="Game Over">游戏结束</div>
                 <div class="stats-container" id="stats-container">
                     <!-- 统计信息会动态生成 -->
                 </div>
                 <div class="game-controls">
-                    <button id="play-again-btn">再玩一次</button>
+                    <button id="play-again-btn" data-en="Play Again">再玩一次</button>
                 </div>
             </div>
         </div>

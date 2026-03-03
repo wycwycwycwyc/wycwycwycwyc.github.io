@@ -1,68 +1,70 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XLS转XLSX转换器(基础数据转换)</title>
-    <script>
-      function scriptLoaded() {
-        document.addEventListener('DOMContentLoaded', function () {
-          // 这个函数将在脚本加载完成后执行
-          // 获取加载动画元素
-          var loadingAnimation = document.getElementById('loadingAnimation');
-          loadingAnimation.style.display = 'none';
-        });
-        }
-    </script>
-<script src="/config/serverUrl.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-en="XLS to XLSX Converter (Basic Data Conversion)">XLS转XLSX转换器(基础数据转换)</title>
+  <script>
+    function scriptLoaded() {
+      document.addEventListener('DOMContentLoaded', function () {
+        // 这个函数将在脚本加载完成后执行
+        // 获取加载动画元素
+        var loadingAnimation = document.getElementById('loadingAnimation');
+        loadingAnimation.style.display = 'none';
+      });
+    }
+  </script>
+  <script src="/config/serverUrl.js"></script>
 
-    <link rel="stylesheet" href="/css/styles_button.css">
-    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-    <script src="/js/script_openPage.js"></script>
-    <script src="/js/script3_darkMode.js"></script>
-    <script src="/js/script4_goBackOrHome.js"></script>
-    <link rel="stylesheet" href="/css/styles3_animation.css">
-    <script src="/js/script5_setAnimations.js"></script>
-    <script src="/js/script6_setFontSize.js"></script>
-    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-    <script src="/js/script8_setEyeCare.js"></script>
-    <link rel="stylesheet" href="/css/styles5_brightness.css">
-    <link rel="stylesheet" href="/css/styles6_glow.css">
-    <script src="/js/script9_setbrightness.js"></script>
-    <script src="/js/script10_setGlow.js"></script>
-    <link href="/css/message.min.css" rel="stylesheet" />
-    <script src="/js/message.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
-    <script src="./zhuanhuanhtml.js"></script>
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>
-  </head>
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <script src="/js/script_openPage.js"></script>
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <script src="/js/script8_setEyeCare.js"></script>
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./zhuanhuanhtml.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js" onload="scriptLoaded()"></script>
+  <script src="/js/script14_setLanguage.js"></script>
+</head>
 
-  <body>
-    <div id="loadingAnimation" class="hidden">
-      <div class="spinner"></div>
-      <div class="loadingText">正在加载</div>
-    </div>
-    <header>
-      <h1>XLS转XLSX转换器(基础数据转换)</h1>
-      <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()">返回</button>
-    </header>
-    <div id="dropZone">
-      <button class="file-upload-button custom-button" id="fileUploadButton">选择文件</button>
-      <input type="file" id="fileInput" accept=".xls" multiple style="display:none;">
-      <div>或者将XLS文件拖拽到这里转换为XLSX</div>
-    </div>
-    <table id="downloadLinks" class="download-table hidden">
-      <thead>
-        <tr>
-          <th>文件名</th>
-          <th>下载</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- 下载链接将在这里动态生成 -->
-      </tbody>
-    </table>
-    <button id="downloadAllButton" class=" custom-button">一键下载所有文件</button>
+<body>
+  <div id="loadingAnimation" class="hidden">
+    <div class="spinner"></div>
+    <div class="loadingText" data-en="Loading">正在加载</div>
+  </div>
+  <header>
+    <h1 data-en="XLS to XLSX Converter (Basic Data Conversion)">XLS转XLSX转换器(基础数据转换)</h1>
+    <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+      data-en="Back">返回</button>
+  </header>
+  <div id="dropZone">
+    <button class="file-upload-button custom-button" id="fileUploadButton" data-en="Select Files">选择文件</button>
+    <input type="file" id="fileInput" accept=".xls" multiple style="display:none;">
+    <div data-en="Or drag and drop XLS files here to convert to XLSX">或者将XLS文件拖拽到这里转换为XLSX</div>
+  </div>
+  <table id="downloadLinks" class="download-table hidden">
+    <thead>
+      <tr>
+        <th data-en="File Name">文件名</th>
+        <th data-en="Download">下载</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 下载链接将在这里动态生成 -->
+    </tbody>
+  </table>
+  <button id="downloadAllButton" class="custom-button" data-en="Download All Files">一键下载所有文件</button>

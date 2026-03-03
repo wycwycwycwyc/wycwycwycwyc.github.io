@@ -319,7 +319,7 @@
             const yMax = parseFloat(document.getElementById('y-max').value);
             
             if (isNaN(xMin) || isNaN(xMax) || isNaN(yMin) || isNaN(yMax)) {
-                Qmsg.warning('请输入有效的范围值');
+                Qmsg.warning(getLocalizedText('请输入有效值', 'Please enter valid values'));
                 return;
             }
             

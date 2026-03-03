@@ -1,50 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="/js/script4_goBackOrHome.js"></script>
-        <script src="/js/script3_darkMode.js"></script>
-        <link rel="stylesheet" href="/css/styles3_animation.css">
-        <script src="/js/script5_setAnimations.js"></script>
-        <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-        <script src="/js/script8_setEyeCare.js"></script>
-        <link rel="stylesheet" href="/css/styles5_brightness.css">
-        <link rel="stylesheet" href="/css/styles6_glow.css">
-        <script src="/js/script9_setbrightness.js"></script>
-        <script src="/js/script10_setGlow.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-        <title>更改密码</title>
-        <script src="/config/serverUrl.js"></script>
-        <link rel="stylesheet" href="./style.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script3_darkMode.js"></script>
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <script src="/js/script5_setAnimations.js"></script>
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <script src="/js/script8_setEyeCare.js"></script>
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+    <title data-en="Change Password">更改密码</title>
+    <script src="/config/serverUrl.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="/js/script14_setLanguage.js"></script>
+</head>
 
-    <body>
-        <div class="container">
-            <button class="back-btn" onclick="goBackOrHome()">返回</button>
-            <h1>更改密码</h1>
-            <div class="input-group">
-                <label for="oldPassword">旧密码:</label>
-                <input type="password" id="oldPassword" name="oldPassword" required>
-            </div>
-
-            <div class="input-group">
-                <label for="newPassword">新密码:</label>
-                <input type="password" id="newPassword" name="newPassword" required>
-            </div>
-
-            <div class="input-group">
-                <label for="confirmNewPassword">确认新密码:</label>
-                <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
-            </div>
-
-            <button type="button" onclick="resetPassword()">提交</button>
-            <div class="loading-text" id="loadingText">正在更改...</div>
-            <br><br>
-            <a href="/account/forgotPassword">忘记密码</a>？</p>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="goBackOrHome()" data-en="Back">返回</button>
+        <h1 data-en="Change Password">更改密码</h1>
+        <div class="input-group">
+            <label for="oldPassword" data-en="Old Password:">旧密码:</label>
+            <input type="password" id="oldPassword" name="oldPassword" required>
         </div>
-    </body>
+
+        <div class="input-group">
+            <label for="newPassword" data-en="New Password:">新密码:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+
+        <div class="input-group">
+            <label for="confirmNewPassword" data-en="Confirm New Password:">确认新密码:</label>
+            <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+        </div>
+
+        <button type="button" onclick="resetPassword()" data-en="Submit">提交</button>
+        <div class="loading-text" id="loadingText" data-en="Changing...">正在更改...</div>
+        <br><br>
+        <span data-en="Forgot password? ">忘记密码</span><a href="/account/forgotPassword" data-en="?">？</a>
+    </div>
+</body>
 <script src="./resetPassword.js"></script>
+
 </html>

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>更改用户名</title>
-<script src="/config/serverUrl.js"></script>
+    <title data-en="Change Username">更改用户名</title>
+    <script src="/config/serverUrl.js"></script>
 
     <script src="/js/script4_goBackOrHome.js"></script>
     <script src="/js/script3_darkMode.js"></script>
@@ -20,6 +20,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="./style.css">
+    <script src="/js/script14_setLanguage.js"></script>
     <script>
 
     </script>
@@ -27,16 +28,18 @@
 
 <body>
     <div class="container">
-        <button class="back-btn" onclick="goBackOrHome()">返回</button>
-        <h2>更改用户名</h2>
-        <p>当前用户名: <span id="currentUsername"></span></p>
+        <button class="back-btn" onclick="goBackOrHome()" data-en="Back">返回</button>
+        <h2 data-en="Change Username">更改用户名</h2>
+        <p><span data-en="Current username: ">当前用户名: </span><span id="currentUsername"></span></p>
         <form id="usernameForm" onsubmit="event.preventDefault(); updateUsername();">
-            <input type="text" id="newUsername" placeholder="输入新用户名" required maxlength="10">
+            <input type="text" id="newUsername" placeholder="输入新用户名" required maxlength="10"
+                data-en-placeholder="Enter new username">
             <br><br>
-            <button type="submit">更改用户名</button>
+            <button type="submit" data-en="Change Username">更改用户名</button>
         </form>
         <p id="message" style="display: none;"></p>
     </div>
 </body>
 <script src="./updateUsername.js"></script>
+
 </html>

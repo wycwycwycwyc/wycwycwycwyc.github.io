@@ -27,13 +27,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="./style.css">
     <script src="./unlockpc.js"></script>
-    <title>动态密码生成器</title>
+    <script src="/js/script14_setLanguage.js"></script>
+    <title data-en="Dynamic Password Generator">动态密码生成器</title>
 </head>
-<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()">返回</button>
+<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+    data-en="Back">返回</button>
+
 <body>
     <div class="container">
-        
-        <h1>动态密码生成器</h1>
+
+        <h1 data-en="Dynamic Password Generator">动态密码生成器</h1>
 
         <div class="password-container">
             <div class="password" id="current-password"></div>
@@ -41,22 +44,23 @@
 
         <div class="info-section">
             <div class="info-row" style="--delay: 0.3s">
-                <span class="info-label">当前时间</span>
+                <span class="info-label" data-en="Current Time">当前时间</span>
                 <span class="info-value" id="current-time"></span>
             </div>
             <div class="info-row" style="--delay: 0.4s">
-                <span class="info-label">下次更新</span>
+                <span class="info-label" data-en="Next Update">下次更新</span>
                 <span class="info-value" id="next-update"></span>
             </div>
             <div class="info-row" style="--delay: 0.5s">
-                <span class="info-label">剩余时间</span>
+                <span class="info-label" data-en="Time Remaining">剩余时间</span>
                 <span class="info-value"><span class="countdown" id="countdown"></span></span>
             </div>
         </div>
 
-        <div class="footer">
+        <div class="footer" data-en="Based on computer lock system • Updates every minute">
             基于电脑锁定系统制作 • 每分钟自动更新
         </div>
     </div>
 </body>
+
 </html>

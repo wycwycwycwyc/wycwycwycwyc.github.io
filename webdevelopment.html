@@ -18,9 +18,10 @@
     <script src="https://hcaptcha.com/1/api.js" async defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-    <title>网站发展历程</title>
+    <title data-en="Website Development History">网站发展历程</title>
     <script src="/config/serverUrl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/js/script14_setLanguage.js"></script>
 
     <style>
         :root {
@@ -393,154 +394,211 @@
 
     <div class="container">
         <header>
-            <h1>网站发展历程</h1>
-            <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()">返回</button>
-            <button class="custom-button" style="position: fixed; top: 10px; right: 10px;" onclick="location.href='/code/webapp/oldwebsite'">查看旧版网站</button>
-            <p class="subtitle">记录每一个重要时刻，见证我们的成长轨迹</p>
+            <h1 data-en="Website Development History">网站发展历程</h1>
+            <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+                data-en="Back">返回</button>
+            <button class="custom-button" style="position: fixed; top: 10px; right: 10px;"
+                onclick="location.href='/code/webapp/oldwebsite'" data-en="View Old Version">查看旧版网站</button>
+            <p class="subtitle" data-en="Recording every important moment, witnessing our growth trajectory">
+                记录每一个重要时刻，见证我们的成长轨迹</p>
         </header>
 
         <div class="timeline" id="timelineContainer">
             <!-- 加载状态 -->
             <div class="loader" id="loader">
                 <div class="spinner"></div>
-                <p class="loader-text">正在加载发展历程...</p>
+                <p class="loader-text" data-en="Loading development history...">正在加载发展历程...</p>
             </div>
         </div>
 
         <footer>
-            <p>© 2023-2025 脚本存放站 版权所有</p>
-            <p>我们的旅程仍在继续，期待与您共同创造更多精彩时刻...</p>
+            <p><span data-en="© 2024-2025 Script Repository. All rights reserved.">© 2024-2025 脚本存放站 版权所有</span></p>
+            <p><span
+                    data-en="Our journey continues, looking forward to creating more wonderful moments with you...">我们的旅程仍在继续，期待与您共同创造更多精彩时刻...</span>
+            </p>
         </footer>
     </div>
-
     <script>
-        // 从JSON文件加载发展历程数据
-        async function loadTimelineData() {
-            const timelineContainer = document.getElementById('timelineContainer');
-            const loader = document.getElementById('loader');
+    // 从JSON文件加载发展历程数据
+    async function loadTimelineData() {
+        const timelineContainer = document.getElementById('timelineContainer');
+        const loader = document.getElementById('loader');
 
-            try {
-                // 获取JSON数据
-                const response = await fetch('/config/updateinfo.json');
-                if (!response.ok) {
-                    throw new Error('网络响应不正常');
-                }
+        try {
+            // 显示加载动画
+            loader.style.display = 'flex';
 
-                const data = await response.json();
-
-                // 隐藏加载动画
-                loader.style.display = 'none';
-
-                // 检查数据是否有效
-                if (!data || Object.keys(data).length === 0) {
-                    throw new Error('没有可用的发展历程数据');
-                }
-
-                // 生成时间线内容
-                generateTimelineContent(data);
-
-                // 初始化滚动动画
-                initScrollAnimation();
-
-            } catch (error) {
-                console.error('加载发展历程数据失败:', error);
-                showError(error.message);
+            // 获取JSON数据
+            const response = await fetch('/config/updateinfo.json');
+            if (!response.ok) {
+                throw new Error(getLocalizedText('网络响应不正常', 'Network response was not ok'));
             }
-        }
 
-        // 生成时间线内容
-        function generateTimelineContent(data) {
-            const timelineContainer = document.getElementById('timelineContainer');
+            const data = await response.json();
 
-            // 获取所有更新项的键并排序
-            const updateKeys = Object.keys(data).filter(key => key.startsWith('update'));
-            updateKeys.sort((a, b) => {
-                const numA = parseInt(a.replace('update', ''));
-                const numB = parseInt(b.replace('update', ''));
-                return numA - numB;
-            });
-
-            // 为每个更新项创建HTML
-            updateKeys.forEach((key, index) => {
-                const update = data[key];
-                const isLeft = index % 2 === 0;
-
-                const milestoneDiv = document.createElement('div');
-                milestoneDiv.className = `milestone ${isLeft ? 'left' : 'right'}`;
-
-                // 创建内容HTML
-                let contentHTML = `
-                    <div class="content">
-                        <div class="date">${update.time || '未知日期'}</div>
-                        <h2>${update.title || '未命名更新'}</h2>
-                `;
-
-                // 添加所有文本字段
-                let textIndex = 1;
-                while (update[`text${textIndex}`]) {
-                    const text = update[`text${textIndex}`];
-                    // 处理高亮文本：将<高亮内容>转换为<span class="highlight">高亮内容</span>
-                    const highlightedText = text.replace(/<([^>]+)>/g, '<span class="highlight">$1</span>');
-                    contentHTML += `<p>${highlightedText}</p>`;
-                    textIndex++;
-                }
-
-                contentHTML += `</div>`;
-                milestoneDiv.innerHTML = contentHTML;
-
-                timelineContainer.appendChild(milestoneDiv);
-            });
-        }
-
-        // 显示错误信息
-        function showError(message) {
-            const timelineContainer = document.getElementById('timelineContainer');
-            const loader = document.getElementById('loader');
-
+            // 隐藏加载动画
             loader.style.display = 'none';
 
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `
-                <h3>加载发展历程失败</h3>
-                <p>${message}</p>
-                <button class="retry-button" onclick="location.reload()">重试</button>
-            `;
+            // 检查数据是否有效
+            if (!data || Object.keys(data).length === 0) {
+                throw new Error(getLocalizedText('没有可用的发展历程数据', 'No development history data available'));
+            }
 
-            timelineContainer.appendChild(errorDiv);
+            // 存储数据以便后续重新生成
+            window.timelineData = data;
+
+            // 生成时间线内容
+            generateTimelineContent(data);
+
+            // 初始化滚动动画
+            initScrollAnimation();
+
+        } catch (error) {
+            console.error('加载发展历程数据失败:', error);
+            showError(error.message);
+        }
+    }
+
+    // 获取当前语言
+    function getCurrentLanguage() {
+        const currentLang = localStorage.getItem('preferredLang') || 'auto';
+        if (currentLang === 'auto') {
+            return navigator.language.startsWith('zh') ? 'zh' : 'en';
+        }
+        return currentLang;
+    }
+
+    // 获取文本内容（支持中英文对象或直接字符串）
+    function getLocalizedText(content) {
+        if (!content) return '';
+
+        // 如果已经是字符串，直接返回
+        if (typeof content === 'string') return content;
+
+        // 如果是对象，根据当前语言返回对应内容
+        if (typeof content === 'object') {
+            const lang = getCurrentLanguage();
+            return content[lang] || content.zh || '';
         }
 
-        // 初始化滚动动画
-        function initScrollAnimation() {
-            const milestones = document.querySelectorAll('.milestone');
+        return '';
+    }
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
+    // 生成时间线内容
+    function generateTimelineContent(data) {
+        const timelineContainer = document.getElementById('timelineContainer');
+        timelineContainer.innerHTML = ''; // 清空容器
 
-            milestones.forEach(milestone => {
-                observer.observe(milestone);
+        // 获取所有更新项的键并排序
+        const updateKeys = Object.keys(data).filter(key => key.startsWith('update'));
+        updateKeys.sort((a, b) => {
+            const numA = parseInt(a.replace('update', ''));
+            const numB = parseInt(b.replace('update', ''));
+            return numA - numB;
+        });
+
+        // 为每个更新项创建HTML
+        updateKeys.forEach((key, index) => {
+            const update = data[key];
+            const isLeft = index % 2 === 0;
+
+            const milestoneDiv = document.createElement('div');
+            milestoneDiv.className = `milestone ${isLeft ? 'left' : 'right'}`;
+
+            // 获取本地化后的时间、标题
+            const timeText = getLocalizedText(update.time);
+            const titleText = getLocalizedText(update.title);
+
+            // 创建内容HTML
+            let contentHTML = `
+            <div class="content">
+                <div class="date">${timeText}</div>
+                <h2>${titleText}</h2>
+        `;
+
+            // 添加所有文本字段
+            let textIndex = 1;
+            while (update[`text${textIndex}`]) {
+                const textContent = getLocalizedText(update[`text${textIndex}`]);
+                // 处理高亮文本：将<高亮内容>转换为<span class="highlight">高亮内容</span>
+                const highlightedText = textContent.replace(/<([^>]+)>/g, '<span class="highlight">$1</span>');
+                contentHTML += `<p>${highlightedText}</p>`;
+                textIndex++;
+            }
+
+            contentHTML += `</div>`;
+            milestoneDiv.innerHTML = contentHTML;
+
+            timelineContainer.appendChild(milestoneDiv);
+        });
+    }
+
+    // 显示错误信息
+    function showError(message) {
+        const timelineContainer = document.getElementById('timelineContainer');
+        const loader = document.getElementById('loader');
+
+        loader.style.display = 'none';
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `
+        <h3>${getLocalizedText('加载发展历程失败', 'Failed to load development history')}</h3>
+        <p>${message}</p>
+        <button class="retry-button" onclick="location.reload()">${getLocalizedText('重试', 'Retry')}</button>
+    `;
+
+        timelineContainer.appendChild(errorDiv);
+    }
+
+    // 初始化滚动动画
+    function initScrollAnimation() {
+        const milestones = document.querySelectorAll('.milestone');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
             });
+        }, {
+            threshold: 0.1
+        });
+
+        milestones.forEach(milestone => {
+            observer.observe(milestone);
+        });
+    }
+
+    // 刷新发展历程内容（用于语言切换时）
+    function refreshTimelineContent() {
+        if (window.timelineData) {
+            generateTimelineContent(window.timelineData);
+            initScrollAnimation();
+        } else {
+            // 如果没有数据，重新加载
+            loadTimelineData();
         }
+    }
 
-        // 导航按钮功能
-        document.getElementById('toTopBtn').addEventListener('click', function () {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+    // 导航按钮功能
+    document.getElementById('toTopBtn').addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-        document.getElementById('toBottomBtn').addEventListener('click', function () {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        });
+    document.getElementById('toBottomBtn').addEventListener('click', function () {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
 
-        // 页面加载完成后获取数据
-        document.addEventListener('DOMContentLoaded', loadTimelineData);
+    // 监听语言变化事件
+    window.addEventListener('languagechanged', function () {
+        // 刷新发展历程内容
+        refreshTimelineContent();
+    });
+
+    // 页面加载完成后获取数据
+    document.addEventListener('DOMContentLoaded', loadTimelineData);
     </script>
 </body>
 

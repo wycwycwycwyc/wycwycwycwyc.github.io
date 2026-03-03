@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>炫酷贪吃蛇</title>
-<script src="/config/serverUrl.js"></script>
+    <title data-en="🐍 Cool Snake Game 🐍">炫酷贪吃蛇</title>
+    <script src="/config/serverUrl.js"></script>
 
     <link rel="stylesheet" href="/css/styles_button.css">
     <script src="/js/script3_darkMode.js"></script>
@@ -16,37 +17,41 @@
     <script src="/js/message.min.js"></script>
     <link rel="stylesheet" href="./style.css">
     <script src="./snakegame.js"></script>
-<button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;" onclick="goBackOrHome()">返回</button>
+    <script src="/js/script14_setLanguage.js"></script>
+    <button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;"
+        onclick="goBackOrHome()" data-en="Back">返回</button>
 </head>
+
 <body>
     <div class="game-container">
         <div class="start-screen">
-            <h1 class="game-title">🐍 贪吃蛇 🐍</h1>
-            <button class="start-btn">开始游戏</button>
+            <h1 class="game-title" data-en="🐍 Snake Game 🐍">🐍 贪吃蛇 🐍</h1>
+            <button class="start-btn" data-en="Start Game">开始游戏</button>
             <div class="instructions">
-                <p>使用方向键或WASD控制蛇的移动</p>
-                <p>吃到彩色色食物可以增加分数</p>
-                <p>不要撞到墙壁或自己的身体!</p>
+                <p data-en="Use arrow keys or WASD to control the snake">使用方向键或WASD控制蛇的移动</p>
+                <p data-en="Eat colorful food to increase your score">吃到彩色食物可以增加分数</p>
+                <p data-en="Don't hit the walls or your own body!">不要撞到墙壁或自己的身体!</p>
             </div>
         </div>
-        
+
         <div class="particles" id="particles"></div>
-        
+
         <div id="game-board"></div>
-    <div class="fps-counter" id="fps-counter">
-        <span id="fps">--</span> FPS
-    </div>
-        <div class="score-board">
-            <div>当前分数: <span id="current-score">0</span></div>
-            <div>最高分数: <span id="high-score">0</span></div>
-            <a onclick="goBackOrHome()">返回</a>
+        <div class="fps-counter" id="fps-counter">
+            <span id="fps">--</span> <span data-en="FPS">FPS</span>
         </div>
-        
+        <div class="score-board">
+            <div><span data-en="Current Score: ">当前分数: </span><span id="current-score">0</span></div>
+            <div><span data-en="High Score: ">最高分数: </span><span id="high-score">0</span></div>
+            <a onclick="goBackOrHome()" data-en="Back">返回</a>
+        </div>
+
         <div class="game-over">
-            <h2>游戏结束!</h2>
-            <div>你的分数: <span id="final-score">0</span></div>
-            <button class="restart-btn">再来一局</button>
+            <h2 data-en="Game Over!">游戏结束!</h2>
+            <div><span data-en="Your Score: ">你的分数: </span><span id="final-score">0</span></div>
+            <button class="restart-btn" data-en="Play Again">再来一局</button>
         </div>
     </div>
 </body>
+
 </html>

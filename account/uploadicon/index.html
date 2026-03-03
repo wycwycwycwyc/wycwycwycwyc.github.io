@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>图片上传表单</title>
-<script src="/config/serverUrl.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title data-en="Image Upload Form">图片上传表单</title>
+    <script src="/config/serverUrl.js"></script>
 
-        <script src="/js/script4_goBackOrHome.js"></script>
-        <script src="/js/script3_darkMode.js"></script>
-        <link rel="stylesheet" href="/css/styles3_animation.css">
-        <script src="/js/script5_setAnimations.js"></script>
-        <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-        <script src="/js/script8_setEyeCare.js"></script>
-        <link rel="stylesheet" href="/css/styles5_brightness.css">
-        <link rel="stylesheet" href="/css/styles6_glow.css">
-        <script src="/js/script9_setbrightness.js"></script>
-        <script src="/js/script10_setGlow.js"></script>
-        <script src="https://hcaptcha.com/1/api.js" async defer></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-        <link href="/css/message.min.css" rel="stylesheet" />
-        <script src="/js/message.min.js"></script>
-        <link rel="stylesheet" href="./style.css">
-    </head>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script3_darkMode.js"></script>
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <script src="/js/script5_setAnimations.js"></script>
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <script src="/js/script8_setEyeCare.js"></script>
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+    <link href="/css/message.min.css" rel="stylesheet" />
+    <script src="/js/message.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="/js/script14_setLanguage.js"></script>
+</head>
 
-    <body>
-        <div class="form-container">
-            <form id="uploadForm">
-                <h1>上传头像</h1>
-                <button type="button" class="btn" onclick="document.getElementById('avatar').click();">选择图片</button>
-                <input type="file" id="avatar" accept="image/png, image/jpeg" required onchange="previewImage(this)">
-                <br>
-                <img id="previewold" class="upload-preview" src="#" alt="图片预览">
-                <img id="preview" class="upload-preview" src="#">
-                <progress id="uploadProgress" value="0" max="100">0%</progress>
-                <div class="progress-info" id="progressInfo"></div>
-                <button type="button" onclick=" uploadImage()">开始上传</button>
-            </form>
-        </div>
-    </body>
+<body>
+    <div class="form-container">
+        <form id="uploadForm">
+            <h1 data-en="Upload Avatar">上传头像</h1>
+            <button type="button" class="btn" onclick="document.getElementById('avatar').click();"
+                data-en="Select Image">选择图片</button>
+            <input type="file" id="avatar" accept="image/png, image/jpeg" required onchange="previewImage(this)">
+            <br>
+            <img id="previewold" class="upload-preview" src="#" alt="图片预览" data-en-alt="Image Preview">
+            <img id="preview" class="upload-preview" src="#" alt="" data-en-alt="Preview">
+            <progress id="uploadProgress" value="0" max="100" data-en-value="0%">0%</progress>
+            <div class="progress-info" id="progressInfo"></div>
+            <button type="button" onclick=" uploadImage()" data-en="Start Upload">开始上传</button>
+        </form>
+    </div>
+</body>
 <script src="./uploadIcon.js"></script>
+
 </html>

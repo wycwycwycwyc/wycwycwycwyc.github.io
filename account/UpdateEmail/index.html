@@ -1,55 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>更换邮箱</title>
-<script src="/config/serverUrl.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Change Email">更换邮箱</title>
+    <script src="/config/serverUrl.js"></script>
 
-        <script src="/js/script4_goBackOrHome.js"></script>
-        <script src="/js/script3_darkMode.js"></script>
-        <link rel="stylesheet" href="/css/styles3_animation.css">
-        <script src="/js/script5_setAnimations.js"></script>
-        <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-        <script src="/js/script8_setEyeCare.js"></script>
-        <link rel="stylesheet" href="/css/styles5_brightness.css">
-        <link rel="stylesheet" href="/css/styles6_glow.css">
-        <script src="/js/script9_setbrightness.js"></script>
-        <script src="/js/script10_setGlow.js"></script>
-        <script src="https://hcaptcha.com/1/api.js" async defer></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-        <link rel="stylesheet" href="./style.css">
-    </head>
-    <body>
-        <div class="container">
-            <h2>更换邮箱</h2>
-            <div>
-                <label for="password">用户密码:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div>
-                <label for="email">新邮箱:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div>
-                <label for="verificationCode">验证码:</label>
-                <input type="text" id="verificationCode" name="verificationCode" style="width: 65%;">
-                <button type="button" id="sendCodeBtn" style="margin-top: 10px;">发送验证码</button>
-            </div>
-            <br>
-            <div>
-                <button type="submit" style="width: 100%;
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script3_darkMode.js"></script>
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <script src="/js/script5_setAnimations.js"></script>
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <script src="/js/script8_setEyeCare.js"></script>
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="/js/script14_setLanguage.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2 data-en="Change Email">更换邮箱</h2>
+        <div>
+            <label for="password" data-en="Password:">用户密码:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="email" data-en="New Email:">新邮箱:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="verificationCode" data-en="Verification Code:">验证码:</label>
+            <input type="text" id="verificationCode" name="verificationCode" style="width: 65%;">
+            <button type="button" id="sendCodeBtn" style="margin-top: 10px;" data-en="Send Code">发送验证码</button>
+        </div>
+        <br>
+        <div>
+            <button type="submit" style="width: 100%;
                 padding: 15px;
                 border: none;
                 border-radius: 20px;
                 background-color: #5cb85c;
                 color: white;
                 cursor: pointer;
-                font-size: 16px;">更新邮箱</button>
-            </div>
+                font-size: 16px;" data-en="Update Email">更新邮箱</button>
         </div>
-    </body>
+    </div>
+</body>
 <script src="./updateEmail.js"></script>
+
 </html>

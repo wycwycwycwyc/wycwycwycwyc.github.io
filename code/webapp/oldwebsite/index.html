@@ -20,39 +20,48 @@
   <script src="/js/script11_setHighlight.js"></script>
   <link href="style.css" rel="stylesheet">
   <script src="./webSelection.js"></script>
-  <title>旧网站体验器 · 时光跳转</title>
+  <script src="/js/script14_setLanguage.js"></script>
+  <title data-en="Old Website Explorer · Time Jump">旧网站体验器 · 时光跳转</title>
 </head>
 
 <body>
-  <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()">返回</button>
+  <button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+    data-en="Back">返回</button>
   <!-- 主体结构：对应单独的 index.html 内容 -->
   <main class="time-portal">
-    <h1 class="retro-title">📼 旧网站体验器</h1>
-    <div class="sub-head">· 重返网站初期现场 ·</div>
+    <h1 class="retro-title" data-en="📼 Old Website Explorer">📼 旧网站体验器</h1>
+    <div class="sub-head" data-en="· Return to the early days of the website ·">· 重返网站初期现场 ·</div>
 
     <!-- 两个大按钮区域：跳转到指定路径 (firstUpload / stableVersion) -->
     <div class="button-duo">
       <div class="legacy-notice">
-        <div class="notice-item">⚠️ 1. 旧版网站的界面未适配完整，可能出现一些界面或其他错误</div>
-        <div class="notice-item">🕶️ 2. 旧版网站不支持当前网站的全局样式（如深色模式，护眼模式及自定义字体大小等）</div>
-        <div class="notice-item">📦 3. 旧版网站的内容已在新版网站更新或在新版网站被弃用，请尽量不要使用其中的内容，其中链接或其它功能可能已经失效</div>
+        <div class="notice-item"
+          data-en="⚠️ 1. The old version of the website is not fully adapted and may have some interface or other errors">
+          ⚠️ 1. 旧版网站的界面未适配完整，可能出现一些界面或其他错误</div>
+        <div class="notice-item"
+          data-en="🕶️ 2. The old version does not support the current website's global styles (such as dark mode, eye care mode, custom font size, etc.)">
+          🕶️ 2. 旧版网站不支持当前网站的全局样式（如深色模式，护眼模式及自定义字体大小等）</div>
+        <div class="notice-item"
+          data-en="📦 3. The content of the old version has been updated in the new version or deprecated. Please try not to use its content, as links or other functions may have failed">
+          📦 3. 旧版网站的内容已在新版网站更新或在新版网站被弃用，请尽量不要使用其中的内容，其中链接或其它功能可能已经失效</div>
       </div>
       <!-- 第一次上传初版按钮 -->
-      <button class="time-button" id="firstUploadBtn" data-path="./firstUpload">
+      <button class="time-button" id="firstUploadBtn" data-path="./firstUpload" data-en="🕒 First Upload Version 🕒">
         <span class="button-icon">🕒</span>
         第一次上传初版
         <span class="button-icon" style="font-size:1.6rem;">⏳</span>
       </button>
 
       <!-- 稳定早期版按钮 -->
-      <button class="time-button" id="stableVersionBtn" data-path="./stableVersion">
+      <button class="time-button" id="stableVersionBtn" data-path="./stableVersion"
+        data-en="📀 Early Stable Version 📀">
         <span class="button-icon">📀</span>
         稳定早期版
         <span class="button-icon" style="font-size:1.7rem;">🕹️</span>
       </button>
     </div>
 
-    <div class="footer-note">
+    <div class="footer-note" data-en="⏏️ Click to jump · Nostalgia channel">
       ⏏️ 点击即跳转 · 怀旧通道
     </div>
   </main>

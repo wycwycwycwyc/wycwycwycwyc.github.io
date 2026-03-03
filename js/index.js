@@ -378,7 +378,22 @@ const ThemeManager = {
     // 切换深色模式
     toggleDarkMode: function() {
         if (localStorage.getItem('followSystem') === 'true') {
-            Qmsg.error("当前设置为跟随系统，无法手动切换深浅色模式");
+            // 获取当前语言设置
+            const currentLang = localStorage.getItem('preferredLang') || 'auto';
+            let actualLang = 'zh';
+            
+            if (currentLang === 'auto') {
+                actualLang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+            } else {
+                actualLang = currentLang;
+            }
+            
+            // 根据语言显示不同提示
+            if (actualLang === 'en') {
+                Qmsg.error("Currently set to follow system, cannot manually switch dark/light mode");
+            } else {
+                Qmsg.error("当前设置为跟随系统，无法手动切换深浅色模式");
+            }
             return;
         }
         
@@ -474,31 +489,20 @@ if (isPreview) {
                 <table class="main-table" style="animation: slideUp 1.5s forwards, blurIn 1.5s forwards;">
                     <thead>
                         <tr>
-                            <th>脚本名</th>
-                            <th>简介</th>
-                            <th>备注</th>
-                            <th>查看</th>
+                            <th data-en="Script Name">脚本名</th>
+                            <th data-en="Introduction">简介</th>
+                            <th data-en="Notes">备注</th>
+                            <th data-en="View">查看</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>示例脚本 1</td>
-                            <td>这是一个示例脚本的简介</td>
-                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
-                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
+                            <td data-en="Example Script 1">示例脚本 1</td>
+                            <td data-en="This is an introduction to the example script">这是一个示例脚本的简介</td>
+                            <td data-en="You are previewing the main interface. You can slide the slider in the settings to change the homepage style">你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
+                            <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
                         </tr>
-                        <tr>
-                            <td>示例脚本 2</td>
-                            <td>这是一个示例脚本的简介</td>
-                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
-                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
-                        </tr>
-                        <tr>
-                            <td>示例脚本 3</td>
-                            <td>这是一个示例脚本的简介</td>
-                            <td>你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
-                            <td><button class="custom-button" onclick="alert('预览模式，无法查看实际内容')">查看</button></td>
-                        </tr>
+                        <!-- 其他示例行类似 -->
                     </tbody>
                 </table>
             </div>
@@ -513,17 +517,30 @@ if (isPreview) {
     return;
 }
     // ==================== 站点运行时间 ====================
-    var startDate = new Date('2024-01-18');
-    var currentDate = new Date();
-    var diffTime = Math.abs(currentDate - startDate);
-    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const script = document.createElement('script');
-    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
-    document.head.appendChild(script);
-    var busuanziElement = document.getElementById('busuanzi_container_site_pv');
-    if (busuanziElement) {
-        busuanziElement.innerHTML = "本站总访问量<span id='busuanzi_value_site_pv'></span>次<br>主站运行总时间:" + diffDays + "天";
-    }
+// 站点运行时间
+var startDate = new Date('2024-01-18');
+var currentDate = new Date();
+var diffTime = Math.abs(currentDate - startDate);
+var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+const script = document.createElement('script');
+script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+document.head.appendChild(script);
+var busuanziElement = document.getElementById('busuanzi_container_site_pv');
+if (busuanziElement) {
+    // 拆分成两部分，中间插入动态天数
+    busuanziElement.innerHTML = `
+        <span data-en="Total site visits: ">本站总访问量</span>
+        <span id='busuanzi_value_site_pv'></span>
+        <span data-en=" times">次</span>
+        <br>
+        <span data-en="Site running time: ">主站运行总时间:</span>
+        <span>${diffDays}</span>
+        <span data-en=" days">天</span>
+    `;
+    
+    // 注册新添加的翻译元素
+    registerI18nElements(busuanziElement);
+}
     
     // ==================== 登录状态处理 ====================
     var loginStatusElement = document.getElementById('loginStatus');
@@ -531,56 +548,63 @@ if (isPreview) {
     var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     var menuVisible = false;
 
-    if (!isLoggedIn) {
-        if (logoutButton) logoutButton.style.display = 'none';
-        if (loginStatusElement) {
-            loginStatusElement.onclick = function() {
-                var loginUrl = '/account/Login/index.html?redirect=/index.html';
-                window.location.href = loginUrl;
-            };
-        }
-    } else {
-        if (loginStatusElement) {
-            loginStatusElement.querySelector('.login-status').textContent = '正在加载';
-            var user = localStorage.getItem('username');
-            let userId = localStorage.getItem('userid');
-            const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
-            loginStatusElement.style.backgroundImage = `url('${imageUrl}')`;
-            
-            // 获取用户名
-            fetch(`${serverurl}/get-username-by-id`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('用户名:', data.data.username);
-                    localStorage.setItem('username', data.data.username);
-                    if (loginStatusElement) {
-                        loginStatusElement.querySelector('.login-status').textContent = '';
-                    }
-                } else {
-                    console.error(data.message);
-                    showLoginError();
-                }
-            })
-            .catch(error => {
-                showLoginError();
-            });
-
-            loginStatusElement.onclick = function(event) {
-                event.stopPropagation();
-                toggleMenu();
-            };
-
-            document.addEventListener('click', function() {
-                if (!menuVisible) return;
-                hideMenu();
-            });
-        }
+// 登录状态处理
+if (!isLoggedIn) {
+    if (logoutButton) logoutButton.style.display = 'none';
+    if (loginStatusElement) {
+        loginStatusElement.onclick = function() {
+            var loginUrl = '/account/Login/index.html?redirect=/index.html';
+            window.location.href = loginUrl;
+        };
     }
+} else {
+    if (loginStatusElement) {
+        // 创建带翻译的加载状态
+        const loginStatusSpan = loginStatusElement.querySelector('.login-status');
+        loginStatusSpan.textContent = '正在加载';
+        loginStatusSpan.setAttribute('data-en', 'Loading');
+        
+        var user = localStorage.getItem('username');
+        let userId = localStorage.getItem('userid');
+        const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
+        loginStatusElement.style.backgroundImage = `url('${imageUrl}')`;
+        
+        // 获取用户名
+        fetch(`${serverurl}/get-username-by-id`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('用户名:', data.data.username);
+                localStorage.setItem('username', data.data.username);
+                if (loginStatusElement) {
+                    const statusSpan = loginStatusElement.querySelector('.login-status');
+                    statusSpan.textContent = '';
+                    statusSpan.removeAttribute('data-en'); // 清空后不需要翻译
+                }
+            } else {
+                console.error(data.message);
+                showLoginError();
+            }
+        })
+        .catch(error => {
+            showLoginError();
+        });
+
+        loginStatusElement.onclick = function(event) {
+            event.stopPropagation();
+            toggleMenu();
+        };
+
+        document.addEventListener('click', function() {
+            if (!menuVisible) return;
+            hideMenu();
+        });
+    }
+}
 
     // 登录错误处理函数
 function showLoginError() {
@@ -613,16 +637,47 @@ function showLoginError() {
     });
 }
 
-    // 退出登录函数
-function logout() {
+// 登录错误处理函数
+function showLoginError() {
     Swal.fire({
-        title: "您确定要退出登录吗？",
-        text: "这将清除你本地的登录信息",
+        title: localStorage.getItem('preferredLang') === 'en' ? "User not found, try to login again?" : "找不到该用户，是否尝试重新登录？",
+        text: localStorage.getItem('preferredLang') === 'en' ? "Note: If the page is still loading, please wait" : "注意：如果页面未加载完成时进行操作请忽略，等待页面加载完成即可",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "是",
-        cancelButtonText: "否"
+        confirmButtonText: localStorage.getItem('preferredLang') === 'en' ? "Yes" : "是",
+        cancelButtonText: localStorage.getItem('preferredLang') === 'en' ? "No" : "否"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: localStorage.getItem('preferredLang') === 'en' ? "Redirecting!" : "正在跳转!",
+                text: localStorage.getItem('preferredLang') === 'en' ? "Redirecting" : "正在跳转",
+                icon: "info",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('usertype');
+            localStorage.removeItem('userid');
+            localStorage.removeItem('developerOptionsEnabled');
+            window.location.href = '/account/Login/index.html';
+        } else {
+            window.location.reload();
+        }
+    });
+}
+
+// 退出登录函数
+function logout() {
+    Swal.fire({
+        title: localStorage.getItem('preferredLang') === 'en' ? "Are you sure you want to logout?" : "您确定要退出登录吗？",
+        text: localStorage.getItem('preferredLang') === 'en' ? "This will clear your local login information" : "这将清除你本地的登录信息",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: localStorage.getItem('preferredLang') === 'en' ? "Yes" : "是",
+        cancelButtonText: localStorage.getItem('preferredLang') === 'en' ? "No" : "否"
     }).then((result) => {
         if (result.isConfirmed) {
             localStorage.removeItem('isLoggedIn');
@@ -630,7 +685,11 @@ function logout() {
             localStorage.removeItem('usertype');
             localStorage.removeItem('userid');
             localStorage.removeItem('developerOptionsEnabled');
-            Swal.fire("退出成功！", "已退出登录", "success");
+            Swal.fire(
+                localStorage.getItem('preferredLang') === 'en' ? "Logout successful!" : "退出成功！", 
+                localStorage.getItem('preferredLang') === 'en' ? "You have been logged out" : "已退出登录", 
+                "success"
+            );
             location.reload();
         }
     });
@@ -638,13 +697,13 @@ function logout() {
 
 function sa() {
     Swal.fire({
-        title: "您确定要切换账号吗",
-        text: "这将清除你现在的登录信息",
+        title: localStorage.getItem('preferredLang') === 'en' ? "Are you sure you want to switch accounts?" : "您确定要切换账号吗",
+        text: localStorage.getItem('preferredLang') === 'en' ? "This will clear your current login information" : "这将清除你现在的登录信息",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: "是",
-        cancelButtonText: "否"
+        confirmButtonText: localStorage.getItem('preferredLang') === 'en' ? "Yes" : "是",
+        cancelButtonText: localStorage.getItem('preferredLang') === 'en' ? "No" : "否"
     }).then((result) => {
         if (result.isConfirmed) {
             localStorage.removeItem('isLoggedIn');
@@ -656,7 +715,6 @@ function sa() {
         }
     });
 }
-
     // 菜单显示/隐藏函数
     function toggleMenu() {
         if (menuVisible) {
@@ -670,15 +728,15 @@ function sa() {
         var menu = document.createElement('ul');
         isDarkMode = localStorage.getItem('darkMode') === 'enabled';
         menu.style.position = 'absolute';
-        menu.style.listStyle = 'none';  // 修改这里：去掉列表样式
-        menu.style.padding = '2px 0';   // 修改这里：减小上下内边距
-        menu.style.margin = '0';        // 添加：移除默认外边距
+        menu.style.listStyle = 'none';
+        menu.style.padding = '2px 0';
+        menu.style.margin = '0';
         menu.style.width = '200px';
         menu.style.height = 'auto';
         menu.style.backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
         menu.style.color = isDarkMode ? 'white' : 'black';
         menu.style.border = '1px solid #ccc';
-        menu.style.borderRadius = '10px'; // 添加：圆角边框
+        menu.style.borderRadius = '10px';
         menu.style.boxShadow = '2px 2px 5px rgba(0, 0, 0, 0.3)';
         menu.style.zIndex = '1000';
         menu.style.top = '100%';
@@ -688,28 +746,29 @@ function sa() {
         menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
 
         var menuItems = [
-            { text: '账户设置', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
-            { text: '切换账号', action: function () { sa(); } },
-            { text: '退出登录', action: function () { logout(); } }
+            { text: '账户设置', enText: 'Account Settings', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
+            { text: '切换账号', enText: 'Switch Account', action: function () { sa(); } },
+            { text: '退出登录', enText: 'Logout', action: function () { logout(); } }
         ];
 
         menuItems.forEach(function (item, index) {
             if (index > 0) {
                 var separator = document.createElement('li');
                 separator.className = 'menu-separator';
-                separator.style.height = '1px';           // 添加：分隔线高度
-                separator.style.backgroundColor = '#ccc';  // 添加：分隔线颜色
-                separator.style.margin = '4px 0';          // 添加：分隔线上下间距
-                separator.style.padding = '0';             // 添加：移除内边距
+                separator.style.height = '1px';
+                separator.style.backgroundColor = '#ccc';
+                separator.style.margin = '4px 0';
+                separator.style.padding = '0';
                 menu.appendChild(separator);
             }
 
             var menuItem = document.createElement('li');
             menuItem.className = 'menu-item';
             menuItem.textContent = item.text;
-            menuItem.style.padding = '8px 15px';          // 修改这里：减小菜单项内边距
+            menuItem.setAttribute('data-en', item.enText); // 添加翻译
+            menuItem.style.padding = '8px 15px';
             menuItem.style.cursor = 'pointer';
-            menuItem.style.fontSize = '14px';              // 添加：设置字体大小
+            menuItem.style.fontSize = '14px';
             menuItem.onmouseover = function() {
                 this.style.backgroundColor = isDarkMode ? '#333' : '#f0f0f0';
             };
@@ -724,6 +783,13 @@ function sa() {
         });
 
         loginStatusElement.appendChild(menu);
+        
+        // 注册菜单项到 i18n 系统
+        if (window.i18n) {
+            const menuItems = menu.querySelectorAll('[data-en]');
+            menuItems.forEach(el => window.i18n.register(el));
+        }
+        
         setTimeout(function () {
             menu.style.opacity = '1';
             menu.style.transform = 'translateY(0)';
@@ -759,10 +825,30 @@ function sa() {
         var timeNow = document.getElementById('time_now');
         var dateNow = document.getElementById('date_now');
         
-        if (timeNow) timeNow.textContent = '本地时间：' + hoursUtc + ':' + minutesUtc + ':' + secondsUtc;
-        if (dateNow) dateNow.textContent = '本地日期：' + year + '-' + month + '-' + day;
+        if (timeNow) {
+            // 检查是否已经添加了翻译属性
+            if (!timeNow.hasAttribute('data-en')) {
+                timeNow.setAttribute('data-en', 'Local time: ');
+            }
+            // 使用 innerHTML 保留翻译标记
+            timeNow.innerHTML = `<span data-en="Local time: ">本地时间：</span>${hoursUtc}:${minutesUtc}:${secondsUtc}`;
+            
+            // 注册新添加的翻译元素
+            const span = timeNow.querySelector('span[data-en]');
+            if (span && window.i18n) window.i18n.register(span);
+        }
+        
+        if (dateNow) {
+            if (!dateNow.hasAttribute('data-en')) {
+                dateNow.setAttribute('data-en', 'Local date: ');
+            }
+            dateNow.innerHTML = `<span data-en="Local date: ">本地日期：</span>${year}-${month}-${day}`;
+            
+            // 注册新添加的翻译元素
+            const span = dateNow.querySelector('span[data-en]');
+            if (span && window.i18n) window.i18n.register(span);
+        }
     }
-
     updateLocalDateTime();
     setInterval(updateLocalDateTime, 1000);
 
@@ -808,117 +894,175 @@ function sa() {
             });
 
         // 根据JSON数据创建表格
-        function createTablesFromJSON(data) {
-            tablesContainer.innerHTML = '';
+        // 根据JSON数据创建表格
+            function getCurrentLanguage() {
+                const currentLang = localStorage.getItem('preferredLang') || 'auto';
+                if (currentLang === 'auto') {
+                    return navigator.language.startsWith('zh') ? 'zh' : 'en';
+                }
+                return currentLang;
+            }
+// 根据JSON数据创建表格
+function createTablesFromJSON(data) {
+    // 获取当前语言
+    const currentLang = localStorage.getItem('preferredLang') || 'auto';
+    let lang = 'zh';
+    if (currentLang === 'auto') {
+        lang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+    } else {
+        lang = currentLang;
+    }
+    
+    tablesContainer.innerHTML = '';
 
-            Object.entries(data).forEach(([tableType, tableData], index) => {
-                const tableWrapper = document.createElement('div');
-                tableWrapper.className = 'table-wrapper';
-                tableWrapper.style.display = 'none';
+    Object.entries(data).forEach(([tableType, tableData], index) => {
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'table-wrapper';
+        tableWrapper.style.display = 'none';
 
-                const table = document.createElement('table');
-                table.className = 'main-table';
-                table.style.animation = 'slideUp 1.5s forwards, blurIn 1.5s forwards';
+        const table = document.createElement('table');
+        table.className = 'main-table';
+        table.style.animation = 'slideUp 1.5s forwards, blurIn 1.5s forwards';
 
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
 
-                const headers = Object.keys(tableData.row1 || {});
+        const headers = Object.keys(tableData.row1 || {});
 
-                headers.forEach((header, headerIndex) => {
-                    const th = document.createElement('th');
+        headers.forEach((header, headerIndex) => {
+            const th = document.createElement('th');
 
-                    if (headerIndex === 0 && tableNames.length > 1) {
-                        const tableSelector = document.createElement('select');
-                        tableSelector.className = 'table-selector';
-                        tableSelector.onchange = (e) => showTable(parseInt(e.target.value));
+            if (headerIndex === 0 && tableNames.length > 1) {
+                const tableSelector = document.createElement('select');
+                tableSelector.className = 'table-selector';
+                tableSelector.onchange = (e) => showTable(parseInt(e.target.value));
 
-                        tableNames.forEach((name, idx) => {
-                            const option = document.createElement('option');
-                            option.value = idx;
-                            option.textContent = name;
-                            option.selected = idx === index;
-                            tableSelector.appendChild(option);
-                        });
+                tableNames.forEach((name, idx) => {
+                    const option = document.createElement('option');
+                    option.value = idx;
+                    option.textContent = name;
+                    option.selected = idx === index;
+                    tableSelector.appendChild(option);
+                });
 
-                        const container = document.createElement('div');
-                        container.style.display = 'flex';
-                        container.style.alignItems = 'center';
-                        container.style.justifyContent = 'space-between';
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.justifyContent = 'space-between';
 
-                        const titleSpan = document.createElement('span');
-                        titleSpan.textContent = '脚本名';
+                const titleSpan = document.createElement('span');
+                // 根据语言设置表头文本
+                const headerInfo = tableData.row1[header];
+                if (typeof headerInfo === 'object') {
+                    titleSpan.textContent = headerInfo[lang] || headerInfo.zh;
+                    titleSpan.setAttribute('data-en', headerInfo.en);
+                } else {
+                    titleSpan.textContent = headerInfo || '脚本名';
+                }
 
-                        container.appendChild(titleSpan);
-                        container.appendChild(tableSelector);
-                        th.appendChild(container);
+                container.appendChild(titleSpan);
+                container.appendChild(tableSelector);
+                th.appendChild(container);
+            } else {
+                // 根据语言设置表头文本
+                const headerInfo = tableData.row1[header];
+                if (typeof headerInfo === 'object') {
+                    th.textContent = headerInfo[lang] || headerInfo.zh;
+                    th.setAttribute('data-en', headerInfo.en);
+                } else {
+                    const headerDisplayNames = {
+                        'name': { zh: '脚本名', en: 'Script Name' },
+                        'Introduction': { zh: '简介', en: 'Introduction' },
+                        'note': { zh: '备注', en: 'Notes' },
+                        'view': { zh: '查看', en: 'View' },
+                        'author': { zh: '作者', en: 'Author' },
+                        'version': { zh: '版本', en: 'Version' },
+                        'date': { zh: '日期', en: 'Date' }
+                    };
+                    const displayInfo = headerDisplayNames[header] || { zh: header, en: header };
+                    th.textContent = displayInfo[lang];
+                    th.setAttribute('data-en', displayInfo.en);
+                }
+            }
+
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+
+        Object.entries(tableData).forEach(([rowKey, rowData]) => {
+            if (rowKey === 'row1') return;
+
+            const tr = document.createElement('tr');
+
+            headers.forEach(header => {
+                const td = document.createElement('td');
+
+                if (header === 'view' && rowData[header]) {
+                    const button = document.createElement('button');
+                    button.className = 'custom-button';
+                    
+                    // 设置按钮文本
+                    const viewInfo = tableData.row1.view;
+                    if (typeof viewInfo === 'object') {
+                        button.textContent = viewInfo[lang];
+                        button.setAttribute('data-en', viewInfo.en);
                     } else {
-                        const headerDisplayNames = {
-                            'name': '脚本名',
-                            'Introduction': '简介',
-                            'note': '备注',
-                            'view': '查看',
-                            'author': '作者',
-                            'version': '版本',
-                            'date': '日期'
-                        };
-                        th.textContent = headerDisplayNames[header] || header;
+                        button.textContent = '查看';
+                        button.setAttribute('data-en', 'View');
                     }
 
-                    headerRow.appendChild(th);
-                });
+                    const viewUrl = rowData[header];
+                    if (viewUrl.includes('?')) {
+                        const urlParts = viewUrl.split('?');
+                        const urlParams = new URLSearchParams(urlParts[1]);
+                        const title = urlParams.get('title');
+                        const file = urlParams.get('file');
 
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
+                        button.onclick = function() {
+                            openPage(`/code.html?title=${encodeURIComponent(title)}&file=${encodeURIComponent(file)}`);
+                        };
+                    } else {
+                        button.onclick = function() {
+                            openPage(viewUrl);
+                        };
+                    }
 
-                const tbody = document.createElement('tbody');
-
-                Object.entries(tableData).forEach(([rowKey, rowData]) => {
-                    if (rowKey === 'row1') return;
-
-                    const tr = document.createElement('tr');
-
-                    headers.forEach(header => {
-                        const td = document.createElement('td');
-
-                        if (header === 'view' && rowData[header]) {
-                            const button = document.createElement('button');
-                            button.className = 'custom-button';
-                            button.textContent = '查看';
-
-                            const viewUrl = rowData[header];
-                            if (viewUrl.includes('?')) {
-                                const urlParts = viewUrl.split('?');
-                                const urlParams = new URLSearchParams(urlParts[1]);
-                                const title = urlParams.get('title');
-                                const file = urlParams.get('file');
-
-                                button.onclick = function() {
-                                    openPage(`/code.html?title=${encodeURIComponent(title)}&file=${encodeURIComponent(file)}`);
-                                };
-                            } else {
-                                button.onclick = function() {
-                                    openPage(viewUrl);
-                                };
-                            }
-
-                            td.appendChild(button);
-                        } else {
-                            td.textContent = rowData[header] || '';
+                    td.appendChild(button);
+                } else {
+                    // 根据语言设置单元格内容
+                    const cellData = rowData[header];
+                    if (typeof cellData === 'object') {
+                        td.textContent = cellData[lang] || cellData.zh;
+                        if (cellData.en) {
+                            td.setAttribute('data-en', cellData.en);
                         }
+                    } else {
+                        td.textContent = cellData || '';
+                    }
+                }
 
-                        tr.appendChild(td);
-                    });
-
-                    tbody.appendChild(tr);
-                });
-
-                table.appendChild(tbody);
-                tableWrapper.appendChild(table);
-                tablesContainer.appendChild(tableWrapper);
-                tables.push(tableWrapper);
+                tr.appendChild(td);
             });
+
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        tableWrapper.appendChild(table);
+        tablesContainer.appendChild(tableWrapper);
+        tables.push(tableWrapper);
+        
+        // 注册新创建的元素到 i18n 系统
+        if (window.i18n) {
+            const newElements = tableWrapper.querySelectorAll('[data-en]');
+            newElements.forEach(el => window.i18n.register(el));
         }
+    });
+}
 
         // 创建导航按钮
         function createNavigationButtons() {
@@ -945,8 +1089,10 @@ function sa() {
             nextButton.style.display = 'block';
             nextButton.onclick = () => showTable(currentTableIndex + 1);
             navigationButtons.appendChild(nextButton);
+            
+            // 注册导航按钮
+            registerI18nElements(navigationButtons);
         }
-
         // 显示指定索引的表格
         function showTable(index) {
             if (index < 0) index = 0;

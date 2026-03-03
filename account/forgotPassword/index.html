@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>忘记密码</title>
-<script src="/config/serverUrl.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title data-en="Forgot Password">忘记密码</title>
+    <script src="/config/serverUrl.js"></script>
 
-        <script src="/js/script4_goBackOrHome.js"></script>
-        <script src="/js/script3_darkMode.js"></script>
-        <link rel="stylesheet" href="/css/styles3_animation.css">
-        <script src="/js/script5_setAnimations.js"></script>
-        <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-        <script src="/js/script8_setEyeCare.js"></script>
-        <link rel="stylesheet" href="/css/styles5_brightness.css">
-        <link rel="stylesheet" href="/css/styles6_glow.css">
-        <script src="/js/script9_setbrightness.js"></script>
-        <script src="/js/script10_setGlow.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-        <link rel="stylesheet" href="./style.css">
-        <style>
+    <script src="/js/script4_goBackOrHome.js"></script>
+    <script src="/js/script3_darkMode.js"></script>
+    <link rel="stylesheet" href="/css/styles3_animation.css">
+    <script src="/js/script5_setAnimations.js"></script>
+    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+    <script src="/js/script8_setEyeCare.js"></script>
+    <link rel="stylesheet" href="/css/styles5_brightness.css">
+    <link rel="stylesheet" href="/css/styles6_glow.css">
+    <script src="/js/script9_setbrightness.js"></script>
+    <script src="/js/script10_setGlow.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="/js/script14_setLanguage.js"></script>
+    <style>
 
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <a href="/account/Login/index.html" class="back-button">返回</a>
-            <h2>忘记密码</h2>
-            <form id="reset_password_form" onsubmit="return validateForm(event)">
-                <label for="email">邮箱:</label>
-                <input type="email" id="email" name="email" required>
+    </style>
+</head>
 
-                <label for="verification_code">验证码:</label>
-                <input type="verification_code" id="verification_code" name="verification_code" required>
-                <button type="button" id="send_code_button" class="verification-code-button"
-                    onclick="sendVerificationCode()">发送验证码</button>
+<body>
+    <div class="container">
+        <a href="/account/Login/index.html" class="back-button" data-en="Back">返回</a>
+        <h2 data-en="Forgot Password">忘记密码</h2>
+        <form id="reset_password_form" onsubmit="return validateForm(event)">
+            <label for="email" data-en="Email:">邮箱:</label>
+            <input type="email" id="email" name="email" required>
 
-                <label for="new_password">新密码:</label>
-                <input type="password" id="new_password" name="new_password" required>
+            <label for="verification_code" data-en="Verification Code:">验证码:</label>
+            <input type="verification_code" id="verification_code" name="verification_code" required>
+            <button type="button" id="send_code_button" class="verification-code-button"
+                onclick="sendVerificationCode()" data-en="Send Code">发送验证码</button>
 
-                <label for="confirm_password">确认新密码:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+            <label for="new_password" data-en="New Password:">新密码:</label>
+            <input type="password" id="new_password" name="new_password" required>
 
-                <div id="error_message" class="error"></div>
-                <div id="submit_message" style="display: none;">正在重置...</div>
+            <label for="confirm_password" data-en="Confirm New Password:">确认新密码:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
 
-                <input type="submit" value="重置密码">
-            </form>
-        </div>
-        <script src="./forgotPassword.js"></script>
+            <div id="error_message" class="error"></div>
+            <div id="submit_message" style="display: none;" data-en="Resetting...">正在重置...</div>
+
+            <input type="submit" value="重置密码" data-en="Reset Password">
+        </form>
+    </div>
+    <script src="./forgotPassword.js"></script>

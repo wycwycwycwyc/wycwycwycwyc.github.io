@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>双人贪吃蛇大作战</title>
-<script src="/config/serverUrl.js"></script>
+    <title data-en="Two-Player Snake Battle">双人贪吃蛇大作战</title>
+    <script src="/config/serverUrl.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/styles_button.css">
@@ -14,114 +15,124 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
     <link href="/css/message.min.css" rel="stylesheet" />
     <script src="/js/message.min.js"></script>
+    <script src="/js/script14_setLanguage.js"></script>
     <link rel="stylesheet" href="./style.css">
-<button id="back" class="custom-button" style="position: fixed; top: 120px; left: 10px;z-index: 10;" onclick="goBackOrHome()">返回</button>
+    <button id="back" class="custom-button" style="position: fixed; top: 120px; left: 10px;z-index: 10;"
+        onclick="goBackOrHome()" data-en="Back">返回</button>
 </head>
+
 <body>
     <div id="game-stats-modal" class="modal">
-    <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
-        <span class="close-modal" data-modal="game-stats-modal">&times;</span>
-        <h2><i class="fas fa-chart-bar"></i> 本局游戏详细数据</h2>
-        <div id="game-stats-content"></div>
-    </div>
-</div>   
-<!-- 玩家1商店 -->
-<div id="store-player1" class="store-overlay player1">
-    <div class="store-container">
-        <div class="store-header">
-            <h2><i class="fas fa-shopping-cart"></i> 商店</h2>
-            <div class="store-player-name player1" id="store-player1-name">玩家1</div>
-            <div class="store-score">
-                当前分数: <span id="store-player1-score">0</span>分
-            </div>
-        </div>
-        
-        <div class="store-items" id="store-player1-items">
-            <!-- 商店项目将通过JS动态生成 -->
-        </div>
-        
-        <div class="store-footer">
-            <button class="store-buy-btn" id="store-player1-buy" disabled>
-                购买 (左Alt键)
-            </button>
-            <div class="store-hint">
-                <i class="fas fa-info-circle"></i> WSAD选择，左Alt购买，左Ctrl关闭
-            </div>
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
+            <span class="close-modal" data-modal="game-stats-modal">&times;</span>
+            <h2><i class="fas fa-chart-bar"></i> <span data-en="Game Statistics">本局游戏详细数据</span></h2>
+            <div id="game-stats-content"></div>
         </div>
     </div>
-</div>
-
-<!-- 玩家2商店 -->
-<div id="store-player2" class="store-overlay player2">
-    <div class="store-container">
-        <div class="store-header">
-            <h2><i class="fas fa-shopping-cart"></i> 商店</h2>
-            <div class="store-player-name player2" id="store-player2-name">玩家2</div>
-            <div class="store-score">
-                当前分数: <span id="store-player2-score">0</span>分
-            </div>
-        </div>
-        
-        <div class="store-items" id="store-player2-items">
-            <!-- 商店项目将通过JS动态生成 -->
-        </div>
-        
-        <div class="store-footer">
-            <button class="store-buy-btn" id="store-player2-buy" disabled>
-                购买 (右Alt键)
-            </button>
-            <div class="store-hint">
-                <i class="fas fa-info-circle"></i> 方向键选择，右Alt购买，右Ctrl关闭
-            </div>
-        </div>
-    </div>
-</div>
-    <!-- 添加到character-selection div之后 -->
-<div class="map-selection">
-    <h2 class="selection-title">选择地图</h2>
-    <div class="map-options">
-        <div class="map-option" data-map="default">
-            <div class="map-preview" style="background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);"></div>
-            <div class="map-name">默认地图</div>
-            <div class="map-desc">经典双蛇对战地图</div>
-        </div>
-        <div class="map-option" data-map="snow">
-            <div class="map-preview" style="background: linear-gradient(135deg, #1e3c72, #2a5298, #7b4397);"></div>
-            <div class="map-name">雪山地图</div>
-            <div class="map-desc">暴风雪天气挑战</div>
-        </div>
-        <div class="map-option" data-map="volcano">
-            <div class="map-preview" style="background: linear-gradient(135deg, #8B0000, #FF4500, #FF8C00);"></div>
-            <div class="map-name">火山地图</div>
-            <div class="map-desc">火山喷发挑战</div>
-        </div>        
-    </div>
-    <button class="start-game-btn" disabled>开始游戏</button>
-</div>
-    <button id="view-records"style="position: absolute;top: 20px;right: 20px; background: rgba(255,255,255,0.2);border: none;color: white;padding: 5px 10px;border-radius: 5px;cursor: pointer;z-index: 10;">查看战绩</button>
-            <div id="records-modal" class="modal">
-            <div class="modal-content" style="max-width: 800px;">
-                <span class="close-modal">&times;</span>
-                <h2>玩家对战记录</h2>
-                <div class="search-controls">
-                    <input type="text" id="search-username" placeholder="搜索玩家...">
-                    <button id="refresh-records">刷新</button>
+    <!-- 玩家1商店 -->
+    <div id="store-player1" class="store-overlay player1">
+        <div class="store-container">
+            <div class="store-header">
+                <h2><i class="fas fa-shopping-cart"></i> <span data-en="Store">商店</span></h2>
+                <div class="store-player-name player1" id="store-player1-name" data-en="Player 1">玩家1</div>
+                <div class="store-score">
+                    <span data-en="Current Score: ">当前分数: </span><span id="store-player1-score">0</span><span
+                        data-en=" points">分</span>
                 </div>
-                <div id="records-container"></div>
+            </div>
+
+            <div class="store-items" id="store-player1-items">
+                <!-- 商店项目将通过JS动态生成 -->
+            </div>
+
+            <div class="store-footer">
+                <button class="store-buy-btn" id="store-player1-buy" disabled data-en="Buy (Left Alt)">
+                    购买 (左Alt键)
+                </button>
+                <div class="store-hint">
+                    <i class="fas fa-info-circle"></i> <span
+                        data-en="WSAD to select, Left Alt to buy, Left Ctrl to close">WSAD选择，左Alt购买，左Ctrl关闭</span>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- 玩家2商店 -->
+    <div id="store-player2" class="store-overlay player2">
+        <div class="store-container">
+            <div class="store-header">
+                <h2><i class="fas fa-shopping-cart"></i> <span data-en="Store">商店</span></h2>
+                <div class="store-player-name player2" id="store-player2-name" data-en="Player 2">玩家2</div>
+                <div class="store-score">
+                    <span data-en="Current Score: ">当前分数: </span><span id="store-player2-score">0</span><span
+                        data-en=" points">分</span>
+                </div>
+            </div>
+
+            <div class="store-items" id="store-player2-items">
+                <!-- 商店项目将通过JS动态生成 -->
+            </div>
+
+            <div class="store-footer">
+                <button class="store-buy-btn" id="store-player2-buy" disabled data-en="Buy (Right Alt)">
+                    购买 (右Alt键)
+                </button>
+                <div class="store-hint">
+                    <i class="fas fa-info-circle"></i> <span
+                        data-en="Arrow keys to select, Right Alt to buy, Right Ctrl to close">方向键选择，右Alt购买，右Ctrl关闭</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 添加到character-selection div之后 -->
+    <div class="map-selection">
+        <h2 class="selection-title" data-en="Select Map">选择地图</h2>
+        <div class="map-options">
+            <div class="map-option" data-map="default">
+                <div class="map-preview" style="background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);"></div>
+                <div class="map-name" data-en="Default Map">默认地图</div>
+                <div class="map-desc" data-en="Classic Snake Battle Map">经典双蛇对战地图</div>
+            </div>
+            <div class="map-option" data-map="snow">
+                <div class="map-preview" style="background: linear-gradient(135deg, #1e3c72, #2a5298, #7b4397);"></div>
+                <div class="map-name" data-en="Snow Map">雪山地图</div>
+                <div class="map-desc" data-en="Blizzard Challenge">暴风雪天气挑战</div>
+            </div>
+            <div class="map-option" data-map="volcano">
+                <div class="map-preview" style="background: linear-gradient(135deg, #8B0000, #FF4500, #FF8C00);"></div>
+                <div class="map-name" data-en="Volcano Map">火山地图</div>
+                <div class="map-desc" data-en="Volcanic Eruption Challenge">火山喷发挑战</div>
+            </div>
+        </div>
+        <button class="start-game-btn" disabled data-en="Start Game">开始游戏</button>
+    </div>
+    <button id="view-records"
+        style="position: absolute;top: 20px;right: 20px; background: rgba(255,255,255,0.2);border: none;color: white;padding: 5px 10px;border-radius: 5px;cursor: pointer;z-index: 10;"
+        data-en="View Records">查看战绩</button>
+    <div id="records-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal">&times;</span>
+            <h2 data-en="Player Battle Records">玩家对战记录</h2>
+            <div class="search-controls">
+                <input type="text" id="search-username" placeholder="搜索玩家..." data-en-placeholder="Search player...">
+                <button id="refresh-records" data-en="Refresh">刷新</button>
+            </div>
+            <div id="records-container"></div>
+        </div>
+    </div>
     <div class="game-container">
         <div class="start-screen">
-            <h1 class="game-title">🐍 双人贪吃蛇 🐍</h1>
-            <button class="start-btn">开始游戏</button>
+            <h1 class="game-title" data-en="🐍 Two-Player Snake 🐍">🐍 双人贪吃蛇 🐍</h1>
+            <button class="start-btn" data-en="Start Game">开始游戏</button>
             <div class="instructions">
-                <p>两条蛇各有10点生命值，撞到对方蛇身会扣血并缩短</p>
-                <p>活到最后的玩家获胜！</p>
-                
+                <p data-en="Each snake has 10 HP. Hitting the opponent's body reduces HP and shortens the snake">
+                    两条蛇各有10点生命值，撞到对方蛇身会扣血并缩短</p>
+                <p data-en="The last player standing wins!">活到最后的玩家获胜！</p>
+
                 <div class="player-instructions">
                     <div class="player-instruction player-1-instruction">
-                        <h3><i class="fas fa-fire"></i> 玩家1 (橙色)</h3>
-                        <p>使用WASD控制</p>
+                        <h3><i class="fas fa-fire"></i> <span data-en="Player 1 (Orange)">玩家1 (橙色)</span></h3>
+                        <p data-en="Use WASD to control">使用WASD控制</p>
                         <div>
                             <div class="key">W</div>
                             <div class="key">A</div>
@@ -129,10 +140,10 @@
                             <div class="key">D</div>
                         </div>
                     </div>
-                    
+
                     <div class="player-instruction player-2-instruction">
-                        <h3><i class="fas fa-tint"></i> 玩家2 (蓝色)</h3>
-                        <p>使用方向键控制</p>
+                        <h3><i class="fas fa-tint"></i> <span data-en="Player 2 (Blue)">玩家2 (蓝色)</span></h3>
+                        <p data-en="Use arrow keys to control">使用方向键控制</p>
                         <div>
                             <div class="key">↑</div>
                             <div class="key">←</div>
@@ -143,161 +154,166 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="particles" id="particles"></div>
-        
+
         <div id="game-board"></div>
-        
+
         <!-- 状态效果显示 -->
         <div class="status-effect player-1-effect" id="player1-effect"></div>
         <div class="status-effect player-2-effect" id="player2-effect"></div>
-        
-    <div class="game-over">
-        <h2 class="winner-banner" id="winner-banner">游戏结束!</h2>
-        <!-- 新增比分显示 -->
-        <div class="score-display">
-            <div id="winner-name">获胜者: <span id="winner-player"></span></div>
-            <div class="final-score" id="final-score">0:0</div>
-        </div>
-        <div class="buttons-container">
-            <button class="restart-btn upload-btn" id="upload-record">上传战绩</button>
-            <button class="restart-btn">再来一局</button>
-        </div>
-    </div>
-    </div>
-        <div class="score-board">
-            <div class="player-score player-1">
-                <div class="score-display">
-                    <span class="player-name" id="player1-name">玩家1: </span>
-                    <span class="score-text" id="score-1">0分</span>
-                </div>
-                <div class="health-display">
-                    <span>生命值: </span>
-                    <div class="health-bar">
-                        <div class="health-fill" id="health-1" style="width: 100%;"></div>
-                    </div>
-                    <span id="health-text-1">10HP</span>
-                </div>
-            </div>
-            <div class="player-score player-2">
-                <div class="score-display">
-                    <span class="player-name" id="player2-name">玩家2: </span>
-                    <span class="score-text" id="score-2">0分</span>
-                </div>
-                <div class="health-display">
-                    <span>生命值: </span>
-                    <div class="health-bar">
-                        <div class="health-fill" id="health-2" style="width: 100%;"></div>
-                    </div>
-                    <span id="health-text-2">10HP</span>
-                </div>
-            </div>
-        </div>
-        <div class="ball-storage player-1-storage">
-            <div id ="storage-title1" class="storage-title">玩家1储存:</div>
-            <div class="ball-slot" id="p1-slot-1"><span class="key-hint">1</span></div>
-            <div class="ball-slot" id="p1-slot-2"><span class="key-hint">2</span></div>
-            <div class="ball-slot" id="p1-slot-3"><span class="key-hint">3</span></div>
-            <div class="ball-slot" id="p1-slot-4"><span class="key-hint">4</span></div>
-            <div class="ball-slot" id="p1-slot-5"><span class="key-hint">5</span></div>
-        </div>
-        
-        <div class="ball-storage player-2-storage">
-            <div id ="storage-title2" class="storage-title">玩家2储存:</div>
-            <div class="ball-slot" id="p2-slot-1"><span class="key-hint">6</span></div>
-            <div class="ball-slot" id="p2-slot-2"><span class="key-hint">7</span></div>
-            <div class="ball-slot" id="p2-slot-3"><span class="key-hint">8</span></div>
-            <div class="ball-slot" id="p2-slot-4"><span class="key-hint">9</span></div>
-            <div class="ball-slot" id="p2-slot-5"><span class="key-hint">0</span></div>
-        </div>       
-        <!-- 角色选择界面 -->
-        <div class="character-selection">
-            <h2 class="selection-title">选择你的蛇</h2>
-            
-            <div class="player-selections">
-<div class="player-selection">
-    <div class="player-label" id="player-label1">玩家1 (橙色)</div>
-    <div class="snake-options">
-        <div class="snake-option speed-snake" data-player="1" data-type="speed">
-            <div class="snake-type" style="color: #FFD700;">
-                速度蛇 <span class="speed-rating">★★★★★</span>
-            </div>
-            <div class="snake-desc">
-                <span class="health-rating">生命: ★★☆☆☆</span> | 
-                <span class="magic-rating">魔法: ★☆☆☆☆</span>
-            </div>
-        </div>
-        
-        <div class="snake-option tough-snake" data-player="1" data-type="tough">
-            <div class="snake-type" style="color: #C0C0C0;">
-                坚硬蛇 <span class="health-rating">生命: ★★★★★</span>
-            </div>
-            <div class="snake-desc">
-                <span class="speed-rating">速度: ★★☆☆☆</span> | 
-                <span class="magic-rating">魔法: ★☆☆☆☆</span>
-            </div>
-        </div>
-        
-        <div class="snake-option magic-snake" data-player="1" data-type="magic">
-            <div class="snake-type" style="color: #9C27B0;">
-                魔法蛇 <span class="magic-rating">魔法: ★★★★★</span>
-            </div>
-            <div class="snake-desc">
-                <span class="health-rating">生命: ★★★☆☆</span> | 
-                <span class="speed-rating">速度: ★★★☆☆</span>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="player-selection">
-    <div class="player-label" id="player-label2">玩家2 (蓝色)</div>
-    <div class="snake-options">
-        <div class="snake-option speed-snake" data-player="2" data-type="speed">
-            <div class="snake-type" style="color: #FFD700;">
-                速度蛇 <span class="speed-rating">★★★★★</span>
+        <div class="game-over">
+            <h2 class="winner-banner" id="winner-banner" data-en="Game Over!">游戏结束!</h2>
+            <!-- 新增比分显示 -->
+            <div class="score-display">
+                <div id="winner-name"><span data-en="Winner: ">获胜者: </span><span id="winner-player"></span></div>
+                <div class="final-score" id="final-score">0:0</div>
             </div>
-            <div class="snake-desc">
-                <span class="health-rating">生命: ★★☆☆☆</span> | 
-                <span class="magic-rating">魔法: ★☆☆☆☆</span>
-            </div>
-        </div>
-        
-        <div class="snake-option tough-snake" data-player="2" data-type="tough">
-            <div class="snake-type" style="color: #C0C0C0;">
-                坚硬蛇 <span class="health-rating">生命: ★★★★★</span>
-            </div>
-            <div class="snake-desc">
-                <span class="speed-rating">速度: ★★☆☆☆</span> | 
-                <span class="magic-rating">魔法: ★☆☆☆☆</span>
-            </div>
-        </div>
-        
-        <div class="snake-option magic-snake" data-player="2" data-type="magic">
-            <div class="snake-type" style="color: #9C27B0;">
-                魔法蛇 <span class="magic-rating">魔法: ★★★★★</span>
-            </div>
-            <div class="snake-desc">
-                <span class="health-rating">生命: ★★★☆☆</span> | 
-                <span class="speed-rating">速度: ★★★☆☆</span>
+            <div class="buttons-container">
+                <button class="restart-btn upload-btn" id="upload-record" data-en="Upload Record">上传战绩</button>
+                <button class="restart-btn" data-en="Play Again">再来一局</button>
             </div>
         </div>
     </div>
-</div>  
-            
-            <button class="start-game-btn">开始游戏</button>
+    <div class="score-board">
+        <div class="player-score player-1">
+            <div class="score-display">
+                <span class="player-name" id="player1-name" data-en="Player 1: ">玩家1: </span>
+                <span class="score-text" id="score-1"><span data-en="0 points">0分</span></span>
+            </div>
+            <div class="health-display">
+                <span data-en="Health: ">生命值: </span>
+                <div class="health-bar">
+                    <div class="health-fill" id="health-1" style="width: 100%;"></div>
+                </div>
+                <span id="health-text-1">10HP</span>
+            </div>
         </div>
-                <!-- 添加到body的末尾 -->
+        <div class="player-score player-2">
+            <div class="score-display">
+                <span class="player-name" id="player2-name" data-en="Player 2: ">玩家2: </span>
+                <span class="score-text" id="score-2"><span data-en="0 points">0分</span></span>
+            </div>
+            <div class="health-display">
+                <span data-en="Health: ">生命值: </span>
+                <div class="health-bar">
+                    <div class="health-fill" id="health-2" style="width: 100%;"></div>
+                </div>
+                <span id="health-text-2">10HP</span>
+            </div>
+        </div>
+    </div>
+    <div class="ball-storage player-1-storage">
+        <div id="storage-title1" class="storage-title" data-en="Player 1 Storage:">玩家1储存:</div>
+        <div class="ball-slot" id="p1-slot-1"><span class="key-hint">1</span></div>
+        <div class="ball-slot" id="p1-slot-2"><span class="key-hint">2</span></div>
+        <div class="ball-slot" id="p1-slot-3"><span class="key-hint">3</span></div>
+        <div class="ball-slot" id="p1-slot-4"><span class="key-hint">4</span></div>
+        <div class="ball-slot" id="p1-slot-5"><span class="key-hint">5</span></div>
+    </div>
+
+    <div class="ball-storage player-2-storage">
+        <div id="storage-title2" class="storage-title" data-en="Player 2 Storage:">玩家2储存:</div>
+        <div class="ball-slot" id="p2-slot-1"><span class="key-hint">6</span></div>
+        <div class="ball-slot" id="p2-slot-2"><span class="key-hint">7</span></div>
+        <div class="ball-slot" id="p2-slot-3"><span class="key-hint">8</span></div>
+        <div class="ball-slot" id="p2-slot-4"><span class="key-hint">9</span></div>
+        <div class="ball-slot" id="p2-slot-5"><span class="key-hint">0</span></div>
+    </div>
+    <!-- 角色选择界面 -->
+    <div class="character-selection">
+        <h2 class="selection-title" data-en="Choose Your Snake">选择你的蛇</h2>
+
+        <div class="player-selections">
+            <div class="player-selection">
+                <div class="player-label" id="player-label1" data-en="Player 1 (Orange)">玩家1 (橙色)</div>
+                <div class="snake-options">
+                    <div class="snake-option speed-snake" data-player="1" data-type="speed">
+                        <div class="snake-type" style="color: #FFD700;">
+                            <span data-en="Speed Snake">速度蛇</span> <span class="speed-rating">★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="health-rating"><span data-en="Health: ">生命: </span>★★☆☆☆</span> |
+                            <span class="magic-rating"><span data-en="Magic: ">魔法: </span>★☆☆☆☆</span>
+                        </div>
+                    </div>
+
+                    <div class="snake-option tough-snake" data-player="1" data-type="tough">
+                        <div class="snake-type" style="color: #C0C0C0;">
+                            <span data-en="Hard Snake">坚硬蛇</span> <span class="health-rating"><span
+                                    data-en="Health: ">生命: </span>★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="speed-rating"><span data-en="Speed: ">速度: </span>★★☆☆☆</span> |
+                            <span class="magic-rating"><span data-en="Magic: ">魔法: </span>★☆☆☆☆</span>
+                        </div>
+                    </div>
+
+                    <div class="snake-option magic-snake" data-player="1" data-type="magic">
+                        <div class="snake-type" style="color: #9C27B0;">
+                            <span data-en="Magic Snake">魔法蛇</span> <span class="magic-rating"><span
+                                    data-en="Magic: ">魔法: </span>★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="health-rating"><span data-en="Health: ">生命: </span>★★★☆☆</span> |
+                            <span class="speed-rating"><span data-en="Speed: ">速度: </span>★★★☆☆</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="player-selection">
+                <div class="player-label" id="player-label2" data-en="Player 2 (Blue)">玩家2 (蓝色)</div>
+                <div class="snake-options">
+                    <div class="snake-option speed-snake" data-player="2" data-type="speed">
+                        <div class="snake-type" style="color: #FFD700;">
+                            <span data-en="Speed Snake">速度蛇</span> <span class="speed-rating">★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="health-rating"><span data-en="Health: ">生命: </span>★★☆☆☆</span> |
+                            <span class="magic-rating"><span data-en="Magic: ">魔法: </span>★☆☆☆☆</span>
+                        </div>
+                    </div>
+
+                    <div class="snake-option tough-snake" data-player="2" data-type="tough">
+                        <div class="snake-type" style="color: #C0C0C0;">
+                            <span data-en="Hard Snake">坚硬蛇</span> <span class="health-rating"><span
+                                    data-en="Health: ">生命: </span>★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="speed-rating"><span data-en="Speed: ">速度: </span>★★☆☆☆</span> |
+                            <span class="magic-rating"><span data-en="Magic: ">魔法: </span>★☆☆☆☆</span>
+                        </div>
+                    </div>
+
+                    <div class="snake-option magic-snake" data-player="2" data-type="magic">
+                        <div class="snake-type" style="color: #9C27B0;">
+                            <span data-en="Magic Snake">魔法蛇</span> <span class="magic-rating"><span
+                                    data-en="Magic: ">魔法: </span>★★★★★</span>
+                        </div>
+                        <div class="snake-desc">
+                            <span class="health-rating"><span data-en="Health: ">生命: </span>★★★☆☆</span> |
+                            <span class="speed-rating"><span data-en="Speed: ">速度: </span>★★★☆☆</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-game-btn" data-en="Start Game">开始游戏</button>
+        </div>
+        <!-- 添加到body的末尾 -->
         <div id="snake-details-modal" class="modal">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h2>蛇类特性详情</h2>
+                <h2 data-en="Snake Details">蛇类特性详情</h2>
                 <div id="snake-details-content"></div>
             </div>
         </div>
         <!-- 添加到body的合适位置 -->
-<!-- 在HTML文件的合适位置（比如在records-modal之后）添加统计数据模态框 -->
-<script src="./snakegamepro.js"></script>
+        <!-- 在HTML文件的合适位置（比如在records-modal之后）添加统计数据模态框 -->
+        <script src="./snakegamepro.js"></script>
 
 </body>
+
 </html>

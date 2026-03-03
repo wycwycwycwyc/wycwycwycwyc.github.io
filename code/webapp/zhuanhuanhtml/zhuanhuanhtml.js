@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
             reader.readAsBinaryString(file);
           } else {
-            alert('请只拖拽XLS文件。');
+            alert(getLocalizedText('请只拖拽XLS文件。', 'Please only drag and drop XLS files.'));
           }
         }
       }
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let filesProcessed = 0;
 
         function downloadAndAddToZip(link, fileName) {
-          Qmsg.success("已开启下载");
+          Qmsg.success(getLocalizedText("已开启下载", "Download started"));
           fetch(link.href)
             .then(response => response.blob())
             .then(blob => {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
               if (filesProcessed === links.length) {
                 // 所有文件处理完毕，触发zip下载
                 zip.generateAsync({ type: "blob" }).then(function (content) {
-                  saveAs(content, "你的xlsx文件.zip");
+                  saveAs(content, getLocalizedText("你的xlsx文件.zip", "your_xlsx_files.zip"));
                 });
               }
             })
