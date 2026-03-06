@@ -404,5 +404,19 @@
       "zh": "大多数界面支持英语和中文两种语言",
       "en": "Most interfaces now support both English and Chinese languages"
     }
+  },
+  "update18": {
+    "time": {
+      "zh": "2026年3月6日",
+      "en": "March 6, 2026"
+    },
+    "title": {
+      "zh": "适配",
+      "en": "Adaptation"
+    },
+    "text1": {
+      "zh": "语言英语进一步适配",
+      "en": "Further English language adaptation"
+    }
   }
 }

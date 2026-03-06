@@ -1234,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function newtable(isnewtable) {
     // 使用静态方法
     if (isnewtable === 1) {
-        loading = Qmsg.loading("正在重新加载用户列表");
+        loading = Qmsg.loading(getLocalizedText("正在重新加载用户列表", "Reloading user list..."));
     }
     fetch(`${serverurl}/users?userid=${localStorage.getItem('userid')}`)
         .then(response => {
@@ -1249,12 +1249,12 @@ function newtable(isnewtable) {
                 userTableContainer.innerHTML = '';
                 createTable(data.data);
                 loading.close();
-                Qmsg.success("用户列表加载成功");
+                Qmsg.success(getLocalizedText("用户列表加载成功", "User list loaded successfully"));
             }
         })
         .catch(error => {
             console.error('请求失败:', error);
-            showError('系统繁忙，请稍后再试');
+            showError(getLocalizedText('系统繁忙，请稍后再试', 'System busy, please try again later'));
         });
 }
 function createTable(users, isicon, input) {
@@ -1346,72 +1346,91 @@ function createRow(user, index, users, isicon, input) {
     buttonTd.appendChild(circleButton);
 
     // 将圆形按钮单元格添加到行的开头
-    tr.appendChild(buttonTd);
-    const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin' || localStorage.getItem('usertype') === 'user';
-    let isSuperAdmin = user.type === 'superadmin'; // 检查用户是否是 superadmin
-    let isAndmin = user.type === 'admin'; // 检查用户是否是 admin
-    Object.values(user).forEach((text, i) => {
-        const td = document.createElement('td');
-        if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && i !== 0 && localStorage.getItem('username') !== user.username) {
-            // 如果当前用户是 admin 且用户是 superadmin，则隐藏信息（除了用户名）
-            td.textContent = i === 0 || i === 3 ? text : '错误:拒绝访问';
-            td.style.color = i === 0 || i === 3 ? null : 'red';
-            td.style.pointerEvents = 'none'; // 使单元格不可点击
-        } else {
-            td.textContent = text;
+tr.appendChild(buttonTd);
+const isCurrentUserAdmin = localStorage.getItem('usertype') === 'admin' || localStorage.getItem('usertype') === 'user';
+let isSuperAdmin = user.type === 'superadmin'; // 检查用户是否是 superadmin
+let isAndmin = user.type === 'admin'; // 检查用户是否是 admin
+Object.values(user).forEach((text, i) => {
+    const td = document.createElement('td');
+    if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && i !== 0 && localStorage.getItem('username') !== user.username) {
+        // 如果当前用户是 admin 且用户是 superadmin，则隐藏信息（除了用户名）
+        td.textContent = i === 0 || i === 3 ? text : '错误:拒绝访问';
+        if (i !== 0 && i !== 3) {
+            td.setAttribute('data-en', 'Error: Access Denied');
         }
-        tr.appendChild(td);
-    });
-    const switchUserIdTd = document.createElement('td');
-    const switchUserIdButton = document.createElement('button');
-    switchUserIdButton.textContent = '切换';
-    switchUserIdButton.style.width = 'auto';
-    switchUserIdButton.className = 'custom-button';
-    switchUserIdButton.onclick = function () {
-        storeUserId(index, users, user);
-    };
-    switchUserIdTd.appendChild(switchUserIdButton);
-    // 添加编辑按钮和链接
-    const editTd = document.createElement('td');
-    const editButton = document.createElement('button');
-    if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && localStorage.getItem('username') !== user.username) {
-        // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则禁用编辑按钮
-        editButton.disabled = true;
-        editButton.textContent = '不可编辑';
+        td.style.color = i === 0 || i === 3 ? null : 'red';
+        td.style.pointerEvents = 'none'; // 使单元格不可点击
     } else {
-        editButton.textContent = '编辑';
-        editButton.style.width = 'auto';
-        editButton.className = 'custom-button';
-        editButton.setAttribute('id', `editButton-${user.username}`); // 给每个按钮一个唯一 ID（可选）
-
-        // 使用闭包绑定 index，确保点击时能正确获取
-        editButton.onclick = (function (idx) {
-            return function () {
-                editUser(idx, users); // 这里的 idx 就是创建时的 index
-            };
-        })(index);
+        td.textContent = text;
     }
-    editTd.appendChild(editButton);
+    tr.appendChild(td);
+});
+const switchUserIdTd = document.createElement('td');
+const switchUserIdButton = document.createElement('button');
+switchUserIdButton.textContent = '切换';
+switchUserIdButton.setAttribute('data-en', 'Switch');
+switchUserIdButton.style.width = 'auto';
+switchUserIdButton.className = 'custom-button';
+switchUserIdButton.onclick = function () {
+    storeUserId(index, users, user);
+};
+switchUserIdTd.appendChild(switchUserIdButton);
+// 添加编辑按钮和链接
+const editTd = document.createElement('td');
+const editButton = document.createElement('button');
+if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && localStorage.getItem('username') !== user.username) {
+    // 如果当前用户是 admin 且正在编辑的用户是 superadmin，则禁用编辑按钮
+    editButton.disabled = true;
+    editButton.textContent = '不可编辑';
+    editButton.setAttribute('data-en', 'Not Editable');
+} else {
+    editButton.textContent = '编辑';
+    editButton.setAttribute('data-en', 'Edit');
+    editButton.style.width = 'auto';
+    editButton.className = 'custom-button';
+    editButton.setAttribute('id', `editButton-${user.username}`); // 给每个按钮一个唯一 ID（可选）
 
-    // 创建链接
-    const customLink = document.createElement('a');
-    customLink.textContent = '×';
-    customLink.display = 'inline';
-    customLink.style.color = 'red';
-    customLink.style.fontSize = '30px';
-    customLink.style.marginLeft = '10px'; // 设置右边距为10像素
-    customLink.style.textDecoration = 'none'; // 去掉下划线
-    if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && localStorage.getItem('username') !== user.username) {
-        // 如果当前用户是 admin 且正在操作的用户是 superadmin，则禁用链接
-        customLink.style.color = 'grey';
-        customLink.onclick = function (event) {
-            event.preventDefault(); // 阻止链接的默认行为
-            Swal.fire("错误:拒绝访问", "错误:拒绝访问", "error");
+    // 使用闭包绑定 index，确保点击时能正确获取
+    editButton.onclick = (function (idx) {
+        return function () {
+            editUser(idx, users); // 这里的 idx 就是创建时的 index
         };
-    } else {
-        customLink.className = 'custom-link';
-        const currentType = localStorage.getItem('usertype'); // 获取当前用户类型
-        const newType = user.type; // 这里替换为实际的要更改的用户类型
+    })(index);
+}
+editTd.appendChild(editButton);
+
+// 创建链接
+const customLink = document.createElement('a');
+customLink.textContent = '×';
+customLink.display = 'inline';
+customLink.style.color = 'red';
+customLink.style.fontSize = '30px';
+customLink.style.marginLeft = '10px'; // 设置右边距为10像素
+customLink.style.textDecoration = 'none'; // 去掉下划线
+if (isCurrentUserAdmin && (isSuperAdmin || isAndmin) && localStorage.getItem('username') !== user.username) {
+    // 如果当前用户是 admin 且正在操作的用户是 superadmin，则禁用链接
+    customLink.style.color = 'grey';
+    customLink.onclick = function (event) {
+        event.preventDefault(); // 阻止链接的默认行为
+        Swal.fire({
+            title: '错误:拒绝访问',
+            text: '错误:拒绝访问',
+            icon: 'error'
+        });
+        // 为 Swal 按钮添加 data-en 属性（如果需要）
+        setTimeout(() => {
+            const swalConfirmButton = document.querySelector('.swal2-confirm');
+            if (swalConfirmButton) {
+                swalConfirmButton.setAttribute('data-en', 'OK');
+            }
+        }, 100);
+    };
+} else {
+    customLink.className = 'custom-link';
+    const currentType = localStorage.getItem('usertype'); // 获取当前用户类型
+    const newType = user.type; // 这里替换为实际的要更改的用户类型
+    // ... 原有删除逻辑保持不变
+
 
         // 将当前用户类型和要更改的用户类型添加到 updatedUserInfo 对象中
         customLink.onclick = function () {
@@ -1454,14 +1473,26 @@ Swal.fire({
         .then(data => {
             if (data.success) {
                 newtable();
-                Swal.fire("用户删除成功", "此用户将不能登录", "success");
+                Swal.fire({
+                    title: getLocalizedText("用户删除成功", "User deleted successfully"),
+                    text: getLocalizedText("此用户将不能登录", "This user will not be able to login"),
+                    icon: "success"
+                });
             } else {
-                Swal.fire("用户删除失败", data.message, "error");
+                Swal.fire({
+                    title: getLocalizedText("用户删除失败", "User deletion failed"),
+                    text: data.message,
+                    icon: "error"
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            Swal.fire("删除用户时发生错误，请稍后重试。", "删除用户时发生错误，请稍后重试。", "error");
+            Swal.fire({
+                title: getLocalizedText("删除用户时发生错误", "Error occurred while deleting user"),
+                text: getLocalizedText("请稍后重试。", "Please try again later."),
+                icon: "error"
+            });
         });
     }
     // else 部分已完全移除 - 用户点击取消时不执行任何操作

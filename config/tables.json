@@ -31,7 +31,7 @@
         "zh": "能够批量将同一文件夹下的xls文件转换为xlsx",
         "en": "Batch convert xls files to xlsx in the same folder"
       },
-      "view": "/code.html?title=基础数据转换&file=/code/python/zhuanhuan.py"
+      "path": "/code/python/zhuanhuan.py"
     },
     "script2": {
       "name": {
@@ -39,14 +39,14 @@
         "en": "Basic Data Processing"
       },
       "Introduction": {
-        "zh": "用于基础数据的转换处理，比基础数据转换高效",
-        "en": "For basic data processing, more efficient than Basic Data Conversion"
+        "zh": "用于基础数据的转换处理",
+        "en": "For basic data processing"
       },
       "note": {
         "zh": "高效地批量将同一文件夹下的xls文件转换为xlsx，附带填写周报功能",
         "en": "Efficiently batch convert xls files to xlsx in the same folder, with weekly report filling feature"
       },
-      "view": "/code.html?title=基础数据处理&file=/code/python/chuli.py"
+      "path": "/code/python/chuli.py"
     },
     "script3": {
       "name": {
@@ -61,7 +61,7 @@
         "zh": "适用于一般抢票需求。",
         "en": "Suitable for general ticket grabbing needs."
       },
-      "view": "/code.html?title=抢车票（普通版）&file=/code/python/qiangchepiao.py"
+      "path": "/code/python/qiangchepiao.py"
     },
     "script4": {
       "name": {
@@ -76,7 +76,7 @@
         "zh": "适用于高级抢票需求。",
         "en": "Suitable for advanced ticket grabbing needs."
       },
-      "view": "/code.html?title=抢车票（升级版）&file=/code/python/qiangchepiao1.py"
+      "path": "/code/python/qiangchepiao1.py"
     },
     "script5": {
       "name": {
@@ -91,7 +91,7 @@
         "zh": "可精细的控制计算机上的进程、服务,附带映像劫持功能",
         "en": "Precisely control processes and services on computer, with image hijacking feature"
       },
-      "view": "/code.html?title=进程管理&file=/code/python/jincheng.py"
+      "path": "/code/python/jincheng.py"
     },
     "script6": {
       "name": {
@@ -99,14 +99,14 @@
         "en": "Multi-function Intelligent Sorting System"
       },
       "Introduction": {
-        "zh": "智能排序：一键排序，支持多种算法，文件导入",
-        "en": "Intelligent sorting: one-click sort, supports multiple algorithms, file import"
+        "zh": "智能排序",
+        "en": "Intelligent sorting"
       },
       "note": {
         "zh": "本程序集成多种算法,支持手动输入,文件导入,执行升序降序排列。",
         "en": "This program integrates multiple algorithms, supports manual input, file import, ascending and descending sorting."
       },
-      "view": "/code.html?title=多功能智能排序系统&file=/code/python/paixv.py"
+      "path": "/code/python/paixv.py"
     },
     "script7": {
       "name": {
@@ -121,7 +121,7 @@
         "zh": "本程序有一键锁定电脑，动态密码验证，防止暴力破解，普通应用启动",
         "en": "One-click lock, dynamic password verification, brute force protection, normal app launch"
       },
-      "view": "/code.html?title=电脑锁定系统&file=/code/python/lockpc.py"
+      "path": "/code/python/lockpc.py"
     },
     "script8": {
       "name": {
@@ -136,7 +136,7 @@
         "zh": "本程序的功能为开发者设计，如有需求可自行修改使用",
         "en": "Designed for developers, can be modified as needed"
       },
-      "view": "/code.html?title=图片裁剪合并专用&file=/code/python/image_process.py"
+      "path": "/code/python/image_process.py"
     },
     "script9": {
       "name": {
@@ -151,7 +151,7 @@
         "zh": "速度极快，具有选择输出格式，选择线程数等功能，还可以随时暂停",
         "en": "Very fast, supports output format selection, thread count selection, and can pause anytime"
       },
-      "view": "/code.html?title=多线程视频帧提取器&file=/code/python/FrameExtractor.py"
+      "path": "/code/python/FrameExtractor.py"
     }
   },
   "C++": {
@@ -186,7 +186,7 @@
         "zh": "本程序集成多种算法，支持手动输入与文件导入，自动执行升序降序排列。",
         "en": "This program integrates multiple algorithms, supports manual input and file import, automatically performs ascending and descending sorting."
       },
-      "view": "/code.html?title=多功能智能排序系统&file=/code/cpp/paixv.cpp"
+      "path": "/code/cpp/paixv.cpp"
     },
     "script2": {
       "name": {
@@ -201,7 +201,7 @@
         "zh": "可以设置发送次数、间隔和是否添加序号",
         "en": "Can set send count, interval, and whether to add sequence numbers"
       },
-      "view": "/code.html?title=消息自动发送器&file=/code/cpp/MessageSender.cpp"
+      "path": "/code/cpp/MessageSender.cpp"
     },
     "script3": {
       "name": {
@@ -216,7 +216,7 @@
         "zh": "可以设置点击间隔和持续时间，支持按键停止",
         "en": "Can set click interval and duration, supports key to stop"
       },
-      "view": "/code.html?title=鼠标连点器&file=/code/cpp/AutoClicker.cpp"
+      "path": "/code/cpp/AutoClicker.cpp"
     }
   },
   "WebApp": {
@@ -251,7 +251,7 @@
         "zh": "支持基本运算，科学运算，函数画图等功能，不需下载，是网页计算的不错选择",
         "en": "Supports basic operations, scientific calculations, function graphing, no download required, great choice for web calculations"
       },
-      "view": "/code/webapp/calculator"
+      "path": "/code/webapp/calculator"
     },
     "tool2": {
       "name": {
@@ -266,7 +266,7 @@
         "zh": "比基础数据转换更快",
         "en": "Faster than Basic Data Conversion"
       },
-      "view": "/code/webapp/zhuanhuanhtml"
+      "path": "/code/webapp/zhuanhuanhtml"
     },
     "tool3": {
       "name": {
@@ -281,7 +281,7 @@
         "zh": "可以实时生成动态密码给用户解锁",
         "en": "Generates dynamic passwords in real-time for user unlock"
       },
-      "view": "/code/webapp/unlockpc"
+      "path": "/code/webapp/unlockpc"
     },
     "tool4": {
       "name": {
@@ -296,7 +296,7 @@
         "zh": "可以在线游玩，无需下载，记录分数",
         "en": "Play online, no download required, score tracking"
       },
-      "view": "/code/webapp/snakegame"
+      "path": "/code/webapp/snakegame"
     },
     "tool5": {
       "name": {
@@ -311,7 +311,7 @@
         "zh": "可以在线游玩，无需下载，记录分数",
         "en": "Play online, no download required, score tracking"
       },
-      "view": "/code/webapp/snakegamepro/snakegamepro.html"
+      "path": "/code/webapp/snakegamepro/snakegamepro.html"
     },
     "tool6": {
       "name": {
@@ -326,7 +326,7 @@
         "zh": "可以在线游玩，无需下载，记录分数",
         "en": "Play online, no download required, score tracking"
       },
-      "view": "/code/webapp/snakegame3Dpro/snakegame3Dpro.html"
+      "path": "/code/webapp/snakegame3Dpro/snakegame3Dpro.html"
     },
     "tool7": {
       "name": {
@@ -341,7 +341,7 @@
         "zh": "可以预览旧版网站，回忆网站发展历程",
         "en": "Preview old versions of the website, recall the development history"
       },
-      "view": "/code/webapp/oldwebsite"
+      "path": "/code/webapp/oldwebsite"
     }    
   }
 }

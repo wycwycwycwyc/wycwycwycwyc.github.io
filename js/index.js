@@ -1001,11 +1001,11 @@ function createTablesFromJSON(data) {
             headers.forEach(header => {
                 const td = document.createElement('td');
 
-                if (header === 'view' && rowData[header]) {
+                if (header === 'view') {
                     const button = document.createElement('button');
                     button.className = 'custom-button';
                     
-                    // 设置按钮文本
+                    // 获取查看按钮的文本
                     const viewInfo = tableData.row1.view;
                     if (typeof viewInfo === 'object') {
                         button.textContent = viewInfo[lang];
@@ -1015,20 +1015,24 @@ function createTablesFromJSON(data) {
                         button.setAttribute('data-en', 'View');
                     }
 
-                    const viewUrl = rowData[header];
-                    if (viewUrl.includes('?')) {
-                        const urlParts = viewUrl.split('?');
-                        const urlParams = new URLSearchParams(urlParts[1]);
-                        const title = urlParams.get('title');
-                        const file = urlParams.get('file');
-
-                        button.onclick = function() {
-                            openPage(`/code.html?title=${encodeURIComponent(title)}&file=${encodeURIComponent(file)}`);
-                        };
-                    } else {
-                        button.onclick = function() {
-                            openPage(viewUrl);
-                        };
+                    // 根据是否有path字段构建URL
+                    if (rowData.path) {
+                        // 检查是否是代码文件（需要显示code.html）
+                        if (rowData.path.endsWith('.py') || rowData.path.endsWith('.cpp')) {
+                            const nameObj = rowData.name;
+                            const title = typeof nameObj === 'object' ? nameObj[lang] : nameObj;
+                            const encodedTitle = encodeURIComponent(title);
+                            const url = `/code.html?title=${encodedTitle}&file=${rowData.path}`;
+                            
+                            button.onclick = function() {
+                                openPage(url);
+                            };
+                        } else {
+                            // 直接跳转到path
+                            button.onclick = function() {
+                                openPage(rowData.path);
+                            };
+                        }
                     }
 
                     td.appendChild(button);

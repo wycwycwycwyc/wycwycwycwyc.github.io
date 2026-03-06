@@ -281,18 +281,18 @@ let lastImmunityDashTime = {
 const storeItems = [
     {
         id: 'shield',
-        name: '能量护盾',
-        description: '获得10点护盾值，优先抵挡伤害',
+        name: getLocalizedText('能量护盾', 'Energy Shield'),
+        description: getLocalizedText('获得10点护盾值，优先抵挡伤害', 'Gain 10 shield points that absorb damage first'),
         price: 400,
         icon: '🛡️',
         color: '#00BCD4',
         type: 'shield',
-        maxLevel: 1  // 只能购买一次
+        maxLevel: 1
     },
     {
         id: 'random_balls',
-        name: '随机魔法球礼包',
-        description: '获得3个随机魔法球 (攻击/血球/无敌/反转/炸弹)',
+        name: getLocalizedText('随机魔法球礼包', 'Random Magic Ball Pack'),
+        description: getLocalizedText('获得3个随机魔法球 (攻击/血球/无敌/反转/炸弹)', 'Get 3 random magic balls (Attack/Health/Immunity/Reverse/Bomb)'),
         price: 400,
         icon: '🎁',
         color: '#9C27B0',
@@ -300,8 +300,8 @@ const storeItems = [
     },
     {
         id: 'speed_upgrade',
-        name: '速度属性升级',
-        description: '永久增加移动速度15% (最多叠加2次)',
+        name: getLocalizedText('速度属性升级', 'Speed Upgrade'),
+        description: getLocalizedText('永久增加移动速度15% (最多叠加2次)', 'Permanently increase movement speed by 15% (max 2 times)'),
         price: 500,
         icon: '⚡',
         color: '#FFD700',
@@ -310,8 +310,8 @@ const storeItems = [
     },
     {
         id: 'tough_upgrade',
-        name: '坚硬属性升级',
-        description: '永久增加生命值上限2点 (最多叠加2次)',
+        name: getLocalizedText('坚硬属性升级', 'Tough Upgrade'),
+        description: getLocalizedText('永久增加生命值上限2点 (最多叠加2次)', 'Permanently increase max HP by 2 (max 2 times)'),
         price: 500,
         icon: '🛡️',
         color: '#C0C0C0',
@@ -320,8 +320,8 @@ const storeItems = [
     },
     {
         id: 'magic_upgrade',
-        name: '魔法属性升级',
-        description: '永久延长特殊效果时间20% (最多叠加2次)',
+        name: getLocalizedText('魔法属性升级', 'Magic Upgrade'),
+        description: getLocalizedText('永久延长特殊效果时间20% (最多叠加2次)', 'Permanently extend special effect duration by 20% (max 2 times)'),
         price: 500,
         icon: '✨',
         color: '#2196F3',
@@ -441,7 +441,7 @@ function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
     if (!gameStarted || health[snakeId] <= 0) return false;
     
     const otherSnakeId = snakeId === 'snake1' ? 'snake2' : 'snake1';
-    const snakeName = snakeId === 'snake1' ? '玩家1' : '玩家2';
+    const snakeName = snakeId === 'snake1' ? getLocalizedText('玩家1', 'Player 1') : getLocalizedText('玩家2', 'Player 2');
     const head = snakes[snakeId][0];
     
     // === 第一步：记录原始伤害（无论是否被抵挡）===
@@ -471,7 +471,7 @@ function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
         gameStats[snakeId].shieldDamageAbsorbed += damageToShield;
         
         // 显示护盾抵挡提示
-        showNotice(`护盾抵挡${damageToShield}点伤害`, '#00BCD4', head.x, head.y);
+        showNotice(getLocalizedText(`护盾抵挡${damageToShield}点伤害`, `Shield absorbed ${damageToShield} damage`), '#00BCD4', head.x, head.y);
         createParticles(head.x + 10, head.y + 10, damageToShield * 2, '#00BCD4');
         
         // 更新护盾显示
@@ -490,7 +490,7 @@ function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
         if (shield.health <= 0) {
             shield.active = false;
             shield.health = 0;
-            showNotice('护盾被打破!', '#FF5722', head.x, head.y);
+            showNotice(getLocalizedText('护盾被打破!', 'Shield Broken!'), '#FF5722', head.x, head.y);
             createParticles(head.x + 10, head.y + 10, 20, '#FF5722');
             
             // 更新护盾显示
@@ -520,7 +520,7 @@ function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
             });
         }
         
-        console.log(`${snakeName}的护盾抵挡了${damageToShield}点${source}伤害`);
+        console.log(`${snakeName}${getLocalizedText('的护盾抵挡了', '\'s shield absorbed')}${damageToShield}${getLocalizedText('点', ' points of ')}${source}${getLocalizedText('伤害', ' damage')}`);
         return true;
     }
     
@@ -544,66 +544,66 @@ function applyDamage(snakeId, damage, source = 'unknown', details = {}) {
         gameStats[snakeId].immuneBlocks++;
         
         // 显示免疫提示
-        showNotice('免疫伤害!', '#FFFF00', head.x, head.y);
+        showNotice(getLocalizedText('免疫伤害!', 'Immune!'), '#FFFF00', head.x, head.y);
         createParticles(head.x + 10, head.y + 10, 15, '#FFFF00');
         
-        console.log(`${snakeName}免疫了${damage}点${source}伤害`);
+        console.log(`${snakeName}${getLocalizedText('免疫了', ' immune to ')}${damage}${getLocalizedText('点', ' points of ')}${source}${getLocalizedText('伤害', ' damage')}`);
         return false;
     }
     
     // === 第四步：检查坚硬蛇特性 ===
     let finalDamage = damage;
     const isToughSnake = snakeId === 'snake1' ? snakeTypes.snake1 === 'tough' : snakeTypes.snake2 === 'tough';
-    let isToughImmune = false;
     let isToughReduced = false;
     
-// 完整修复后的坚硬蛇伤害处理逻辑
-if (isToughSnake) {
-    // 检查是否是子弹类伤害
-    const isBulletType = source === 'bullet' || source === 'base';
-    
-    if (isBulletType) {
-        // 对子弹类伤害有50%概率免疫
-        if (Math.random() < 0.5) {
-            const bulletTypeName = source === 'bullet' ? '子弹' : '基地子弹';
-            
-            // 记录免疫统计
-            if (!gameStats[snakeId].toughImmuneDamagePrevented) {
-                gameStats[snakeId].toughImmuneDamagePrevented = {};
-            }
-            if (!gameStats[snakeId].toughImmuneDamagePrevented[source]) {
-                gameStats[snakeId].toughImmuneDamagePrevented[source] = 0;
-            }
-            gameStats[snakeId].toughImmuneDamagePrevented[source] += damage;
-            
-            if (!gameStats[snakeId].toughImmuneBlocks) {
-                gameStats[snakeId].toughImmuneBlocks = 0;
-            }
-            gameStats[snakeId].toughImmuneBlocks++;
-            
-            showNotice(`坚硬免疫${bulletTypeName}!`, '#C0C0C0', head.x, head.y);
-            createParticles(head.x + 10, head.y + 10, 15, '#C0C0C0');
-            return false;
-        }
-    } else {
-        // 对非子弹类伤害减半
-        const originalDamage = damage;
-        finalDamage = Math.ceil(damage / 2);
+    // 完整修复后的坚硬蛇伤害处理逻辑
+    if (isToughSnake) {
+        // 检查是否是子弹类伤害
+        const isBulletType = source === 'bullet' || source === 'base';
         
-        // 记录减伤统计
-        if (!gameStats[snakeId].toughReducedDamage) {
-            gameStats[snakeId].toughReducedDamage = {};
-        }
-        if (!gameStats[snakeId].toughReducedDamage[source]) {
-            gameStats[snakeId].toughReducedDamage[source] = 0;
-        }
-        gameStats[snakeId].toughReducedDamage[source] += (originalDamage - finalDamage);
-        
-        if (finalDamage < damage) {
-            showNotice(`坚硬减伤! (-${finalDamage}HP)`, '#C0C0C0', head.x, head.y);
+        if (isBulletType) {
+            // 对子弹类伤害有50%概率免疫
+            if (Math.random() < 0.5) {
+                const bulletTypeName = source === 'bullet' ? getLocalizedText('子弹', 'bullet') : getLocalizedText('基地子弹', 'base bullet');
+                
+                // 记录免疫统计
+                if (!gameStats[snakeId].toughImmuneDamagePrevented) {
+                    gameStats[snakeId].toughImmuneDamagePrevented = {};
+                }
+                if (!gameStats[snakeId].toughImmuneDamagePrevented[source]) {
+                    gameStats[snakeId].toughImmuneDamagePrevented[source] = 0;
+                }
+                gameStats[snakeId].toughImmuneDamagePrevented[source] += damage;
+                
+                if (!gameStats[snakeId].toughImmuneBlocks) {
+                    gameStats[snakeId].toughImmuneBlocks = 0;
+                }
+                gameStats[snakeId].toughImmuneBlocks++;
+                
+                showNotice(getLocalizedText(`坚硬免疫${bulletTypeName}!`, `Tough immune to ${bulletTypeName}!`), '#C0C0C0', head.x, head.y);
+                createParticles(head.x + 10, head.y + 10, 15, '#C0C0C0');
+                return false;
+            }
+        } else {
+            // 对非子弹类伤害减半
+            const originalDamage = damage;
+            finalDamage = Math.ceil(damage / 2);
+            
+            // 记录减伤统计
+            if (!gameStats[snakeId].toughReducedDamage) {
+                gameStats[snakeId].toughReducedDamage = {};
+            }
+            if (!gameStats[snakeId].toughReducedDamage[source]) {
+                gameStats[snakeId].toughReducedDamage[source] = 0;
+            }
+            gameStats[snakeId].toughReducedDamage[source] += (originalDamage - finalDamage);
+            
+            if (finalDamage < damage) {
+                showNotice(getLocalizedText(`坚硬减伤! (-${finalDamage}HP)`, `Tough reduced! (-${finalDamage}HP)`), '#C0C0C0', head.x, head.y);
+            }
         }
     }
-}
+    
     // === 第五步：应用实际伤害 ===
     health[snakeId] = Math.max(0, health[snakeId] - finalDamage);
     
@@ -614,21 +614,21 @@ if (isToughSnake) {
     let damageMessage = `-${finalDamage}HP`;
     if (source !== 'unknown') {
         const sourceNames = {
-            'wall': '撞墙',
-            'snakeCollision': '蛇相撞',
-            'bullet': '子弹',
-            'base': '基地防御',
-            'lava': '岩浆',
-            'home': '敌方基地',
-            'bomb': '炸弹'
+            'wall': getLocalizedText('撞墙', 'wall'),
+            'snakeCollision': getLocalizedText('蛇相撞', 'collision'),
+            'bullet': getLocalizedText('子弹', 'bullet'),
+            'base': getLocalizedText('基地防御', 'base'),
+            'lava': getLocalizedText('岩浆', 'lava'),
+            'home': getLocalizedText('敌方基地', 'enemy base'),
+            'bomb': getLocalizedText('炸弹', 'bomb')
         };
         damageMessage += ` (${sourceNames[source] || source})`;
     }
     
     // 添加备注信息
     const notes = [];
-    if (details.shieldBroken) notes.push('破盾后');
-    if (isToughReduced) notes.push('坚硬减伤');
+    if (details.shieldBroken) notes.push(getLocalizedText('破盾后', 'after shield'));
+    if (isToughReduced) notes.push(getLocalizedText('坚硬减伤', 'tough reduced'));
     if (notes.length > 0) {
         damageMessage += ` (${notes.join('+')})`;
     }
@@ -646,55 +646,54 @@ if (isToughSnake) {
     gameStats[snakeId].totalDamageReceived += finalDamage;
     
     // 记录输出伤害统计（如果有攻击者）
-// 在applyDamage函数中找到输出伤害统计部分，确保存在
-// === 记录输出伤害统计（如果有攻击者）===
-if (details.attacker) {
-    const attackerSnakeId = details.attacker === 'snake1' ? 'snake1' : 'snake2';
+    if (details.attacker) {
+        const attackerSnakeId = details.attacker === 'snake1' ? 'snake1' : 'snake2';
+        
+        // 记录攻击者的原始伤害输出
+        if (!gameStats[attackerSnakeId].originalDamageDealt) {
+            gameStats[attackerSnakeId].originalDamageDealt = {};
+        }
+        if (!gameStats[attackerSnakeId].originalDamageDealt[source]) {
+            gameStats[attackerSnakeId].originalDamageDealt[source] = 0;
+        }
+        gameStats[attackerSnakeId].originalDamageDealt[source] += damage;
+        
+        // 记录攻击者的实际伤害输出
+        if (!gameStats[attackerSnakeId].damageDealt) {
+            gameStats[attackerSnakeId].damageDealt = {};
+        }
+        if (!gameStats[attackerSnakeId].damageDealt[source]) {
+            gameStats[attackerSnakeId].damageDealt[source] = 0;
+        }
+        gameStats[attackerSnakeId].damageDealt[source] += finalDamage;
+        gameStats[attackerSnakeId].totalDamageDealt += finalDamage;
+        gameStats[attackerSnakeId].totalOriginalDamageDealt += damage;
+    }
     
-    // 记录攻击者的原始伤害输出
-    if (!gameStats[attackerSnakeId].originalDamageDealt) {
-        gameStats[attackerSnakeId].originalDamageDealt = {};
-    }
-    if (!gameStats[attackerSnakeId].originalDamageDealt[source]) {
-        gameStats[attackerSnakeId].originalDamageDealt[source] = 0;
-    }
-    gameStats[attackerSnakeId].originalDamageDealt[source] += damage;
-    
-    // 记录攻击者的实际伤害输出
-    if (!gameStats[attackerSnakeId].damageDealt) {
-        gameStats[attackerSnakeId].damageDealt = {};
-    }
-    if (!gameStats[attackerSnakeId].damageDealt[source]) {
-        gameStats[attackerSnakeId].damageDealt[source] = 0;
-    }
-    gameStats[attackerSnakeId].damageDealt[source] += finalDamage;
-    gameStats[attackerSnakeId].totalDamageDealt += finalDamage;
-    gameStats[attackerSnakeId].totalOriginalDamageDealt += damage;
-}
     // === 第七步：检查死亡 ===
     if (health[snakeId] <= 0) {
         // 设置死亡原因
         const causeNames = {
-            'wall': '撞墙而死',
-            'snakeCollision': '蛇相撞而死',
-            'bullet': '被子弹击中',
-            'base': '被基地防御系统击杀',
-            'lava': '被岩浆烧死',
-            'home': '在对方基地中致死',
-            'bomb': '被炸弹炸死'
+            'wall': getLocalizedText('撞墙而死', 'Died from wall'),
+            'snakeCollision': getLocalizedText('蛇相撞而死', 'Died from collision'),
+            'bullet': getLocalizedText('被子弹击中', 'Shot by bullet'),
+            'base': getLocalizedText('被基地防御系统击杀', 'Killed by base defense'),
+            'lava': getLocalizedText('被岩浆烧死', 'Burned by lava'),
+            'home': getLocalizedText('在对方基地中致死', 'Died in enemy base'),
+            'bomb': getLocalizedText('被炸弹炸死', 'Killed by bomb')
         };
         
-        deathCause[snakeId] = causeNames[source] || '未知原因死亡';
+        deathCause[snakeId] = causeNames[source] || getLocalizedText('未知原因死亡', 'Unknown cause of death');
         
         // 添加备注信息
         const deathNotes = [];
-        if (details.shieldBroken) deathNotes.push('护盾被破后');
-        if (isToughSnake && isToughReduced) deathNotes.push('坚硬蛇减伤后');
+        if (details.shieldBroken) deathNotes.push(getLocalizedText('护盾被破后', 'after shield break'));
+        if (isToughSnake && isToughReduced) deathNotes.push(getLocalizedText('坚硬蛇减伤后', 'after tough reduction'));
         if (deathNotes.length > 0) {
             deathCause[snakeId] += ` (${deathNotes.join('+')})`;
         }
         
-        console.log(`${snakeName}死亡，原因: ${deathCause[snakeId]}`);
+        console.log(`${snakeName}${getLocalizedText('死亡，原因: ', ' died, cause: ')}${deathCause[snakeId]}`);
         gameOver();
         return true;
     }
@@ -952,7 +951,8 @@ function drawHomes() {
             defenseText.style.fontSize = '12px';
             defenseText.style.color = '#FFFF00';
             defenseText.style.fontWeight = 'bold';
-            defenseText.textContent = '防御激活';
+            defenseText.setAttribute('data-en', 'Defense Active');
+            defenseText.textContent = getLocalizedText('防御激活', 'Defense Active');
             defenseText.style.textShadow = '0 0 5px #000';
             defenseText.style.zIndex = '2';
             home1.appendChild(defenseText);
@@ -966,7 +966,7 @@ function drawHomes() {
         
         // 添加基地的图标和名称
         const name1 = document.createElement('div');
-        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || '玩家1'}的基地`;
+        name1.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('username') || getLocalizedText('玩家1', 'Player 1')}${getLocalizedText('的基地', '\'s Base')}`;
         name1.style.textAlign = 'center';
         name1.style.marginTop = '25px';
         name1.style.fontSize = '16px';
@@ -986,7 +986,8 @@ function drawHomes() {
         
         const healthText1 = document.createElement('div');
         healthText1.className = 'home-health-text';
-        healthText1.textContent = `HP: ${homes.player1.health}/${homes.player1.maxHealth}`;
+        healthText1.setAttribute('data-en', 'HP: ');
+        healthText1.textContent = `${getLocalizedText('HP: ', 'HP: ')}${homes.player1.health}/${homes.player1.maxHealth}`;
         healthText1.style.fontSize = '12px';
         healthText1.style.zIndex = '2';
         
@@ -1088,7 +1089,8 @@ function drawHomes() {
             defenseText.style.fontSize = '12px';
             defenseText.style.color = '#FFFF00';
             defenseText.style.fontWeight = 'bold';
-            defenseText.textContent = '防御激活';
+            defenseText.setAttribute('data-en', 'Defense Active');
+            defenseText.textContent = getLocalizedText('防御激活', 'Defense Active');
             defenseText.style.textShadow = '0 0 5px #000';
             defenseText.style.zIndex = '2';
             home2.appendChild(defenseText);
@@ -1102,7 +1104,7 @@ function drawHomes() {
         
         // 添加基地的图标和名称
         const name2 = document.createElement('div');
-        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || '玩家2'}的基地`;
+        name2.innerHTML = `<i class="fas fa-home"></i> ${localStorage.getItem('player2_username') || getLocalizedText('玩家2', 'Player 2')}${getLocalizedText('的基地', '\'s Base')}`;
         name2.style.textAlign = 'center';
         name2.style.marginTop = '25px';
         name2.style.fontSize = '16px';
@@ -1122,7 +1124,8 @@ function drawHomes() {
         
         const healthText2 = document.createElement('div');
         healthText2.className = 'home-health-text';
-        healthText2.textContent = `HP: ${homes.player2.health}/${homes.player2.maxHealth}`;
+        healthText2.setAttribute('data-en', 'HP: ');
+        healthText2.textContent = `${getLocalizedText('HP: ', 'HP: ')}${homes.player2.health}/${homes.player2.maxHealth}`;
         healthText2.style.fontSize = '12px';
         healthText2.style.zIndex = '2';
         
@@ -1203,11 +1206,11 @@ function initGame() {
     resetDeathCauses();        
     // 如果玩家2已登录，设置其名称
     const player2Name = localStorage.getItem('player2_username') || '玩家2';
-    document.getElementById('player2-name').textContent = player2Name + ': '; 
-    document.getElementById("player-label1").textContent =localStorage.getItem("username") + "(橙色)" || '玩家1'
-    document.getElementById("player-label2").textContent =localStorage.getItem("player2_username") + "(蓝色)" || '玩家2'
-    document.getElementById("storage-title1").textContent =localStorage.getItem("username") + "储存:" || '玩家1储存:'
-    document.getElementById("storage-title2").textContent =localStorage.getItem("player2_username") + "储存:"  || '玩家2储存:'    
+// 在initGame函数中修改
+document.getElementById("player-label1").textContent = localStorage.getItem("username") + getLocalizedText('(橙色)', ' (Orange)') || getLocalizedText('玩家1', 'Player 1');
+document.getElementById("player-label2").textContent = localStorage.getItem("player2_username") + getLocalizedText('(蓝色)', ' (Blue)') || getLocalizedText('玩家2', 'Player 2');
+document.getElementById("storage-title1").textContent = localStorage.getItem("username") + getLocalizedText('储存:', ' Storage:') || getLocalizedText('玩家1储存:', 'Player 1 Storage:');
+document.getElementById("storage-title2").textContent = localStorage.getItem("player2_username") + getLocalizedText('储存:', ' Storage:') || getLocalizedText('玩家2储存:', 'Player 2 Storage:');   
     // 清除现有蛇和食物
     if (currentMap === 'snow') {
         document.body.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298, #7b4397)';
@@ -1446,12 +1449,13 @@ lastMoveTime = {
     immunity.timer2 = currentTime + 3000; // 3秒免疫
     
     // 显示免疫提示
-    showNotice('游戏开始! 3秒无敌时间', '#FFFF00', 
-              homes.player1.x + homes.player1.width/2, 
-              homes.player1.y - 20);
-    showNotice('游戏开始! 3秒无敌时间', '#FFFF00', 
-              homes.player2.x + homes.player2.width/2, 
-              homes.player2.y - 20);
+// 在initGame函数中修改
+    showNotice(getLocalizedText('游戏开始! 3秒无敌时间', 'Game Start! 3s Immunity'), '#FFFF00', 
+            homes.player1.x + homes.player1.width/2, 
+            homes.player1.y - 20);
+    showNotice(getLocalizedText('游戏开始! 3秒无敌时间', 'Game Start! 3s Immunity'), '#FFFF00', 
+            homes.player2.x + homes.player2.width/2, 
+            homes.player2.y - 20);
     
     // 重置分数
     scores = {
@@ -4840,6 +4844,7 @@ deathCauseStyle.textContent = `
 `;
 document.head.appendChild(deathCauseStyle);
 // 修改showGameStats函数，显示更详细的统计
+// 修改showGameStats函数，显示更详细的统计
 function showGameStats() {
     const modal = document.getElementById('game-stats-modal');
     const content = document.getElementById('game-stats-content');
@@ -4854,7 +4859,7 @@ function showGameStats() {
     
     const minutes = Math.floor(totalTime / 60);
     const seconds = totalTime % 60;
-    const timeString = `${minutes}分${seconds}秒`;
+    const timeString = `${minutes}${getLocalizedText('分', 'm')}${seconds}${getLocalizedText('秒', 's')}`;
     
     // 计算防御效率
     const calculateDefenseEfficiency = (snakeId) => {
@@ -4869,7 +4874,7 @@ function showGameStats() {
     // 生成统计数据HTML
     content.innerHTML = `
         <div class="game-time-display">
-            <i class="fas fa-clock"></i> 游戏时长: <strong>${timeString}</strong>
+            <i class="fas fa-clock"></i> ${getLocalizedText('游戏时长: ', 'Game Time: ')}<strong>${timeString}</strong>
         </div>
         
         <div class="stats-grid">
@@ -4877,105 +4882,102 @@ function showGameStats() {
             <div class="player-stats-box player1">
                 <div class="stats-header">
                     <h3 style="color: #FF5722;">
-                        <i class="fas fa-fire"></i> ${localStorage.getItem("username") || "玩家1"}
+                        <i class="fas fa-fire"></i> ${localStorage.getItem("username") || getLocalizedText("玩家1", "Player 1")}
                     </h3>
                     <div style="font-size: 12px; color: #aaa;">
-                        ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
-                          snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
-                          snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                        ${snakeTypes.snake1 === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') : 
+                          snakeTypes.snake1 === 'tough' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                          snakeTypes.snake1 === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : getLocalizedText('未选择', 'Not Selected')}
                     </div>
                 </div>
                 
                 <!-- 输出伤害统计 -->
-    <div class="stats-section">
-        <div class="section-title">
-            <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
-            <span>输出伤害统计</span>
-        </div>
-    <div class="stats-section">
-
-            <div class="stats-items">
-                ${gameStats.snake1.totalDamageDealt > 0 ? `
-                    <div class="stat-item">
-                        <span>总输出伤害:</span>
-                        <span style="color: #4CAF50;">${gameStats.snake1.totalDamageDealt.toFixed(1)}</span>
+                <div class="stats-section">
+                    <div class="section-title">
+                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+                        <span>${getLocalizedText('输出伤害统计', 'Damage Dealt')}</span>
                     </div>
-                ` : ''}
-                
-                ${gameStats.snake1.damageDealt.snakeCollision > 0 ? `
-                    <div class="stat-item">
-                        <span>蛇相撞伤害:</span>
-                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.snakeCollision.toFixed(1)}</span>
+                    <div class="stats-items">
+                        ${gameStats.snake1.totalDamageDealt > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('总输出伤害:', 'Total Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake1.totalDamageDealt.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.damageDealt.snakeCollision > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('蛇相撞伤害:', 'Collision Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.snakeCollision.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.damageDealt.bullet > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('子弹伤害:', 'Bullet Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bullet.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.damageDealt.bomb > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('炸弹伤害:', 'Bomb Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bomb.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${(gameStats.snake1.damageDealt.base || 0) > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('基地子弹伤害:', 'Base Damage:')}</span>
+                                <span style="color: #4CAF50;">${(gameStats.snake1.damageDealt.base || 0).toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake1.totalDamageDealt <= 0 ? `
+                            <div class="stat-item">${getLocalizedText('无输出伤害记录', 'No damage dealt')}</div>
+                        ` : ''}
                     </div>
-                ` : ''}
-                
-                ${gameStats.snake1.damageDealt.bullet > 0 ? `
-                    <div class="stat-item">
-                        <span>子弹伤害:</span>
-                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bullet.toFixed(1)}</span>
-                    </div>
-                ` : ''}
-                
-                ${gameStats.snake1.damageDealt.bomb > 0 ? `
-                    <div class="stat-item">
-                        <span>炸弹伤害:</span>
-                        <span style="color: #4CAF50;">${gameStats.snake1.damageDealt.bomb.toFixed(1)}</span>
-                    </div>
-                ` : ''}
-                
-                ${(gameStats.snake1.damageDealt.base || 0) > 0 ? `
-                    <div class="stat-item">
-                        <span>基地子弹伤害:</span>
-                        <span style="color: #4CAF50;">${(gameStats.snake1.damageDealt.base || 0).toFixed(1)}</span>
-                    </div>
-                ` : ''}
-                
-                ${gameStats.snake1.totalDamageDealt <= 0 ? `
-                    <div class="stat-item">无输出伤害记录</div>
-                ` : ''}
-            </div>
-        </div>
-        </div>
+                </div>
                 
                 <!-- 防御统计 -->
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-shield-alt" style="color: #00BCD4;"></i>
-                        <span>防御统计</span>
+                        <span>${getLocalizedText('防御统计', 'Defense Stats')}</span>
                     </div>
                     <div class="stats-items">
                         ${gameStats.snake1.shieldDamageAbsorbed > 0 ? `
                         <div class="stat-item">
-                            <span>护盾吸收:</span>
+                            <span>${getLocalizedText('护盾吸收:', 'Shield Absorbed:')}</span>
                             <span style="color: #00BCD4;">${gameStats.snake1.shieldDamageAbsorbed.toFixed(1)}</span>
                         </div>
                         <div class="stat-item">
-                            <span>护盾格挡:</span>
+                            <span>${getLocalizedText('护盾格挡:', 'Shield Blocks:')}</span>
                             <span style="color: #00BCD4;">${gameStats.snake1.shieldBlocks || 0}</span>
                         </div>
                         ` : ''}
                         
                         ${gameStats.snake1.immuneBlocks > 0 ? `
                         <div class="stat-item">
-                            <span>免疫格挡:</span>
+                            <span>${getLocalizedText('免疫格挡:', 'Immune Blocks:')}</span>
                             <span style="color: #FFFF00;">${gameStats.snake1.immuneBlocks}</span>
                         </div>
                         <div class="stat-item">
-                            <span>免疫免伤:</span>
+                            <span>${getLocalizedText('免疫免伤:', 'Damage Prevented:')}</span>
                             <span style="color: #FFFF00;">${getTotalImmuneDamage('snake1').toFixed(1)}</span>
                         </div>
                         ` : ''}
                         
                         ${gameStats.snake1.toughImmuneBlocks > 0 ? `
                         <div class="stat-item">
-                            <span>坚硬免疫:</span>
+                            <span>${getLocalizedText('坚硬免疫:', 'Tough Immune:')}</span>
                             <span style="color: #C0C0C0;">${gameStats.snake1.toughImmuneBlocks}</span>
                         </div>
                         ` : ''}
                         
                         ${getTotalToughReducedDamage('snake1') > 0 ? `
                         <div class="stat-item">
-                            <span>坚硬减伤:</span>
+                            <span>${getLocalizedText('坚硬减伤:', 'Damage Reduced:')}</span>
                             <span style="color: #C0C0C0;">${getTotalToughReducedDamage('snake1').toFixed(1)}</span>
                         </div>
                         ` : ''}
@@ -4986,7 +4988,7 @@ function showGameStats() {
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-heartbeat" style="color: #ff6b6b;"></i>
-                        <span>承受伤害详情</span>
+                        <span>${getLocalizedText('承受伤害详情', 'Damage Received')}</span>
                     </div>
                     <div class="stats-items">
                         ${generateDamageDetailStats('snake1')}
@@ -4997,119 +4999,117 @@ function showGameStats() {
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-road" style="color: #00BCD4;"></i>
-                        <span>移动统计</span>
+                        <span>${getLocalizedText('移动统计', 'Movement Stats')}</span>
                     </div>
                     <div style="text-align: center; padding: 10px; background: rgba(0, 188, 212, 0.2); border-radius: 8px;">
                         <div style="font-size: 24px; color: #00BCD4; font-weight: bold;">
                             ${gameStats.snake1.distanceTraveled}
                         </div>
-                        <div style="font-size: 14px; color: white;">格 (20px/格)</div>
+                        <div style="font-size: 14px; color: white;">${getLocalizedText('格 (20px/格)', 'tiles (20px/tile)')}</div>
                     </div>
                 </div>
             </div>
+            
             <!-- 玩家2统计 -->
             <div class="player-stats-box player2">
                 <div class="stats-header">
                     <h3 style="color: #2196F3;">
-                        <i class="fas fa-tint"></i> ${localStorage.getItem("player2_username") || "玩家2"}
+                        <i class="fas fa-tint"></i> ${localStorage.getItem("player2_username") || getLocalizedText("玩家2", "Player 2")}
                     </h3>
                     <div style="font-size: 12px; color: #aaa;">
-                        ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
-                          snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
-                          snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
-
+                        ${snakeTypes.snake2 === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') : 
+                          snakeTypes.snake2 === 'tough' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                          snakeTypes.snake2 === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : getLocalizedText('未选择', 'Not Selected')}
                     </div>
                 </div>
                 
                 <!-- 输出伤害统计 -->
                 <div class="stats-section">
-    <div class="stats-section">
-        <div class="section-title">
-            <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
-            <span>输出伤害统计</span>
-        </div>
-        <div class="stats-items">
-            ${gameStats.snake2.totalDamageDealt > 0 ? `
-                <div class="stat-item">
-                    <span>总输出伤害:</span>
-                    <span style="color: #4CAF50;">${gameStats.snake2.totalDamageDealt.toFixed(1)}</span>
-                </div>
-            ` : ''}
-            
-            ${gameStats.snake2.damageDealt.snakeCollision > 0 ? `
-                <div class="stat-item">
-                    <span>蛇相撞伤害:</span>
-                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.snakeCollision.toFixed(1)}</span>
-                </div>
-            ` : ''}
-            
-            ${gameStats.snake2.damageDealt.bullet > 0 ? `
-                <div class="stat-item">
-                    <span>子弹伤害:</span>
-                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bullet.toFixed(1)}</span>
-                </div>
-            ` : ''}
-            
-            ${gameStats.snake2.damageDealt.bomb > 0 ? `
-                <div class="stat-item">
-                    <span>炸弹伤害:</span>
-                    <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bomb.toFixed(1)}</span>
-                </div>
-            ` : ''}
-            
-            ${(gameStats.snake2.damageDealt.base || 0) > 0 ? `
-                <div class="stat-item">
-                    <span>基地子弹伤害:</span>
-                    <span style="color: #4CAF50;">${(gameStats.snake2.damageDealt.base || 0).toFixed(1)}</span>
-                </div>
-            ` : ''}
-            
-            ${gameStats.snake2.totalDamageDealt <= 0 ? `
-                <div class="stat-item">无输出伤害记录</div>
-            ` : ''}
-        </div>
-    </div>
+                    <div class="section-title">
+                        <i class="fas fa-crosshairs" style="color: #4CAF50;"></i>
+                        <span>${getLocalizedText('输出伤害统计', 'Damage Dealt')}</span>
+                    </div>
+                    <div class="stats-items">
+                        ${gameStats.snake2.totalDamageDealt > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('总输出伤害:', 'Total Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake2.totalDamageDealt.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.damageDealt.snakeCollision > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('蛇相撞伤害:', 'Collision Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.snakeCollision.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.damageDealt.bullet > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('子弹伤害:', 'Bullet Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bullet.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.damageDealt.bomb > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('炸弹伤害:', 'Bomb Damage:')}</span>
+                                <span style="color: #4CAF50;">${gameStats.snake2.damageDealt.bomb.toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${(gameStats.snake2.damageDealt.base || 0) > 0 ? `
+                            <div class="stat-item">
+                                <span>${getLocalizedText('基地子弹伤害:', 'Base Damage:')}</span>
+                                <span style="color: #4CAF50;">${(gameStats.snake2.damageDealt.base || 0).toFixed(1)}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${gameStats.snake2.totalDamageDealt <= 0 ? `
+                            <div class="stat-item">${getLocalizedText('无输出伤害记录', 'No damage dealt')}</div>
+                        ` : ''}
+                    </div>
                 </div>
                 
                 <!-- 防御统计 -->
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-shield-alt" style="color: #00BCD4;"></i>
-                        <span>防御统计</span>
+                        <span>${getLocalizedText('防御统计', 'Defense Stats')}</span>
                     </div>
                     <div class="stats-items">
                         ${gameStats.snake2.shieldDamageAbsorbed > 0 ? `
                         <div class="stat-item">
-                            <span>护盾吸收:</span>
+                            <span>${getLocalizedText('护盾吸收:', 'Shield Absorbed:')}</span>
                             <span style="color: #00BCD4;">${gameStats.snake2.shieldDamageAbsorbed.toFixed(1)}</span>
                         </div>
                         <div class="stat-item">
-                            <span>护盾格挡:</span>
+                            <span>${getLocalizedText('护盾格挡:', 'Shield Blocks:')}</span>
                             <span style="color: #00BCD4;">${gameStats.snake2.shieldBlocks || 0}</span>
                         </div>
                         ` : ''}
                         
                         ${gameStats.snake2.immuneBlocks > 0 ? `
                         <div class="stat-item">
-                            <span>免疫格挡:</span>
+                            <span>${getLocalizedText('免疫格挡:', 'Immune Blocks:')}</span>
                             <span style="color: #FFFF00;">${gameStats.snake2.immuneBlocks}</span>
                         </div>
                         <div class="stat-item">
-                            <span>免疫免伤:</span>
+                            <span>${getLocalizedText('免疫免伤:', 'Damage Prevented:')}</span>
                             <span style="color: #FFFF00;">${getTotalImmuneDamage('snake2').toFixed(1)}</span>
                         </div>
                         ` : ''}
                         
                         ${gameStats.snake2.toughImmuneBlocks > 0 ? `
                         <div class="stat-item">
-                            <span>坚硬免疫:</span>
+                            <span>${getLocalizedText('坚硬免疫:', 'Tough Immune:')}</span>
                             <span style="color: #C0C0C0;">${gameStats.snake2.toughImmuneBlocks}</span>
                         </div>
                         ` : ''}
                         
                         ${getTotalToughReducedDamage('snake2') > 0 ? `
                         <div class="stat-item">
-                            <span>坚硬减伤:</span>
+                            <span>${getLocalizedText('坚硬减伤:', 'Damage Reduced:')}</span>
                             <span style="color: #C0C0C0;">${getTotalToughReducedDamage('snake2').toFixed(1)}</span>
                         </div>
                         ` : ''}
@@ -5120,7 +5120,7 @@ function showGameStats() {
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-heartbeat" style="color: #ff6b6b;"></i>
-                        <span>承受伤害详情</span>
+                        <span>${getLocalizedText('承受伤害详情', 'Damage Received')}</span>
                     </div>
                     <div class="stats-items">
                         ${generateDamageDetailStats('snake2')}
@@ -5131,23 +5131,33 @@ function showGameStats() {
                 <div class="stats-section">
                     <div class="section-title">
                         <i class="fas fa-road" style="color: #00BCD4;"></i>
-                        <span>移动统计</span>
+                        <span>${getLocalizedText('移动统计', 'Movement Stats')}</span>
                     </div>
                     <div style="text-align: center; padding: 10px; background: rgba(0, 188, 212, 0.2); border-radius: 8px;">
                         <div style="font-size: 24px; color: #00BCD4; font-weight: bold;">
                             ${gameStats.snake2.distanceTraveled}
                         </div>
-                        <div style="font-size: 14px; color: white;">格 (20px/格)</div>
+                        <div style="font-size: 14px; color: white;">${getLocalizedText('格 (20px/格)', 'tiles (20px/tile)')}</div>
                     </div>
                 </div>
             </div>
         </div>
         
         <div style="text-align: center; margin-top: 20px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 12px; color: #aaa;">
-            <i class="fas fa-info-circle"></i> 注：原始伤害包括所有受到的攻击伤害，实际伤害为扣除防御后的实际血量减少
+            <i class="fas fa-info-circle"></i> ${getLocalizedText('注：原始伤害包括所有受到的攻击伤害，实际伤害为扣除防御后的实际血量减少', 'Note: Original damage includes all attacks received, actual damage is HP loss after defense reduction')}
         </div>
     `;
 
+    // 在模态框中添加关闭按钮的事件
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'custom-button';
+    closeBtn.style.marginTop = '20px';
+    closeBtn.style.width = '100%';
+    closeBtn.textContent = getLocalizedText('关闭', 'Close');
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    };
+    content.appendChild(closeBtn);
     
     modal.style.display = 'block';
 }
@@ -5223,17 +5233,18 @@ function getTotalToughReducedDamage(snakeId) {
 }
 
 // 辅助函数：生成伤害详情统计
+// 辅助函数：生成伤害详情统计
 function generateDamageDetailStats(snakeId) {
     const stats = gameStats[snakeId];
     const damageTypes = ['wall', 'snakeCollision', 'bullet', 'base', 'lava', 'home', 'bomb'];
     const typeNames = {
-        'wall': '撞墙',
-        'snakeCollision': '蛇相撞',
-        'bullet': '子弹',
-        'base': '基地防御',
-        'lava': '岩浆',
-        'home': '敌方基地',
-        'bomb': '炸弹'
+        'wall': getLocalizedText('撞墙', 'Wall'),
+        'snakeCollision': getLocalizedText('蛇相撞', 'Collision'),
+        'bullet': getLocalizedText('子弹', 'Bullet'),
+        'base': getLocalizedText('基地防御', 'Base'),
+        'lava': getLocalizedText('岩浆', 'Lava'),
+        'home': getLocalizedText('敌方基地', 'Enemy Base'),
+        'bomb': getLocalizedText('炸弹', 'Bomb')
     };
     
     let html = '';
@@ -5251,14 +5262,14 @@ function generateDamageDetailStats(snakeId) {
                     <span>${typeNames[type]}:</span>
                     <div style="display: flex; flex-direction: column; align-items: flex-end;">
                         <div style="font-size: 11px; color: #aaa;">
-                            原始: ${original.toFixed(1)}
+                            ${getLocalizedText('原始: ', 'Original: ')}${original.toFixed(1)}
                         </div>
                         <div style="font-size: 12px; color: #ff6b6b;">
-                            实际: ${actual.toFixed(1)}
+                            ${getLocalizedText('实际: ', 'Actual: ')}${actual.toFixed(1)}
                         </div>
                         ${reduction > 0 ? `
                         <div style="font-size: 10px; color: #4CAF50;">
-                            减免: ${reduction.toFixed(1)} (${reductionPercent}%)
+                            ${getLocalizedText('减免: ', 'Reduced: ')}${reduction.toFixed(1)} (${reductionPercent}%)
                         </div>
                         ` : ''}
                     </div>
@@ -5267,7 +5278,7 @@ function generateDamageDetailStats(snakeId) {
         }
     });
     
-    return html || '<div class="stat-item">无伤害记录</div>';
+    return html || `<div class="stat-item">${getLocalizedText('无伤害记录', 'No damage records')}</div>`;
 }
 function gameOver() {
     gameOverScreen.style.display = '';
@@ -5380,110 +5391,110 @@ document.getElementById("store-player2").style.display="none";
         const timeString = `${minutes}分${seconds}秒`;
         
         // 创建游戏结束界面
-    gameOverScreen.innerHTML = `
-        <div class="game-over-content">
-            <div class="winner-container">
-                ${winner === 'draw' ? `
-                    <div class="trophy-icon">
-                        <i class="fas fa-trophy" style="color: #FFD700;"></i>
-                        <i class="fas fa-trophy" style="color: #C0C0C0;"></i>
-                    </div>
-                    <h2 class="winner-banner">平局!</h2>
-                ` : `
-                    <div class="trophy-icon">
-                        <i class="fas fa-trophy" style="color: ${winner === 'snake1' ? '#FFD700' : '#C0C0C0'};"></i>
-                    </div>
-                    <h2 class="winner-banner ${winner === 'snake1' ? 'player-1-win' : 'player-2-win'}">
-                        ${winner === 'snake1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}获胜!
-                    </h2>
-                `}
+gameOverScreen.innerHTML = `
+    <div class="game-over-content">
+        <div class="winner-container">
+            ${winner === 'draw' ? `
+                <div class="trophy-icon">
+                    <i class="fas fa-trophy" style="color: #FFD700;"></i>
+                    <i class="fas fa-trophy" style="color: #C0C0C0;"></i>
+                </div>
+                <h2 class="winner-banner">${getLocalizedText('平局!', 'Draw!')}</h2>
+            ` : `
+                <div class="trophy-icon">
+                    <i class="fas fa-trophy" style="color: ${winner === 'snake1' ? '#FFD700' : '#C0C0C0'};"></i>
+                </div>
+                <h2 class="winner-banner ${winner === 'snake1' ? 'player-1-win' : 'player-2-win'}">
+                    ${winner === 'snake1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}${getLocalizedText('获胜!', ' Wins!')}
+                </h2>
+            `}
+        </div>
+        
+        <!-- 失败者死亡原因 -->
+        ${loser ? `
+            <div class="death-cause" style="
+                margin: 15px auto;
+                padding: 10px;
+                background: ${loser === 'snake1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
+                border-radius: 10px;
+                max-width: 400px;
+                text-align: center;
+                border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
+            ">
+                <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
+                    <i class="fas fa-skull-crossbones"></i> ${getLocalizedText('原因', 'Cause')}
+                </div>
+                <div style="font-size: 18px; font-weight: bold; color: white;">
+                    ${loserName} ${loserCause}
+                </div>
+                <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
+                    ${getLocalizedText('血量: ', 'HP: ')}${deathAnalysis[loser].health} | ${getLocalizedText('分数: ', 'Score: ')}${deathAnalysis[loser].score}
+                </div>
             </div>
-            
-            <!-- 失败者死亡原因 -->
-            ${loser ? `
-                <div class="death-cause" style="
-                    margin: 15px auto;
-                    padding: 10px;
-                    background: ${loser === 'snake1' ? 'rgba(255, 87, 34, 0.2)' : 'rgba(33, 150, 243, 0.2)'};
-                    border-radius: 10px;
-                    max-width: 400px;
-                    text-align: center;
-                    border: 1px solid ${loser === 'snake1' ? '#FF5722' : '#2196F3'};
-                ">
-                    <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-                        <i class="fas fa-skull-crossbones"></i> 原因
-                    </div>
-                    <div style="font-size: 18px; font-weight: bold; color: white;">
-                        ${loserName}${loserCause}
-                    </div>
-                    <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
-                        血量: ${deathAnalysis[loser].health} | 分数: ${deathAnalysis[loser].score}
-                    </div>
+        ` : ''}
+        
+        <!-- 详细统计 -->
+        <div class="stats-container">
+            <div class="player-stats player-1-stats">
+                <div class="player-avatar">
+                    <i class="fas fa-user" style="color: #FF5722;"></i>
                 </div>
-            ` : ''}
-            
-            <!-- 详细统计 -->
-            <div class="stats-container">
-                <div class="player-stats player-1-stats">
-                    <div class="player-avatar">
-                        <i class="fas fa-user" style="color: #FF5722;"></i>
-                    </div>
-                    <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
-                    <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
-                        ${snakeTypes.snake1 === 'speed' ? '⚡ 速度蛇' : 
-                          snakeTypes.snake1 === 'tough' ? '🛡️ 坚硬蛇' : 
-                          snakeTypes.snake1 === 'magic' ? '✨ 魔法蛇' : '未选择'}
-                    </div>
-                    <div class="win-count">
-                        <span class="history-wins">${player1Wins}</span>
-                        ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
-                    </div>
-                    <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                        ${deathCause.snake1 ? `💀 ${deathCause.snake1}` : health.snake1 > 0 ? '👍 存活' : ''}
-                    </div>
+                <div class="player-name">${localStorage.getItem("username") || getLocalizedText("玩家1", "Player 1")}</div>
+                <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
+                    ${snakeTypes.snake1 === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') : 
+                      snakeTypes.snake1 === 'tough' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                      snakeTypes.snake1 === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : getLocalizedText('未选择', 'Not Selected')}
                 </div>
-                
-                <div class="vs-text">VS</div>
-                
-                <div class="player-stats player-2-stats">
-                    <div class="player-avatar">
-                        <i class="fas fa-user" style="color: #2196F3;"></i>
-                    </div>
-                    <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
-                    <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
-                        ${snakeTypes.snake2 === 'speed' ? '⚡ 速度蛇' : 
-                          snakeTypes.snake2 === 'tough' ? '🛡️ 坚硬蛇' : 
-                          snakeTypes.snake2 === 'magic' ? '✨ 魔法蛇' : '未选择'}
-                    </div>
-                    <div class="win-count">
-                        <span class="history-wins">${player2Wins}</span>
-                        ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
-                    </div>
-                    <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                        ${deathCause.snake2 ? `💀 ${deathCause.snake2}` : health.snake2 > 0 ? '👍 存活' : ''}
-                    </div>
+                <div class="win-count">
+                    <span class="history-wins">${player1Wins}</span>
+                    ${currentWin1 > 0 ? `<span class="current-win">+${currentWin1}</span>` : ''}
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
+                </div>
+                <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                    ${deathCause.snake1 ? `💀 ${deathCause.snake1}` : health.snake1 > 0 ? '👍 ' + getLocalizedText('存活', 'Alive') : ''}
                 </div>
             </div>
             
-            <div class="buttons-container">
-                <button class="restart-btn" id="show-game-stats">
-                    <i class="fas fa-chart-bar"></i> 显示本局数据
-                </button>
-                <button class="restart-btn" id="play-again">
-                    <i class="fas fa-redo"></i> 再来一局
-                </button>
-                <button class="restart-btn upload-btn" id="save-record">
-                    <i class="fas fa-save"></i> 保存战绩
-                </button>
+            <div class="vs-text">VS</div>
+            
+            <div class="player-stats player-2-stats">
+                <div class="player-avatar">
+                    <i class="fas fa-user" style="color: #2196F3;"></i>
+                </div>
+                <div class="player-name">${localStorage.getItem("player2_username") || getLocalizedText("玩家2", "Player 2")}</div>
+                <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
+                    ${snakeTypes.snake2 === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') : 
+                      snakeTypes.snake2 === 'tough' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                      snakeTypes.snake2 === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : getLocalizedText('未选择', 'Not Selected')}
+                </div>
+                <div class="win-count">
+                    <span class="history-wins">${player2Wins}</span>
+                    ${currentWin2 > 0 ? `<span class="current-win">+${currentWin2}</span>` : ''}
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
+                </div>
+                <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
+                    ${deathCause.snake2 ? `💀 ${deathCause.snake2}` : health.snake2 > 0 ? '👍 ' + getLocalizedText('存活', 'Alive') : ''}
+                </div>
             </div>
         </div>
-    `;
+        
+        <div class="buttons-container">
+            <button class="restart-btn" id="show-game-stats">
+                <i class="fas fa-chart-bar"></i> ${getLocalizedText('显示本局数据', 'Show Game Stats')}
+            </button>
+            <button class="restart-btn" id="play-again">
+                <i class="fas fa-redo"></i> ${getLocalizedText('再来一局', 'Play Again')}
+            </button>
+            <button class="restart-btn upload-btn" id="save-record">
+                <i class="fas fa-save"></i> ${getLocalizedText('保存战绩', 'Save Record')}
+            </button>
+        </div>
+    </div>
+`;
     
         // 再来一局按钮事件
         document.getElementById('play-again').addEventListener('click', () => {
@@ -5517,7 +5528,7 @@ document.getElementById("store-player2").style.display="none";
             // 禁用按钮防止重复点击
             const saveBtn = document.getElementById('save-record');
             saveBtn.disabled = true;
-            saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 保存中...`;
+            saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${getLocalizedText('保存中...', 'Saving...')}`;
             
             // 上传本次比赛结果
             uploadGameRecord(currentWin1, currentWin2).then(() => {
@@ -5543,18 +5554,18 @@ document.getElementById("store-player2").style.display="none";
                     }
                     
                     // 显示保存成功提示
-                    showGameOverMessage('战绩保存成功!', '#4CAF50');
+                    showGameOverMessage(getLocalizedText('战绩保存成功!', 'Record saved successfully!'), '#4CAF50');
                     
                     // 更新按钮状态
-                    saveBtn.innerHTML = `<i class="fas fa-check"></i> 已保存`;
+                    saveBtn.innerHTML = `<i class="fas fa-check"></i> ${getLocalizedText('已保存', 'Saved')}`;
                 }
             }).catch(error => {
                 console.error('保存战绩失败:', error);
-                showGameOverMessage('保存失败: ' + error.message, '#FF5722');
+                showGameOverMessage(getLocalizedText('保存失败: ', 'Save failed: ') + error.message, '#FF5722');
                 
                 // 恢复按钮状态
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = `<i class="fas fa-save"></i> 保存战绩`;
+                saveBtn.innerHTML = `<i class="fas fa-save"></i> ${getLocalizedText('保存战绩', 'Save Records')}`;
             });
         });
 
@@ -5880,8 +5891,7 @@ if (e.key === 'q' || e.key === 'Q') {
     
     // 显示状态提示
     const head = snakes.snake1[0];
-    showNotice(pausedSnakes.snake1 ? '玩家1已暂停' : '玩家1已恢复', 
-              '#FF5722', head.x, head.y);
+showNotice(pausedSnakes.snake1 ? getLocalizedText('玩家1已暂停', 'Player 1 Paused') : getLocalizedText('玩家1已恢复', 'Player 1 Resumed'), '#FF5722', head.x, head.y);
     
     // 添加音效或特效（可选）
     if (pausedSnakes.snake1) {
@@ -5908,8 +5918,7 @@ if (e.key === '/' || e.key === '?') {
     
     // 显示状态提示
     const head = snakes.snake2[0];
-    showNotice(pausedSnakes.snake2 ? '玩家2已暂停' : '玩家2已恢复', 
-              '#2196F3', head.x, head.y);
+showNotice(pausedSnakes.snake2 ? getLocalizedText('玩家2已暂停', 'Player 2 Paused') : getLocalizedText('玩家2已恢复', 'Player 2 Resumed'), '#2196F3', head.x, head.y);
     
     // 添加音效或特效（可选）
     if (pausedSnakes.snake2) {
@@ -6370,24 +6379,24 @@ function loginPlayer2() {
     
     // 第一步：询问用户名
     Swal.fire({
-        title: "玩家2登录",
-        text: "请输入用户名",
+        title: getLocalizedText("玩家2登录", "Player 2 Login"),
+        text: getLocalizedText("请输入用户名", "Enter username"),
         input: "text",
-        inputPlaceholder: "请输入用户名",
+        inputPlaceholder: getLocalizedText("请输入用户名", "Enter username"),
         showCancelButton: true,
-        cancelButtonText: "取消",
-        confirmButtonText: "下一步",
+        cancelButtonText: getLocalizedText("取消", "Cancel"),
+        confirmButtonText: getLocalizedText("下一步", "Next"),
         showLoaderOnConfirm: true,
         preConfirm: (username) => {
             if (!username) {
-                Swal.showValidationMessage("请输入用户名");
+                Swal.showValidationMessage(getLocalizedText("请输入用户名", "Please enter username"));
                 return false;
             }
             
             // 检查是否与玩家1用户名相同
             const player1Username = localStorage.getItem('username');
             if (player1Username && username === player1Username) {
-                Swal.showValidationMessage("用户名不能与玩家1相同");
+                Swal.showValidationMessage(getLocalizedText("用户名不能与玩家1相同", "Username cannot be the same as Player 1"));
                 return false;
             }
             
@@ -6400,17 +6409,17 @@ function loginPlayer2() {
             
             // 第二步：询问密码
             Swal.fire({
-                title: "玩家2登录",
-                text: "请输入密码",
+                title: getLocalizedText("玩家2登录", "Player 2 Login"),
+                text: getLocalizedText("请输入密码", "Enter password"),
                 input: "password",
-                inputPlaceholder: "请输入密码",
+                inputPlaceholder: getLocalizedText("请输入密码", "Enter password"),
                 showCancelButton: true,
-                cancelButtonText: "上一步",
-                confirmButtonText: "登录",
+                cancelButtonText: getLocalizedText("上一步", "Back"),
+                confirmButtonText: getLocalizedText("登录", "Login"),
                 showLoaderOnConfirm: true,
                 preConfirm: (password) => {
                     if (!password) {
-                        Swal.showValidationMessage("请输入密码");
+                        Swal.showValidationMessage(getLocalizedText("请输入密码", "Please enter password"));
                         return false;
                     }
                     
@@ -6430,9 +6439,9 @@ function loginPlayer2() {
                         if (data.includes('<h1>登录成功</h1>')) {
                             return { username, password };
                         } else if (data.includes('登录失败')) {
-                            throw new Error('用户名或密码错误');
+                            throw new Error(getLocalizedText('用户名或密码错误', 'Incorrect username or password'));
                         } else {
-                            throw new Error('登录失败，请重试');
+                            throw new Error(getLocalizedText('登录失败，请重试', 'Login failed, please try again'));
                         }
                     })
                     .catch(error => {
@@ -6466,21 +6475,34 @@ function loginPlayer2() {
                             
                             // 更新界面
                             document.getElementById('player2-name').textContent = username + ': ';
-                            document.getElementById('player-label1').textContent = localStorage.getItem('username') + '(橙色)';
-                            document.getElementById('player-label2').textContent = localStorage.getItem('player2_username') + '(蓝色)';
-                            document.getElementById('storage-title1').textContent = localStorage.getItem('username') + '储存:';
-                            document.getElementById('storage-title2').textContent = localStorage.getItem('player2_username') + '储存:';
+                            // 在loginPlayer2函数中修改
+                            document.getElementById('player-label1').textContent = localStorage.getItem('username') + getLocalizedText('(橙色)', ' (Orange)');
+                            document.getElementById('player-label2').textContent = localStorage.getItem('player2_username') + getLocalizedText('(蓝色)', ' (Blue)');
+                            document.getElementById('storage-title1').textContent = localStorage.getItem('username') + getLocalizedText('储存:', ' Storage:');
+                            document.getElementById('storage-title2').textContent = localStorage.getItem('player2_username') + getLocalizedText('储存:', ' Storage:');
                             document.querySelector('.map-selection .start-game-btn').style.display = 'block';
                             
-                            Swal.fire('登录成功', '玩家2已登录', 'success');
+                            Swal.fire(
+                                getLocalizedText('登录成功', 'Login Successful'),
+                                getLocalizedText('玩家2已登录', 'Player 2 logged in'),
+                                'success'
+                            );
                         } else {
                             console.log(data.message);
-                            Swal.fire('错误', '获取用户信息失败', 'error');
+                            Swal.fire(
+                                getLocalizedText('错误', 'Error'),
+                                getLocalizedText('获取用户信息失败', 'Failed to get user information'),
+                                'error'
+                            );
                         }
                     })
                     .catch(error => {
                         console.error('Fetch error:', error);
-                        Swal.fire('错误', '获取用户信息时发生错误', 'error');
+                        Swal.fire(
+                            getLocalizedText('错误', 'Error'),
+                            getLocalizedText('获取用户信息时发生错误', 'Error occurred while getting user information'),
+                            'error'
+                        );
                     });
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     // 点击上一步，返回用户名输入
@@ -6493,85 +6515,85 @@ function loginPlayer2() {
 // 蛇类详细数据
 const snakeDetails = {
     speed: {
-        title: "速度蛇",
+        title: getLocalizedText("速度蛇", "Speed Snake"),
         color: "#FFD700",
         ratings: [
-            { name: "生命", value: 3, max: 5 },
-            { name: "速度", value: 5, max: 5 },
-            { name: "魔法", value: 1, max: 5 }
+            { name: getLocalizedText("生命", "Health"), value: 3, max: 5 },
+            { name: getLocalizedText("速度", "Speed"), value: 5, max: 5 },
+            { name: getLocalizedText("魔法", "Magic"), value: 1, max: 5 }
         ],
         attributes: [
             { 
-                name: "移动速度", 
+                name: getLocalizedText("移动速度", "Movement Speed"), 
                 value: "<span class='speed-icon'></span> +50%", 
-                desc: "移动间隔减少50%，比普通蛇快一倍" 
+                desc: getLocalizedText("移动间隔减少50%，比普通蛇快一倍", "Movement interval reduced by 50%, twice as fast as normal snake") 
             },
             { 
-                name: "生命值", 
+                name: getLocalizedText("生命值", "Health"), 
                 value: "<span class='health-icon'></span> 10HP", 
-                desc: "标准生命值，碰撞会受到正常伤害" 
+                desc: getLocalizedText("标准生命值，碰撞会受到正常伤害", "Standard HP, takes normal damage from collisions") 
             },
             { 
-                name: "特殊能力", 
-                value: "无", 
-                desc: "专注于高速移动，没有其他特殊能力" 
+                name: getLocalizedText("特殊能力", "Special Ability"), 
+                value: getLocalizedText("无", "None"), 
+                desc: getLocalizedText("专注于高速移动，没有其他特殊能力", "Focuses on high-speed movement, no other special abilities") 
             }
         ],
-        tips: "适合喜欢快节奏、高操作的玩家。利用速度优势快速包围对手。"
+        tips: getLocalizedText("适合喜欢快节奏、高操作的玩家。利用速度优势快速包围对手。", "Suitable for players who like fast-paced, high-skill gameplay. Use speed advantage to quickly surround opponents.")
     },
     tough: {
-        title: "坚硬蛇",
+        title: getLocalizedText("坚硬蛇", "Hard Snake"),
         color: "#C0C0C0",
         ratings: [
-            { name: "生命", value: 5, max: 5 },
-            { name: "速度", value: 2, max: 5 },
-            { name: "魔法", value: 1, max: 5 }
+            { name: getLocalizedText("生命", "Health"), value: 5, max: 5 },
+            { name: getLocalizedText("速度", "Speed"), value: 2, max: 5 },
+            { name: getLocalizedText("魔法", "Magic"), value: 1, max: 5 }
         ],
         attributes: [
             { 
-                name: "生命值", 
-                value: "<span class='health-icon'></span> 10HP(上限15)", 
-                desc: "1.5倍生命值，生存能力更强" 
+                name: getLocalizedText("生命值", "Health"), 
+                value: "<span class='health-icon'></span> 10HP(15)", 
+                desc: getLocalizedText("1.5倍生命值，生存能力更强", "1.5x HP, stronger survivability") 
             },
             { 
-                name: "进攻", 
-                value: "撞击别人伤害增加", 
-                desc: "仅有0.5概率受到子弹伤害" 
+                name: getLocalizedText("进攻", "Attack"), 
+                value: getLocalizedText("撞击别人伤害增加", "Increased collision damage"), 
+                desc: getLocalizedText("仅有0.5概率受到子弹伤害", "Only 50% chance to take bullet damage") 
             },
             { 
-                name: "速度", 
-                value: "标准速度", 
-                desc: "移动速度较慢" 
+                name: getLocalizedText("速度", "Speed"), 
+                value: getLocalizedText("标准速度", "Standard Speed"), 
+                desc: getLocalizedText("移动速度较慢", "Slower movement speed") 
             }
         ],
-        tips: "适合稳健型玩家。高生命值让你可以承受更多失误，但要注意子弹伤害不减。"
+        tips: getLocalizedText("适合稳健型玩家。高生命值让你可以承受更多失误，但要注意子弹伤害不减。", "Suitable for steady players. High HP allows for more mistakes, but bullet damage is not reduced.")
     },
     magic: {
-        title: "魔法蛇",
+        title: getLocalizedText("魔法蛇", "Magic Snake"),
         color: "#9C27B0",
         ratings: [
-            { name: "生命", value: 3, max: 5 },
-            { name: "速度", value: 3, max: 5 },
-            { name: "魔法", value: 5, max: 5 }
+            { name: getLocalizedText("生命", "Health"), value: 3, max: 5 },
+            { name: getLocalizedText("速度", "Speed"), value: 3, max: 5 },
+            { name: getLocalizedText("魔法", "Magic"), value: 5, max: 5 }
         ],
         attributes: [
             { 
-                name: "移动速度", 
+                name: getLocalizedText("移动速度", "Movement Speed"), 
                 value: "<span class='speed-icon'></span> +15%", 
-                desc: "比坚硬蛇稍快，但不如速度蛇" 
+                desc: getLocalizedText("比坚硬蛇稍快，但不如速度蛇", "Slightly faster than Hard Snake, but slower than Speed Snake") 
             },
             { 
-                name: "效果时长", 
+                name: getLocalizedText("效果时长", "Effect Duration"), 
                 value: "<span class='magic-icon'></span> +50%", 
-                desc: "所有特殊球效果时间延长50%" 
+                desc: getLocalizedText("所有特殊球效果时间延长50%", "All special ball effects duration increased by 50%") 
             },
             { 
-                name: "自动获得", 
-                value: "每20秒", 
-                desc: "自动获得一个随机特殊球(攻击40%/血球30%/无敌20%/反转10%)" 
+                name: getLocalizedText("自动获得", "Auto Generate"), 
+                value: getLocalizedText("每20秒", "Every 20 seconds"), 
+                desc: getLocalizedText("自动获得一个随机特殊球(攻击40%/血球30%/无敌20%/反转10%)", "Automatically gain a random special ball every 20 seconds (40% Attack / 30% Health / 20% Immunity / 10% Reverse)") 
             }
         ],
-        tips: "适合策略型玩家。合理规划特殊球使用时机，效果延长让你更有优势。"
+        tips: getLocalizedText("适合策略型玩家。合理规划特殊球使用时机，效果延长让你更有优势。", "Suitable for strategic players. Plan special ball usage wisely, extended effects give you an advantage.")
     }
 };
 
@@ -6647,7 +6669,7 @@ async function showAllRecords() {
         const container = document.getElementById('records-container');
         modal.style.zIndex = "100";
         // 显示加载中
-        container.innerHTML = '<div class="loading">加载中...</div>';
+        container.innerHTML = '<div class="loading" data-en="Loading...">加载中...</div>';
         modal.style.display = 'block';
         
         // 获取所有用户数据
@@ -6682,7 +6704,7 @@ function displayRecords(users) {
     container.innerHTML = '';
     
     if (!users || users.length === 0) {
-        container.innerHTML = '<div class="no-data">暂无战绩数据</div>';
+        container.innerHTML = `<div class="no-data">${getLocalizedText('暂无战绩数据', 'No record data')}</div>`;
         return;
     }
     
@@ -6701,22 +6723,20 @@ function displayRecords(users) {
         const recordElement = document.createElement('div');
         recordElement.className = 'record-item';
         recordElement.innerHTML = `
-            
             <div class="record-details">
                 <div class="record-username">${user.username}</div>
                 <div class="record-stats">
-                    <div class="record-stat">总场次: ${stats.totalMatches}</div>
-                    <div class="record-stat">总胜场: ${stats.totalWins}</div>
-                    <div class="record-stat">胜率: ${stats.winRate}%</div>
+                    <div class="record-stat">${getLocalizedText('总场次: ', 'Total Matches: ')}${stats.totalMatches}</div>
+                    <div class="record-stat">${getLocalizedText('总胜场: ', 'Total Wins: ')}${stats.totalWins}</div>
+                    <div class="record-stat">${getLocalizedText('胜率: ', 'Win Rate: ')}${stats.winRate}%</div>
                 </div>
                 ${records.map(record => `
                     <div class="record-match">
                         <div class="record-match-opponent">
-                            
-                            <span>对战 ${record.opponentName}</span>
+                            <span>${getLocalizedText('对战 ', 'vs ')}${record.opponentName}</span>
                         </div>
-                        <div>战绩: ${record.wins}胜 ${record.losses}负</div>
-                        <div>胜率: ${record.winRate}%</div>
+                        <div>${getLocalizedText('战绩: ', 'Record: ')}${record.wins}${getLocalizedText('胜 ', 'W ')}${record.losses}${getLocalizedText('负', 'L')}</div>
+                        <div>${getLocalizedText('胜率: ', 'Win Rate: ')}${record.winRate}%</div>
                     </div>
                 `).join('')}
             </div>
@@ -6953,14 +6973,14 @@ function updateStoreDisplay(snakeId) {
     storeBuyBtn.disabled = !selectedCanAfford;
     if (selectedIsMaxLevel) {
         if (selectedItem.id === 'shield') {
-            storeBuyBtn.textContent = '已有护盾';
+            storeBuyBtn.textContent = getLocalizedText('已有护盾', 'Shield Active');
         } else if (selectedItem.id === 'random_balls') {
-            storeBuyBtn.textContent = '可购买';
+            storeBuyBtn.textContent = getLocalizedText('可购买', 'Buy');
         } else {
-            storeBuyBtn.textContent = '已满级';
+            storeBuyBtn.textContent = getLocalizedText('已满级', 'Max Level');
         }
     } else {
-        storeBuyBtn.textContent = selectedCanAfford ? '购买' : '分数不足';
+        storeBuyBtn.textContent = selectedCanAfford ? getLocalizedText('购买', 'Buy') : getLocalizedText('分数不足', 'Insufficient Score');
     }
 }
 
@@ -6997,8 +7017,7 @@ function buyStoreItem(snakeId) {
     applyStoreItemEffect(snakeId, item);
     
     // 显示购买成功提示
-    showNotice(`购买成功! -${item.price}分`, '#4CAF50', 
-              snakes[snakeId][0].x, snakes[snakeId][0].y);
+showNotice(getLocalizedText('购买成功! -', 'Purchase Successful! -') + item.price + getLocalizedText('分', 'pts'), '#4CAF50', head.x, head.y);
     
     // 播放购买特效
     createParticles(snakes[snakeId][0].x + 10, snakes[snakeId][0].y + 10, 20, '#FFD700');
@@ -7023,7 +7042,7 @@ function applyStoreItemEffect(snakeId, item) {
                 updateShieldDisplay(snakeId);
                 
                 // 显示护盾激活特效
-                showNotice('护盾已激活!', '#00BCD4', head.x, head.y);
+                showNotice(getLocalizedText('护盾已激活!', 'Shield Activated!'), '#00BCD4', head.x, head.y);
                 createParticles(head.x + 10, head.y + 10, 30, '#00BCD4');
                 
                 // 创建护盾环绕特效
@@ -7051,7 +7070,7 @@ function applyStoreItemEffect(snakeId, item) {
             // 增加速度
             playerUpgrades[snakeId].speed++;
             speedBoosts[snakeId] += 0.15; // 增加15%速度
-            showNotice('速度增加15%!', '#FFD700', head.x, head.y);
+            showNotice(getLocalizedText('速度增加15%!', 'Speed +15%!'), '#FFD700', head.x, head.y);
             break;
             
         case 'tough_upgrade':
@@ -7066,14 +7085,14 @@ function applyStoreItemEffect(snakeId, item) {
                 health.snake2 += maxHealthIncrease;
             }
             
-            showNotice(`生命值上限+${maxHealthIncrease}!`, '#C0C0C0', head.x, head.y);
+            showNotice(getLocalizedText('生命值上限+2!', 'Max HP +2!'), '#C0C0C0', head.x, head.y);
             updateHealthBars();
             break;
             
         case 'magic_upgrade':
             // 延长特殊效果时间
             playerUpgrades[snakeId].magic++;
-            showNotice('魔法效果时间延长20%!', '#2196F3', head.x, head.y);
+            showNotice(getLocalizedText('魔法效果时间延长20%!', 'Magic Effect Duration +20%!'), '#2196F3', head.x, head.y);
             break;
     }
 }
@@ -7081,13 +7100,13 @@ function applyStoreItemEffect(snakeId, item) {
 // 获取球体名称
 function getBallName(ballType) {
     const names = {
-        'attack': '攻击球',
-        'health': '血球',
-        'immunity': '无敌球',
-        'reverse': '反转球',
-        'bomb': '炸弹球'
+        'attack': getLocalizedText('攻击球', 'Attack Ball'),
+        'health': getLocalizedText('血球', 'Health Ball'),
+        'immunity': getLocalizedText('无敌球', 'Immunity Ball'),
+        'reverse': getLocalizedText('反转球', 'Reverse Ball'),
+        'bomb': getLocalizedText('炸弹球', 'Bomb Ball')
     };
-    return names[ballType] || '魔法球';
+    return names[ballType] || getLocalizedText('魔法球', 'Magic Ball');
 }
 
 // 获取球体颜色

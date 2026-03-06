@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // 添加新函数：检查并提示上传
-  function checkAndPromptUpload() {
+function checkAndPromptUpload() {
     const localHighScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 
     fetch(`${serverurl}/get-all-custom-data`)
@@ -99,17 +99,20 @@ document.addEventListener('DOMContentLoaded', function () {
           if (localHighScore > serverHighScore) {
             setTimeout(() => {
             Swal.fire({
-                title: "发现更高分数",
-                text: `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
+                title: getLocalizedText("发现更高分数", "Higher Score Found"),
+                text: getLocalizedText(
+                    `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
+                    `Your local high score (${localHighScore}) is higher than the server record (${serverHighScore}). Upload?`
+                ),
                 icon: "info",
                 showCancelButton: true,
-                confirmButtonText: "上传",
-                cancelButtonText: "不上传"
+                confirmButtonText: getLocalizedText("上传", "Upload"),
+                cancelButtonText: getLocalizedText("不上传", "Cancel")
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: '正在上传',
-                        text: '请稍候...',
+                        title: getLocalizedText('正在上传', 'Uploading'),
+                        text: getLocalizedText('请稍候...', 'Please wait...'),
                         icon: 'info',
                         showConfirmButton: false,
                         allowOutsideClick: false,
@@ -130,11 +133,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // 排行榜相关HTML和CSS
-  const leaderboardHTML = `
+const leaderboardHTML = `
 <div id="leaderboard-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2 style="font-size: 30px;">贪吃蛇排行榜</h2>
+        <h2 style="font-size: 30px;" data-en="Snake Game Leaderboard">贪吃蛇排行榜</h2>
         <div id="leaderboard-status"></div>
         <div id="leaderboard-list"></div>
     </div>
@@ -252,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 </style>
-<button id="show-leaderboard">排行榜</button>
+<button id="show-leaderboard" data-en="Leaderboard">排行榜</button>
 `;
 
   // 将排行榜HTML添加到页面
@@ -302,7 +305,7 @@ function updateLeaderboard() {
         const userId = localStorage.getItem('userId');
         if (localHighScore > 0 && !topScores.some(item => item.isMe)) {
           topScores.push({
-            username: '我 (本地记录)',
+            username: getLocalizedText('我 (本地记录)', 'Me (Local)'),
             score: parseInt(localHighScore),
             avatar: '',
             isMe: true
@@ -317,13 +320,19 @@ function updateLeaderboard() {
             <div class="leaderboard-rank">${index + 1}</div>
               <img src="${item.avatar || 'default-avatar-url'}" class="leaderboard-avatar" alt="${item.username}">
             <div class="leaderboard-name">${item.username}</div>
-            <div class="leaderboard-score">${item.score}分</div>`;
+            <div class="leaderboard-score">${item.score}${getLocalizedText('分', 'pts')}</div>`;
           leaderboardList.appendChild(itemElement);
         });
 
         // 如果没有数据，显示提示
         if (topScores.length === 0) {
-          leaderboardList.innerHTML = '<div style="text-align:center;padding:20px;">暂无排行榜数据</div>';
+          leaderboardList.innerHTML = `<div style="text-align:center;padding:20px;" data-en="No leaderboard data available">暂无排行榜数据</div>`;
+        }
+        
+        // 注册新元素
+        if (window.i18n) {
+          const newElements = leaderboardList.querySelectorAll('[data-en]');
+          newElements.forEach(el => window.i18n.register(el));
         }
       } else {
         console.error('获取排行榜数据失败:', data.message);
@@ -704,7 +713,7 @@ function updateLeaderboard() {
   }
         
   // 游戏结束
-  function gameOver() {
+function gameOver() {
     isGameActive = false;
     backButton.style.display = "block";
     clearInterval(gameInterval);
@@ -760,17 +769,20 @@ function updateLeaderboard() {
           if (localHighScore > serverHighScore) {
             setTimeout(() => {
               Swal.fire({
-                  title: "新纪录！",
-                  text: `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
+                  title: getLocalizedText("新纪录！", "New Record!"),
+                  text: getLocalizedText(
+                      `你的本地最高分(${localHighScore})高于服务器记录(${serverHighScore})，要上传吗?`,
+                      `Your local high score (${localHighScore}) is higher than the server record (${serverHighScore}). Upload?`
+                  ),
                   icon: "info",
                   showCancelButton: true,
-                  confirmButtonText: "上传",
-                  cancelButtonText: "不上传"
+                  confirmButtonText: getLocalizedText("上传", "Upload"),
+                  cancelButtonText: getLocalizedText("不上传", "Cancel")
               }).then((result) => {
                   if (result.isConfirmed) {
                       Swal.fire({
-                          title: '正在上传',
-                          text: '请稍候...',
+                          title: getLocalizedText('正在上传', 'Uploading'),
+                          text: getLocalizedText('请稍候...', 'Please wait...'),
                           icon: 'info',
                           showConfirmButton: false,
                           allowOutsideClick: false,
@@ -790,12 +802,15 @@ function updateLeaderboard() {
       });
   }
 
-  // 上传分数函数
-  function uploadScore(score) {
+function uploadScore(score) {
     const userId = localStorage.getItem('userid');
     
     if (!userId) {
-      Swal.fire("上传失败", "请先登录", "error");
+      Swal.fire(
+          getLocalizedText("上传失败", "Upload Failed"),
+          getLocalizedText("请先登录", "Please login first"),
+          "error"
+      );
       return;
     }
     
@@ -825,7 +840,11 @@ function updateLeaderboard() {
       .then(data => {
         if (data && data.success) {
           localStorage.setItem('uploadedHighScore', score);
-          Swal.fire("上传成功", "你的分数已记录到排行榜", "success");
+          Swal.fire(
+              getLocalizedText("上传成功", "Upload Successful"),
+              getLocalizedText("你的分数已记录到排行榜", "Your score has been recorded to the leaderboard"),
+              "success"
+          );
           updateLeaderboard();
         } else {
           throw new Error(data?.message || "未知错误");
@@ -837,14 +856,19 @@ function updateLeaderboard() {
         
         // 处理常见的错误情况
         if (errorMsg.includes('<!DOCTYPE')) {
-          errorMsg = "服务器返回了错误页面，请检查网络连接";
+          errorMsg = getLocalizedText("服务器返回了错误页面，请检查网络连接", "Server returned an error page, please check network connection");
         } else if (errorMsg.includes('Failed to fetch')) {
-          errorMsg = "网络连接失败，请检查网络设置";
+          errorMsg = getLocalizedText("网络连接失败，请检查网络设置", "Network connection failed, please check network settings");
         }
         
-        Swal.fire("上传失败", errorMsg, "error");
+        Swal.fire(
+            getLocalizedText("上传失败", "Upload Failed"),
+            errorMsg,
+            "error"
+        );
       });
   }
+
         
   // 创建粒子效果
   function createParticles(x, y, count, color) {

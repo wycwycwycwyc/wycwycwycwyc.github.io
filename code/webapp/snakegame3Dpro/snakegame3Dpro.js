@@ -149,22 +149,22 @@
                 open: false,
                 selectedIndex: 0,
                 items: [
-                    { id: 'shield', name: '能量护盾', desc: '获得10点护盾值', price: 400 },
-                    { id: 'magic-pack', name: '魔法球礼包', desc: '获得3个随机魔法球', price: 400 },
-                    { id: 'speed-upgrade', name: '速度升级', desc: '永久增加15%移动速度', price: 500 },
-                    { id: 'hard-upgrade', name: '坚硬升级', desc: '永久增加2点生命上限', price: 500 },
-                    { id: 'magic-upgrade', name: '魔法升级', desc: '延长20%效果时间', price: 500 }
+                    { id: 'shield', name: getLocalizedText('能量护盾', 'Energy Shield'), desc: getLocalizedText('获得10点护盾值', 'Gain 10 shield points'), price: 400 },
+                    { id: 'magic-pack', name: getLocalizedText('魔法球礼包', 'Magic Ball Pack'), desc: getLocalizedText('获得3个随机魔法球', 'Get 3 random magic balls'), price: 400 },
+                    { id: 'speed-upgrade', name: getLocalizedText('速度升级', 'Speed Upgrade'), desc: getLocalizedText('永久增加15%移动速度', 'Permanently increase movement speed by 15%'), price: 500 },
+                    { id: 'hard-upgrade', name: getLocalizedText('坚硬升级', 'Hard Upgrade'), desc: getLocalizedText('永久增加2点生命上限', 'Permanently increase max HP by 2'), price: 500 },
+                    { id: 'magic-upgrade', name: getLocalizedText('魔法升级', 'Magic Upgrade'), desc: getLocalizedText('延长20%效果时间', 'Extend effect duration by 20%'), price: 500 }
                 ]
             },
             player2: {
                 open: false,
                 selectedIndex: 0,
                 items: [
-                    { id: 'shield', name: '能量护盾', desc: '获得10点护盾值', price: 400 },
-                    { id: 'magic-pack', name: '魔法球礼包', desc: '获得3个随机魔法球', price: 400 },
-                    { id: 'speed-upgrade', name: '速度升级', desc: '永久增加15%移动速度', price: 500 },
-                    { id: 'hard-upgrade', name: '坚硬升级', desc: '永久增加2点生命上限', price: 500 },
-                    { id: 'magic-upgrade', name: '魔法升级', desc: '延长20%效果时间', price: 500 }
+                    { id: 'shield', name: getLocalizedText('能量护盾', 'Energy Shield'), desc: getLocalizedText('获得10点护盾值', 'Gain 10 shield points'), price: 400 },
+                    { id: 'magic-pack', name: getLocalizedText('魔法球礼包', 'Magic Ball Pack'), desc: getLocalizedText('获得3个随机魔法球', 'Get 3 random magic balls'), price: 400 },
+                    { id: 'speed-upgrade', name: getLocalizedText('速度升级', 'Speed Upgrade'), desc: getLocalizedText('永久增加15%移动速度', 'Permanently increase movement speed by 15%'), price: 500 },
+                    { id: 'hard-upgrade', name: getLocalizedText('坚硬升级', 'Hard Upgrade'), desc: getLocalizedText('永久增加2点生命上限', 'Permanently increase max HP by 2'), price: 500 },
+                    { id: 'magic-upgrade', name: getLocalizedText('魔法升级', 'Magic Upgrade'), desc: getLocalizedText('延长20%效果时间', 'Extend effect duration by 20%'), price: 500 }
                 ]
             }
         };
@@ -200,12 +200,12 @@
         const winnerText = document.getElementById('winner-text');
         const statsContainer = document.getElementById('stats-container');
         const playAgainButton = document.getElementById('play-again-btn');
-        document.getElementById('player1-base-name').textContent = player1Name + '基地';
-        document.getElementById('player2-base-name').textContent = player2Name + '基地';
+        document.getElementById('player1-base-name').textContent = player1Name + getLocalizedText('基地', ' Base');
+        document.getElementById('player2-base-name').textContent = player2Name + getLocalizedText('基地', ' Base');
         document.getElementById('player1-panel-name').textContent = player1Name;
         document.getElementById('player2-panel-name').textContent = player2Name;
-        document.getElementById('player1-selection-title').textContent = player1Name + '选择蛇类型';
-        document.getElementById('player2-selection-title').textContent = player2Name + '选择蛇类型';
+        document.getElementById('player1-selection-title').textContent = player1Name + getLocalizedText('选择蛇类型', ' Choose Snake Type');
+        document.getElementById('player2-selection-title').textContent = player2Name + getLocalizedText('选择蛇类型', ' Choose Snake Type');
         let homepageState = {
             visible: true,
             animationComplete: false
@@ -387,17 +387,19 @@
                 if (player1Selected) {
                     const player1Type = player1Selected.dataset.type;
                     gameState.player1.type = player1Type;
-                    document.getElementById('player1-type').textContent =
-                        player1Type === 'speed' ? '速度蛇' :
-                            player1Type === 'hard' ? '坚硬蛇' : '魔法蛇';
+                    document.getElementById('player1-type').textContent = 
+                        player1Type === 'speed' ? getLocalizedText('速度蛇', 'Speed Snake') :
+                        player1Type === 'hard' ? getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                        getLocalizedText('魔法蛇', 'Magic Snake');
                 }
 
                 if (player2Selected) {
                     const player2Type = player2Selected.dataset.type;
                     gameState.player2.type = player2Type;
-                    document.getElementById('player2-type').textContent =
-                        player2Type === 'speed' ? '速度蛇' :
-                            player2Type === 'hard' ? '坚硬蛇' : '魔法蛇';
+                    document.getElementById('player2-type').textContent = 
+                        player2Type === 'speed' ? getLocalizedText('速度蛇', 'Speed Snake') :
+                        player2Type === 'hard' ? getLocalizedText('坚硬蛇', 'Hard Snake') : 
+                        getLocalizedText('魔法蛇', 'Magic Snake');
                 }
                 setTimeout(() => {
                     selectionOverlay.style.display = 'none';
@@ -2431,9 +2433,7 @@
                 recordDamageDealt(playerKey, damage, otherPlayerKey, 'headCollision');
                 recordDamageDealt(otherPlayerKey, damage, playerKey, 'headCollision');
                 if (gameState[playerKey].hp <= 0) {
-                    gameState[playerKey].deathReason = `与${otherPlayerKey === 'player1' ?
-                        localStorage.getItem('username') || '玩家1' :
-                        localStorage.getItem('player2_username') || '玩家2'}迎面相撞身亡`;
+                    gameState[playerKey].deathReason = getDeathReason(source, damage, player);
                 }
                 // 更新碰撞时间
                 gameState.lastCollisionTime[playerKey] = currentTime;
@@ -2462,9 +2462,7 @@
                         showDamageEffect(playerKey);
                         // 设置死亡原因
                         if (gameState[playerKey].hp <= 0) {
-                            gameState[playerKey].deathReason = `撞到${otherPlayerKey === 'player1' ?
-                                localStorage.getItem('username') || '玩家1' :
-                                localStorage.getItem('player2_username') || '玩家2'}的蛇身身亡`;
+                            gameState[playerKey].deathReason = getDeathReason(source, damage, player);
                         }
                     }
                     recordDamageDealt(otherPlayerKey, damage, playerKey, 'bodyCollision');
@@ -3007,52 +3005,43 @@
             // 返回是否实际造成了伤害
             return oldHp > player.hp;
         }
-        function getDeathReason(source, damage, player) {
-            const playerName = player === gameState.player1 ?
-                localStorage.getItem('username') || '玩家1' :
-                localStorage.getItem('player2_username') || '玩家2';
+function getDeathReason(source, damage, player) {
+    const playerName = player === gameState.player1 ?
+        localStorage.getItem('username') || getLocalizedText('玩家1', 'Player 1') :
+        localStorage.getItem('player2_username') || getLocalizedText('玩家2', 'Player 2');
 
-            const opponentName = player === gameState.player1 ?
-                localStorage.getItem('player2_username') || '玩家2' :
-                localStorage.getItem('username') || '玩家1';
+    const opponentName = player === gameState.player1 ?
+        localStorage.getItem('player2_username') || getLocalizedText('玩家2', 'Player 2') :
+        localStorage.getItem('username') || getLocalizedText('玩家1', 'Player 1');
 
-            switch (source) {
-                case 'wall':
-                    return `${playerName}撞墙而死`;
+    switch (source) {
+        case 'wall':
+            return getLocalizedText(playerName + '撞墙而死', playerName + ' crashed into the wall');
+        case 'headCollision':
+            return getLocalizedText(playerName + '蛇头相撞而死', playerName + ' collided head-on');
+        case 'bodyCollision':
+            return getLocalizedText(playerName + '蛇身相撞身亡', playerName + ' collided with body');
+        case 'bullet':
+            return getLocalizedText(playerName + '被子弹击中', playerName + ' was hit by a bullet');
+        case 'baseBullet':
+            return getLocalizedText(playerName + '被基地防御系统击杀', playerName + ' was killed by base defense');
+        case 'base':
+            return getLocalizedText(playerName + '在对方基地内被击毙', playerName + ' was killed in enemy base');
+        case 'lava':
+            return getLocalizedText(playerName + '被岩浆烧死', playerName + ' was burned by lava');
+        case 'bomb':
+            return getLocalizedText(playerName + '被炸弹炸死', playerName + ' was killed by a bomb');
+        case 'dash':
+            return getLocalizedText(playerName + '俯冲过猛身亡', playerName + ' crashed while dashing');
+        case 'storm':
+            return getLocalizedText(playerName + '在暴风雪中冻死', playerName + ' froze to death in blizzard');
+        case 'magic':
+            return getLocalizedText(playerName + '被魔法效果致死', playerName + ' died from magic effect');
+        default:
+            return getLocalizedText('被击败', 'was defeated');
+    }
+}
 
-                case 'headCollision':
-                    return `${playerName}蛇头相撞而死`;
-                case 'bodyCollision':
-                    return `${playerName}蛇身相撞身亡`;
-
-                case 'bullet':
-                    return `${playerName}被子弹击中`;
-
-                case 'baseBullet':
-                    return `${playerName}被基地防御系统击杀`;
-
-                case 'base':
-                    return `${playerName}在对方基地内被击毙`;
-
-                case 'lava':
-                    return `${playerName}被岩浆烧死`;
-
-                case 'bomb':
-                    return `${playerName}被炸弹炸死`;
-
-                case 'dash':
-                    return `${playerName}俯冲过猛身亡`;
-
-                case 'storm':
-                    return `${playerName}在暴风雪中冻死`;
-
-                case 'magic':
-                    return `${playerName}被魔法效果致死`;
-
-                default:
-                    return '被击败';
-            }
-        }
         function recordDamageDealt(dealerKey, damage, targetKey, source) {
             const dealer = gameState[dealerKey];
 
@@ -4262,7 +4251,7 @@
                 const timeString = `${minutes}分${seconds}秒`;
 
                 // 创建游戏结束界面
-                gameOverScreen.innerHTML = `
+gameOverScreen.innerHTML = `
 <div class="game-over-content">
     <div class="winner-container">
         ${winner === 'draw' ? `
@@ -4270,19 +4259,18 @@
                 <i class="fas fa-trophy" style="color: #FFD700;"></i>
                 <i class="fas fa-trophy" style="color: #C0C0C0;"></i>
             </div>
-            <h2 class="winner-banner">平局!</h2>
+            <h2 class="winner-banner">${getLocalizedText('平局!', 'Draw!')}</h2>
         ` : `
             <div class="trophy-icon">
                 <i class="fas fa-trophy" style="color: ${winner === 'player1' ? '#FFD700' : '#C0C0C0'};"></i>
             </div>
             <h2 class="winner-banner ${winner === 'player1' ? 'player-1-win' : 'player-2-win'}">
-                ${winner === 'player1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}获胜!
+                ${winner === 'player1' ? localStorage.getItem("username") : localStorage.getItem("player2_username")}${getLocalizedText('获胜!', ' Wins!')}
             </h2>
         `}
     </div>
     
     <!-- 失败者死亡原因 -->
-<!-- 失败者死亡原因 -->
 ${loser ? `
     <div class="death-cause" id="death-cause" style="
         margin: 15px auto;
@@ -4294,13 +4282,13 @@ ${loser ? `
         border: 1px solid ${loser === 'player1' ? '#FF5722' : '#2196F3'};
     ">
         <div style="font-size: 14px; color: #ccc; margin-bottom: 5px;">
-            <i class="fas fa-skull-crossbones"></i> 原因
+            <i class="fas fa-skull-crossbones"></i> ${getLocalizedText('原因', 'Cause')}
         </div>
         <div style="font-size: 18px; font-weight: bold; color: white;">
-            ${gameState[loser].deathReason || '被击败'}
+            ${gameState[loser].deathReason || getLocalizedText('被击败', 'Defeated')}
         </div>
         <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
-            最后血量: ${Math.max(0, gameState[loser].hp.toFixed(1))} | 最终分数: ${gameState[loser].score}
+            ${getLocalizedText('最后血量: ', 'Final HP: ')}${Math.max(0, gameState[loser].hp.toFixed(1))} | ${getLocalizedText('最终分数: ', 'Final Score: ')}${gameState[loser].score}
         </div>
     </div>
 ` : ''}
@@ -4311,11 +4299,12 @@ ${loser ? `
             <div class="player-avatar">
                 <i class="fas fa-user" style="color: #FF5722;"></i>
             </div>
-            <div class="player-name">${localStorage.getItem("username") || "玩家1"}</div>
+            <div class="player-name">${localStorage.getItem("username") || getLocalizedText("玩家1", "Player 1")}</div>
             <div class="player-type" style="font-size: 12px; color: #FFA500; margin: 5px 0;">
-                ${gameState.player1.type === 'speed' ? '⚡ 速度蛇' :
-                        gameState.player1.type === 'hard' ? '🛡️ 坚硬蛇' :
-                            gameState.player1.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                ${gameState.player1.type === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') :
+                    gameState.player1.type === 'hard' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') :
+                    gameState.player1.type === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : 
+                    getLocalizedText('未选择', 'Not Selected')}
             </div>
             <div class="win-count">
                 <span class="history-wins">${player1Wins}</span>
@@ -4325,7 +4314,7 @@ ${loser ? `
                 <div class="progress-fill" style="width: ${calculateWinPercentage(player1Wins, player2Wins)}%; background: linear-gradient(to right, #FF5722, #FF9800);"></div>
             </div>
             <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                ${gameStats.deathCauses.player1 ? `💀 ${gameStats.deathCauses.player1}` : gameState.player1.hp > 0 ? '👍 存活' : ''}
+                ${gameStats.deathCauses.player1 ? `💀 ${gameStats.deathCauses.player1}` : gameState.player1.hp > 0 ? '👍 ' + getLocalizedText('存活', 'Alive') : ''}
             </div>
         </div>
         
@@ -4335,11 +4324,12 @@ ${loser ? `
             <div class="player-avatar">
                 <i class="fas fa-user" style="color: #2196F3;"></i>
             </div>
-            <div class="player-name">${localStorage.getItem("player2_username") || "玩家2"}</div>
+            <div class="player-name">${localStorage.getItem("player2_username") || getLocalizedText("玩家2", "Player 2")}</div>
             <div class="player-type" style="font-size: 12px; color: #00BCD4; margin: 5px 0;">
-                ${gameState.player2.type === 'speed' ? '⚡ 速度蛇' :
-                        gameState.player2.type === 'hard' ? '🛡️ 坚硬蛇' :
-                            gameState.player2.type === 'magic' ? '✨ 魔法蛇' : '未选择'}
+                ${gameState.player2.type === 'speed' ? '⚡ ' + getLocalizedText('速度蛇', 'Speed Snake') :
+                    gameState.player2.type === 'hard' ? '🛡️ ' + getLocalizedText('坚硬蛇', 'Hard Snake') :
+                    gameState.player2.type === 'magic' ? '✨ ' + getLocalizedText('魔法蛇', 'Magic Snake') : 
+                    getLocalizedText('未选择', 'Not Selected')}
             </div>
             <div class="win-count">
                 <span class="history-wins">${player2Wins}</span>
@@ -4349,7 +4339,7 @@ ${loser ? `
                 <div class="progress-fill" style="width: ${calculateWinPercentage(player2Wins, player1Wins)}%; background: linear-gradient(to right, #2196F3, #00BCD4);"></div>
             </div>
             <div class="death-info" style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">
-                ${gameStats.deathCauses.player2 ? `💀 ${gameStats.deathCauses.player2}` : gameState.player2.hp > 0 ? '👍 存活' : ''}
+                ${gameStats.deathCauses.player2 ? `💀 ${gameStats.deathCauses.player2}` : gameState.player2.hp > 0 ? '👍 ' + getLocalizedText('存活', 'Alive') : ''}
             </div>
         </div>
     </div>
@@ -4363,41 +4353,41 @@ ${loser ? `
         border: 1px solid rgba(255, 215, 0, 0.3);
     ">
         <h3 style="color: #FFD700; text-align: center; margin-bottom: 20px;">
-            <i class="fas fa-chart-bar"></i> 本局详细数据统计
+            <i class="fas fa-chart-bar"></i> ${getLocalizedText('本局详细数据统计', 'Game Statistics')}
         </h3>
 
         <div style="display: flex; justify-content: space-between; gap: 20px;">
             <!-- 玩家1统计 -->
             <div style="flex: 1;">
-                <h4 style="color: #FF7F00; text-align: center;">${localStorage.getItem("username") || "玩家1"}</h4>
+                <h4 style="color: #FF7F00; text-align: center;">${localStorage.getItem("username") || getLocalizedText("玩家1", "Player 1")}</h4>
                 <div style="font-size: 12px; color: #ccc; margin: 5px 0;">
-                    <i class="fas fa-road"></i> 总路程: ${Math.round(gameState.player1.stats.totalDistance)} 米
+                    <i class="fas fa-road"></i> ${getLocalizedText('总路程: ', 'Total Distance: ')}${Math.round(gameState.player1.stats.totalDistance)} ${getLocalizedText('米', 'm')}
                 </div>
                 
                 <div style="background: rgba(255, 127, 0, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                    <div style="color: #FFA500; font-weight: bold; margin-bottom: 8px;">承受伤害统计:</div>
+                    <div style="color: #FFA500; font-weight: bold; margin-bottom: 8px;">${getLocalizedText('承受伤害统计:', 'Damage Taken:')}</div>
                     <div style="font-size: 12px; color: #ccc;">
-                        <div>撞墙伤害: ${Math.round(gameState.player1.stats.damageTaken.wall)}</div>
-                        <div>蛇碰撞伤害: ${Math.round(gameState.player1.stats.damageTaken.snakeCollision)}</div>
-                        <div>子弹伤害: ${Math.round(gameState.player1.stats.damageTaken.bullet)}</div>
-                        <div>基地伤害: ${Math.round(gameState.player1.stats.damageTaken.base)}</div>
-                        ${gameState.mapType === 'volcano' ? `<div>岩浆伤害: ${Math.round(gameState.player1.stats.damageTaken.lava)}</div>` : ''}
-                        <div>炸弹伤害: ${Math.round(gameState.player1.stats.damageTaken.bomb)}</div>
+                        <div>${getLocalizedText('撞墙伤害: ', 'Wall: ')}${Math.round(gameState.player1.stats.damageTaken.wall)}</div>
+                        <div>${getLocalizedText('蛇碰撞伤害: ', 'Collision: ')}${Math.round(gameState.player1.stats.damageTaken.snakeCollision)}</div>
+                        <div>${getLocalizedText('子弹伤害: ', 'Bullet: ')}${Math.round(gameState.player1.stats.damageTaken.bullet)}</div>
+                        <div>${getLocalizedText('基地伤害: ', 'Base: ')}${Math.round(gameState.player1.stats.damageTaken.base)}</div>
+                        ${gameState.mapType === 'volcano' ? `<div>${getLocalizedText('岩浆伤害: ', 'Lava: ')}${Math.round(gameState.player1.stats.damageTaken.lava)}</div>` : ''}
+                        <div>${getLocalizedText('炸弹伤害: ', 'Bomb: ')}${Math.round(gameState.player1.stats.damageTaken.bomb)}</div>
                         <div style="color: #FF6B6B; font-weight: bold; margin-top: 5px;">
-                            总计: ${Math.round(gameState.player1.stats.damageTaken.total)}
+                            ${getLocalizedText('总计: ', 'Total: ')}${Math.round(gameState.player1.stats.damageTaken.total)}
                         </div>
                     </div>
                 </div>
                 
                 <div style="background: rgba(255, 215, 0, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                    <div style="color: #FFD700; font-weight: bold; margin-bottom: 8px;">输出伤害统计:</div>
+                    <div style="color: #FFD700; font-weight: bold; margin-bottom: 8px;">${getLocalizedText('输出伤害统计:', 'Damage Dealt:')}</div>
                     <div style="font-size: 12px; color: #ccc;">
-                        <div>蛇碰撞伤害: ${Math.round(gameState.player1.stats.damageDealt.snakeCollision)}</div>
-                        <div>子弹伤害: ${Math.round(gameState.player1.stats.damageDealt.bullet)}</div>
-                        <div>炸弹伤害: ${Math.round(gameState.player1.stats.damageDealt.bomb)}</div>
-                        <div>对基地伤害: ${Math.round(gameState.player1.stats.damageDealt.baseDamage)}</div>
+                        <div>${getLocalizedText('蛇碰撞伤害: ', 'Collision: ')}${Math.round(gameState.player1.stats.damageDealt.snakeCollision)}</div>
+                        <div>${getLocalizedText('子弹伤害: ', 'Bullet: ')}${Math.round(gameState.player1.stats.damageDealt.bullet)}</div>
+                        <div>${getLocalizedText('炸弹伤害: ', 'Bomb: ')}${Math.round(gameState.player1.stats.damageDealt.bomb)}</div>
+                        <div>${getLocalizedText('对基地伤害: ', 'Base Damage: ')}${Math.round(gameState.player1.stats.damageDealt.baseDamage)}</div>
                         <div style="color: #00FF00; font-weight: bold; margin-top: 5px;">
-                            总输出伤害: ${Math.round(gameState.player1.stats.damageDealt.total)}
+                            ${getLocalizedText('总输出伤害: ', 'Total Damage: ')}${Math.round(gameState.player1.stats.damageDealt.total)}
                         </div>
                     </div>
                 </div>
@@ -4411,40 +4401,40 @@ ${loser ? `
                 <div style="color: white; font-size: 1.8rem; font-weight: bold;">
                     ${Math.floor(gameState.gameTime / 60)}:${Math.floor(gameState.gameTime % 60).toString().padStart(2, '0')}
                 </div>
-                <div style="color: #aaa; font-size: 12px; margin-top: 5px;">总游戏时间</div>
+                <div style="color: #aaa; font-size: 12px; margin-top: 5px;">${getLocalizedText('总游戏时间', 'Game Time')}</div>
             </div>
             
             <!-- 玩家2统计 -->
             <div style="flex: 1;">
-                <h4 style="color: #4169E1; text-align: center;">${localStorage.getItem("player2_username") || "玩家2"}</h4>
+                <h4 style="color: #4169E1; text-align: center;">${localStorage.getItem("player2_username") || getLocalizedText("玩家2", "Player 2")}</h4>
                 <div style="font-size: 12px; color: #ccc; margin: 5px 0;">
-                    <i class="fas fa-road"></i> 总路程: ${Math.round(gameState.player2.stats.totalDistance)} 米
+                    <i class="fas fa-road"></i> ${getLocalizedText('总路程: ', 'Total Distance: ')}${Math.round(gameState.player2.stats.totalDistance)} ${getLocalizedText('米', 'm')}
                 </div>
                 
                 <div style="background: rgba(65, 105, 225, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">承受伤害统计:</div>
+                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">${getLocalizedText('承受伤害统计:', 'Damage Taken:')}</div>
                     <div style="font-size: 12px; color: #ccc;">
-                        <div>撞墙伤害: ${Math.round(gameState.player2.stats.damageTaken.wall)}</div>
-                        <div>蛇碰撞伤害: ${Math.round(gameState.player2.stats.damageTaken.snakeCollision)}</div>
-                        <div>子弹伤害: ${Math.round(gameState.player2.stats.damageTaken.bullet)}</div>
-                        <div>基地伤害: ${Math.round(gameState.player2.stats.damageTaken.base)}</div>
-                        ${gameState.mapType === 'volcano' ? `<div>岩浆伤害: ${Math.round(gameState.player2.stats.damageTaken.lava)}</div>` : ''}
-                        <div>炸弹伤害: ${Math.round(gameState.player2.stats.damageTaken.bomb)}</div>
+                        <div>${getLocalizedText('撞墙伤害: ', 'Wall: ')}${Math.round(gameState.player2.stats.damageTaken.wall)}</div>
+                        <div>${getLocalizedText('蛇碰撞伤害: ', 'Collision: ')}${Math.round(gameState.player2.stats.damageTaken.snakeCollision)}</div>
+                        <div>${getLocalizedText('子弹伤害: ', 'Bullet: ')}${Math.round(gameState.player2.stats.damageTaken.bullet)}</div>
+                        <div>${getLocalizedText('基地伤害: ', 'Base: ')}${Math.round(gameState.player2.stats.damageTaken.base)}</div>
+                        ${gameState.mapType === 'volcano' ? `<div>${getLocalizedText('岩浆伤害: ', 'Lava: ')}${Math.round(gameState.player2.stats.damageTaken.lava)}</div>` : ''}
+                        <div>${getLocalizedText('炸弹伤害: ', 'Bomb: ')}${Math.round(gameState.player2.stats.damageTaken.bomb)}</div>
                         <div style="color: #FF6B6B; font-weight: bold; margin-top: 5px;">
-                            总计: ${Math.round(gameState.player2.stats.damageTaken.total)}
+                            ${getLocalizedText('总计: ', 'Total: ')}${Math.round(gameState.player2.stats.damageTaken.total)}
                         </div>
                     </div>
                 </div>
                 
                 <div style="background: rgba(135, 206, 235, 0.1); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">输出伤害统计:</div>
+                    <div style="color: #87CEEB; font-weight: bold; margin-bottom: 8px;">${getLocalizedText('输出伤害统计:', 'Damage Dealt:')}</div>
                     <div style="font-size: 12px; color: #ccc;">
-                        <div>蛇碰撞伤害: ${Math.round(gameState.player2.stats.damageDealt.snakeCollision)}</div>
-                        <div>子弹伤害: ${Math.round(gameState.player2.stats.damageDealt.bullet)}</div>
-                        <div>炸弹伤害: ${Math.round(gameState.player2.stats.damageDealt.bomb)}</div>
-                        <div>对基地伤害: ${Math.round(gameState.player2.stats.damageDealt.baseDamage)}</div>
+                        <div>${getLocalizedText('蛇碰撞伤害: ', 'Collision: ')}${Math.round(gameState.player2.stats.damageDealt.snakeCollision)}</div>
+                        <div>${getLocalizedText('子弹伤害: ', 'Bullet: ')}${Math.round(gameState.player2.stats.damageDealt.bullet)}</div>
+                        <div>${getLocalizedText('炸弹伤害: ', 'Bomb: ')}${Math.round(gameState.player2.stats.damageDealt.bomb)}</div>
+                        <div>${getLocalizedText('对基地伤害: ', 'Base Damage: ')}${Math.round(gameState.player2.stats.damageDealt.baseDamage)}</div>
                         <div style="color: #00FF00; font-weight: bold; margin-top: 5px;">
-                            总输出伤害: ${Math.round(gameState.player2.stats.damageDealt.total)}
+                            ${getLocalizedText('总输出伤害: ', 'Total Damage: ')}${Math.round(gameState.player2.stats.damageDealt.total)}
                         </div>
                     </div>
                 </div>
@@ -4455,17 +4445,17 @@ ${loser ? `
     
     <div class="buttons-container">
     <button class="restart-btn" id="show-game-stats" onclick="toggleGameStats()">
-        <i class="fas fa-chart-bar"></i> 显示本局数据
+        <i class="fas fa-chart-bar"></i> ${getLocalizedText('显示本局数据', 'Show Stats')}
     </button>
         <button class="restart-btn" id="play-again">
-            <i class="fas fa-redo"></i> 再来一局
+            <i class="fas fa-redo"></i> ${getLocalizedText('再来一局', 'Play Again')}
         </button>
         <button class="restart-btn upload-btn" id="save-record">
-            <i class="fas fa-save"></i> 保存战绩
+            <i class="fas fa-save"></i> ${getLocalizedText('保存战绩', 'Save Record')}
         </button>
     </div>
 </div>
-                `;
+`;
 
                 // 再来一局按钮事件
                 document.getElementById('play-again').addEventListener('click', () => {
@@ -4480,7 +4470,7 @@ ${loser ? `
                     // 禁用按钮防止重复点击
                     const saveBtn = document.getElementById('save-record');
                     saveBtn.disabled = true;
-                    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 保存中...`;
+                    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${getLocalizedText('保存中...', 'Saving...')}`;
 
                     // 上传本次比赛结果
                     uploadGameRecord(currentWin1, currentWin2).then(() => {
@@ -4506,19 +4496,23 @@ ${loser ? `
                             }
 
                             // 显示保存成功提示
-                            showGameOverMessage('战绩保存成功!', '#4CAF50');
+                            showGameOverMessage(getLocalizedText('战绩保存成功!', 'Record saved successfully!'), '#4CAF50');
 
                             // 更新按钮状态
-                            saveBtn.innerHTML = `<i class="fas fa-check"></i> 已保存`;
+                            saveBtn.innerHTML = `<i class="fas fa-check"></i> ${getLocalizedText('已保存', 'Saved')}`;
                         }
                     }).catch(error => {
                         console.error('保存战绩失败:', error);
-                        showGameOverMessage('保存失败: ' + error.message, '#FF5722');
+                        showGameOverMessage(
+                            getLocalizedText('保存失败: ', 'Save failed: ') + error.message, 
+                            '#FF5722'
+                        );
 
                         // 恢复按钮状态
                         saveBtn.disabled = false;
-                        saveBtn.innerHTML = `<i class="fas fa-save"></i> 保存战绩`;
+                        saveBtn.innerHTML = `<i class="fas fa-save"></i> ${getLocalizedText('保存战绩', 'Save Record')}`;
                     });
+
                 });
 
                 // 显示游戏结束界面
@@ -4537,7 +4531,7 @@ ${loser ? `
             if (statsContainer.style.display === 'none') {
                 // 显示数据统计
                 statsContainer.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-chart-bar"></i> 隐藏本局数据';
+                button.innerHTML = `<i class="fas fa-chart-bar"></i> ${getLocalizedText('隐藏本局数据', 'Hide Game Data')}`;
                 document.getElementById('death-cause').style.display = 'none';
                 document.getElementById('stats-container').style.display = 'none';
                 // 添加动画效果
@@ -4557,7 +4551,7 @@ ${loser ? `
                 document.getElementById('stats-container').style.display = 'flex';
                 setTimeout(() => {
                     statsContainer.style.display = 'none';
-                    button.innerHTML = '<i class="fas fa-chart-bar"></i> 显示本局数据';
+                    button.innerHTML = `<i class="fas fa-chart-bar"></i> ${getLocalizedText('显示本局数据', 'Show Game Data')}`;
                 }, 300);
             }
         }
@@ -4565,17 +4559,17 @@ ${loser ? `
         function recordDeathCauses() {
             if (gameState.player1.hp <= 0) {
                 if (gameState.player1.shield <= 0) {
-                    gameStats.deathCauses.player1 = '被击败';
+                    gameStats.deathCauses.player1 = getLocalizedText('被击败', 'Defeated');
                 } else {
-                    gameStats.deathCauses.player1 = '护盾耗尽';
+                    gameStats.deathCauses.player1 = getLocalizedText('护盾耗尽', 'Shield Depleted');
                 }
             }
 
             if (gameState.player2.hp <= 0) {
                 if (gameState.player2.shield <= 0) {
-                    gameStats.deathCauses.player2 = '被击败';
+                    gameStats.deathCauses.player2 = getLocalizedText('被击败', 'Defeated');
                 } else {
-                    gameStats.deathCauses.player2 = '护盾耗尽';
+                    gameStats.deathCauses.player2 = getLocalizedText('护盾耗尽', 'Shield Depleted');
                 }
             }
         }
@@ -4607,7 +4601,6 @@ ${loser ? `
             if (buttonsContainer) {
                 buttonsContainer.insertAdjacentElement('beforebegin', messageEl);
 
-                // 3秒后淡出
                 setTimeout(() => {
                     messageEl.style.opacity = '0';
                     setTimeout(() => {
@@ -4616,6 +4609,7 @@ ${loser ? `
                 }, 3000);
             }
         }
+
 
         // 计算胜率百分比
         function calculateWinPercentage(wins, opponentWins) {
@@ -4790,12 +4784,12 @@ ${loser ? `
         // 获取魔法球描述
         function getBallDescription(ballType) {
             switch (ballType) {
-                case 'invincible': return '无敌球：一段时间内免疫所有伤害';
-                case 'health': return '血球：恢复5点生命值';
-                case 'reverse': return '反转球：使对手控制反向';
-                case 'attack': return '攻击球：激活自动攻击模式';
-                case 'bomb': return '炸弹球：触发范围爆炸';
-                default: return '未知魔法球';
+                case 'invincible': return getLocalizedText('无敌球：一段时间内免疫所有伤害', 'Invincibility: Immune to all damage for a period');
+                case 'health': return getLocalizedText('血球：恢复5点生命值', 'Health: Restore 5 HP');
+                case 'reverse': return getLocalizedText('反转球：使对手控制反向', 'Reverse: Reverse opponent controls');
+                case 'attack': return getLocalizedText('攻击球：激活自动攻击模式', 'Attack: Activate auto-attack mode');
+                case 'bomb': return getLocalizedText('炸弹球：触发范围爆炸', 'Bomb: Trigger area explosion');
+                default: return getLocalizedText('未知魔法球', 'Unknown magic ball');
             }
         }
 
@@ -5308,8 +5302,8 @@ ${loser ? `
             const maps = ['classic', 'snow', 'volcano'];
             const currentIndex = maps.indexOf(gameState.mapType);
             gameState.mapType = maps[(currentIndex + 1) % maps.length];
-            mapButton.textContent = `地图: ${gameState.mapType === 'classic' ? '经典' :
-                gameState.mapType === 'snow' ? '雪山' : '火山'}`;
+mapButton.textContent = `${getLocalizedText('地图: ', 'Map: ')}${gameState.mapType === 'classic' ? getLocalizedText('经典', 'Classic') :
+    gameState.mapType === 'snow' ? getLocalizedText('雪山', 'Snow') : getLocalizedText('火山', 'Volcano')}`;
             initGame();
         });
 
@@ -5349,26 +5343,24 @@ ${loser ? `
 function loginPlayer2() {
     document.getElementById('confirm-start-btn').style.display = 'none';
     
-    // 第一步：询问用户名
     Swal.fire({
-        title: "玩家2登录",
-        text: "请输入用户名",
+        title: getLocalizedText("玩家2登录", "Player 2 Login"),
+        text: getLocalizedText("请输入用户名", "Enter username"),
         input: "text",
-        inputPlaceholder: "请输入用户名",
+        inputPlaceholder: getLocalizedText("请输入用户名", "Enter username"),
         showCancelButton: true,
-        cancelButtonText: "取消",
-        confirmButtonText: "下一步",
+        cancelButtonText: getLocalizedText("取消", "Cancel"),
+        confirmButtonText: getLocalizedText("下一步", "Next"),
         showLoaderOnConfirm: true,
         preConfirm: (username) => {
             if (!username) {
-                Swal.showValidationMessage("请输入用户名");
+                Swal.showValidationMessage(getLocalizedText("请输入用户名", "Please enter username"));
                 return false;
             }
 
-            // 检查是否与玩家1用户名相同
             const player1Username = localStorage.getItem('username');
             if (player1Username && username === player1Username) {
-                Swal.showValidationMessage("用户名不能与玩家1相同");
+                Swal.showValidationMessage(getLocalizedText("用户名不能与玩家1相同", "Username cannot be the same as Player 1"));
                 return false;
             }
             
@@ -5379,23 +5371,21 @@ function loginPlayer2() {
         if (result.isConfirmed) {
             const username = result.value;
             
-            // 第二步：询问密码
             Swal.fire({
-                title: "玩家2登录",
-                text: "请输入密码",
+                title: getLocalizedText("玩家2登录", "Player 2 Login"),
+                text: getLocalizedText("请输入密码", "Enter password"),
                 input: "password",
-                inputPlaceholder: "请输入密码",
+                inputPlaceholder: getLocalizedText("请输入密码", "Enter password"),
                 showCancelButton: true,
-                cancelButtonText: "上一步",
-                confirmButtonText: "登录",
+                cancelButtonText: getLocalizedText("上一步", "Back"),
+                confirmButtonText: getLocalizedText("登录", "Login"),
                 showLoaderOnConfirm: true,
                 preConfirm: (password) => {
                     if (!password) {
-                        Swal.showValidationMessage("请输入密码");
+                        Swal.showValidationMessage(getLocalizedText("请输入密码", "Please enter password"));
                         return false;
                     }
                     
-                    // 发送登录请求
                     return fetch(`${serverurl}/login`, {
                         method: 'POST',
                         headers: {
@@ -5411,9 +5401,9 @@ function loginPlayer2() {
                         if (data.includes('<h1>登录成功</h1>')) {
                             return { username, password };
                         } else if (data.includes('登录失败')) {
-                            throw new Error('用户名或密码错误');
+                            throw new Error(getLocalizedText('用户名或密码错误', 'Invalid username or password'));
                         } else {
-                            throw new Error('登录失败，请重试');
+                            throw new Error(getLocalizedText('登录失败，请重试', 'Login failed, please try again'));
                         }
                     })
                     .catch(error => {
@@ -5425,7 +5415,6 @@ function loginPlayer2() {
                 if (result.isConfirmed) {
                     const username = result.value.username;
                     
-                    // 获取用户ID
                     fetch(`${serverurl}/get-user-id-by-username`, {
                         method: 'POST',
                         headers: {
@@ -5445,36 +5434,46 @@ function loginPlayer2() {
                             localStorage.setItem('player2_username', username);
                             localStorage.setItem('player2_userid', userId);
                             
-                            // 更新玩家名称变量
-                            player1Name = localStorage.getItem('username') || '玩家1';
-                            player2Name = localStorage.getItem('player2_username') || '玩家2';
+                            player1Name = localStorage.getItem('username') || getLocalizedText('玩家1', 'Player 1');
+                            player2Name = localStorage.getItem('player2_username') || getLocalizedText('玩家2', 'Player 2');
                             
-                            // 更新界面
                             document.getElementById('player1-panel-name').textContent = player1Name;
                             document.getElementById('player2-panel-name').textContent = player2Name;
-                            document.getElementById('player1-selection-title').textContent = player1Name + '选择蛇类型';
-                            document.getElementById('player2-selection-title').textContent = player2Name + '选择蛇类型';
-                            document.getElementById('player2-base-name').textContent = player2Name + '基地';
+                            document.getElementById('player1-selection-title').textContent = player1Name + getLocalizedText('选择蛇类型', ' Choose Snake Type');
+                            document.getElementById('player2-selection-title').textContent = player2Name + getLocalizedText('选择蛇类型', ' Choose Snake Type');
+                            document.getElementById('player2-base-name').textContent = player2Name + getLocalizedText('基地', ' Base');
                             document.getElementById('confirm-start-btn').style.display = 'block';
                             
-                            Swal.fire('登录成功', '玩家2已登录', 'success');
+                            Swal.fire(
+                                getLocalizedText('登录成功', 'Login Successful'), 
+                                getLocalizedText('玩家2已登录', 'Player 2 logged in'), 
+                                'success'
+                            );
                         } else {
                             console.log(data.message);
-                            Swal.fire('错误', '获取用户信息失败', 'error');
+                            Swal.fire(
+                                getLocalizedText('错误', 'Error'), 
+                                getLocalizedText('获取用户信息失败', 'Failed to get user info'), 
+                                'error'
+                            );
                         }
                     })
                     .catch(error => {
                         console.error('Fetch error:', error);
-                        Swal.fire('错误', '获取用户信息时发生错误', 'error');
+                        Swal.fire(
+                            getLocalizedText('错误', 'Error'), 
+                            getLocalizedText('获取用户信息时发生错误', 'Error getting user info'), 
+                            'error'
+                        );
                     });
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    // 点击上一步，返回用户名输入
                     loginPlayer2();
                 }
             });
         }
     });
 }
+
         async function getServerRecords() {
             try {
                 const userId = localStorage.getItem("userid");
@@ -5518,7 +5517,7 @@ function loginPlayer2() {
         let hasUploaded = false;
         async function uploadGameRecord(player1Wins, player2Wins) {
             if (hasUploaded) {
-                throw new Error('战绩已保存，请勿重复提交');
+                throw new Error(getLocalizedText('战绩已保存，请勿重复提交', 'Record already saved, please do not submit again'));
             }
 
             try {
@@ -5528,7 +5527,7 @@ function loginPlayer2() {
                 const player2Username = localStorage.getItem("player2_username");
 
                 if (!userId || !player2UserId || !currentUsername || !player2Username) {
-                    throw new Error('用户信息不完整');
+                    throw new Error(getLocalizedText('用户信息不完整', 'Incomplete user information'));
                 }
 
                 // 准备上传的数据
@@ -5637,7 +5636,7 @@ function loginPlayer2() {
                 const container = document.getElementById('records-container');
 
                 // 显示加载中
-                container.innerHTML = '<div class="loading">加载中...</div>';
+                container.innerHTML = '<div class="loading" data-en="Loading...">加载中...</div>';
                 modal.style.display = 'block';
 
                 // 获取所有用户数据
@@ -5694,17 +5693,17 @@ function loginPlayer2() {
                     <div class="record-details">
                         <div class="record-username">${user.username}</div>
                         <div class="record-stats">
-                            <div class="record-stat">总场次: ${stats.totalMatches}</div>
-                            <div class="record-stat">总胜场: ${stats.totalWins}</div>
-                            <div class="record-stat">胜率: ${stats.winRate}%</div>
+                            <div class="record-stat" data-en="Total Matches: ">总场次: ${stats.totalMatches}</div>
+                            <div class="record-stat" data-en="Total Wins: ">总胜场: ${stats.totalWins}</div>
+                            <div class="record-stat" data-en="Win Rate: ">胜率: ${stats.winRate}%</div>
                         </div>
                         ${records.map(record => `
                             <div class="record-match">
                                 <div class="record-match-opponent">
-                                    <span>对战 ${record.opponentName}</span>
+                                    <span data-en="vs ">对战 </span><span>${record.opponentName}</span>
                                 </div>
-                                <div>战绩: ${record.wins}胜 ${record.losses}负</div>
-                                <div>胜率: ${record.winRate}%</div>
+                                <div><span data-en="Record: ">战绩: </span>${record.wins}<span data-en=" W ">胜 </span>${record.losses}<span data-en=" L">负</span></div>
+                                <div><span data-en="Win Rate: ">胜率: </span>${record.winRate}%</div>
                             </div>
                         `).join('')}
                     </div>
