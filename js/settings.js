@@ -1666,7 +1666,8 @@ function storeUserId(index, users, currentUser) {
                     getLocalizedText("用户已更新", "User updated"), 
                     getLocalizedText("当前用户已更新为: " + username, "Current user updated to: " + username), 
                     "success"
-                );
+                    );
+                    location.reload();
                 }
             } else if (currentUserType === 'user') {
                 if (targetUserType === 'superadmin' || targetUserType === 'admin') {
@@ -1682,6 +1683,7 @@ function storeUserId(index, users, currentUser) {
                         getLocalizedText("当前用户已更新为: " + username, "Current user updated to: " + username), 
                         "success"
                     );
+                    location.reload();
                 }
 
             }
@@ -1750,6 +1752,7 @@ function confirmPassword(targetUserId, username, targetUserType) {
                         text: getLocalizedText("当前用户已更新为: " + username, "Current user updated to: " + username),
                         icon: "success"
                     });
+                    location.reload();
                 } else if (data.includes('登录失败')) {
                     Swal.fire({
                         title: getLocalizedText("密码错误", "Wrong password"),
@@ -1827,7 +1830,7 @@ function editUser(index, users) {
         editButton.disabled = true;
         editButton.textContent = '不可编辑';
     } else {
-        editButton.textContent = '提交';
+        editButton.textContent = getLocalizedText('提交', 'Submit');
         editButton.onclick = function () {
             Swal.fire({
                 title: getLocalizedText("确定要更改此用户信息吗", "Update this user's information?"),

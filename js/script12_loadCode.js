@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(data => {
                         var blob = new Blob([data], { type: "text/plain;charset=utf-8" });
                         var filename = fileParam.split('/').pop() || 'download.txt';
-                        Qmsg.success("已开始下载");
+                        Qmsg.success(getLocalizedText("已开始下载", "Download started"));
                         saveAs(blob, filename);
                     })
                     .catch(error => {
                         console.error('下载文件时出错:', error);
-                        Qmsg.error("文件下载失败");
+                        Qmsg.error(getLocalizedText("文件下载失败", "File download failed"));
                     });
             }
         }
@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(data => {
                         var blob = new Blob([data], { type: "text/plain;charset=utf-8" });
                         var filename = fileParam.split('/').pop() || 'download.txt';
-                        Qmsg.success("已开始下载");
+                        Qmsg.success(getLocalizedText("已开始下载", "Download started"));
                         saveAs(blob, filename);
                     })
                     .catch(error => {
                         console.error('下载文件时出错:', error);
-                        Qmsg.error("文件下载失败");
+                        Qmsg.error(getLocalizedText("文件下载失败", "File download failed"));
                     });
             }
         } else {
@@ -96,6 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const titleElement = document.querySelector('.title');
             if (titleElement) {
                 titleElement.textContent = params.title;
+                // 为标题添加data-en属性（如果需要翻译）
+                if (params.titleEn) {
+                    titleElement.setAttribute('data-en', params.titleEn);
+                }
             }
         }
 
@@ -104,74 +108,27 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(params.file)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('文件加载失败');
+                        throw new Error(getLocalizedText('文件加载失败', 'File loading failed'));
                     }
                     return response.text();
                 })
                 .then(data => {
                     const preElement = document.getElementById('sourceCode');
                     if (preElement) {
-                        preElement.querySelector('code').textContent = data;
+                        const codeElement = preElement.querySelector('code');
+                        codeElement.textContent = data;
                         // 重新高亮代码
                         if (typeof hljs !== 'undefined') {
-                            hljs.highlightElement(preElement.querySelector('code'));
+                            hljs.highlightElement(codeElement);
                         }
                     }
                 })
                 .catch(error => {
                     console.error('加载文件时出错:', error);
-                });
-        }
-    };
-    // 获取URL参数
-    function getQueryParams() {
-        const params = {};
-        const queryString = window.location.search.substring(1);
-        const pairs = queryString.split('&');
-
-        for (let i = 0; i < pairs.length; i++) {
-            const pair = pairs[i].split('=');
-            const key = decodeURIComponent(pair[0]);
-            const value = decodeURIComponent(pair[1] || '');
-            params[key] = value;
-        }
-        return params;
-    }
-
-    // 页面加载时根据参数设置内容
-    window.onload = function () {
-        const params = getQueryParams();
-
-        // 设置标题
-        if (params.title) {
-            document.title = params.title;
-            const titleElement = document.querySelector('.title');
-            if (titleElement) {
-                titleElement.textContent = params.title;
-            }
-        }
-
-        // 加载对应的txt文件到pre元素
-        if (params.file) {
-            fetch(params.file)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('文件加载失败');
-                    }
-                    return response.text();
-                })
-                .then(data => {
                     const preElement = document.getElementById('sourceCode');
                     if (preElement) {
-                        preElement.querySelector('code').textContent = data;
-                        // 重新高亮代码
-                        if (typeof hljs !== 'undefined') {
-                            hljs.highlightElement(preElement.querySelector('code'));
-                        }
+                        preElement.querySelector('code').textContent = getLocalizedText('文件加载失败', 'Failed to load file');
                     }
-                })
-                .catch(error => {
-                    console.error('加载文件时出错:', error);
                 });
         }
     };

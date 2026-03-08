@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!isLoggedIn) {
         Swal.fire({
-            title: "你还未登录",
-            text: "请登录后使用",
+            title: getLocalizedText("你还未登录", "You are not logged in"),
+            text: getLocalizedText("请登录后使用", "Please login to continue"),
             icon: "warning",
             showCancelButton: false,
-            confirmButtonText: "确定"
+            confirmButtonText: getLocalizedText("确定", "OK")
         }).then((result) => {
             if (result.isConfirmed) {
                 location.href = `/account/Login/index.html?redirect=${encodeURIComponent(currentPageUrl)}`;
