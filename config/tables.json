@@ -167,6 +167,21 @@
         "en": "Can change password and other functions on the lock screen"
       },
       "path": "/code/python/lockmgr.py"
+    },
+    "script11": {
+      "name": {
+        "zh": "刷机工具箱",
+        "en": "FlashCraft"
+      },
+      "Introduction": {
+        "zh": "集成了多种刷机工具和功能。",
+        "en": "Integrates multiple flash tools and features."
+      },
+      "note": {
+        "zh": "支持多种刷机需求，提供便捷的操作界面和丰富的功能选项。",
+        "en": "Supports various flashing needs, offers a convenient interface and rich feature options."
+      },
+      "path": "/code/python/FlashCraft.py"
     }    
   },
   "C++": {
