@@ -10,10 +10,8 @@ function previewImage(input) {
                 // 创建canvas元素
                 var canvas = document.createElement('canvas');
                 var ctx = canvas.getContext('2d');
-
                 // 原始图片的宽高比
                 var aspectRatio = img.width / img.height;
-
                 // 根据宽高比确定压缩后的尺寸
                 var targetWidth, targetHeight;
                 if (aspectRatio > 1) {
@@ -29,12 +27,10 @@ function previewImage(input) {
                     targetWidth = 200;
                     targetHeight = 200;
                 }
-
                 // 绘制压缩后的图片
                 canvas.width = 200;
                 canvas.height = 200;
                 ctx.drawImage(img, (200 - targetWidth) / 2, (200 - targetHeight) / 2, targetWidth, targetHeight);
-
                 // 将canvas转换为DataURL并设置为预览图片的源
                 var preview = document.getElementById('preview');
                 preview.src = canvas.toDataURL('image/png');
@@ -45,7 +41,6 @@ function previewImage(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
-
 function uploadImage() {
     var userId = localStorage.getItem('userid');
     var preview = document.getElementById('preview');
@@ -56,7 +51,6 @@ function uploadImage() {
         Qmsg.error(getLocalizedText('请先选择文件', 'Please select a file first'));
         return;
     }
-
     // 将DataURL转换为Blob
     fetch(preview.src)
         .then(res => res.blob())
@@ -65,7 +59,6 @@ function uploadImage() {
                 Qmsg.error(getLocalizedText('只能上传不超过1MB的图片,格式为png或jpg', 'Only PNG or JPG images under 1MB are allowed'));
                 return;
             }
-
             var formData = new FormData();
             formData.append('userId', userId);
             formData.append('avatar', blob);

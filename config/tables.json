@@ -152,7 +152,22 @@
         "en": "Very fast, supports output format selection, thread count selection, and can pause anytime"
       },
       "path": "/code/python/FrameExtractor.py"
-    }
+    },
+    "script10": {
+      "name": {
+        "zh": "锁屏管理器",
+        "en": "Lock Screen Manager"
+      },
+      "Introduction": {
+        "zh": "在锁屏界面使用电脑",
+        "en": "Use computer on lock screen"
+      },
+      "note": {
+        "zh": "可以在锁屏界面更改密码及其他功能",
+        "en": "Can change password and other functions on the lock screen"
+      },
+      "path": "/code/python/lockmgr.py"
+    }    
   },
   "C++": {
     "row1": {
