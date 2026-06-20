@@ -163,7 +163,7 @@
         "en": "Use computer on lock screen"
       },
       "note": {
-        "zh": "可以在锁屏界面更改密码及其他功能",
+        "zh": "可以在锁屏界面更改密码和其他功能",
         "en": "Can change password and other functions on the lock screen"
       },
       "path": "/code/python/lockmgr.py"

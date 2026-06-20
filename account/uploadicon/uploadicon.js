@@ -92,7 +92,6 @@ function uploadImage() {
                 uploadProgress.value = 0; // 重置进度条
                 progressInfo.textContent = '';
             };
-
             xhr.send(formData);
         })
         .catch(error => {
