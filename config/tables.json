@@ -372,6 +372,21 @@
         "en": "Preview old versions of the website, recall the development history"
       },
       "path": "/code/webapp/oldwebsite"
-    }    
+    },
+    "tool8": {
+      "name": {
+        "zh": "天气查询",
+        "en": "Weather Forecast"
+      },
+      "Introduction": {
+        "zh": "天气查询系统",
+        "en": "Weather Forecast System"
+      },
+      "note": {
+        "zh": "可以查询天气信息，暂不支持英文",
+        "en": "Can query weather information, English not supported yet"
+      },
+      "path": "/code/webapp/weatherForecast"
+    }       
   }
 }
