@@ -62,11 +62,17 @@ body.dark-mode .modal-content {
 }
 
 body.dark-mode .rank-btn {
-  background: rgba(30, 41, 59, 0.8);
-  color: #e2e8f0;
-  border-color: #334155;
+  background: rgba(30, 41, 59, 0.85)!important;
+  color: #e2e8f0!important;
+  border-color: #475569!important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3)!important;
 }
 
+body.dark-mode .rank-btn:hover {
+  background: rgba(30, 41, 59, 0.95)!important;
+  border-color: #60a5fa!important;
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.25)!important;
+}
 body.dark-mode #rankTypeSelect,
 body.dark-mode #rankTimeSelect {
   background: rgba(30, 41, 59, 0.9);
@@ -410,6 +416,7 @@ h1 {
 
 /* 七日预报 - 手机端可滑动 */
 .forecast-scroll-wrapper {
+  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
@@ -434,7 +441,7 @@ h1 {
 .forecast-scroll {
   display: flex;
   gap: 0.7rem;
-  min-width: min-content;
+  min-width: 100%;
 }
 
 .forecast-day {
@@ -443,8 +450,8 @@ h1 {
   padding: 0.8rem 0.6rem;
   text-align: center;
   border: 2px solid transparent;
-  min-width: 95px;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 90px;
 }
 
 .forecast-day strong {

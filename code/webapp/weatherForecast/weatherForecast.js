@@ -23,14 +23,17 @@ window.weatherApp = {
     'maxtemp_24h': { label: '最高气温(24h)', unit: '°C', api: 'maxtemp/24' },
     'mintemp_24h': { label: '最低气温(24h)', unit: '°C', api: 'mintemp/24' },
   },
-  refreshWeather() {
-  const app = window.weatherApp;
-    if (app.currentStationCode) {
-      app.fetchWeather(app.currentStationCode);
-    } else {
-      Qmsg.warning('请先选择城市');
-    }
+
+  getWarnLevelColor(level) {
+    if (!level) return '#f97316';
+    const l = level.replace('预警', '').trim();
+    if (l.includes('红') || l.includes('红色')) return '#dc2626';
+    if (l.includes('橙') || l.includes('橙色')) return '#f97316';
+    if (l.includes('黄') || l.includes('黄色')) return '#eab308';
+    if (l.includes('蓝') || l.includes('蓝色')) return '#3b82f6';
+    return '#f97316';
   },
+
   getTempColor(temp) {
     if (temp === undefined || temp === null || isNaN(temp)) return '#888888';
     const t = parseFloat(temp);
@@ -111,12 +114,17 @@ window.weatherApp = {
     if (info.includes('晴')) return '☀️';
     if (info.includes('多云')) return '⛅';
     if (info.includes('阴')) return '☁️';
+    if (info.includes('雷')) return '⛈️';
+    if (info.includes('雾') && !info.includes('雨') && !info.includes('雪')) return '🌫️';
+    if ((info.includes('雨') || info.includes('阵雨')) && (info.includes('雪') || info.includes('冰'))) return '🌨️';
+    if (info.includes('阵雨') || info.includes('雷阵雨')) return '🌦️';
     if (info.includes('雨')) return '🌧️';
     if (info.includes('雪')) return '❄️';
-    if (info.includes('雷')) return '⛈️';
-    if (info.includes('雾')) return '🌫️';
-    if (info.includes('阵雨')) return '🌦️';
     return '';
+  },
+
+  isDarkMode() {
+    return document.body.classList.contains('dark-mode');
   },
 
   generateTimeOptions(publishTime) {
@@ -170,6 +178,14 @@ window.weatherApp = {
     return `${match[1]}${match[2]}${match[3]}${match[4]}`;
   },
 
+  refreshWeather() {
+    if (this.currentStationCode) {
+      this.fetchWeather(this.currentStationCode);
+    } else {
+      Qmsg.warning('请先选择城市');
+    }
+  },
+
   async fetchWeather(code) {
     const app = window.weatherApp;
     app.currentStationCode = code;
@@ -193,9 +209,8 @@ window.weatherApp = {
   },
 
   setDefaultStation() {
-    const app = window.weatherApp;
-    if (app.currentStationCode) {
-      localStorage.setItem('defaultStationCode', app.currentStationCode);
+    if (this.currentStationCode) {
+      localStorage.setItem('defaultStationCode', this.currentStationCode);
       Qmsg.success('已设为默认站点');
     }
   },
@@ -205,7 +220,10 @@ window.weatherApp = {
     const warn = app.currentWeatherData?.real?.warn;
     if (!warn) return;
     let html = '';
-    html += `<h3>⚠️ ${warn.signaltype || ''}${app.isValid(warn.signallevel) ? ' ' + warn.signallevel : ''}预警</h3>`;
+    const signalType = warn.signaltype || '';
+    const signalLevel = app.isValid(warn.signallevel) ? warn.signallevel : '';
+    const levelColor = app.getWarnLevelColor(signalLevel);
+    html += `<h3 style="color:${levelColor};">${signalType}${signalLevel}预警</h3>`;
     if (app.isValid(warn.alert)) html += `<p><strong>预警信息：</strong>${warn.alert}</p>`;
     if (app.isValid(warn.issuecontent)) html += `<p>${warn.issuecontent}</p>`;
     if (app.isValid(warn.fmeans)) html += `<p><strong>防御指南：</strong>${warn.fmeans}</p>`;
@@ -255,10 +273,13 @@ window.weatherApp = {
       optionsHtml += `<option value="${t.value}"${selected}>${t.display}</option>`;
     });
 
+    const dm = app.isDarkMode();
+    const selectStyle = `padding:0.5rem 1rem;border-radius:2rem;border:1px solid ${dm ? '#334155' : '#cbd5e1'};background:${dm ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.8)'};color:${dm ? '#e2e8f0' : '#1a2b3c'};font-size:0.85rem;`;
+
     let html = `
-      <h3>📊 实况排行</h3>
+      <h3>实况排行</h3>
       <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center;margin:1rem 0;">
-        <select id="rankTypeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;font-size:0.85rem;">
+        <select id="rankTypeSelect" onchange="window.weatherApp.fetchRankData()" style="${selectStyle}">
           <option value="maxtemp_1h">最高气温(1h)</option>
           <option value="rain_1h">降水量(1h)</option>
           <option value="wind_1h">极大风速(1h)</option>
@@ -269,7 +290,7 @@ window.weatherApp = {
           <option value="maxtemp_24h">最高气温(24h)</option>
           <option value="mintemp_24h">最低气温(24h)</option>
         </select>
-        <select id="rankTimeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;font-size:0.85rem;">
+        <select id="rankTimeSelect" onchange="window.weatherApp.fetchRankData()" style="${selectStyle}">
           ${optionsHtml}
         </select>
       </div>
@@ -322,31 +343,34 @@ window.weatherApp = {
     const station = app.currentWeatherData?.real?.station || app.currentWeatherData?.predict?.station || {};
     const cityName = station.city || '';
     const cityRank = cityName ? list.findIndex(item => item.name === cityName) : -1;
+    const dm = app.isDarkMode();
 
-    let html = `<div style="margin-bottom:1rem;font-weight:600;">📅 ${timeStr} · ${config.label}</div>`;
+    const cardBg = dm ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.5)';
+    const highlightBg = dm ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.08)';
+    const highlightBorder = 'rgba(59,130,246,0.3)';
+    const textColor = dm ? '#e2e8f0' : '#1a2b3c';
+    const subColor = dm ? '#94a3b8' : '#64748b';
+
+    let html = `<div style="margin-bottom:1rem;font-weight:600;color:${textColor};">${timeStr} ${config.label}</div>`;
 
     if (cityName && cityRank >= 0) {
-      html += `<div style="padding:0.5rem 1rem;background:rgba(59,130,246,0.1);border-radius:1rem;margin-bottom:0.8rem;font-weight:600;">
-        📍 ${cityName} 排名: <span style="color:#3b82f6;">第${cityRank + 1}名</span> (${list[cityRank].value} ${config.unit})
-      </div>`;
-    } else if (cityName) {
-      html += `<div style="padding:0.5rem 1rem;background:rgba(148,163,184,0.1);border-radius:1rem;margin-bottom:0.8rem;color:#888;">
-        📍 ${cityName} 未进入前10名
+      html += `<div style="padding:0.5rem 1rem;background:${highlightBg};border-radius:1rem;margin-bottom:0.8rem;font-weight:600;color:${textColor};">
+        ${cityName} 排名: <span style="color:#3b82f6;">第${cityRank + 1}名</span> (${list[cityRank].value} ${config.unit})
       </div>`;
     }
 
     if (!list.length) {
-      html += '<div style="text-align:center;padding:1rem;">暂无数据</div>';
+      html += `<div style="text-align:center;padding:1rem;color:${subColor};">暂无数据</div>`;
     } else {
       html += '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
       list.forEach((item, i) => {
-        const rankColor = i < 3 ? ['#fbbf24', '#94a3b8', '#cd853f'][i] : '#64748b';
+        const rankColor = i < 3 ? ['#fbbf24', '#94a3b8', '#cd853f'][i] : subColor;
         const valueColor = this.getTempColor(item.value);
         const isCurrentCity = item.name === cityName;
         html += `
-          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrentCity ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.5)'};border-radius:1rem;${isCurrentCity ? 'border:1px solid rgba(59,130,246,0.3);' : ''}">
+          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrentCity ? highlightBg : cardBg};border-radius:1rem;${isCurrentCity ? 'border:1px solid ' + highlightBorder : ''}">
             <span style="font-weight:700;color:${rankColor};min-width:24px;text-align:center;">${i + 1}</span>
-            <span style="flex:1;${isCurrentCity ? 'font-weight:600;' : ''}">${item.pname} · ${item.name}${isCurrentCity ? ' ⭐' : ''}</span>
+            <span style="flex:1;${isCurrentCity ? 'font-weight:600;' : ''}color:${textColor};">${item.pname} ${item.name}</span>
             <span style="font-weight:700;color:${valueColor};font-size:1.05rem;">${item.value} ${config.unit}</span>
           </div>
         `;
@@ -354,12 +378,14 @@ window.weatherApp = {
       html += '</div>';
     }
 
+    const btnStyle = 'padding:0.5rem 1.5rem;border-radius:2rem;color:white;border:none;cursor:pointer;font-weight:600;';
+
     if (type === 'maxtemp_1h') {
       html += `
         <div style="text-align:center;margin-top:1rem;">
           <button onclick="window.weatherApp.showAllTemperature('${time}')"
-            style="padding:0.5rem 1.5rem;border-radius:2rem;background:#3b82f6;color:white;border:none;cursor:pointer;font-weight:600;">
-            📋 查看全部逐小时气温数据
+            style="${btnStyle}background:#3b82f6;">
+            查看全部逐小时气温数据
           </button>
         </div>`;
     }
@@ -368,8 +394,8 @@ window.weatherApp = {
       html += `
         <div style="text-align:center;margin-top:1rem;">
           <button onclick="window.weatherApp.showAllMaxTemperature('${ymd}')"
-            style="padding:0.5rem 1.5rem;border-radius:2rem;background:#ef4444;color:white;border:none;cursor:pointer;font-weight:600;">
-            📋 查看全部24小时最高气温数据
+            style="${btnStyle}background:#ef4444;">
+            查看全部24小时最高气温数据
           </button>
         </div>`;
     }
@@ -378,8 +404,8 @@ window.weatherApp = {
       html += `
         <div style="text-align:center;margin-top:1rem;">
           <button onclick="window.weatherApp.showAllMinTemperature('${ymd}')"
-            style="padding:0.5rem 1.5rem;border-radius:2rem;background:#3b82f6;color:white;border:none;cursor:pointer;font-weight:600;">
-            📋 查看全部24小时最低气温数据
+            style="${btnStyle}background:#3b82f6;">
+            查看全部24小时最低气温数据
           </button>
         </div>`;
     }
@@ -401,13 +427,29 @@ window.weatherApp = {
       if (result.code === 0 && result.data) {
         const allData = result.data.stations || [];
         const cityName = app.currentWeatherData?.real?.station?.city || '';
+        const dm = app.isDarkMode();
+        const cardBg = dm ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.5)';
+        const highlightBg = dm ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.08)';
+        const inputBg = dm ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.8)';
+        const textColor = dm ? '#e2e8f0' : '#1a2b3c';
+        const borderColor = dm ? '#334155' : '#cbd5e1';
 
-        let html = `<h3>📋 全部逐小时气温数据</h3>`;
+        let html = `<h3 style="color:${textColor};">全部逐小时气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${result.data.formatTime || ''}</div>`;
+
+        if (cityName) {
+          const cityIdx = allData.findIndex(item => item[1] === cityName);
+          if (cityIdx >= 0) {
+            const cityValue = allData[cityIdx][5];
+            html += `<div style="padding:0.5rem 1rem;background:${highlightBg};border-radius:1rem;margin-bottom:0.8rem;font-weight:600;color:${textColor};">
+              ${cityName} 排名: <span style="color:#3b82f6;">第${cityIdx + 1}名</span> (${cityValue}°C)
+            </div>`;
+          }
+        }
 
         html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
           oninput="window.weatherApp.filterAllData()"
-          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
+          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid ${borderColor};margin:0.5rem 0;background:${inputBg};color:${textColor};">`;
 
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
         allData.forEach((item, i) => {
@@ -417,9 +459,9 @@ window.weatherApp = {
           const isCurrent = name === cityName;
           const vColor = app.getTempColor(value);
           html += `
-            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.5)'};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(59,130,246,0.3);' : ''}">
+            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? highlightBg : cardBg};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(59,130,246,0.3);' : ''}">
               <span style="min-width:30px;color:#888;">${i + 1}</span>
-              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}">${prov} · ${name}${isCurrent ? ' ⭐' : ''}</span>
+              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}color:${textColor};">${prov} ${name}</span>
               <span style="font-weight:700;color:${vColor};">${value}°C</span>
             </div>`;
         });
@@ -446,12 +488,29 @@ window.weatherApp = {
       if (result.code === 0 && result.data) {
         const allData = result.data.stations || [];
         const cityName = app.currentWeatherData?.real?.station?.city || '';
+        const dm = app.isDarkMode();
+        const cardBg = dm ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.5)';
+        const highlightBg = dm ? 'rgba(239,68,68,0.12)' : 'rgba(239,68,68,0.06)';
+        const inputBg = dm ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.8)';
+        const textColor = dm ? '#e2e8f0' : '#1a2b3c';
+        const borderColor = dm ? '#334155' : '#cbd5e1';
 
-        let html = `<h3>📋 全部24小时最高气温数据</h3>`;
+        let html = `<h3 style="color:${textColor};">全部24小时最高气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${ymd}</div>`;
+
+        if (cityName) {
+          const cityIdx = allData.findIndex(item => item[1] === cityName);
+          if (cityIdx >= 0) {
+            const cityValue = allData[cityIdx][5];
+            html += `<div style="padding:0.5rem 1rem;background:${highlightBg};border-radius:1rem;margin-bottom:0.8rem;font-weight:600;color:${textColor};">
+              ${cityName} 排名: <span style="color:#ef4444;">第${cityIdx + 1}名</span> (${cityValue}°C)
+            </div>`;
+          }
+        }
+
         html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
           oninput="window.weatherApp.filterAllData()"
-          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
+          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid ${borderColor};margin:0.5rem 0;background:${inputBg};color:${textColor};">`;
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
         allData.forEach((item, i) => {
           const prov = item[0] || '';
@@ -460,9 +519,9 @@ window.weatherApp = {
           const isCurrent = name === cityName;
           const vColor = app.getTempColor(value);
           html += `
-            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? 'rgba(239,68,68,0.08)' : 'rgba(255,255,255,0.5)'};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(239,68,68,0.3);' : ''}">
+            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? highlightBg : cardBg};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(239,68,68,0.3);' : ''}">
               <span style="min-width:30px;color:#888;">${i + 1}</span>
-              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}">${prov} · ${name}${isCurrent ? ' ⭐' : ''}</span>
+              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}color:${textColor};">${prov} ${name}</span>
               <span style="font-weight:700;color:${vColor};">${value}°C</span>
             </div>`;
         });
@@ -488,12 +547,29 @@ window.weatherApp = {
       if (result.code === 0 && result.data) {
         const allData = result.data.stations || [];
         const cityName = app.currentWeatherData?.real?.station?.city || '';
+        const dm = app.isDarkMode();
+        const cardBg = dm ? 'rgba(30,41,59,0.5)' : 'rgba(255,255,255,0.5)';
+        const highlightBg = dm ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.08)';
+        const inputBg = dm ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.8)';
+        const textColor = dm ? '#e2e8f0' : '#1a2b3c';
+        const borderColor = dm ? '#334155' : '#cbd5e1';
 
-        let html = `<h3>📋 全部24小时最低气温数据</h3>`;
+        let html = `<h3 style="color:${textColor};">全部24小时最低气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${ymd}</div>`;
+
+        if (cityName) {
+          const cityIdx = allData.findIndex(item => item[1] === cityName);
+          if (cityIdx >= 0) {
+            const cityValue = allData[cityIdx][5];
+            html += `<div style="padding:0.5rem 1rem;background:${highlightBg};border-radius:1rem;margin-bottom:0.8rem;font-weight:600;color:${textColor};">
+              ${cityName} 排名: <span style="color:#3b82f6;">第${cityIdx + 1}名</span> (${cityValue}°C)
+            </div>`;
+          }
+        }
+
         html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
           oninput="window.weatherApp.filterAllData()"
-          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
+          style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid ${borderColor};margin:0.5rem 0;background:${inputBg};color:${textColor};">`;
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
         allData.forEach((item, i) => {
           const prov = item[0] || '';
@@ -502,9 +578,9 @@ window.weatherApp = {
           const isCurrent = name === cityName;
           const vColor = app.getTempColor(value);
           html += `
-            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.5)'};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(59,130,246,0.3);' : ''}">
+            <div class="all-data-item" data-search="${prov} ${name}" style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.8rem;background:${isCurrent ? highlightBg : cardBg};border-radius:1rem;${isCurrent ? 'border:1px solid rgba(59,130,246,0.3);' : ''}">
               <span style="min-width:30px;color:#888;">${i + 1}</span>
-              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}">${prov} · ${name}${isCurrent ? ' ⭐' : ''}</span>
+              <span style="flex:1;${isCurrent ? 'font-weight:600;' : ''}color:${textColor};">${prov} ${name}</span>
               <span style="font-weight:700;color:${vColor};">${value}°C</span>
             </div>`;
         });
@@ -542,14 +618,15 @@ window.weatherApp = {
     const tempchart = data.tempchart || [];
     const climate = data.climate;
     const radar = data.radar;
+    const dm = app.isDarkMode();
+    const sectionColor = dm ? '#e2e8f0' : '#1a2b3c';
 
-    // 在 renderWeather 方法中，修改 station-header 部分
     let html = '<div class="weather-panel">';
-    html += `<div class="station-header"><strong style="font-size:1.4rem;">📍 ${station.province || ''} ${station.city || ''}</strong>`;
-    html += `<div style="display:flex;align-items:center;gap:0.5rem;">
-      <span style="opacity:0.7;margin-right:0.5rem;">${real.publish_time || ''}</span>
-      <button class="refresh-btn" onclick="window.weatherApp.refreshWeather()" title="刷新天气数据">🔄 刷新</button>
-      <button class="default-btn" onclick="window.weatherApp.setDefaultStation()">⭐设为默认</button>
+    html += `<div class="station-header"><strong style="font-size:1.2rem;">${station.province || ''} ${station.city || ''}</strong>`;
+    html += `<div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+      <span style="opacity:0.7;font-size:0.85rem;">${real.publish_time || ''}</span>
+      <button class="refresh-btn" onclick="window.weatherApp.refreshWeather()" title="刷新天气数据">刷新</button>
+      <button class="default-btn" onclick="window.weatherApp.setDefaultStation()">设为默认</button>
     </div>`;
     html += '</div>';
 
@@ -559,43 +636,47 @@ window.weatherApp = {
 
     html += '<div class="real-time-card">';
     html += '<div class="temp-main">';
-    html += `<span class="temp-display" style="color:${tempColor};">${app.isValid(temp) ? temp + '°' : '--'}</span>`;
+    html += `<span class="temp-display" style="color:${tempColor};">${app.isValid(temp) ? temp + '°C' : '--'}</span>`;
     html += '<div class="weather-summary">';
     html += `<span class="info">${app.isValid(weather.info) ? weather.info : '--'}</span>`;
-    if (app.isValid(weather.feelst)) html += `<span class="feel">体感 ${weather.feelst}°</span>`;
+    if (app.isValid(weather.feelst)) html += `<span class="feel">体感 ${weather.feelst}°C</span>`;
     html += '</div>';
     html += '</div>';
     html += '<div class="real-meta">';
-    if (app.isValid(weather.humidity)) html += `<span>💧 ${weather.humidity}%</span>`;
-    if (app.isValid(wind.direct)) html += `<span>🌬️ ${wind.direct} ${app.isValid(wind.power) ? wind.power : ''}</span>`;
-    if (app.isValid(weather.rain)) html += `<span>🌧️ ${weather.rain}mm</span>`;
-    if (app.isValid(weather.temperatureDiff)) html += `<span>📉 ${weather.temperatureDiff}°</span>`;
+    if (app.isValid(weather.humidity)) html += `<span>湿度 ${weather.humidity}%</span>`;
+    if (app.isValid(weather.rain)) html += `<span>降水 ${weather.rain}mm</span>`;
+    if (app.isValid(wind.direct)) html += `<span>${wind.direct} ${app.isValid(wind.power) ? wind.power : ''}</span>`;
+    if (app.isValid(weather.temperatureDiff)) html += `<span>变温 ${weather.temperatureDiff}°C</span>`;
     if (air && app.isValid(air.text) && app.isValid(air.aqi)) {
       const aqiColor = app.getAQIColor(air.aqi);
-      html += `<span>🌫️ 空气 <strong style="color:${aqiColor};">${air.text}</strong> AQI:${air.aqi}</span>`;
+      html += `<span>空气 <strong style="color:${aqiColor};">${air.text}</strong> AQI:${air.aqi}</span>`;
     }
     html += '</div>';
     html += '</div>';
 
     html += '<div class="detail-grid">';
-    if (app.isValid(weather.airpressure)) html += `<div>🌀气压 ${weather.airpressure}hPa</div>`;
+    if (app.isValid(weather.airpressure)) html += `<div>气压 ${weather.airpressure}hPa</div>`;
     html += '</div>';
 
     if (warn && app.isValid(warn.signaltype)) {
-      html += `<div class="warn-box" onclick="window.weatherApp.showWarnDetail()">`;
-      if (app.isValid(warn.pic)) {
-        html += `<img src="${warn.pic}" onerror="this.style.display='none'" alt="预警图标">`;
-      }
-      html += `<div><strong>⚠️${warn.signaltype}${app.isValid(warn.signallevel) ? ' ' + warn.signallevel : ''}预警</strong> - 点击查看详情</div>`;
-      html += `</div>`;
+      const signalType = warn.signaltype || '';
+      const signalLevel = app.isValid(warn.signallevel) ? warn.signallevel : '';
+      const levelColor = app.getWarnLevelColor(signalLevel);
+      const warnBg = dm ? 
+        `rgba(${parseInt(levelColor.slice(1,3),16)},${parseInt(levelColor.slice(3,5),16)},${parseInt(levelColor.slice(5,7),16)},0.12)` :
+        `rgba(${parseInt(levelColor.slice(1,3),16)},${parseInt(levelColor.slice(3,5),16)},${parseInt(levelColor.slice(5,7),16)},0.08)`;
+      html += `<div class="warn-box" onclick="window.weatherApp.showWarnDetail()" style="background:${warnBg};border-left-color:${levelColor};">
+        ${app.isValid(warn.pic) ? `<img src="${warn.pic}" onerror="this.style.display='none'" alt="预警图标">` : ''}
+        <div><strong style="color:${levelColor};">${signalType}${signalLevel}预警</strong> - 点击查看详情</div>
+      </div>`;
     }
 
     if (radar && app.isValid(radar.image)) {
-      html += `<div style="margin:0.5rem 0;"><span class="radar-btn" onclick="window.weatherApp.showRadarModal()">📡 查看雷达图 - ${radar.title || ''}</span></div>`;
+      html += `<div style="margin:0.5rem 0;"><span class="radar-btn" onclick="window.weatherApp.showRadarModal()">查看雷达图 - ${radar.title || ''}</span></div>`;
     }
 
     if (detail.length) {
-      html += '<div class="section-title">📅 七天预报</div>';
+      html += `<div class="section-title" style="color:${sectionColor};">七天预报</div>`;
       html += '<div class="forecast-scroll-wrapper"><div class="forecast-scroll">';
       detail.forEach(d => {
         const dObj = d.date ? new Date(d.date) : null;
@@ -607,36 +688,40 @@ window.weatherApp = {
         const showHigh = app.isValid(high) ? high : null;
         const hColor = showHigh ? app.getTempColor(showHigh) : '#888';
         const lColor = app.getTempColor(low);
+        const dayIcon = app.getWeatherIcon(showDayInfo);
+        const nightInfo = d.night?.weather?.info;
+        const nightIcon = app.getWeatherIcon(app.isValid(nightInfo) ? nightInfo : '');
         html += `<div class="forecast-day">
           <div><strong>${dateStr}</strong></div>
+          <div style="font-size:1.5rem;">${dayIcon || ''}</div>
           <div>${showDayInfo || '--'}</div>
-          <div>${showHigh ? `<span style="color:${hColor};font-weight:700;font-size:1.1rem;">${showHigh}°</span>` : '--'} <span style="color:${lColor};font-weight:600;">${app.isValid(low) ? low + '°' : '--'}</span></div>
-          <div style="font-size:0.8rem;">🌙${app.isValid(d.night?.weather?.info) ? d.night.weather.info : '--'}</div>
+          <div>${showHigh ? `<span style="color:${hColor};font-weight:700;font-size:1.1rem;">${showHigh}°C</span>` : '--'} <span style="color:${lColor};font-weight:600;">${app.isValid(low) ? low + '°C' : '--'}</span></div>
+          <div style="font-size:0.8rem;">${nightIcon ? nightIcon + ' ' : ''}${app.isValid(nightInfo) ? nightInfo : '--'}</div>
         </div>`;
       });
       html += '</div></div>';
     }
 
     if (sunrise && (app.isValid(sunrise.sunrise) || app.isValid(sunrise.sunset))) {
-      html += '<div class="section-title">🌅 日出日落</div>';
+      html += `<div class="section-title" style="color:${sectionColor};">日出日落</div>`;
       html += '<div class="sunrise-box">';
-      if (app.isValid(sunrise.sunrise)) html += `<span>🌅 日出 ${sunrise.sunrise.split(' ')[1] || sunrise.sunrise}</span>`;
-      if (app.isValid(sunrise.sunset)) html += `<span>🌇 日落 ${sunrise.sunset.split(' ')[1] || sunrise.sunset}</span>`;
+      if (app.isValid(sunrise.sunrise)) html += `<span>日出 ${sunrise.sunrise.split(' ')[1] || sunrise.sunrise}</span>`;
+      if (app.isValid(sunrise.sunset)) html += `<span>日落 ${sunrise.sunset.split(' ')[1] || sunrise.sunset}</span>`;
       html += '</div>';
     }
 
     if (tempchart.length > 0) {
-      html += '<div class="section-title">📈 14天温度预报趋势</div>';
+      html += `<div class="section-title" style="color:${sectionColor};">14天温度预报趋势</div>`;
       html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="forecastChart"></canvas></div></div>';
     }
 
     if (passedchart.length > 0) {
-      html += '<div class="section-title">📉 24小时实况曲线</div>';
+      html += `<div class="section-title" style="color:${sectionColor};">24小时实况曲线</div>`;
       html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="tempChart"></canvas></div></div>';
     }
 
     if (climate && climate.month && climate.month.length > 0) {
-      html += '<div class="section-title">📊 月平均气温与降水</div>';
+      html += `<div class="section-title" style="color:${sectionColor};">月平均气温与降水</div>`;
       html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="climateChart"></canvas></div></div>';
     }
 
@@ -685,19 +770,28 @@ window.weatherApp = {
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { position: 'top' },
+                legend: { 
+                  position: 'top',
+                  labels: { color: dm ? '#e2e8f0' : '#333' }
+                },
                 datalabels: {
                   anchor: 'end',
                   align: 'top',
                   offset: 4,
                   font: { weight: 'bold', size: 10 },
                   formatter: (value) => value + '°',
-                  color: '#333',
+                  color: dm ? '#e2e8f0' : '#333',
                   display: true,
                 }
               },
               scales: {
-                y: { type: 'linear', position: 'left', title: { display: true, text: '温度 °C' } }
+                x: { ticks: { color: dm ? '#94a3b8' : '#666' } },
+                y: { 
+                  type: 'linear', 
+                  position: 'left', 
+                  title: { display: true, text: '温度 °C', color: dm ? '#e2e8f0' : '#333' },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                }
               }
             },
             plugins: [ChartDataLabels, {
@@ -797,12 +891,42 @@ window.weatherApp = {
               responsive: true,
               maintainAspectRatio: false,
               interaction: { mode: 'index', intersect: false },
-              plugins: { legend: { position: 'top' } },
+              plugins: { 
+                legend: { 
+                  position: 'top',
+                  labels: { color: dm ? '#e2e8f0' : '#333' }
+                } 
+              },
               scales: {
-                y: { type: 'linear', position: 'left', title: { display: true, text: '温度 °C' } },
-                y1: { type: 'linear', position: 'right', title: { display: true, text: '湿度 %' }, grid: { drawOnChartArea: false }, min: 0, max: 100 },
-                y2: { type: 'linear', position: 'right', title: { display: true, text: '气压 hPa' }, grid: { drawOnChartArea: false } },
-                y3: { type: 'linear', position: 'right', title: { display: true, text: '降水 mm' }, grid: { drawOnChartArea: false } }
+                x: { ticks: { color: dm ? '#94a3b8' : '#666' } },
+                y: { 
+                  type: 'linear', 
+                  position: 'left', 
+                  title: { display: true, text: '温度 °C', color: dm ? '#e2e8f0' : '#333' },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                },
+                y1: { 
+                  type: 'linear', 
+                  position: 'right', 
+                  title: { display: true, text: '湿度 %', color: dm ? '#e2e8f0' : '#333' }, 
+                  grid: { drawOnChartArea: false }, 
+                  min: 0, max: 100,
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                },
+                y2: { 
+                  type: 'linear', 
+                  position: 'right', 
+                  title: { display: true, text: '气压 hPa', color: dm ? '#e2e8f0' : '#333' }, 
+                  grid: { drawOnChartArea: false },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                },
+                y3: { 
+                  type: 'linear', 
+                  position: 'right', 
+                  title: { display: true, text: '降水 mm', color: dm ? '#e2e8f0' : '#333' }, 
+                  grid: { drawOnChartArea: false },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                }
               }
             }
           });
@@ -857,23 +981,42 @@ window.weatherApp = {
               responsive: true,
               maintainAspectRatio: false,
               plugins: {
-                legend: { position: 'top' },
+                legend: { 
+                  position: 'top',
+                  labels: { color: dm ? '#e2e8f0' : '#333' }
+                },
                 datalabels: {
                   anchor: 'end',
                   align: 'top',
                   offset: 2,
                   font: { weight: 'bold', size: 10 },
                   formatter: (value, context) => {
-                    if (context.dataset.label.includes('温')) return value + '°';
-                    if (context.dataset.label.includes('降水')) return value + 'mm';
-                    return value;
+                    if (context.dataset.label.includes('最高温') || context.dataset.label.includes('最低温')) {
+                      return value + '°';
+                    }
+                    return '';
                   },
-                  color: '#444'
+                  color: dm ? '#e2e8f0' : '#444',
+                  display: (context) => {
+                    return context.dataset.label.includes('温');
+                  }
                 }
               },
               scales: {
-                y: { type: 'linear', position: 'left', title: { display: true, text: '温度 °C' } },
-                y1: { type: 'linear', position: 'right', title: { display: true, text: '降水 mm' }, grid: { drawOnChartArea: false } }
+                x: { ticks: { color: dm ? '#94a3b8' : '#666' } },
+                y: { 
+                  type: 'linear', 
+                  position: 'left', 
+                  title: { display: true, text: '温度 °C', color: dm ? '#e2e8f0' : '#333' },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                },
+                y1: { 
+                  type: 'linear', 
+                  position: 'right', 
+                  title: { display: true, text: '降水 mm', color: dm ? '#e2e8f0' : '#333' }, 
+                  grid: { drawOnChartArea: false },
+                  ticks: { color: dm ? '#94a3b8' : '#666' }
+                }
               }
             },
             plugins: [ChartDataLabels]
@@ -892,6 +1035,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const searchResults = document.getElementById('searchResults');
 
   let searchTimer = null;
+  let currentSearchResults = [];
 
   document.getElementById('warnModal').addEventListener('click', function (e) {
     if (e.target === this) app.closeWarnModal();
@@ -942,11 +1086,47 @@ document.addEventListener('DOMContentLoaded', function () {
     if (this.value) app.fetchWeather(this.value);
   });
 
+  function renderSearchResults() {
+    searchResults.innerHTML = '';
+    if (!currentSearchResults.length) {
+      searchResults.style.display = 'none';
+      return;
+    }
+    currentSearchResults.forEach(item => {
+      const parts = item.split('|');
+      if (parts.length >= 3) {
+        const li = document.createElement('li');
+        li.textContent = `${parts[1]} ${parts[2]}`;
+        li.addEventListener('click', () => {
+          searchResults.style.display = 'none';
+          citySearch.value = '';
+          currentSearchResults = [];
+          app.fetchWeather(parts[0]);
+        });
+        searchResults.appendChild(li);
+      }
+    });
+    searchResults.style.display = 'block';
+  }
+
+  function selectFirstSearchResult() {
+    if (currentSearchResults.length > 0) {
+      const parts = currentSearchResults[0].split('|');
+      if (parts.length >= 3) {
+        searchResults.style.display = 'none';
+        citySearch.value = '';
+        currentSearchResults = [];
+        app.fetchWeather(parts[0]);
+      }
+    }
+  }
+
   citySearch.addEventListener('input', function () {
     clearTimeout(searchTimer);
     const q = this.value.trim();
     if (!q) {
       searchResults.style.display = 'none';
+      currentSearchResults = [];
       return;
     }
     searchTimer = setTimeout(() => {
@@ -954,28 +1134,25 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(result => {
           if (result.code === 0 && Array.isArray(result.data)) {
-            searchResults.innerHTML = '';
-            result.data.forEach(item => {
-              const parts = item.split('|');
-              if (parts.length >= 3) {
-                const li = document.createElement('li');
-                li.textContent = `${parts[1]} · ${parts[2]}`;
-                li.addEventListener('click', () => {
-                  searchResults.style.display = 'none';
-                  citySearch.value = '';
-                  app.fetchWeather(parts[0]);
-                });
-                searchResults.appendChild(li);
-              }
-            });
-            searchResults.style.display = 'block';
+            currentSearchResults = result.data;
+            renderSearchResults();
           }
         });
-    }, 300);
+    }, 200);
+  });
+
+  citySearch.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      selectFirstSearchResult();
+    }
   });
 
   document.addEventListener('click', function (e) {
-    if (!e.target.closest('.search-wrapper')) searchResults.style.display = 'none';
+    if (!e.target.closest('.search-wrapper')) {
+      searchResults.style.display = 'none';
+      currentSearchResults = [];
+    }
   });
 
   const defaultCode = localStorage.getItem('defaultStationCode');
