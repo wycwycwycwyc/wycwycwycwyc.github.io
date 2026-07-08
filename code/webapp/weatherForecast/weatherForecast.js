@@ -23,7 +23,14 @@ window.weatherApp = {
     'maxtemp_24h': { label: '最高气温(24h)', unit: '°C', api: 'maxtemp/24' },
     'mintemp_24h': { label: '最低气温(24h)', unit: '°C', api: 'mintemp/24' },
   },
-
+  refreshWeather() {
+  const app = window.weatherApp;
+    if (app.currentStationCode) {
+      app.fetchWeather(app.currentStationCode);
+    } else {
+      Qmsg.warning('请先选择城市');
+    }
+  },
   getTempColor(temp) {
     if (temp === undefined || temp === null || isNaN(temp)) return '#888888';
     const t = parseFloat(temp);
@@ -113,7 +120,22 @@ window.weatherApp = {
   },
 
   generateTimeOptions(publishTime) {
-    if (!publishTime) return [];
+    if (!publishTime) {
+      const now = new Date();
+      const options = [];
+      for (let i = 0; i < 24; i++) {
+        const d = new Date(now.getTime() - i * 3600000);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        options.push({
+          value: `${yyyy}${mm}${dd}${hh}`,
+          display: `${mm}月${dd}日${hh}时`
+        });
+      }
+      return options;
+    }
     const match = publishTime.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/);
     if (!match) return [];
 
@@ -135,7 +157,14 @@ window.weatherApp = {
   },
 
   getDefaultTime(publishTime) {
-    if (!publishTime) return '';
+    if (!publishTime) {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}${hh}`;
+    }
     const match = publishTime.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):\d{2}/);
     if (!match) return '';
     return `${match[1]}${match[2]}${match[3]}${match[4]}`;
@@ -206,9 +235,18 @@ window.weatherApp = {
 
   showRankModal() {
     const app = window.weatherApp;
-    const defaultTime = app.getDefaultTime(app.currentPublishTime) ||
-      new Date().toISOString().slice(0, 10).replace(/-/g, '') +
-      String(new Date().getHours()).padStart(2, '0');
+
+    let defaultTime;
+    if (app.currentPublishTime) {
+      defaultTime = app.getDefaultTime(app.currentPublishTime);
+    } else {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      defaultTime = `${yyyy}${mm}${dd}${hh}`;
+    }
 
     const timeOptions = app.generateTimeOptions(app.currentPublishTime);
     let optionsHtml = '';
@@ -220,7 +258,7 @@ window.weatherApp = {
     let html = `
       <h3>📊 实况排行</h3>
       <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center;margin:1rem 0;">
-        <select id="rankTypeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;">
+        <select id="rankTypeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;font-size:0.85rem;">
           <option value="maxtemp_1h">最高气温(1h)</option>
           <option value="rain_1h">降水量(1h)</option>
           <option value="wind_1h">极大风速(1h)</option>
@@ -231,20 +269,20 @@ window.weatherApp = {
           <option value="maxtemp_24h">最高气温(24h)</option>
           <option value="mintemp_24h">最低气温(24h)</option>
         </select>
-        <select id="rankTimeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;">
+        <select id="rankTimeSelect" onchange="window.weatherApp.fetchRankData()" style="padding:0.5rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;background:rgba(255,255,255,0.8);color:#1a2b3c;font-size:0.85rem;">
           ${optionsHtml}
         </select>
       </div>
       <div id="rankDataContainer" style="max-height:55vh;overflow-y:auto;">
-        <div style="text-align:center;padding:2rem;color:#888;">请选择类型和时间后点击查询</div>
+        <div style="text-align:center;padding:2rem;color:#888;">加载中...</div>
       </div>
     `;
     document.getElementById('warnModalContent').innerHTML = html;
     document.getElementById('warnModal').classList.add('active');
 
-    // 自动加载默认数据
     setTimeout(() => app.fetchRankData(), 100);
   },
+
   async fetchRankData() {
     const typeSelect = document.getElementById('rankTypeSelect');
     const timeSelect = document.getElementById('rankTimeSelect');
@@ -280,7 +318,6 @@ window.weatherApp = {
     const list = data.data || [];
     const timeStr = data.format_time || data.time || '';
 
-    // 查找默认城市排名
     const app = this;
     const station = app.currentWeatherData?.real?.station || app.currentWeatherData?.predict?.station || {};
     const cityName = station.city || '';
@@ -288,7 +325,6 @@ window.weatherApp = {
 
     let html = `<div style="margin-bottom:1rem;font-weight:600;">📅 ${timeStr} · ${config.label}</div>`;
 
-    // 显示默认城市排名
     if (cityName && cityRank >= 0) {
       html += `<div style="padding:0.5rem 1rem;background:rgba(59,130,246,0.1);border-radius:1rem;margin-bottom:0.8rem;font-weight:600;">
         📍 ${cityName} 排名: <span style="color:#3b82f6;">第${cityRank + 1}名</span> (${list[cityRank].value} ${config.unit})
@@ -318,11 +354,10 @@ window.weatherApp = {
       html += '</div>';
     }
 
-    // 查看全部数据按钮
     if (type === 'maxtemp_1h') {
       html += `
         <div style="text-align:center;margin-top:1rem;">
-          <button onclick="window.weatherApp.showAllTemperature('${time}')" 
+          <button onclick="window.weatherApp.showAllTemperature('${time}')"
             style="padding:0.5rem 1.5rem;border-radius:2rem;background:#3b82f6;color:white;border:none;cursor:pointer;font-weight:600;">
             📋 查看全部逐小时气温数据
           </button>
@@ -332,7 +367,7 @@ window.weatherApp = {
       const ymd = time.slice(0, 8);
       html += `
         <div style="text-align:center;margin-top:1rem;">
-          <button onclick="window.weatherApp.showAllMaxTemperature('${ymd}')" 
+          <button onclick="window.weatherApp.showAllMaxTemperature('${ymd}')"
             style="padding:0.5rem 1.5rem;border-radius:2rem;background:#ef4444;color:white;border:none;cursor:pointer;font-weight:600;">
             📋 查看全部24小时最高气温数据
           </button>
@@ -342,7 +377,7 @@ window.weatherApp = {
       const ymd = time.slice(0, 8);
       html += `
         <div style="text-align:center;margin-top:1rem;">
-          <button onclick="window.weatherApp.showAllMinTemperature('${ymd}')" 
+          <button onclick="window.weatherApp.showAllMinTemperature('${ymd}')"
             style="padding:0.5rem 1.5rem;border-radius:2rem;background:#3b82f6;color:white;border:none;cursor:pointer;font-weight:600;">
             📋 查看全部24小时最低气温数据
           </button>
@@ -352,10 +387,8 @@ window.weatherApp = {
     document.getElementById('rankDataContainer').innerHTML = html;
   },
 
-  // 查看全部逐小时气温
   async showAllTemperature(ymdh) {
     const app = this;
-    const modal = document.getElementById('warnModal');
     const content = document.getElementById('warnModalContent');
 
     content.innerHTML = '<div style="text-align:center;padding:2rem;"><span class="loading-spinner"></span>加载全部数据...</div>';
@@ -372,9 +405,8 @@ window.weatherApp = {
         let html = `<h3>📋 全部逐小时气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${result.data.formatTime || ''}</div>`;
 
-        // 搜索过滤
-        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..." 
-          oninput="window.weatherApp.filterAllData()" 
+        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
+          oninput="window.weatherApp.filterAllData()"
           style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
 
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
@@ -400,7 +432,6 @@ window.weatherApp = {
     }
   },
 
-  // 查看全部24小时最高气温
   async showAllMaxTemperature(ymd) {
     const app = this;
     const content = document.getElementById('warnModalContent');
@@ -418,8 +449,8 @@ window.weatherApp = {
 
         let html = `<h3>📋 全部24小时最高气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${ymd}</div>`;
-        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..." 
-          oninput="window.weatherApp.filterAllData()" 
+        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
+          oninput="window.weatherApp.filterAllData()"
           style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
         allData.forEach((item, i) => {
@@ -443,7 +474,6 @@ window.weatherApp = {
     }
   },
 
-  // 查看全部24小时最低气温
   async showAllMinTemperature(ymd) {
     const app = this;
     const content = document.getElementById('warnModalContent');
@@ -461,8 +491,8 @@ window.weatherApp = {
 
         let html = `<h3>📋 全部24小时最低气温数据</h3>`;
         html += `<div style="margin:0.5rem 0;color:#888;">${ymd}</div>`;
-        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..." 
-          oninput="window.weatherApp.filterAllData()" 
+        html += `<input type="text" id="allDataSearch" placeholder="搜索城市..."
+          oninput="window.weatherApp.filterAllData()"
           style="width:100%;padding:0.6rem 1rem;border-radius:2rem;border:1px solid #cbd5e1;margin:0.5rem 0;background:rgba(255,255,255,0.8);">`;
         html += `<div id="allDataList" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;">`;
         allData.forEach((item, i) => {
@@ -486,7 +516,6 @@ window.weatherApp = {
     }
   },
 
-  // 过滤全部数据列表
   filterAllData() {
     const searchInput = document.getElementById('allDataSearch');
     if (!searchInput) return;
@@ -514,9 +543,14 @@ window.weatherApp = {
     const climate = data.climate;
     const radar = data.radar;
 
+    // 在 renderWeather 方法中，修改 station-header 部分
     let html = '<div class="weather-panel">';
     html += `<div class="station-header"><strong style="font-size:1.4rem;">📍 ${station.province || ''} ${station.city || ''}</strong>`;
-    html += `<div><span style="opacity:0.7;margin-right:1rem;">${real.publish_time || ''}</span><button class="default-btn" onclick="window.weatherApp.setDefaultStation()">⭐设为默认</button></div>`;
+    html += `<div style="display:flex;align-items:center;gap:0.5rem;">
+      <span style="opacity:0.7;margin-right:0.5rem;">${real.publish_time || ''}</span>
+      <button class="refresh-btn" onclick="window.weatherApp.refreshWeather()" title="刷新天气数据">🔄 刷新</button>
+      <button class="default-btn" onclick="window.weatherApp.setDefaultStation()">⭐设为默认</button>
+    </div>`;
     html += '</div>';
 
     const temp = weather.temperature;
@@ -562,7 +596,7 @@ window.weatherApp = {
 
     if (detail.length) {
       html += '<div class="section-title">📅 七天预报</div>';
-      html += '<div class="forecast-scroll">';
+      html += '<div class="forecast-scroll-wrapper"><div class="forecast-scroll">';
       detail.forEach(d => {
         const dObj = d.date ? new Date(d.date) : null;
         const dateStr = dObj ? `${dObj.getMonth() + 1}/${dObj.getDate()}` : d.date;
@@ -580,7 +614,7 @@ window.weatherApp = {
           <div style="font-size:0.8rem;">🌙${app.isValid(d.night?.weather?.info) ? d.night.weather.info : '--'}</div>
         </div>`;
       });
-      html += '</div>';
+      html += '</div></div>';
     }
 
     if (sunrise && (app.isValid(sunrise.sunrise) || app.isValid(sunrise.sunset))) {
@@ -593,17 +627,17 @@ window.weatherApp = {
 
     if (tempchart.length > 0) {
       html += '<div class="section-title">📈 14天温度预报趋势</div>';
-      html += '<div class="chart-container"><canvas id="forecastChart"></canvas></div>';
+      html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="forecastChart"></canvas></div></div>';
     }
 
     if (passedchart.length > 0) {
       html += '<div class="section-title">📉 24小时实况曲线</div>';
-      html += '<div class="chart-container"><canvas id="tempChart"></canvas></div>';
+      html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="tempChart"></canvas></div></div>';
     }
 
     if (climate && climate.month && climate.month.length > 0) {
       html += '<div class="section-title">📊 月平均气温与降水</div>';
-      html += '<div class="chart-container"><canvas id="climateChart"></canvas></div>';
+      html += '<div class="chart-scroll-wrapper"><div class="chart-container"><canvas id="climateChart"></canvas></div></div>';
     }
 
     html += '</div>';

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>GPS + 免费逆地理编码</title>
+</head>
+
+<body>
+  <button onclick="getFullLocation()">点击获取位置（含县）</button>
+  <p id="result">等待定位...</p>
+
+  <script>
+    function getFullLocation() {
+      if (!navigator.geolocation) {
+        document.getElementById('result').textContent = '浏览器不支持GPS';
+        return;
+      }
+
+      document.getElementById('result').textContent = 'GPS定位中...';
+
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          var lat = pos.coords.latitude;
+          var lng = pos.coords.longitude;
+
+          document.getElementById('result').textContent = '正在解析地址...';
+
+          // 用免费API把经纬度转成地址（无需注册，无次数限制）
+          fetch('https://api.opencagedata.com/geocode/v1/json?q=' + lat + '+' + lng + '&key=demo&language=zh')
+            .then(res => res.json())
+            .then(data => {
+              if (data.results && data.results.length > 0) {
+                var components = data.results[0].components;
+                var province = components.state || components.province || '未知';
+                var city = components.city || components.town || '未知';
+                var district = components.suburb || components.county || components.district || '未知';
+                var full = data.results[0].formatted;
+
+                document.getElementById('result').innerHTML =
+                  '📍 ' + full + '<br><br>' +
+                  '🏢 省/州: ' + province + '<br>' +
+                  '🏙️ 市: ' + city + '<br>' +
+                  '🏘️ 区/县: ' + district + '<br><br>' +
+                  '⚠️ 使用OpenCage演示Key，有每日限制，仅供测试';
+              } else {
+                document.getElementById('result').textContent = '地址解析失败';
+              }
+            })
+            .catch(() => {
+              document.getElementById('result').textContent = '逆地理编码请求失败';
+            });
+        },
+        function (err) {
+          document.getElementById('result').textContent = 'GPS失败: ' + err.message;
+        }
+      );
+    }
+  </script>
+</body>
+
+</html>
