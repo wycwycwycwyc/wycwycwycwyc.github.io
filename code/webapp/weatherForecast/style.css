@@ -492,3 +492,99 @@
         transform: rotate(360deg);
       }
     }
+    /* 位置检测横幅 */
+  .location-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 2rem;
+    padding: 0.8rem 1.5rem;
+    margin: 0.8rem auto;
+    max-width: 600px;
+    width: 100%;
+    font-size: 0.95rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
+  }
+
+  .location-banner.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .location-banner strong {
+    color: #3b82f6;
+  }
+
+  .location-banner-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.2s;
+    white-space: nowrap;
+  }
+
+  .location-banner-btn:hover {
+    background: #2563eb;
+  }
+
+  .location-banner-close {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0 0.3rem;
+    line-height: 1;
+    transition: 0.2s;
+  }
+
+  .location-banner-close:hover {
+    color: #333;
+  }
+
+  /* 深色模式适配 */
+  body.dark-mode .location-banner {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+
+  body.dark-mode .location-banner strong {
+    color: #60a5fa;
+  }
+
+  body.dark-mode .location-banner-close {
+    color: #aaa;
+  }
+
+  body.dark-mode .location-banner-close:hover {
+    color: #fff;
+  }
+  body.dark-mode .rank-btn {
+    background: rgba(30, 41, 59, 0.8);
+    color: #e2e8f0;
+    border-color: #334155;
+  }
+
+  #rankTypeSelect,
+  #rankTimeSelect {
+    background: rgba(255, 255, 255, 0.8);
+    color: #1a2b3c;
+  }
+
+  body.dark-mode #rankTypeSelect,
+  body.dark-mode #rankTimeSelect {
+    background: rgba(30, 41, 59, 0.9);
+    color: #e2e8f0;
+    border-color: #334155;
+  }
