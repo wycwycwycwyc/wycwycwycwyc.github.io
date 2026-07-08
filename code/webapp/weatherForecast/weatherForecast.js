@@ -245,7 +245,6 @@ window.weatherApp = {
     // 自动加载默认数据
     setTimeout(() => app.fetchRankData(), 100);
   },
-
   async fetchRankData() {
     const typeSelect = document.getElementById('rankTypeSelect');
     const timeSelect = document.getElementById('rankTimeSelect');
