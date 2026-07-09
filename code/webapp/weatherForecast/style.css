@@ -722,3 +722,110 @@ body.dark-mode .refresh-btn:hover {
   background: #4ade80;
   color: #1a2b3c;
 }
+/* 收藏城市标签行 */
+.favorite-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.6s ease;
+  padding: 0.5rem 0;
+}
+
+.favorite-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.favorite-tag {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 2rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+}
+
+.favorite-tag:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.favorite-tag.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  font-weight: 600;
+}
+
+.favorite-tag .tag-close {
+  margin-left: 0.3rem;
+  opacity: 0.6;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.favorite-tag .tag-close:hover {
+  opacity: 1;
+}
+
+.favorite-btn {
+  background: none;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+  padding: 0.4rem 1rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.favorite-btn:hover {
+  background: #f59e0b;
+  color: white;
+}
+
+.favorite-btn.active {
+  background: #f59e0b;
+  color: white;
+}
+
+/* 深色模式 */
+body.dark-mode .favorite-tag {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .favorite-tag:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #60a5fa;
+}
+
+body.dark-mode .favorite-tag.active {
+  background: #3b82f6;
+  color: white;
+}
+
+body.dark-mode .favorite-btn {
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+body.dark-mode .favorite-btn:hover,
+body.dark-mode .favorite-btn.active {
+  background: #fbbf24;
+  color: #1a2b3c;
+}

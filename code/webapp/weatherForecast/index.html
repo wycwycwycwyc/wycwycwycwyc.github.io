@@ -50,7 +50,13 @@
         <option value="" data-en="Select City">-- 请先选择省份 --</option>
       </select>
     </div>
-
+    <!-- 收藏城市标签行 -->
+    <div class="favorite-row" id="favoriteRow" style="display:none;">
+      <div class="favorite-tags" id="favoriteTags"></div>
+      <button class="favorite-btn" onclick="window.weatherApp.toggleFavorite()" id="favoriteToggleBtn">
+        收藏当前城市
+      </button>
+    </div>
     <div id="weatherContainer">
       <div style="text-align:center;padding:2rem;opacity:0.8;" data-en="Please select a city">📍 请选择城市查看天气</div>
     </div>
