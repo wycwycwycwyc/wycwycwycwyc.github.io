@@ -553,8 +553,22 @@ updateFavoriteUI() {
           </button>
         </div>`;
     }
-    if (type === "maxtemp_24h") {
-      const ymd = time.slice(0, 8);
+    if (type === 'maxtemp_24h') {
+      // 24小时数据应该是昨天的日期
+      const timeStr = time; // 例如 2026070802
+      const timeDate = new Date(
+        parseInt(timeStr.slice(0, 4)),    // 年
+        parseInt(timeStr.slice(4, 6)) - 1, // 月 (0-11)
+        parseInt(timeStr.slice(6, 8)),     // 日
+        parseInt(timeStr.slice(8, 10)) || 0 // 时
+      );
+      // 减去一天得到昨天
+      timeDate.setDate(timeDate.getDate() - 1);
+      const yyyy = timeDate.getFullYear();
+      const mm = String(timeDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(timeDate.getDate()).padStart(2, '0');
+      const ymd = `${yyyy}${mm}${dd}`;
+      
       html += `
         <div style="text-align:center;margin-top:1rem;">
           <button onclick="window.weatherApp.showAllMaxTemperature('${ymd}')"
@@ -563,8 +577,22 @@ updateFavoriteUI() {
           </button>
         </div>`;
     }
-    if (type === "mintemp_24h") {
-      const ymd = time.slice(0, 8);
+
+    if (type === 'mintemp_24h') {
+      // 24小时数据应该是昨天的日期
+      const timeStr = time;
+      const timeDate = new Date(
+        parseInt(timeStr.slice(0, 4)),
+        parseInt(timeStr.slice(4, 6)) - 1,
+        parseInt(timeStr.slice(6, 8)),
+        parseInt(timeStr.slice(8, 10)) || 0
+      );
+      timeDate.setDate(timeDate.getDate() - 1);
+      const yyyy = timeDate.getFullYear();
+      const mm = String(timeDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(timeDate.getDate()).padStart(2, '0');
+      const ymd = `${yyyy}${mm}${dd}`;
+      
       html += `
         <div style="text-align:center;margin-top:1rem;">
           <button onclick="window.weatherApp.showAllMinTemperature('${ymd}')"
