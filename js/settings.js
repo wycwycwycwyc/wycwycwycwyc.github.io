@@ -2307,3 +2307,56 @@ function clearScreen() {
   // 初始化
   clearScreen();
 });
+function loadServerInfo() {
+    const serverTypeEl = document.getElementById('serverType');
+    const serverLangEl = document.getElementById('serverLang');
+    const serverStatusEl = document.getElementById('serverStatus');
+    const serverVersionEl = document.getElementById('serverVersion');
+    
+    serverTypeEl.textContent = '加载中...';
+    serverLangEl.textContent = '加载中...';
+    serverStatusEl.textContent = '加载中...';
+    serverVersionEl.textContent = '加载中...';
+
+    fetch(serverurl + '/server-info')
+        .then(response => response.json())
+        .then(data => {
+            serverTypeEl.textContent = data.server || '未知';
+            serverLangEl.textContent = data.language || '未知';
+            serverStatusEl.textContent = data.status || '未知';
+            serverVersionEl.textContent = data.version || '未知';
+            
+            if (data.status === 'running') {
+                serverStatusEl.style.color = '#4CAF50';
+            } else if (data.status === 'stopped') {
+                serverStatusEl.style.color = '#f44336';
+            } else {
+                serverStatusEl.style.color = '#FF9800';
+            }
+        })
+        .catch(error => {
+            serverTypeEl.textContent = '❌ 获取失败';
+            serverLangEl.textContent = '❌ 获取失败';
+            serverStatusEl.textContent = '❌ 获取失败';
+            serverVersionEl.textContent = '❌ 获取失败';
+            console.error('获取服务器信息失败:', error);
+        });
+}
+
+// 开发者选项显示时自动加载
+document.addEventListener('DOMContentLoaded', function() {
+    const devSection = document.getElementById('developer');
+    if (devSection && devSection.style.display !== 'none') {
+        loadServerInfo();
+    }
+    
+    // 监听开发者选项的显示状态
+    const observer = new MutationObserver(function() {
+        const dev = document.getElementById('developer');
+        if (dev && dev.style.display !== 'none') {
+            loadServerInfo();
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
+});

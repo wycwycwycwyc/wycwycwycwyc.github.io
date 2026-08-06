@@ -365,6 +365,30 @@
                 data-en="Create New User">新建用户</button>
             <br>
             <br>
+            <div id="server-info">
+                <h2 data-en="Server Information">服务器信息</h2>
+                <div id="serverInfo"
+                    style="background: #f5f7fa; border-radius: 8px; padding: 15px; margin: 10px 0; border-left: 4px solid #2196F3; font-family: monospace;">
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
+                        <span data-en="Server Type">服务端类型</span>
+                        <span id="serverType" style="color: #2196F3; font-weight: bold;">加载中...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
+                        <span data-en="Language">编程语言</span>
+                        <span id="serverLang" style="color: #2196F3; font-weight: bold;">加载中...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
+                        <span data-en="Status">状态</span>
+                        <span id="serverStatus" style="color: #4CAF50; font-weight: bold;">加载中...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                        <span data-en="Version">版本</span>
+                        <span id="serverVersion" style="color: #666;">加载中...</span>
+                    </div>
+                </div>
+                <button onclick="loadServerInfo()" class="custom-button" data-en="Refresh Server Info">刷新服务器信息</button>
+            </div>
+            <br>
             <div id="server" style="display: none;">
                 <h2 data-en="Server Operations">服务器操作</h2>
                 <button class="custom-button" style="background-color: red;" id="restartSystemBtn"
