@@ -270,101 +270,135 @@
     // ============================================================
     // 展示HTML广播（iframe弹窗）- 宽高80%
     // ============================================================
-    function displayHtmlBroadcast(broadcast) {
-        var overlay = document.createElement('div');
-        overlay.id = 'broadcast-overlay';
-        overlay.style.cssText = [
-            'position: fixed',
-            'top: 0',
-            'left: 0',
-            'width: 100%',
-            'height: 100%',
-            'background: rgba(0,0,0,0.65)',
-            'z-index: 99999',
-            'display: flex',
-            'justify-content: center',
-            'align-items: center',
-            'animation: broadcastFadeIn 0.3s ease-out'
-        ].join(';');
+function displayHtmlBroadcast(broadcast) {
+    var overlay = document.createElement('div');
+    overlay.id = 'broadcast-overlay';
+    overlay.style.cssText = [
+        'position: fixed',
+        'top: 0',
+        'left: 0',
+        'width: 100%',
+        'height: 100%',
+        'background: rgba(0,0,0,0.65)',
+        'z-index: 99999',
+        'display: flex',
+        'justify-content: center',
+        'align-items: center',
+        'animation: broadcastFadeIn 0.3s ease-out'
+    ].join(';');
 
-        var container = document.createElement('div');
-        container.style.cssText = [
-            'position: relative',
-            'width: 80%',
-            'height: 80%',
-            'max-width: 80vw',
-            'max-height: 80vh',
-            'background: #fff',
-            'border-radius: 12px',
-            'box-shadow: 0 20px 60px rgba(0,0,0,0.3)',
-            'overflow: hidden',
-            'animation: broadcastSlideUp 0.3s ease-out',
-            'display: flex',
-            'flex-direction: column'
-        ].join(';');
+    var container = document.createElement('div');
+    container.style.cssText = [
+        'position: relative',
+        'width: 80%',
+        'height: 80%',
+        'max-width: 80vw',
+        'max-height: 80vh',
+        'background: #fff',
+        'border-radius: 12px',
+        'box-shadow: 0 20px 60px rgba(0,0,0,0.3)',
+        'overflow: hidden',
+        'animation: broadcastSlideUp 0.3s ease-out',
+        'display: flex',
+        'flex-direction: column'
+    ].join(';');
 
-        var closeBtn = document.createElement('button');
-        closeBtn.textContent = '×';
-        closeBtn.style.cssText = [
-            'position: absolute',
-            'top: 10px',
-            'right: 15px',
-            'z-index: 10',
-            'font-size: 28px',
-            'font-weight: bold',
-            'color: #999',
-            'background: none',
-            'border: none',
-            'cursor: pointer',
-            'transition: color 0.2s',
-            'line-height: 1'
-        ].join(';');
-        closeBtn.onmouseover = function() { this.style.color = '#333'; };
-        closeBtn.onmouseout = function() { this.style.color = '#999'; };
-        closeBtn.onclick = function() {
-            if (document.body.contains(overlay)) {
-                document.body.removeChild(overlay);
-            }
-        };
+    // ====== 加载提示 ======
+    var loadingDiv = document.createElement('div');
+    loadingDiv.id = 'broadcast-loading';
+    loadingDiv.style.cssText = [
+        'position: absolute',
+        'top: 50%',
+        'left: 50%',
+        'transform: translate(-50%, -50%)',
+        'z-index: 1',
+        'font-size: 18px',
+        'color: #666',
+        'text-align: center',
+        'pointer-events: none'
+    ].join(';');
+    loadingDiv.innerHTML = '⏳ 正在加载内容...';
 
-        var iframe = document.createElement('iframe');
-        iframe.style.cssText = [
-            'width: 100%',
-            'height: 100%',
-            'border: none',
-            'display: block',
-            'flex: 1'
-        ].join(';');
-        iframe.srcdoc = broadcast.content || '';
-        iframe.sandbox = 'allow-scripts allow-modals allow-same-origin';
-
-        container.appendChild(closeBtn);
-        container.appendChild(iframe);
-        overlay.appendChild(container);
-        document.body.appendChild(overlay);
-
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay && document.body.contains(overlay)) {
-                document.body.removeChild(overlay);
-            }
-        });
-
-        if (!document.getElementById('broadcast-animations')) {
-            var style = document.createElement('style');
-            style.id = 'broadcast-animations';
-            style.textContent = [
-                '@keyframes broadcastFadeIn {',
-                '  from { opacity: 0; }',
-                '  to { opacity: 1; }',
-                '}',
-                '@keyframes broadcastSlideUp {',
-                '  from { opacity: 0; transform: translateY(30px); }',
-                '  to { opacity: 1; transform: translateY(0); }',
-                '}'
-            ].join('\n');
-            document.head.appendChild(style);
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = [
+        'position: absolute',
+        'top: 10px',
+        'right: 15px',
+        'z-index: 10',
+        'font-size: 28px',
+        'font-weight: bold',
+        'color: #999',
+        'background: none',
+        'border: none',
+        'cursor: pointer',
+        'transition: color 0.2s',
+        'line-height: 1'
+    ].join(';');
+    closeBtn.onmouseover = function() { this.style.color = '#333'; };
+    closeBtn.onmouseout = function() { this.style.color = '#999'; };
+    closeBtn.onclick = function() {
+        if (document.body.contains(overlay)) {
+            document.body.removeChild(overlay);
         }
+    };
+
+    var iframe = document.createElement('iframe');
+    iframe.style.cssText = [
+        'width: 100%',
+        'height: 100%',
+        'border: none',
+        'display: block',
+        'flex: 1',
+        'position: relative',
+        'z-index: 2'
+    ].join(';');
+    iframe.srcdoc = broadcast.content || '';
+
+    // iframe 加载完成后隐藏加载提示
+    iframe.onload = function() {
+        var loading = document.getElementById('broadcast-loading');
+        if (loading) {
+            loading.style.display = 'none';
+        }
+    };
+
+    // 如果内容为空或加载失败，隐藏加载提示
+    setTimeout(function() {
+        var loading = document.getElementById('broadcast-loading');
+        if (loading) {
+            loading.style.display = 'none';
+        }
+    }, 3000);
+
+    container.appendChild(loadingDiv);
+    container.appendChild(closeBtn);
+    container.appendChild(iframe);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay && document.body.contains(overlay)) {
+            document.body.removeChild(overlay);
+        }
+    });
+
+    if (!document.getElementById('broadcast-animations')) {
+        var style = document.createElement('style');
+        style.id = 'broadcast-animations';
+        style.textContent = [
+            '@keyframes broadcastFadeIn {',
+            '  from { opacity: 0; }',
+            '  to { opacity: 1; }',
+            '}',
+            '@keyframes broadcastSlideUp {',
+            '  from { opacity: 0; transform: translateY(30px); }',
+            '  to { opacity: 1; transform: translateY(0); }',
+            '}'
+        ].join('\n');
+        document.head.appendChild(style);
     }
+}
 
     // ============================================================
     // 初始化

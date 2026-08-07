@@ -68,14 +68,13 @@
                 </div>
             </div>
 
-            <!-- 复选框 HTML -->
             <label>
                 <input type="checkbox" id="followSystemCheckbox"><span data-en="Follow System">跟随系统</span>
             </label>
             <div class="input-group toggle-with-select">
                 <h2 data-en="Animation">动画</h2>
                 <label for="animationToggle" class="toggle-label" data-en="Toggle">开关</label>
-                <div class="toggle-controls"> <!-- 新增容器包裹开关和下拉菜单 -->
+                <div class="toggle-controls">
                     <label class="toggle-switch">
                         <input type="checkbox" id="animationToggle">
                         <span class="slider"></span>
@@ -106,14 +105,12 @@
             <div class="input-group1">
                 <label for="opacityRange" data-en="Opacity">可见度</label>
                 <input type="range" id="opacityRange" min="0" max="100" step="1">
-                <input type="number" id="opacityNumber" min="0" max="100" step="1" <p>%
-                <p>
+                <input type="number" id="opacityNumber" min="0" max="100" step="1">
             </div>
             <div class="input-group1">
                 <label for="blurRange" data-en="Blur (Radius)">模糊度(模糊半径)</label>
                 <input type="range" id="blurRange" min="0" max="50" step="1">
-                <input type="number" id="blurNumber" min="0" max="50" step="1" <p>px
-                <p>
+                <input type="number" id="blurNumber" min="0" max="50" step="1">
             </div>
             <h2 data-en="Homepage Background">主页背景</h2>
             <div class="input-group">
@@ -128,6 +125,7 @@
             </div>
             <button id="isDarkModeimg" class="custom-button" data-en="Apply">应用</button>
         </div>
+
         <div id="display" class="section">
             <h1 data-en="Display">显示</h1>
             <label for="fontSizeSelect" data-en="Font Size">字体大小</label>
@@ -147,11 +145,11 @@
                 <div class="input-group1">
                     <label for="brightness" data-en="Brightness">亮度</label>
                     <input type="range" id="brightnessRange" min="10" max="100" step="1">
-                    <input type="number" id="brightnessNumber" min="10" max="100" step="1" <p>%
-                    <p>
+                    <input type="number" id="brightnessNumber" min="10" max="100" step="1">
                 </div>
             </div>
         </div>
+
         <div id="settingsData" class="section">
             <h1 data-en="Settings Data">设置数据</h1>
             <div>
@@ -213,59 +211,47 @@
                 </div>
             </div>
         </div>
+
         <div id="account" style="height: 200px" class="section">
             <h1 data-en="Account">账户</h1>
-            <button id="loginStatus" onclick="openPage('/account/uploadicon')" style=" width: 90px; height: 90px; border-radius: 50%; border: none; font-size: 16px;
-                                cursor: pointer; outline: none; display: inline; vertical-align: middle; margin-right:
-                                10px; background-size: cover; /* 确保背景图片覆盖整个元素 */ background-repeat: no-repeat; /* 防止背景图片重复
-                                */ background-position: center center;transform: translate(5px, 15px);">
+            <button id="loginStatus" onclick="openPage('/account/uploadicon')"
+                style="width: 90px; height: 90px; border-radius: 50%; border: none; font-size: 16px; cursor: pointer; outline: none; display: inline; vertical-align: middle; margin-right: 10px; background-size: cover; background-repeat: no-repeat; background-position: center center; transform: translate(5px, 15px);">
             </button>
             <div style="width: 90%;display: flex;flex-wrap: wrap;transform: translate(110px, -70px);overflow-x: auto;">
-                <!-- 紧跟按钮的div元素 -->
                 <div id="username" class="username" style="display: block; vertical-align: middle;margin-bottom: 20px;">
                 </div>
                 <div style="flex-basis: 100%"></div>
-                <div id="email" class="email" style="display: block; vertical-align: middle;margin-bottom: 20px;">
-                </div>
+                <div id="email" class="email" style="display: block; vertical-align: middle;margin-bottom: 20px;"></div>
                 <div style="flex-basis: 100%"></div>
                 <div id="passwordLink" class="password-link"></div>
-                <br>
-                <br>
-                <a style="color: #337ab7;
-                            text-decoration: none;
-                            font-weight: bold;
-                            transition: color 0.3s;margin-left: 30px;" href="/account/forgotPassword"
-                    data-en="Forgot Password">忘记密码</a></p>
+                <br><br>
+                <a style="color: #337ab7; text-decoration: none; font-weight: bold; transition: color 0.3s; margin-left: 30px;"
+                    href="/account/forgotPassword" data-en="Forgot Password">忘记密码</a>
                 <div style="flex-basis: 100%"></div>
-                <a id="sa" style="color: #337ab7;
-                            text-decoration: none;
-                            font-weight: bold;
-                            transition: color 0.3s;" onclick="sa()" data-en="Switch Account">切换账号</a></p>
-                <a id="logout" style="color: #337ab7;
-                            text-decoration: none;
-                            font-weight: bold;
-                            transition: color 0.3s;margin-left: 30px;" onclick="logout()"
-                    data-en="Logout User">注销用户</a></p>
+                <a id="sa" style="color: #337ab7; text-decoration: none; font-weight: bold; transition: color 0.3s;"
+                    onclick="sa()" data-en="Switch Account">切换账号</a>
+                <a id="logout"
+                    style="color: #337ab7; text-decoration: none; font-weight: bold; transition: color 0.3s; margin-left: 30px;"
+                    onclick="logout()" data-en="Logout User">注销用户</a>
             </div>
             <button id="logoutButton" class="logout-btn custom-button" style="transform: translateY(-120px);"
                 data-en="Logout">退出登录</button>
             <button id="loginButton" class="login-btn custom-button" style="transform: translateY(-110px);"
                 data-en="Login">登录</button>
-
         </div>
+
         <br>
         <div id="language" class="section">
             <h1 data-en="Language">语言</h1>
-        <label for="languageSelect" data-en="Select Language">选择语言</label>
-        <br>
-        <br>
+            <label for="languageSelect" data-en="Select Language">选择语言</label>
+            <br><br>
             <select id="languageSelect" class="styled-select" style="width: 150px;">
                 <option value="auto" selected data-en="System Default">跟随系统</option>
                 <option value="zh">中文</option>
                 <option value="en">English</option>
             </select>
         </div>
-        <!-- 深色模式设置说明 -->
+
         <br>
         <div id="section">
             <h1 data-en="Features">功能说明</h1>
@@ -277,28 +263,27 @@
                     深色模式提供了更加舒适的夜间浏览体验，减少屏幕亮度对眼睛的刺激。启用后，界面将以深色背景和浅色文字显示。
                 </div>
 
-
-                <!-- 动画设置说明（已有） -->
                 <h2 data-en="Animation Settings">动画设置数据</h2>
                 <button class="explanation-trigger" data-target="animationHelp" data-en="Info">说明</button>
                 <div class="explanation" id="animationHelp" style="display: none;"
                     data-en="Animation settings allow you to enable or disable page animations. This can help improve the smoothness of page interactions, or turn off animations when you prefer a simpler interface.">
                     动画设置允许您开启或关闭页面上的动画效果。这可以帮助提高页面交互的流畅性，或者在您偏好简洁界面时关闭动画。
                 </div>
-                <!-- 动画设置说明（已有） -->
+
                 <h2 data-en="Glow & Shadow Settings">泛光与阴影设置数据</h2>
                 <button class="explanation-trigger" data-target="glowToggleHelp" data-en="Info">说明</button>
                 <div class="explanation" id="glowToggleHelp" style="display: none;"
                     data-en="Glow and shadow settings allow you to enable or disable glow effects on the page. Text glows in dark mode, and shadows appear in light mode.">
                     泛光与阴影设置允许您开启或关闭页面上的泛光效果。深色模式文字泛光，浅色模式文字出现阴影。
                 </div>
+
                 <h2 data-en="Better Code Display Settings">更好的代码显示设置数据</h2>
                 <button class="explanation-trigger" data-target="codeHelp" data-en="Info">说明</button>
                 <div class="explanation" id="codeHelp" style="display: none;"
                     data-en="Better code display settings provide clearer code presentation, including improved syntax highlighting and code fonts.">
                     更好的代码显示设置能为您提供更清晰的代码显示效果，包括更好的代码高亮和代码字体。
                 </div>
-                <!-- 可见度设置说明 -->
+
                 <h2 data-en="Opacity Settings">可见度设置数据</h2>
                 <button class="explanation-trigger" data-target="visibilityHelp" data-en="Info">说明</button>
                 <div class="explanation" id="visibilityHelp" style="display: none;"
@@ -306,8 +291,6 @@
                     可见度设置允许您调整页面元素的透明度，从而根据您的视觉偏好和环境光线条件优化页面的可读性。
                 </div>
 
-
-                <!-- 字体大小设置说明 -->
                 <h2 data-en="Font Size Settings">字体大小设置数据</h2>
                 <button class="explanation-trigger" data-target="fontSizeHelp" data-en="Info">说明</button>
                 <div class="explanation" id="fontSizeHelp" style="display: none;"
@@ -315,8 +298,6 @@
                     字体大小设置允许您根据阅读习惯调整页面上字体的大小，提高阅读的舒适度和易读性。
                 </div>
 
-
-                <!-- 护眼模式设置说明 -->
                 <h2 data-en="Eye Care Settings">护眼模式设置数据</h2>
                 <button class="explanation-trigger" data-target="eyeCareHelp" data-en="Info">说明</button>
                 <div class="explanation" id="eyeCareHelp" style="display: none;"
@@ -324,8 +305,6 @@
                     护眼模式通过调整屏幕色温和亮度，减少对眼睛的疲劳和伤害，特别是在长时间使用屏幕的情况下。
                 </div>
 
-
-                <!-- 亮度设置说明 -->
                 <h2 data-en="Brightness Settings">亮度设置数据</h2>
                 <button class="explanation-trigger" data-target="brightnessHelp" data-en="Info">说明</button>
                 <div class="explanation" id="brightnessHelp" style="display: none;"
@@ -333,8 +312,6 @@
                     亮度设置允许您调整屏幕的亮度，以适应不同的环境光线条件，确保屏幕内容的清晰可见。
                 </div>
 
-
-                <!-- 登录信息设置说明 -->
                 <h2 data-en="Login Settings">登录设置</h2>
                 <button class="explanation-trigger" data-target="loginInfoHelp" data-en="Info">说明</button>
                 <div class="explanation" id="loginInfoHelp" style="display: none;"
@@ -342,8 +319,6 @@
                     登录设置允许您保存登录状态，以便在不同设备间同步您访问高级功能。
                 </div>
 
-
-                <!-- 设置数据说明 -->
                 <h2 data-en="Settings Data">设置数据</h2>
                 <button class="explanation-trigger" data-target="allSettingsHelp" data-en="Info">说明</button>
                 <div class="explanation" id="allSettingsHelp" style="display: none;"
@@ -352,6 +327,7 @@
                 </div>
             </div>
         </div>
+
         <div id="developer" style="display: none;" class="section">
             <h1 data-en="Developer Options">开发者选项</h1>
             <h2 data-en="User List">用户列表</h2>
@@ -359,15 +335,14 @@
             <img id="preview" class="upload-preview" style="display: none;" src="#">
             <input type="file" id="avatar" style="display: none;" accept="image/png, image/jpeg" required
                 onchange="previewImagebebefore(this)">
-            <div id="userTableContainer">
-                <!-- 表格将在这里被JavaScript动态创建 -->
-            </div>
-            <button id='registerButton' onclick="registerUserBydev()" class="newuser"
+            <div id="userTableContainer"></div>
+            <button id="registerButton" onclick="registerUserBydev()" class="newuser"
                 data-en="Create New User">新建用户</button>
-            <br>
-            <!-- ========== 广播管理 ========== -->
+            <br><br>
+
+            <h2 data-en="Broadcast Management">广播管理</h2>
             <div id="broadcast-section">
-                <h2 data-en="Broadcast Management">广播管理</h2>
+                <h2 data-en="Broadcast List">广播列表</h2>
                 <div class="broadcast-toolbar">
                     <button onclick="showCreateBroadcast()" class="custom-button btn-create"
                         data-en="Create Broadcast">创建广播</button>
@@ -382,32 +357,32 @@
                 </div>
             </div>
             <br>
-            <div id="server-info">
-<div id="serverInfo">
-    <div>
-        <span class="label" data-en="Server Type">服务端类型</span>
-        <span class="value" id="serverType">加载中...</span>
-    </div>
-    <div>
-        <span class="label" data-en="Language">编程语言</span>
-        <span class="value" id="serverLang">加载中...</span>
-    </div>
-    <div>
-        <span class="label" data-en="Status">状态</span>
-        <span class="value" id="serverStatus">加载中...</span>
-    </div>
-    <div>
-        <span class="label" data-en="Version">版本</span>
-        <span class="value" id="serverVersion">加载中...</span>
-    </div>
-</div>
+
+            <div id="serverInfo">
+                <div>
+                    <span class="label" data-en="Server Type">服务端类型</span>
+                    <span class="value" id="serverType">加载中...</span>
+                </div>
+                <div>
+                    <span class="label" data-en="Language">编程语言</span>
+                    <span class="value" id="serverLang">加载中...</span>
+                </div>
+                <div>
+                    <span class="label" data-en="Status">状态</span>
+                    <span class="value" id="serverStatus">加载中...</span>
+                </div>
+                <div>
+                    <span class="label" data-en="Version">版本</span>
+                    <span class="value" id="serverVersion">加载中...</span>
+                </div>
+            </div>
             <br>
+
             <div id="server" style="display: none;">
                 <h2 data-en="Server Operations">服务器操作</h2>
                 <button class="custom-button" style="background-color: red;" id="restartSystemBtn"
                     data-en="Restart Server">重启服务器</button>
-                <br>
-                <br>
+                <br><br>
                 <div class="terminal-container">
                     <div class="terminal-header">
                         <div class="terminal-buttons">
@@ -417,27 +392,28 @@
                         </div>
                         <span class="terminal-title" data-en="Terminal">终端</span>
                     </div>
-                    <div class="terminal-body" id="terminalOutput">
-                        <!-- 终端输出内容将通过JavaScript动态添加 -->
-                    </div>
+                    <div class="terminal-body" id="terminalOutput"></div>
                 </div>
             </div>
+
             <button class="custom-button" onclick="exitdev()" data-en="Exit Developer Mode">退出开发者模式</button>
         </div>
+
         <div id="about" class="section">
             <h1 data-en="About">关于</h1>
             <div class="intro-box">
                 <h1 data-en="ScriptHub Introduction">脚本存放站简介</h1>
-<!-- 把带链接的段落拆分成多个部分 -->
-            <p>
-                <span class="i18n"
-                    data-en="In today's rapidly developing information technology era, the application of programming languages and scripts has become increasingly widespread. To meet the needs of programming enthusiasts and ">在当今信息技术飞速发展的时代，编程语言和脚本的应用变得越来越广泛。为了满足广大编程爱好者和</span><a id="developer-link" onclick="handleButtonClick()" data-en="developers">开发者</a><span class="i18n"
-                    data-en=", we have launched a feature-rich, user-friendly ScriptHub. ">的需求，我们推出了一个功能丰富、用户友好的脚本存放站。</span>
-                <a href="webdevelopment.html"
-                    data-en="This platform, created on January 18, 2024 at 13:20:13">这个平台于2024年1月18日13时20分13秒创建的</a>
-                <span class="i18n"
-                    data-en=", not only stores scripts in multiple programming languages such as C++ and Python, but also provides a wealth of features and setting options, aiming to provide users with the best experience.">，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。</span>
-            </p>
+                <p>
+                    <span class="i18n"
+                        data-en="In today's rapidly developing information technology era, the application of programming languages and scripts has become increasingly widespread. To meet the needs of programming enthusiasts and ">在当今信息技术飞速发展的时代，编程语言和脚本的应用变得越来越广泛。为了满足广大编程爱好者和</span>
+                    <a id="developer-link" onclick="handleButtonClick()" data-en="developers">开发者</a>
+                    <span class="i18n"
+                        data-en=", we have launched a feature-rich, user-friendly ScriptHub. ">的需求，我们推出了一个功能丰富、用户友好的脚本存放站。</span>
+                    <a href="webdevelopment.html"
+                        data-en="This platform, created on January 18, 2024 at 13:20:13">这个平台于2024年1月18日13时20分13秒创建的</a>
+                    <span class="i18n"
+                        data-en=", not only stores scripts in multiple programming languages such as C++ and Python, but also provides a wealth of features and setting options, aiming to provide users with the best experience.">，不仅存放了多种编程语言的脚本，如C++和Python，还提供了丰富的功能和设置选项，旨在为用户提供最佳的使用体验。</span>
+                </p>
 
                 <h2 data-en="Multiple Script Storage">多种脚本存放</h2>
                 <p
@@ -500,8 +476,10 @@
                 </p>
                 <p data-en="—— ScriptHub">——脚本存放站</p>
             </div>
-            <br> <span data-en="© Producer: ">© 制作人：</span><a href="https://github.com/wycwycwycwyc"
-                target="_blank">wyc</a><span data-en=", all rights reserved.">，保留所有权利。</span>
+            <br>
+            <span data-en="© Producer: ">© 制作人：</span>
+            <a href="https://github.com/wycwycwycwyc" target="_blank">wyc</a>
+            <span data-en=", all rights reserved.">，保留所有权利。</span>
         </div>
     </div>
 </body>
