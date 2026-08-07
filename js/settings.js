@@ -1061,8 +1061,12 @@ function checkDeveloperOptions() {
         document.getElementById('developers').style.display = 'block';
         if (!navigator.userAgent.match(/Mobile/i)) {
             document.getElementById('developer').style.display = 'block';
+            // 加载广播列表
+            setTimeout(function() {
+                refreshBroadcastList();
+            }, 500);
         }
-        developerLink.style.pointerEvents = 'none'; // 设置链接可点击
+        developerLink.style.pointerEvents = 'none';
     }
 }
 
@@ -2359,4 +2363,635 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
+});
+// ============================================================
+// 广播管理功能 - 完整优化版
+// ============================================================
+
+var allUsersCache = null;
+
+// 获取当前用户ID
+function getCurrentUserId() {
+    return localStorage.getItem('userid') || '';
+}
+
+// 获取所有用户列表（带缓存）
+function fetchAllUsers(forceRefresh) {
+    if (allUsersCache && !forceRefresh) {
+        console.log('[Broadcast] 使用缓存的用户列表');
+        return Promise.resolve(allUsersCache);
+    }
+
+    var userId = getCurrentUserId();
+    if (!userId) {
+        return Promise.resolve([]);
+    }
+    
+    console.log('[Broadcast] 请求用户列表...');
+    return fetch(serverurl + '/users?userid=' + encodeURIComponent(userId))
+        .then(function(res) {
+            if (!res.ok) throw new Error('请求失败');
+            return res.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                allUsersCache = data.data || [];
+                return allUsersCache;
+            }
+            return [];
+        })
+        .catch(function(err) {
+            console.warn('[Broadcast] 获取用户列表失败:', err);
+            return [];
+        });
+}
+
+// ============================================================
+// 创建广播
+// ============================================================
+function showCreateBroadcast() {
+    var userId = getCurrentUserId();
+    if (!userId) {
+        Swal.fire('提示', '请先登录', 'warning');
+        return;
+    }
+
+    fetchAllUsers().then(function(users) {
+        var userOptionsHtml = '';
+        if (users && users.length > 0) {
+            userOptionsHtml = users.map(function(u) {
+                return '<div class="user-checkbox-item">' +
+                    '<input type="checkbox" class="user-checkbox" value="' + u.id + '" data-username="' + escapeHtml(u.username) + '">' +
+                    '<label>' + escapeHtml(u.username) + ' (' + escapeHtml(u.id) + ')</label>' +
+                    '</div>';
+            }).join('');
+        } else {
+            userOptionsHtml = '<div style="padding:10px;color:#999;">暂无用户数据，请先刷新用户列表</div>';
+        }
+
+        Swal.fire({
+            title: '创建广播',
+            html: '<div class="swal-broadcast-form">' +
+                '<div class="form-group">' +
+                '<label class="form-label">标题 <span style="color:red;">*</span></label>' +
+                '<input id="swal-title" class="form-control" placeholder="请输入广播标题">' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">类型 <span style="color:red;">*</span></label>' +
+                '<select id="swal-type" class="form-control">' +
+                '<option value="text">text（纯文本）</option>' +
+                '<option value="html">html（支持CSS/JS）</option>' +
+                '</select>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">内容 <span style="color:red;">*</span></label>' +
+                '<textarea id="swal-content" class="form-control textarea" placeholder="请输入广播内容"></textarea>' +
+                '</div>' +
+                '<div class="form-row">' +
+                '<div class="form-group">' +
+                '<label class="form-label">结束时间</label>' +
+                '<input id="swal-endtime" type="datetime-local" class="form-control">' +
+                '<div class="form-hint">留空表示永久有效</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">展示次数</label>' +
+                '<select id="swal-display" class="form-control">' +
+                '<option value="once">一次</option>' +
+                '<option value="always">一直显示</option>' +
+                '</select>' +
+                '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">适用范围 <span style="color:red;">*</span></label>' +
+                '<select id="swal-scope" class="form-control">' +
+                '<option value="all">所有已登录用户</option>' +
+                '<option value="all_visitors">所有人（含未登录）</option>' +
+                '<option value="users">指定用户</option>' +
+                '</select>' +
+                '</div>' +
+                '<div class="form-group" id="swal-target-wrapper" style="display:none;">' +
+                '<label class="form-label">选择用户 <span style="color:red;">*</span></label>' +
+                '<div class="user-select-container" id="swal-user-list">' +
+                userOptionsHtml +
+                '</div>' +
+                '<div class="user-select-stats" id="swal-user-stats">已选择 0 个用户</div>' +
+                '<div class="form-hint">勾选要发送广播的用户，可多选</div>' +
+                '</div>' +
+                '</div>',
+            showCancelButton: true,
+            confirmButtonText: '创建',
+            cancelButtonText: '取消',
+            width: '600px',
+            preConfirm: function() {
+                var title = document.getElementById('swal-title').value.trim();
+                var type = document.getElementById('swal-type').value;
+                var content = document.getElementById('swal-content').value.trim();
+                var endTime = document.getElementById('swal-endtime').value;
+                var scope = document.getElementById('swal-scope').value;
+                var displayCount = document.getElementById('swal-display').value;
+                var targetUsers = [];
+
+                if (endTime) {
+                    var d = new Date(endTime);
+                    if (!isNaN(d.getTime())) {
+                        endTime = d.toISOString();
+                        endTime = endTime.replace(/\.\d{3}Z$/, 'Z');
+                    }
+                }
+
+                if (scope === 'users') {
+                    var checkboxes = document.querySelectorAll('#swal-user-list .user-checkbox:checked');
+                    checkboxes.forEach(function(cb) {
+                        targetUsers.push(cb.value);
+                    });
+                }
+
+                if (!title) { Swal.showValidationMessage('请填写标题'); return; }
+                if (!content) { Swal.showValidationMessage('请填写内容'); return; }
+                if (scope === 'users' && targetUsers.length === 0) {
+                    Swal.showValidationMessage('请选择至少一个用户');
+                    return;
+                }
+
+                return {
+                    userId: userId,
+                    title: title,
+                    type: type,
+                    content: content,
+                    endTime: endTime,
+                    scope: scope,
+                    targetUsers: targetUsers,
+                    displayCount: displayCount
+                };
+            },
+            didOpen: function() {
+                var scopeSelect = document.getElementById('swal-scope');
+                var targetWrapper = document.getElementById('swal-target-wrapper');
+                var userStats = document.getElementById('swal-user-stats');
+
+                scopeSelect.addEventListener('change', function() {
+                    targetWrapper.style.display = this.value === 'users' ? 'block' : 'none';
+                });
+
+                var container = document.getElementById('swal-user-list');
+                if (container) {
+                    container.addEventListener('change', function() {
+                        var checked = container.querySelectorAll('.user-checkbox:checked').length;
+                        if (userStats) {
+                            userStats.textContent = '已选择 ' + checked + ' 个用户';
+                        }
+                    });
+                }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed && result.value) {
+                var data = result.value;
+                Swal.fire({ title: '创建中', text: '请稍候...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+
+                fetch(serverurl + '/broadcast/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(resp) {
+                    if (resp.success) {
+                        Swal.fire('成功', '广播创建成功', 'success');
+                        refreshBroadcastList();
+                    } else {
+                        Swal.fire('失败', resp.message || '创建失败', 'error');
+                    }
+                })
+                .catch(function(err) {
+                    Swal.fire('错误', err.message, 'error');
+                });
+            }
+        });
+    });
+}
+
+// ============================================================
+// 编辑广播 - 使用缓存
+// ============================================================
+function showEditBroadcast(broadcast) {
+    var userId = getCurrentUserId();
+    if (!userId) {
+        Swal.fire('提示', '请先登录', 'warning');
+        return;
+    }
+
+    fetchAllUsers().then(function(users) {
+        var selectedTargets = broadcast.targetUsers || [];
+        var userOptionsHtml = '';
+        if (users && users.length > 0) {
+            userOptionsHtml = users.map(function(u) {
+                var checked = selectedTargets.indexOf(u.id) !== -1 ? 'checked' : '';
+                return '<div class="user-checkbox-item">' +
+                    '<input type="checkbox" class="user-checkbox" value="' + u.id + '" data-username="' + escapeHtml(u.username) + '" ' + checked + '>' +
+                    '<label>' + escapeHtml(u.username) + ' (' + escapeHtml(u.id) + ')</label>' +
+                    '</div>';
+            }).join('');
+        } else {
+            userOptionsHtml = '<div style="padding:10px;color:#999;">暂无用户数据</div>';
+        }
+
+        var endTimeValue = broadcast.endTime || '';
+        if (endTimeValue && endTimeValue !== '永久' && endTimeValue !== 'permanent') {
+            var d = new Date(endTimeValue);
+            if (!isNaN(d.getTime())) {
+                endTimeValue = d.toISOString().slice(0, 16);
+            }
+        } else {
+            endTimeValue = '';
+        }
+
+        Swal.fire({
+            title: '编辑广播',
+            html: '<div class="swal-broadcast-form">' +
+                '<div class="form-group">' +
+                '<label class="form-label">标题 <span style="color:red;">*</span></label>' +
+                '<input id="swal-edit-title" class="form-control" value="' + escapeHtml(broadcast.title || '') + '">' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">类型 <span style="color:red;">*</span></label>' +
+                '<select id="swal-edit-type" class="form-control">' +
+                '<option value="text"' + (broadcast.type === 'text' ? ' selected' : '') + '>text（纯文本）</option>' +
+                '<option value="html"' + (broadcast.type === 'html' ? ' selected' : '') + '>html（支持CSS/JS）</option>' +
+                '</select>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">内容 <span style="color:red;">*</span></label>' +
+                '<textarea id="swal-edit-content" class="form-control textarea">' + escapeHtml(broadcast.content || '') + '</textarea>' +
+                '</div>' +
+                '<div class="form-row">' +
+                '<div class="form-group">' +
+                '<label class="form-label">结束时间</label>' +
+                '<input id="swal-edit-endtime" type="datetime-local" class="form-control" value="' + escapeHtml(endTimeValue) + '">' +
+                '<div class="form-hint">留空表示永久有效</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">展示次数</label>' +
+                '<select id="swal-edit-display" class="form-control">' +
+                '<option value="once"' + (broadcast.displayCount === 'once' ? ' selected' : '') + '>一次</option>' +
+                '<option value="always"' + (broadcast.displayCount === 'always' ? ' selected' : '') + '>一直显示</option>' +
+                '</select>' +
+                '</div>' +
+                '</div>' +
+                '<div class="form-group">' +
+                '<label class="form-label">适用范围 <span style="color:red;">*</span></label>' +
+                '<select id="swal-edit-scope" class="form-control">' +
+                '<option value="all"' + (broadcast.scope === 'all' ? ' selected' : '') + '>所有已登录用户</option>' +
+                '<option value="all_visitors"' + (broadcast.scope === 'all_visitors' ? ' selected' : '') + '>所有人（含未登录）</option>' +
+                '<option value="users"' + (broadcast.scope === 'users' ? ' selected' : '') + '>指定用户</option>' +
+                '</select>' +
+                '</div>' +
+                '<div class="form-group" id="swal-edit-target-wrapper" style="' + (broadcast.scope === 'users' ? 'display:block;' : 'display:none;') + '">' +
+                '<label class="form-label">选择用户 <span style="color:red;">*</span></label>' +
+                '<div class="user-select-container" id="swal-edit-user-list">' +
+                userOptionsHtml +
+                '</div>' +
+                '<div class="user-select-stats" id="swal-edit-user-stats">已选择 ' + selectedTargets.length + ' 个用户</div>' +
+                '<div class="form-hint">勾选要发送广播的用户，可多选</div>' +
+                '</div>' +
+                '</div>',
+            showCancelButton: true,
+            confirmButtonText: '保存',
+            cancelButtonText: '取消',
+            width: '600px',
+            preConfirm: function() {
+                var title = document.getElementById('swal-edit-title').value.trim();
+                var type = document.getElementById('swal-edit-type').value;
+                var content = document.getElementById('swal-edit-content').value.trim();
+                var endTime = document.getElementById('swal-edit-endtime').value;
+                var scope = document.getElementById('swal-edit-scope').value;
+                var displayCount = document.getElementById('swal-edit-display').value;
+                var targetUsers = [];
+
+                if (endTime) {
+                    var d = new Date(endTime);
+                    if (!isNaN(d.getTime())) {
+                        endTime = d.toISOString();
+                        endTime = endTime.replace(/\.\d{3}Z$/, 'Z');
+                    }
+                }
+
+                if (scope === 'users') {
+                    var checkboxes = document.querySelectorAll('#swal-edit-user-list .user-checkbox:checked');
+                    checkboxes.forEach(function(cb) {
+                        targetUsers.push(cb.value);
+                    });
+                }
+
+                if (!title) { Swal.showValidationMessage('请填写标题'); return; }
+                if (!content) { Swal.showValidationMessage('请填写内容'); return; }
+                if (scope === 'users' && targetUsers.length === 0) {
+                    Swal.showValidationMessage('请选择至少一个用户');
+                    return;
+                }
+
+                var updates = {
+                    title: title,
+                    type: type,
+                    content: content,
+                    endTime: endTime,
+                    scope: scope,
+                    targetUsers: targetUsers,
+                    displayCount: displayCount
+                };
+                return { userId: userId, broadcastId: broadcast.broadcastId, updates: updates };
+            },
+            didOpen: function() {
+                var scopeSelect = document.getElementById('swal-edit-scope');
+                var targetWrapper = document.getElementById('swal-edit-target-wrapper');
+                var userStats = document.getElementById('swal-edit-user-stats');
+
+                scopeSelect.addEventListener('change', function() {
+                    targetWrapper.style.display = this.value === 'users' ? 'block' : 'none';
+                });
+
+                var container = document.getElementById('swal-edit-user-list');
+                if (container) {
+                    container.addEventListener('change', function() {
+                        var checked = container.querySelectorAll('.user-checkbox:checked').length;
+                        if (userStats) {
+                            userStats.textContent = '已选择 ' + checked + ' 个用户';
+                        }
+                    });
+                }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed && result.value) {
+                var data = result.value;
+                Swal.fire({ title: '保存中', text: '请稍候...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+
+                fetch(serverurl + '/broadcast/admin-update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(resp) {
+                    if (resp.success) {
+                        Swal.fire('成功', '广播更新成功', 'success');
+                        refreshBroadcastList();
+                    } else {
+                        Swal.fire('失败', resp.message || '更新失败', 'error');
+                    }
+                })
+                .catch(function(err) {
+                    Swal.fire('错误', err.message, 'error');
+                });
+            }
+        });
+    });
+}
+
+// ============================================================
+// 删除广播
+// ============================================================
+function deleteBroadcastById(broadcastId) {
+    var userId = getCurrentUserId();
+    if (!userId) {
+        Swal.fire('提示', '请先登录', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: '确认删除',
+        text: '确定要删除此广播吗？此操作不可恢复！',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: '确认删除',
+        cancelButtonText: '取消'
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            Swal.fire({ title: '删除中', text: '请稍候...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+
+            fetch(serverurl + '/broadcast/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId, broadcastId: broadcastId })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(resp) {
+                if (resp.success) {
+                    Swal.fire('成功', '广播删除成功', 'success');
+                    refreshBroadcastList();
+                } else {
+                    Swal.fire('失败', resp.message || '删除失败', 'error');
+                }
+            })
+            .catch(function(err) {
+                Swal.fire('错误', err.message, 'error');
+            });
+        }
+    });
+}
+
+// ============================================================
+// 刷新广播列表
+// ============================================================
+function refreshBroadcastList() {
+    var userId = getCurrentUserId();
+    if (!userId) {
+        Swal.fire('提示', '请先登录', 'warning');
+        return;
+    }
+
+    var container = document.getElementById('broadcastTableContainer');
+    if (container) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">加载中...</div>';
+    }
+
+    var btn = document.querySelector('.broadcast-toolbar .btn-refresh');
+    if (btn) btn.disabled = true;
+
+    // 刷新时也刷新用户缓存
+    allUsersCache = null;
+
+    fetch(serverurl + '/broadcast/admin-list?userId=' + encodeURIComponent(userId))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                renderBroadcastTable(data.data);
+            } else {
+                if (container) {
+                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#f44336;">加载失败: ' + (data.message || '未知错误') + '</div>';
+                }
+            }
+        })
+        .catch(function(err) {
+            if (container) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#f44336;">请求失败: ' + err.message + '</div>';
+            }
+        })
+        .finally(function() {
+            if (btn) btn.disabled = false;
+        });
+}
+
+// ============================================================
+// 渲染广播表格
+// ============================================================
+function renderBroadcastTable(broadcasts) {
+    var container = document.getElementById('broadcastTableContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!broadcasts || broadcasts.length === 0) {
+        container.innerHTML = '<div class="broadcast-empty"><span class="icon">📡</span><p>暂无广播，点击「创建广播」添加</p></div>';
+        return;
+    }
+
+    var table = document.createElement('table');
+    table.className = 'broadcast-table';
+
+    var thead = document.createElement('thead');
+    var headerRow = document.createElement('tr');
+    var headers = ['#', '标题', '类型', '内容', '结束时间', '适用范围', '展示', '操作'];
+    for (var h = 0; h < headers.length; h++) {
+        var th = document.createElement('th');
+        th.textContent = headers[h];
+        headerRow.appendChild(th);
+    }
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    for (var i = 0; i < broadcasts.length; i++) {
+        var broadcast = broadcasts[i];
+        var tr = document.createElement('tr');
+
+        var tdIndex = document.createElement('td');
+        tdIndex.textContent = i + 1;
+        tdIndex.style.textAlign = 'center';
+        tdIndex.style.fontWeight = '500';
+        tr.appendChild(tdIndex);
+
+        var tdTitle = document.createElement('td');
+        tdTitle.textContent = broadcast.title || '(无标题)';
+        tdTitle.style.fontWeight = '500';
+        tr.appendChild(tdTitle);
+
+        var tdType = document.createElement('td');
+        var typeBadge = document.createElement('span');
+        typeBadge.className = 'broadcast-type-badge ' + (broadcast.type === 'html' ? 'type-html' : 'type-text');
+        typeBadge.textContent = broadcast.type || 'text';
+        tdType.appendChild(typeBadge);
+        tr.appendChild(tdType);
+
+        var tdContent = document.createElement('td');
+        var content = broadcast.content || '';
+        tdContent.textContent = content.length > 50 ? content.substring(0, 50) + '...' : content;
+        tdContent.title = content;
+        tdContent.style.maxWidth = '200px';
+        tdContent.style.wordBreak = 'break-word';
+        tr.appendChild(tdContent);
+
+        var tdEndTime = document.createElement('td');
+        var endTimeDisplay = broadcast.endTime || '永久';
+        if (endTimeDisplay && endTimeDisplay !== '永久' && endTimeDisplay !== 'permanent') {
+            try {
+                var d = new Date(endTimeDisplay);
+                if (!isNaN(d.getTime())) {
+                    endTimeDisplay = d.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            } catch (e) {}
+        }
+        tdEndTime.textContent = endTimeDisplay;
+        tdEndTime.style.fontSize = '12px';
+        tr.appendChild(tdEndTime);
+
+        var tdScope = document.createElement('td');
+        var scopeBadge = document.createElement('span');
+        var scopeText = '';
+        var scopeClass = '';
+        if (broadcast.scope === 'all') { scopeText = '所有已登录'; scopeClass = 'scope-all'; }
+        else if (broadcast.scope === 'all_visitors') { scopeText = '所有人'; scopeClass = 'scope-all_visitors'; }
+        else if (broadcast.scope === 'users') { scopeText = '指定用户'; scopeClass = 'scope-users'; }
+        scopeBadge.className = 'broadcast-scope-badge ' + scopeClass;
+        scopeBadge.textContent = scopeText;
+        tdScope.appendChild(scopeBadge);
+        tr.appendChild(tdScope);
+
+        var tdDisplay = document.createElement('td');
+        var displayBadge = document.createElement('span');
+        displayBadge.className = 'broadcast-display-badge ' + (broadcast.displayCount === 'once' ? 'display-once' : 'display-always');
+        displayBadge.textContent = broadcast.displayCount === 'once' ? '一次' : '一直';
+        tdDisplay.appendChild(displayBadge);
+        tr.appendChild(tdDisplay);
+
+        var tdAction = document.createElement('td');
+        tdAction.className = 'broadcast-actions';
+
+        var editBtn = document.createElement('button');
+        editBtn.className = 'btn-edit';
+        editBtn.textContent = '编辑';
+        (function(b) {
+            editBtn.onclick = function(e) {
+                e.stopPropagation();
+                showEditBroadcast(b);
+            };
+        })(broadcast);
+        tdAction.appendChild(editBtn);
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'btn-delete';
+        delBtn.textContent = '删除';
+        (function(id) {
+            delBtn.onclick = function(e) {
+                e.stopPropagation();
+                deleteBroadcastById(id);
+            };
+        })(broadcast.broadcastId);
+        tdAction.appendChild(delBtn);
+
+        tr.appendChild(tdAction);
+        tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+}
+
+// ============================================================
+// HTML 转义
+// ============================================================
+function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================================
+// 开发者选项显示时自动加载广播
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    var observer = new MutationObserver(function() {
+        var dev = document.getElementById('developer');
+        if (dev && dev.style.display !== 'none') {
+            setTimeout(function() {
+                if (localStorage.getItem('developerOptionsEnabled') === 'true') {
+                    refreshBroadcastList();
+                }
+            }, 400);
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
+
+    var dev = document.getElementById('developer');
+    if (dev && dev.style.display !== 'none' && localStorage.getItem('developerOptionsEnabled') === 'true') {
+        setTimeout(function() {
+            refreshBroadcastList();
+        }, 400);
+    }
 });

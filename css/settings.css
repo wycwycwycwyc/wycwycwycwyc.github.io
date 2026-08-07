@@ -1132,3 +1132,500 @@
     display: flex;
     align-items: center;
 }
+/* ============================================================
+   广播管理样式
+   ============================================================ */
+
+/* 广播管理区域 */
+#broadcast-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+}
+
+#broadcast-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-primary, #333);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* 广播工具栏 */
+.broadcast-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.broadcast-toolbar .custom-button {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.broadcast-toolbar .btn-create {
+    background: #4CAF50;
+    color: white;
+}
+
+.broadcast-toolbar .btn-create:hover {
+    background: #43A047;
+}
+
+.broadcast-toolbar .btn-refresh {
+    background: #2196F3;
+    color: white;
+}
+
+.broadcast-toolbar .btn-refresh:hover {
+    background: #1976D2;
+}
+
+.broadcast-toolbar .btn-refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 广播表格容器 */
+#broadcastTableContainer {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+/* 广播表格 */
+.broadcast-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.broadcast-table thead {
+    background: #e9ecef;
+    color: #333;
+}
+
+.broadcast-table thead th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.broadcast-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+}
+
+.broadcast-table tbody tr:hover {
+    background: #f5f7fa;
+}
+
+.broadcast-table tbody td {
+    padding: 10px 10px;
+    vertical-align: middle;
+    word-break: break-word;
+}
+
+/* 广播类型标签 */
+.broadcast-type-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.broadcast-type-badge.type-text {
+    background: #e3f2fd;
+    color: #1565C0;
+}
+
+.broadcast-type-badge.type-html {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+/* 广播范围标签 */
+.broadcast-scope-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.broadcast-scope-badge.scope-all {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.broadcast-scope-badge.scope-all_visitors {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.broadcast-scope-badge.scope-users {
+    background: #f3e5f5;
+    color: #6a1b9a;
+}
+
+/* 广播展示次数标签 */
+.broadcast-display-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.broadcast-display-badge.display-once {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+.broadcast-display-badge.display-always {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* 广播操作按钮组 */
+.broadcast-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.broadcast-actions .btn-edit {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.broadcast-actions .btn-edit:hover {
+    background: #1976D2;
+}
+
+.broadcast-actions .btn-delete {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.broadcast-actions .btn-delete:hover {
+    background: #d32f2f;
+}
+
+/* 空状态 */
+.broadcast-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 16px;
+}
+
+.broadcast-empty .icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* ============================================================
+   SweetAlert 自定义样式
+   ============================================================ */
+
+/* 广播创建/编辑表单样式 */
+.swal-broadcast-form {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.swal-broadcast-form .form-group {
+    margin-bottom: 14px;
+}
+
+.swal-broadcast-form .form-label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.swal-broadcast-form .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.swal-broadcast-form .form-control:focus {
+    border-color: #2196F3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.swal-broadcast-form .form-control.textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.swal-broadcast-form .form-hint {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+}
+
+.swal-broadcast-form .form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.swal-broadcast-form .form-row .form-group {
+    flex: 1;
+}
+
+/* 暗色模式适配 */
+.dark-mode #broadcast-section {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode #broadcast-section h2 {
+    color: #e0e0e0;
+}
+
+.dark-mode .broadcast-table thead {
+    background: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.dark-mode .broadcast-table thead th {
+    border-bottom-color: #555;
+}
+
+.dark-mode .broadcast-table tbody tr {
+    border-bottom-color: #3a3a3a;
+}
+
+.dark-mode .broadcast-table tbody tr:hover {
+    background: #333;
+}
+
+.dark-mode .broadcast-table tbody td {
+    color: #ccc;
+}
+
+.dark-mode .swal-broadcast-form .form-label {
+    color: #ccc;
+}
+
+.dark-mode .swal-broadcast-form .form-control {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+.dark-mode .swal-broadcast-form .form-control:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.dark-mode .swal-broadcast-form .form-hint {
+    color: #777;
+}
+
+.dark-mode .broadcast-empty {
+    color: #777;
+}
+/* ============================================================
+   广播管理 - 增强样式
+   ============================================================ */
+
+/* 日期时间选择器 */
+.swal-broadcast-form input[type="datetime-local"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.swal-broadcast-form input[type="datetime-local"]:focus {
+    border-color: #2196F3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* 用户选择列表 */
+.user-select-container {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    background: #fff;
+}
+
+.user-select-container .user-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.user-select-container .user-checkbox-item:hover {
+    background: #f0f4f8;
+}
+
+.user-select-container .user-checkbox-item input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.user-select-container .user-checkbox-item label {
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+}
+
+/* 用户选择统计 */
+.user-select-stats {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* 暗色模式适配 */
+.dark-mode .user-select-container {
+    background: #3a3a3a;
+    border-color: #555;
+}
+
+.dark-mode .user-select-container .user-checkbox-item:hover {
+    background: #444;
+}
+
+.dark-mode .user-select-container .user-checkbox-item label {
+    color: #ccc;
+}
+
+.dark-mode .swal-broadcast-form input[type="datetime-local"] {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #e0e0e0;
+}
+/* ============================================================
+   服务器信息 - 深色模式适配
+   ============================================================ */
+
+/* 服务器信息卡片 */
+#serverInfo {
+    background: #f5f7fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 4px solid #2196F3;
+    font-family: monospace;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+#serverInfo div {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    transition: border-color 0.3s;
+}
+
+#serverInfo div:last-child {
+    border-bottom: none;
+}
+
+#serverInfo .label {
+    color: #666;
+    transition: color 0.3s;
+}
+
+#serverInfo .value {
+    color: #2196F3;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+#serverInfo .value.status-running {
+    color: #4CAF50;
+}
+
+#serverInfo .value.status-stopped {
+    color: #f44336;
+}
+
+#serverInfo .value.status-unknown {
+    color: #FF9800;
+}
+
+/* ============================================================
+   深色模式 - 服务器信息
+   ============================================================ */
+.dark-mode #serverInfo {
+    background: #2d2d2d;
+    border-left-color: #1e88e5;
+}
+
+.dark-mode #serverInfo div {
+    border-bottom-color: #444;
+}
+
+.dark-mode #serverInfo .label {
+    color: #aaa;
+}
+
+.dark-mode #serverInfo .value {
+    color: #42a5f5;
+}
+
+.dark-mode #serverInfo .value.status-running {
+    color: #66bb6a;
+}
+
+.dark-mode #serverInfo .value.status-stopped {
+    color: #ef5350;
+}
+
+.dark-mode #serverInfo .value.status-unknown {
+    color: #ffa726;
+}

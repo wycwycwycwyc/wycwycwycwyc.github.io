@@ -27,6 +27,7 @@
     <link href="/css/message.min.css" rel="stylesheet" />
     <script src="/js/message.min.js"></script>
     <script src="/js/script14_setLanguage.js"></script>
+    <script src="/js/script15_boardCast.js"></script>
 </head>
 
 <body>
@@ -364,30 +365,42 @@
             <button id='registerButton' onclick="registerUserBydev()" class="newuser"
                 data-en="Create New User">新建用户</button>
             <br>
-            <br>
-            <div id="server-info">
-                <h2 data-en="Server Information">服务器信息</h2>
-                <div id="serverInfo"
-                    style="background: #f5f7fa; border-radius: 8px; padding: 15px; margin: 10px 0; border-left: 4px solid #2196F3; font-family: monospace;">
-                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
-                        <span data-en="Server Type">服务端类型</span>
-                        <span id="serverType" style="color: #2196F3; font-weight: bold;">加载中...</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
-                        <span data-en="Language">编程语言</span>
-                        <span id="serverLang" style="color: #2196F3; font-weight: bold;">加载中...</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e0e0e0;">
-                        <span data-en="Status">状态</span>
-                        <span id="serverStatus" style="color: #4CAF50; font-weight: bold;">加载中...</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                        <span data-en="Version">版本</span>
-                        <span id="serverVersion" style="color: #666;">加载中...</span>
+            <!-- ========== 广播管理 ========== -->
+            <div id="broadcast-section">
+                <h2 data-en="Broadcast Management">广播管理</h2>
+                <div class="broadcast-toolbar">
+                    <button onclick="showCreateBroadcast()" class="custom-button btn-create"
+                        data-en="Create Broadcast">创建广播</button>
+                    <button onclick="refreshBroadcastList()" class="custom-button btn-refresh"
+                        data-en="Refresh Broadcast List">刷新列表</button>
+                </div>
+                <div id="broadcastTableContainer">
+                    <div class="broadcast-empty">
+                        <span class="icon">📡</span>
+                        <p data-en="Click 'Refresh List' to load broadcasts">点击「刷新列表」加载广播</p>
                     </div>
                 </div>
-                <button onclick="loadServerInfo()" class="custom-button" data-en="Refresh Server Info">刷新服务器信息</button>
             </div>
+            <br>
+            <div id="server-info">
+<div id="serverInfo">
+    <div>
+        <span class="label" data-en="Server Type">服务端类型</span>
+        <span class="value" id="serverType">加载中...</span>
+    </div>
+    <div>
+        <span class="label" data-en="Language">编程语言</span>
+        <span class="value" id="serverLang">加载中...</span>
+    </div>
+    <div>
+        <span class="label" data-en="Status">状态</span>
+        <span class="value" id="serverStatus">加载中...</span>
+    </div>
+    <div>
+        <span class="label" data-en="Version">版本</span>
+        <span class="value" id="serverVersion">加载中...</span>
+    </div>
+</div>
             <br>
             <div id="server" style="display: none;">
                 <h2 data-en="Server Operations">服务器操作</h2>

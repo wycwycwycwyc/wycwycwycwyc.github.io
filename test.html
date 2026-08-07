@@ -3,60 +3,228 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>GPS + 免费逆地理编码</title>
+  <title>广播系统测试</title>
 </head>
 
 <body>
-  <button onclick="getFullLocation()">点击获取位置（含县）</button>
-  <p id="result">等待定位...</p>
+  <h1>📢 广播系统测试</h1>
+  <hr>
+
+  <h2>1. 创建广播</h2>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    <p><b>必填：</b></p>
+    <label>userId (admin/superadmin): <input id="createUserId" value="scripthub_superadmin"></label><br>
+    <label>标题: <input id="createTitle" value="测试广播"></label><br>
+    <label>类型:
+      <select id="createType">
+        <option value="text">text</option>
+        <option value="html">html</option>
+      </select>
+    </label><br>
+    <label>内容: <textarea id="createContent" rows="2" cols="30">这是一条测试广播</textarea></label><br>
+    <label>结束时间 (留空=永久): <input id="createEndTime" placeholder="2026-12-31 23:59:59"></label><br>
+    <label>适用范围:
+      <select id="createScope">
+        <option value="all">all (所有已登录)</option>
+        <option value="all_visitors">all_visitors (所有人)</option>
+        <option value="users">users (指定用户)</option>
+      </select>
+    </label><br>
+    <label>指定用户ID (逗号分隔): <input id="createTargetUsers" placeholder="user1,user2"></label><br>
+    <label>展示次数:
+      <select id="createDisplayCount">
+        <option value="once">once (一次)</option>
+        <option value="always">always (一直)</option>
+      </select>
+    </label><br>
+    <button onclick="createBroadcast()">创建广播</button>
+    <span id="createResult"></span>
+  </div>
+
+  <hr>
+
+  <h2>2. 获取广播列表 (普通用户)</h2>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    <label>userId (留空=未登录): <input id="listUserId" placeholder="留空或输入用户ID"></label>
+    <button onclick="getBroadcastList()">获取广播</button>
+    <pre id="listResult" style="background:#f5f5f5;padding:10px;"></pre>
+  </div>
+
+  <hr>
+
+  <h2>3. 删除广播 (需admin/superadmin)</h2>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    <label>userId: <input id="deleteUserId" value="scripthub_superadmin"></label><br>
+    <label>broadcastId: <input id="deleteBroadcastId" placeholder="要删除的广播ID"></label><br>
+    <button onclick="deleteBroadcast()">删除广播</button>
+    <span id="deleteResult"></span>
+  </div>
+
+  <hr>
+
+  <h2>4. 获取所有广播 (admin-list)</h2>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    <label>userId (admin/superadmin): <input id="adminListUserId" value="scripthub_superadmin"></label>
+    <button onclick="getAdminList()">获取所有广播</button>
+    <pre id="adminListResult" style="background:#f5f5f5;padding:10px;"></pre>
+  </div>
+
+  <hr>
+
+  <h2>5. 修改广播 (admin-update) - 支持所有字段</h2>
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    <label>userId: <input id="updateUserId" value="scripthub_superadmin"></label><br>
+    <label>broadcastId: <input id="updateBroadcastId" placeholder="要修改的广播ID"></label><br>
+    <br>
+    <p><b>以下字段留空表示不修改：</b></p>
+    <label>新标题: <input id="updateTitle" placeholder="新标题"></label><br>
+    <label>新内容: <input id="updateContent" placeholder="新内容"></label><br>
+    <label>新类型:
+      <select id="updateType">
+        <option value="">不修改</option>
+        <option value="text">text</option>
+        <option value="html">html</option>
+      </select>
+    </label><br>
+    <label>新结束时间: <input id="updateEndTime" placeholder="2026-12-31 23:59:59 (留空永久)"></label><br>
+    <label>新适用范围:
+      <select id="updateScope">
+        <option value="">不修改</option>
+        <option value="all">all (所有已登录)</option>
+        <option value="all_visitors">all_visitors (所有人)</option>
+        <option value="users">users (指定用户)</option>
+      </select>
+    </label><br>
+    <label>新指定用户ID (逗号分隔): <input id="updateTargetUsers" placeholder="user1,user2"></label><br>
+    <label>新展示次数:
+      <select id="updateDisplayCount">
+        <option value="">不修改</option>
+        <option value="once">once (一次)</option>
+        <option value="always">always (一直)</option>
+      </select>
+    </label><br>
+    <button onclick="updateBroadcast()">修改广播</button>
+    <span id="updateResult"></span>
+  </div>
 
   <script>
-    function getFullLocation() {
-      if (!navigator.geolocation) {
-        document.getElementById('result').textContent = '浏览器不支持GPS';
+    const BASE_URL = 'http://192.168.1.2:3000';
+
+    function apiCall(method, url, body, callback) {
+      const options = {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+      };
+      if (body) options.body = JSON.stringify(body);
+
+      fetch(BASE_URL + url, options)
+        .then(res => res.json())
+        .then(data => callback(null, data))
+        .catch(err => callback(err, null));
+    }
+
+    // 1. 创建
+    function createBroadcast() {
+      const userId = document.getElementById('createUserId').value;
+      const title = document.getElementById('createTitle').value;
+      const type = document.getElementById('createType').value;
+      const content = document.getElementById('createContent').value;
+      const endTime = document.getElementById('createEndTime').value;
+      const scope = document.getElementById('createScope').value;
+      const targetUsersRaw = document.getElementById('createTargetUsers').value;
+      const displayCount = document.getElementById('createDisplayCount').value;
+
+      const targetUsers = targetUsersRaw ? targetUsersRaw.split(',').map(s => s.trim()) : [];
+
+      const body = { userId, title, type, content, endTime, scope, targetUsers, displayCount };
+      apiCall('POST', '/broadcast/create', body, (err, data) => {
+        document.getElementById('createResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
+        if (data && data.data) console.log('创建成功:', data.data);
+      });
+    }
+
+    // 2. 获取列表
+    function getBroadcastList() {
+      const userId = document.getElementById('listUserId').value;
+      const url = '/broadcast/list' + (userId ? '?userId=' + encodeURIComponent(userId) : '');
+      fetch(BASE_URL + url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('listResult').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+          document.getElementById('listResult').textContent = '❌ ' + err.message;
+        });
+    }
+
+    // 3. 删除
+    function deleteBroadcast() {
+      const userId = document.getElementById('deleteUserId').value;
+      const broadcastId = document.getElementById('deleteBroadcastId').value;
+      if (!broadcastId) { document.getElementById('deleteResult').textContent = '❌ 请填写broadcastId'; return; }
+      apiCall('POST', '/broadcast/delete', { userId, broadcastId }, (err, data) => {
+        document.getElementById('deleteResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
+      });
+    }
+
+    // 4. admin-list
+    function getAdminList() {
+      const userId = document.getElementById('adminListUserId').value;
+      const url = '/broadcast/admin-list?userId=' + encodeURIComponent(userId);
+      fetch(BASE_URL + url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('adminListResult').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+          document.getElementById('adminListResult').textContent = '❌ ' + err.message;
+        });
+    }
+
+    // 5. 修改 - 支持所有字段
+    function updateBroadcast() {
+      const userId = document.getElementById('updateUserId').value;
+      const broadcastId = document.getElementById('updateBroadcastId').value;
+
+      const title = document.getElementById('updateTitle').value;
+      const content = document.getElementById('updateContent').value;
+      const type = document.getElementById('updateType').value;
+      const endTime = document.getElementById('updateEndTime').value;
+      const scope = document.getElementById('updateScope').value;
+      const targetUsersRaw = document.getElementById('updateTargetUsers').value;
+      const displayCount = document.getElementById('updateDisplayCount').value;
+
+      if (!broadcastId) {
+        document.getElementById('updateResult').textContent = '❌ 请填写broadcastId';
         return;
       }
 
-      document.getElementById('result').textContent = 'GPS定位中...';
+      const updates = {};
+      if (title) updates.title = title;
+      if (content) updates.content = content;
+      if (type) updates.type = type;
+      if (endTime) updates.endTime = endTime;
+      if (scope) updates.scope = scope;
+      if (targetUsersRaw) {
+        updates.targetUsers = targetUsersRaw.split(',').map(s => s.trim());
+      }
+      if (displayCount) updates.displayCount = displayCount;
 
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          var lat = pos.coords.latitude;
-          var lng = pos.coords.longitude;
+      if (Object.keys(updates).length === 0) {
+        document.getElementById('updateResult').textContent = '❌ 至少填一个要修改的字段';
+        return;
+      }
 
-          document.getElementById('result').textContent = '正在解析地址...';
-
-          // 用免费API把经纬度转成地址（无需注册，无次数限制）
-          fetch('https://api.opencagedata.com/geocode/v1/json?q=' + lat + '+' + lng + '&key=demo&language=zh')
-            .then(res => res.json())
-            .then(data => {
-              if (data.results && data.results.length > 0) {
-                var components = data.results[0].components;
-                var province = components.state || components.province || '未知';
-                var city = components.city || components.town || '未知';
-                var district = components.suburb || components.county || components.district || '未知';
-                var full = data.results[0].formatted;
-
-                document.getElementById('result').innerHTML =
-                  '📍 ' + full + '<br><br>' +
-                  '🏢 省/州: ' + province + '<br>' +
-                  '🏙️ 市: ' + city + '<br>' +
-                  '🏘️ 区/县: ' + district + '<br><br>' +
-                  '⚠️ 使用OpenCage演示Key，有每日限制，仅供测试';
-              } else {
-                document.getElementById('result').textContent = '地址解析失败';
-              }
-            })
-            .catch(() => {
-              document.getElementById('result').textContent = '逆地理编码请求失败';
-            });
-        },
-        function (err) {
-          document.getElementById('result').textContent = 'GPS失败: ' + err.message;
-        }
-      );
+      apiCall('POST', '/broadcast/admin-update', { userId, broadcastId, updates }, (err, data) => {
+        document.getElementById('updateResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
+      });
     }
+
+    console.log('广播系统测试页面已加载，请求地址: ' + BASE_URL);
   </script>
+
+  <hr>
+  <p style="color:#888;">注意: 需要后端服务正在运行，且已实现广播接口。</p>
 </body>
 
 </html>
