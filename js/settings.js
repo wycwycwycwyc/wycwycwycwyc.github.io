@@ -141,98 +141,185 @@ function shouldUseDarkMode() {
     }
 }
 initSwalTheme();
-    if (navigator.userAgent.match(/Mobile/i)) {
-        // 移动设备
+// ✅ 只在移动设备上执行
+if (navigator.userAgent.match(/Mobile/i)) {
+    // 移动设备
+
+    var menu;
+    var currentMenu = null;
+    var isTransitioning = false;
+    var ANIMATION_DURATION = 350;
+    var timeoutId = null;
     
-        var menu;
-        document.getElementById('sidebar').style.width = '100%';
-        document.getElementById("content").style.visibility = 'hidden';
-        document.getElementById("content").style.marginLeft = '0';
-        var sidebars = document.getElementById('sidebar');
+    document.getElementById('sidebar').style.width = '100%';
+    document.getElementById("content").style.visibility = 'hidden';
+    document.getElementById("content").style.marginLeft = '0';
+    var sidebars = document.getElementById('sidebar');
 
-        for (var i = 0; i < sidebars.children.length; i++) {
-            // 获取子元素的id
-            var childId = sidebars.children[i].id;
-            // 打印子元素的id
-            var button = document.createElement('button');
-            button.innerHTML = getLocalizedText('返回', 'Back'); // 修改这里
-            button.id = 'last'; // 设置按钮ID
-            button.className = 'custom-button';
-            // 设置按钮的样式
-            button.style.cssText = 'position: fixed;left :0;top:-40px';
-            var urlParams = new URLSearchParams(window.location.search);
-
-            // 获取容器元素
-            var container = document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer'));
-            button.onclick = function () {
-                document.getElementById(menu).style.display = 'none';
-                var type = urlParams.get('type');
-                if (type == null) {
-                    sidebars.classList.remove('hide');
-                    document.getElementById('sidebar').style.display = 'block';
-                }
+    function resetAllSectionsVisibility(exceptId) {
+        var allSections = document.querySelectorAll('.section');
+        allSections.forEach(function(s) {
+            if (s.id !== exceptId) {
+                s.style.display = 'none';
+                s.style.visibility = 'hidden';
+                s.style.animation = '';
+            } else {
+                s.style.display = 'block';
+                s.style.visibility = 'visible';
             }
-            // 将按钮添加到容器中
+        });
+    }
 
-            if (childId != '') {
-
-                container.appendChild(button);
-                document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.transform = 'translateY(30px)';
-
-
-                document.getElementById(childId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'none';
-            }
-        }
-        if (sidebars) {
-            // 获取 sidebar 元素的所有子元素
-            var children = sidebar.children;
-            // 遍历每个子元素
-            sidebar.addEventListener('click', function (event) {
-                // 检查被点击的元素是否是sidebar的子元素
-                if (event.target.id) {
-                    // 获取被点击元素的id
-                    var clickedId = event.target.id;
-                    event.preventDefault();
-                    menu = clickedId.replace(/-si/g, '').replace(/developers/g, 'developer');
-
-                    // 先添加 hide 类来触发过渡效果
-                    sidebars.classList.add('hide');
-
-                    // 监听过渡结束事件
-                    sidebars.addEventListener('transitionend', function handler() {
-                        // 过渡完成后设置 display: none
-
-
-                        // 移除事件监听器，避免重复触发
-                        sidebars.removeEventListener('transitionend', handler);
-                    }, { once: true });
-                    // 显示点击的菜单项
-                    var contentElement = document.getElementById('content');
-
-                    // 定义动画效果
-                    var animationStyle = {
-                        animationName: 'slideInFromRight', // 动画名称
-                        animationDuration: '0.5s', // 动画持续时间
-                        animationTimingFunction: 'ease-out', // 动画速度曲线
-                        animationFillMode: 'forwards', // 动画完成后的状态
-                    };
-
-                    // 将动画效果应用到元素上
-                    Object.assign(contentElement.style, animationStyle);
-                    document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.display = 'block';
-                    document.getElementById(clickedId.replace(/-si/g, '').replace(/developers/g, 'developer')).style.visibility = 'visible';
-                }
-            });
-        }
+    for (var i = 0; i < sidebars.children.length; i++) {
+        var childId = sidebars.children[i].id;
+        if (!childId) continue;
+        
+        var targetId = childId.replace(/-si/g, '').replace(/developers/g, 'developer');
+        var container = document.getElementById(targetId);
+        
+        if (!container) continue;
+        
+        var button = document.createElement('button');
+        button.innerHTML = getLocalizedText('返回', 'Back');
+        button.id = 'last_' + targetId;
+        button.className = 'custom-button';
+        button.style.cssText = 'position: fixed; left: 0; top: -40px; z-index: 1000;';
+        button.dataset.target = targetId;
+        
         var urlParams = new URLSearchParams(window.location.search);
-        var type = urlParams.get('type');
-        if (type != null) {
-            document.getElementById('last').display = 'none';
-            sidebars.style.display = 'none';
-            document.getElementById(type).style.visibility = 'visible';
-            document.getElementById(type).style.display = 'block';
 
+        button.onclick = function(e) {
+            e.stopPropagation();
+            var target = this.dataset.target;
+            if (isTransitioning) return;
+            
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            
+            var currentEl = document.getElementById(target);
+            if (currentEl) {
+                currentEl.style.display = 'none';
+                currentEl.style.visibility = 'hidden';
+                currentEl.style.animation = '';
+            }
+            
+            currentMenu = null;
+            var type = urlParams.get('type');
+            if (type == null) {
+                sidebars.classList.remove('hide');
+                document.getElementById('sidebar').style.display = 'block';
+                sidebars.style.animation = 'slideInFromLeft ' + (ANIMATION_DURATION / 1000) + 's ease-out forwards';
+            }
+            
+            if (history.pushState) {
+                var url = window.location.pathname + window.location.search;
+                history.pushState(null, null, url);
+            }
+        };
 
+        container.appendChild(button);
+        container.style.transform = 'translateY(30px)';
+        container.style.display = 'none';
+        container.style.visibility = 'hidden';
+    }
+
+    if (sidebars) {
+        sidebar.addEventListener('click', function(event) {
+            if (event.target.id && !isTransitioning) {
+                var clickedId = event.target.id;
+                event.preventDefault();
+                var newMenu = clickedId.replace(/-si/g, '').replace(/developers/g, 'developer');
+
+                var targetElement = document.getElementById(newMenu);
+                if (!targetElement) return;
+
+                if (currentMenu === newMenu) return;
+
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+
+                isTransitioning = true;
+
+                if (currentMenu) {
+                    var currentEl = document.getElementById(currentMenu);
+                    if (currentEl && currentEl.style.display !== 'none') {
+                        currentEl.style.display = 'none';
+                        currentEl.style.visibility = 'hidden';
+                        currentEl.style.animation = '';
+                    }
+                }
+
+                sidebars.classList.add('hide');
+                sidebars.style.animation = 'slideOutToLeft ' + (ANIMATION_DURATION / 1000) + 's ease-in forwards';
+
+                menu = newMenu;
+                currentMenu = newMenu;
+                
+                targetElement.style.display = 'block';
+                targetElement.style.visibility = 'visible';
+                targetElement.style.animation = 'none';
+                void targetElement.offsetHeight;
+                targetElement.style.animation = 'slideInFromRight ' + (ANIMATION_DURATION / 1000) + 's ease-out forwards';
+
+                if (history.pushState) {
+                    history.pushState(null, null, '#' + newMenu);
+                }
+
+                timeoutId = setTimeout(function() {
+                    isTransitioning = false;
+                    timeoutId = null;
+                    var el = document.getElementById(newMenu);
+                    if (el) {
+                        el.style.display = 'block';
+                        el.style.visibility = 'visible';
+                    }
+                    sidebars.style.animation = '';
+                }, ANIMATION_DURATION + 50);
+            }
+        });
+    }
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var type = urlParams.get('type');
+    if (type != null) {
+        var lastBtns = document.querySelectorAll('[id^="last_"]');
+        lastBtns.forEach(function(btn) {
+            btn.style.display = 'none';
+        });
+        sidebars.style.display = 'none';
+        var targetEl = document.getElementById(type);
+        if (targetEl) {
+            targetEl.style.visibility = 'visible';
+            targetEl.style.display = 'block';
+            targetEl.style.animation = 'slideInFromRight ' + (ANIMATION_DURATION / 1000) + 's ease-out forwards';
+            currentMenu = type;
+        }
+    }
+}
+// ✅ 移动端代码结束 - 桌面端不受影响
+});
+document.addEventListener('DOMContentLoaded', function() {
+    // 只在移动端处理 URL 哈希
+    if (navigator.userAgent.match(/Mobile/i)) {
+        var hash = window.location.hash;
+        if (hash) {
+            var targetId = hash.replace('#', '');
+            var targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                // 隐藏所有 section
+                document.querySelectorAll('.section').forEach(function(s) {
+                    s.style.display = 'none';
+                    s.style.visibility = 'hidden';
+                });
+                targetSection.style.display = 'block';
+                targetSection.style.visibility = 'visible';
+                // 移动端隐藏侧边栏
+                document.getElementById('sidebar').style.display = 'none';
+            }
         }
     }
 });

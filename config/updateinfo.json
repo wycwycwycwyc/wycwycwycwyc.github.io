@@ -418,5 +418,45 @@
       "zh": "语言英语进一步适配",
       "en": "Further English language adaptation"
     }
+  },
+  "update19": {
+    "time": {
+      "zh": "2026年8月7日",
+      "en": "August 7, 2026"
+    },
+    "title": {
+      "zh": "网站通知",
+      "en": "Website Notifications"
+    },
+    "text1": {
+      "zh": "网站新增<通知系统>,可实时接收网站通知内容和自定义交互",
+      "en": "Website notifications system added for real-time updates and custom interactions"
+    },
+    "text2": {
+      "zh": "双语言多设备双重<后端>保障网站更好正常运行",
+      "en": "Dual-language, multi-device dual-backend ensures better website performance"
+    }
+  },
+  "update20": {
+    "time": {
+      "zh": "2026年8月13日",
+      "en": "August 13, 2026"
+    },
+    "title": {
+      "zh": "设置修复",
+      "en": "Settings Fixes"
+    },
+    "text1": {
+      "zh": "修复手机端无法直接显示到二级界面的问题",
+      "en": "Fixed issue with mobile端无法直接显示到二级界面"
+    },
+    "text2": {
+      "zh": "修复手机端进入退出二级界面动画异常的问题",
+      "en": "Fixed animation issues when entering and exiting secondary interfaces on mobile devices"
+    },
+    "text3": {
+      "zh": "修复<账户>界面未登录状态显示异常的问题",
+      "en": "Fixed issue with <Account> interface displaying incorrectly when not logged in"
+    }
   }
 }
