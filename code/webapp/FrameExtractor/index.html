@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <script src="/js/script7_setOpacityandBlur.js"></script>
+  <script src="/js/script8_setEyeCare.js"></script>
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <script src="/js/script11_setHighlight.js"></script>
+  <script src="/js/script13_checkIslogin.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="/js/script14_setLanguage.js"></script>
+  <title>视频帧提取器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
+  </script>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <div class="top-bar">
+      <div class="left-group">
+        <!-- 返回按钮放在标题左侧 -->
+        <button class="btn-back" onclick="goBackOrHome()" data-en="Back">返回</button>
+        <div class="brand" data-en="Video Frame Extractor">
+          视频帧提取器
+        </div>
+      </div>
+      <div class="file-info">
+        <span class="name" id="fileNameDisplay" data-en="Not loaded">未加载</span>
+        <span id="statusBadge" class="badge" data-en="Waiting">等待</span>
+        <button class="btn-upload" id="uploadTrigger" data-en="Open">打开</button>
+        <input type="file" id="fileInput" accept="video/*" style="display:none" />
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="player-area">
+        <div class="video-wrapper" id="videoWrapper">
+          <video id="videoPlayer" playsinline></video>
+          <div class="empty-state" id="emptyState">
+            <span class="icon" data-en="Drop or click Open to load video">拖拽或点击「打开」加载视频</span>
+            <span style="font-size:12px;color:#3a4e6a;" data-en="Supports H.264 MP4">支持 H.264 MP4</span>
+          </div>
+        </div>
+        <div class="transport">
+          <button id="playBtn" disabled data-en="Play">▶</button>
+          <button id="rewindBtn" disabled data-en="Rewind">⏪</button>
+          <button id="forwardBtn" disabled data-en="Forward">⏩</button>
+          <span class="timecode" id="timeDisplay">00:00:00 / 00:00:00</span>
+          <input type="range" id="seekSlider" min="0" max="100" value="0" disabled />
+        </div>
+      </div>
+
+      <div class="tools-panel">
+        <div class="section-label" data-en="Extract Tools">提取工具</div>
+        <div class="btn-group">
+          <button class="btn" id="extractSingleBtn" disabled data-en="Single Frame">单帧</button>
+          <button class="btn" id="extractKeyframesBtn" disabled data-en="Keyframes">关键帧</button>
+          <button class="btn primary wide" id="extractAllBtn" disabled data-en="All Frames (ZIP)">全部帧 (ZIP)</button>
+        </div>
+
+        <div class="quality-row">
+          <span data-en="Quality">质量</span>
+          <select id="qualitySelect">
+            <option value="1.0" data-en="Lossless (PNG)">无损 (PNG)</option>
+            <option value="0.95" data-en="Highest (JPEG)">最高 (JPEG)</option>
+            <option value="0.85" selected data-en="High (JPEG)">高 (JPEG)</option>
+            <option value="0.70" data-en="Medium (JPEG)">中 (JPEG)</option>
+            <option value="0.50" data-en="Low (JPEG)">低 (JPEG)</option>
+          </select>
+          <label>
+            <input type="checkbox" id="losslessCheck" checked />
+            <span data-en="Lossless">无损</span>
+          </label>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="bar">
+            <div class="fill" id="progressFill"></div>
+          </div>
+          <div class="info">
+            <span id="progressText" data-en="Ready">就绪</span>
+            <span id="progressPercent">0%</span>
+          </div>
+        </div>
+
+        <div class="log-box" id="logBox">
+          <span class="info" data-en="Waiting for video...">等待加载视频...</span>
+        </div>
+        <div class="frame-hint" id="frameHint">
+          <span data-en="Warning: Video has over 1000 frames, extraction may be slow. Consider using">当前视频帧数超过 1000
+            帧，浏览器提取可能较慢且易崩溃。</span>
+          <a href="/code.html?title=多线程视频帧提取器&file=/code/python/FrameExtractor.py" target="_blank"
+            data-en="Python multi-thread version">Python 多线程版本</a>
+          <span data-en="for faster and stable extraction.">提取，速度更快更稳定。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="./FrameExtractor.js"></script>
+</html>

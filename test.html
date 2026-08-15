@@ -1,230 +1,1426 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8">
-  <title>广播系统测试</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <script src="/js/script7_setOpacityandBlur.js"></script>
+  <script src="/js/script8_setEyeCare.js"></script>
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <script src="/js/script11_setHighlight.js"></script>
+  <script src="/js/script13_checkIslogin.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./FrameExtractor.js"></script>
+  <script src="/js/script14_setLanguage.js"></script>
+  <title>视频帧提取器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
+  </script>
+  <style>
+    /* ===== 全局基础样式 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #1e293b;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app {
+      max-width: 1200px;
+      width: 100%;
+      height: 94vh;
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      transition: background 0.3s, border-color 0.3s;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .top-bar {
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .top-bar .left-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-bar .brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .top-bar .brand small {
+      font-weight: 400;
+      font-size: 12px;
+      color: #64748b;
+      background: #e9edf2;
+      padding: 2px 12px;
+      border-radius: 40px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* 返回按钮（位于标题旁） */
+    .btn-back {
+      background: transparent;
+      border: 1px solid #d1d9e6;
+      color: #1e293b;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, border-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-back:hover {
+      background: #e9edf2;
+      border-color: #94a3b8;
+    }
+
+    .btn-back:active {
+      transform: scale(0.95);
+    }
+
+    .top-bar .file-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: #475569;
+      flex-wrap: wrap;
+    }
+
+    .top-bar .file-info .name {
+      color: #0f172a;
+      font-weight: 500;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .top-bar .file-info .badge {
+      background: #e9edf2;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #2563eb;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .top-bar .file-info .badge.ready {
+      color: #16a34a;
+    }
+
+    .top-bar .file-info .badge.error {
+      color: #dc2626;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    @media (max-width: 820px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+      }
+    }
+
+    .player-area {
+      background: #ffffff;
+      padding: 12px 16px 10px 16px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e2e8f0;
+      min-height: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .player-area .video-wrapper {
+      flex: 1;
+      background: #0a0e14;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 150px;
+      max-height: 70vh;
+      transition: background 0.3s;
+    }
+
+    .player-area .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      height: 100%;
+      gap: 6px;
+      font-size: 14px;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .empty-state .icon {
+      font-size: 40px;
+      opacity: 0.5;
+    }
+
+    .transport {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 4px 4px 4px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .transport button {
+      background: transparent;
+      border: none;
+      color: #475569;
+      font-size: 17px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, color 0.2s;
+    }
+
+    .transport button:hover {
+      background: #e9edf2;
+      color: #0f172a;
+    }
+
+    .transport button:active {
+      transform: scale(0.92);
+    }
+
+    .transport button:disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .transport .timecode {
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      color: #475569;
+      min-width: 105px;
+    }
+
+    .transport input[type="range"] {
+      flex: 1;
+      min-width: 60px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #d1d9e6;
+      border-radius: 4px;
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    .transport input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      transition: transform 0.15s;
+    }
+
+    .transport input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .transport input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      transition: transform 0.15s;
+    }
+
+    .transport input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .tools-panel {
+      background: #f8fafc;
+      padding: 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      transition: background 0.3s;
+    }
+
+    .tools-panel .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      font-weight: 600;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .tools-panel .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .tools-panel .btn-group .btn {
+      background: #ffffff;
+      border: 1px solid #d1d9e6;
+      color: #1e293b;
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .tools-panel .btn-group .btn:hover {
+      background: #e9edf2;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .tools-panel .btn-group .btn:active {
+      transform: scale(0.96);
+    }
+
+    .tools-panel .btn-group .btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      transform: none !important;
+    }
+
+    .tools-panel .btn-group .btn.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+    }
+
+    .tools-panel .btn-group .btn.primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .tools-panel .btn-group .btn.wide {
+      grid-column: 1 / -1;
+    }
+
+    .tools-panel .quality-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #475569;
+      flex-wrap: wrap;
+    }
+
+    .tools-panel .quality-row select {
+      background: #ffffff;
+      border: 1px solid #d1d9e6;
+      color: #1e293b;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      outline: none;
+      flex: 1;
+      min-width: 80px;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .tools-panel .quality-row select:hover {
+      border-color: #94a3b8;
+    }
+
+    .tools-panel .quality-row select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .tools-panel .quality-row label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .tools-panel .quality-row input[type="checkbox"] {
+      accent-color: #2563eb;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .tools-panel .quality-row input[type="checkbox"]:active {
+      transform: scale(1.2);
+    }
+
+    .tools-panel .progress-wrap {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .tools-panel .progress-wrap .bar {
+      width: 100%;
+      height: 5px;
+      background: #e9edf2;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .tools-panel .progress-wrap .bar .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #8b5cf6);
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tools-panel .progress-wrap .info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .tools-panel .log-box {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      max-height: 80px;
+      overflow-y: auto;
+      font-size: 11px;
+      font-family: monospace;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      line-height: 1.6;
+      flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .tools-panel .log-box .info {
+      color: #2563eb;
+    }
+
+    .tools-panel .log-box .success {
+      color: #16a34a;
+    }
+
+    .tools-panel .log-box .error {
+      color: #dc2626;
+    }
+
+    .tools-panel .log-box .warn {
+      color: #f59e0b;
+    }
+
+    .tools-panel .log-box a {
+      color: #2563eb;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .tools-panel .log-box>div {
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .btn-upload {
+      background: #e9edf2;
+      border: 1px solid #d1d9e6;
+      color: #1e293b;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-upload:hover {
+      background: #d1d9e6;
+    }
+
+    .btn-upload:active {
+      transform: scale(0.95);
+    }
+
+    .frame-hint {
+      display: none;
+      background: #fef9e7;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #92400e;
+      margin-top: 4px;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      animation: fadeInHint 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeInHint {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .frame-hint a {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    .frame-hint.show {
+      display: block;
+    }
+
+    /* ===== 深色模式 (通过 .dark-mode 类切换) ===== */
+    html.dark-mode,
+    html.dark-mode body,
+    body.dark-mode {
+      background: #0c0f15;
+      color: #eef2f8;
+    }
+
+    html.dark-mode .app,
+    body.dark-mode .app {
+      background: #141b26;
+      border-color: #28303f;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    html.dark-mode .top-bar,
+    body.dark-mode .top-bar {
+      background: #10161f;
+      border-color: #1f2937;
+    }
+
+    html.dark-mode .top-bar .brand,
+    body.dark-mode .top-bar .brand {
+      color: #eef2f8;
+    }
+
+    html.dark-mode .top-bar .brand small,
+    body.dark-mode .top-bar .brand small {
+      background: #1f2937;
+      color: #8596b0;
+    }
+
+    html.dark-mode .btn-back,
+    body.dark-mode .btn-back {
+      color: #eef2f8;
+      border-color: #28303f;
+    }
+
+    html.dark-mode .btn-back:hover,
+    body.dark-mode .btn-back:hover {
+      background: #1f2937;
+      border-color: #3b82f6;
+    }
+
+    html.dark-mode .top-bar .file-info,
+    body.dark-mode .top-bar .file-info {
+      color: #a0b3cc;
+    }
+
+    html.dark-mode .top-bar .file-info .name,
+    body.dark-mode .top-bar .file-info .name {
+      color: #eef2f8;
+    }
+
+    html.dark-mode .top-bar .file-info .badge,
+    body.dark-mode .top-bar .file-info .badge {
+      background: #1f2937;
+      color: #60a5fa;
+    }
+
+    html.dark-mode .top-bar .file-info .badge.ready,
+    body.dark-mode .top-bar .file-info .badge.ready {
+      color: #4ade80;
+    }
+
+    html.dark-mode .top-bar .file-info .badge.error,
+    body.dark-mode .top-bar .file-info .badge.error {
+      color: #f87171;
+    }
+
+    html.dark-mode .player-area,
+    body.dark-mode .player-area {
+      background: #0a0e14;
+      border-color: #1f2937;
+    }
+
+    html.dark-mode .player-area .video-wrapper,
+    body.dark-mode .player-area .video-wrapper {
+      background: #000000;
+    }
+
+    html.dark-mode .transport button,
+    body.dark-mode .transport button {
+      color: #c8d6e8;
+    }
+
+    html.dark-mode .transport button:hover,
+    body.dark-mode .transport button:hover {
+      background: #1f2a3a;
+      color: #ffffff;
+    }
+
+    html.dark-mode .transport .timecode,
+    body.dark-mode .transport .timecode {
+      color: #a0b3cc;
+    }
+
+    html.dark-mode .transport input[type="range"],
+    body.dark-mode .transport input[type="range"] {
+      background: #28303f;
+    }
+
+    html.dark-mode .transport input[type="range"]::-webkit-slider-thumb,
+    body.dark-mode .transport input[type="range"]::-webkit-slider-thumb {
+      border-color: #0c0f15;
+    }
+
+    html.dark-mode .transport input[type="range"]::-moz-range-thumb,
+    body.dark-mode .transport input[type="range"]::-moz-range-thumb {
+      border-color: #0c0f15;
+    }
+
+    html.dark-mode .tools-panel,
+    body.dark-mode .tools-panel {
+      background: #10161f;
+    }
+
+    html.dark-mode .tools-panel .section-label,
+    body.dark-mode .tools-panel .section-label {
+      color: #6a7e9e;
+      border-color: #1f2937;
+    }
+
+    html.dark-mode .tools-panel .btn-group .btn,
+    body.dark-mode .tools-panel .btn-group .btn {
+      background: #1a2332;
+      border-color: #28303f;
+      color: #eef2f8;
+    }
+
+    html.dark-mode .tools-panel .btn-group .btn:hover,
+    body.dark-mode .tools-panel .btn-group .btn:hover {
+      background: #253040;
+      border-color: #3b82f6;
+    }
+
+    html.dark-mode .tools-panel .btn-group .btn.primary,
+    body.dark-mode .tools-panel .btn-group .btn.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+    }
+
+    html.dark-mode .tools-panel .btn-group .btn.primary:hover,
+    body.dark-mode .tools-panel .btn-group .btn.primary:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    html.dark-mode .tools-panel .quality-row,
+    body.dark-mode .tools-panel .quality-row {
+      color: #a0b3cc;
+    }
+
+    html.dark-mode .tools-panel .quality-row select,
+    body.dark-mode .tools-panel .quality-row select {
+      background: #1a2332;
+      border-color: #28303f;
+      color: #eef2f8;
+    }
+
+    html.dark-mode .tools-panel .quality-row select:hover,
+    body.dark-mode .tools-panel .quality-row select:hover {
+      border-color: #3b82f6;
+    }
+
+    html.dark-mode .tools-panel .quality-row select:focus,
+    body.dark-mode .tools-panel .quality-row select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    html.dark-mode .tools-panel .progress-wrap,
+    body.dark-mode .tools-panel .progress-wrap {
+      background: #0a0e14;
+      border-color: #1f2937;
+    }
+
+    html.dark-mode .tools-panel .progress-wrap .bar,
+    body.dark-mode .tools-panel .progress-wrap .bar {
+      background: #1f2937;
+    }
+
+    html.dark-mode .tools-panel .progress-wrap .info,
+    body.dark-mode .tools-panel .progress-wrap .info {
+      color: #8596b0;
+    }
+
+    html.dark-mode .tools-panel .log-box,
+    body.dark-mode .tools-panel .log-box {
+      background: #0a0e14;
+      border-color: #1f2937;
+      color: #8596b0;
+    }
+
+    html.dark-mode .tools-panel .log-box .info,
+    body.dark-mode .tools-panel .log-box .info {
+      color: #60a5fa;
+    }
+
+    html.dark-mode .tools-panel .log-box .success,
+    body.dark-mode .tools-panel .log-box .success {
+      color: #4ade80;
+    }
+
+    html.dark-mode .tools-panel .log-box .error,
+    body.dark-mode .tools-panel .log-box .error {
+      color: #f87171;
+    }
+
+    html.dark-mode .tools-panel .log-box .warn,
+    body.dark-mode .tools-panel .log-box .warn {
+      color: #fbbf24;
+    }
+
+    html.dark-mode .tools-panel .log-box a,
+    body.dark-mode .tools-panel .log-box a {
+      color: #60a5fa;
+    }
+
+    html.dark-mode .btn-upload,
+    body.dark-mode .btn-upload {
+      background: #1f2937;
+      border-color: #28303f;
+      color: #eef2f8;
+    }
+
+    html.dark-mode .btn-upload:hover,
+    body.dark-mode .btn-upload:hover {
+      background: #2a3345;
+    }
+
+    html.dark-mode .frame-hint,
+    body.dark-mode .frame-hint {
+      background: #1e293b;
+      color: #fbbf24;
+      border-color: #fbbf24;
+    }
+
+    html.dark-mode .frame-hint a,
+    body.dark-mode .frame-hint a {
+      color: #60a5fa;
+    }
+
+    /* 隐藏缩略图区域 */
+    #thumbnailStrip {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>📢 广播系统测试</h1>
-  <hr>
+  <div class="app" id="app">
+    <div class="top-bar">
+      <div class="left-group">
+        <!-- 返回按钮放在标题左侧 -->
+        <button class="btn-back" onclick="goBackOrHome()" data-en="Back">返回</button>
+        <div class="brand" data-en="Video Frame Extractor">
+          视频帧提取器
+        </div>
+      </div>
+      <div class="file-info">
+        <span class="name" id="fileNameDisplay" data-en="Not loaded">未加载</span>
+        <span id="statusBadge" class="badge" data-en="Waiting">等待</span>
+        <button class="btn-upload" id="uploadTrigger" data-en="Open">打开</button>
+        <input type="file" id="fileInput" accept="video/*" style="display:none" />
+      </div>
+    </div>
 
-  <h2>1. 创建广播</h2>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <p><b>必填：</b></p>
-    <label>userId (admin/superadmin): <input id="createUserId" value="scripthub_superadmin"></label><br>
-    <label>标题: <input id="createTitle" value="测试广播"></label><br>
-    <label>类型:
-      <select id="createType">
-        <option value="text">text</option>
-        <option value="html">html</option>
-      </select>
-    </label><br>
-    <label>内容: <textarea id="createContent" rows="2" cols="30">这是一条测试广播</textarea></label><br>
-    <label>结束时间 (留空=永久): <input id="createEndTime" placeholder="2026-12-31 23:59:59"></label><br>
-    <label>适用范围:
-      <select id="createScope">
-        <option value="all">all (所有已登录)</option>
-        <option value="all_visitors">all_visitors (所有人)</option>
-        <option value="users">users (指定用户)</option>
-      </select>
-    </label><br>
-    <label>指定用户ID (逗号分隔): <input id="createTargetUsers" placeholder="user1,user2"></label><br>
-    <label>展示次数:
-      <select id="createDisplayCount">
-        <option value="once">once (一次)</option>
-        <option value="always">always (一直)</option>
-      </select>
-    </label><br>
-    <button onclick="createBroadcast()">创建广播</button>
-    <span id="createResult"></span>
-  </div>
+    <div class="main-grid">
+      <div class="player-area">
+        <div class="video-wrapper" id="videoWrapper">
+          <video id="videoPlayer" playsinline></video>
+          <div class="empty-state" id="emptyState">
+            <span class="icon" data-en="Drop or click Open to load video">拖拽或点击「打开」加载视频</span>
+            <span style="font-size:12px;color:#3a4e6a;" data-en="Supports H.264 MP4">支持 H.264 MP4</span>
+          </div>
+        </div>
+        <div class="transport">
+          <button id="playBtn" disabled data-en="Play">▶</button>
+          <button id="rewindBtn" disabled data-en="Rewind">⏪</button>
+          <button id="forwardBtn" disabled data-en="Forward">⏩</button>
+          <span class="timecode" id="timeDisplay">00:00:00 / 00:00:00</span>
+          <input type="range" id="seekSlider" min="0" max="100" value="0" disabled />
+        </div>
+      </div>
 
-  <hr>
+      <div class="tools-panel">
+        <div class="section-label" data-en="Extract Tools">提取工具</div>
+        <div class="btn-group">
+          <button class="btn" id="extractSingleBtn" disabled data-en="Single Frame">单帧</button>
+          <button class="btn" id="extractKeyframesBtn" disabled data-en="Keyframes">关键帧</button>
+          <button class="btn primary wide" id="extractAllBtn" disabled data-en="All Frames (ZIP)">全部帧 (ZIP)</button>
+        </div>
 
-  <h2>2. 获取广播列表 (普通用户)</h2>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <label>userId (留空=未登录): <input id="listUserId" placeholder="留空或输入用户ID"></label>
-    <button onclick="getBroadcastList()">获取广播</button>
-    <pre id="listResult" style="background:#f5f5f5;padding:10px;"></pre>
-  </div>
+        <div class="quality-row">
+          <span data-en="Quality">质量</span>
+          <select id="qualitySelect">
+            <option value="1.0" data-en="Lossless (PNG)">无损 (PNG)</option>
+            <option value="0.95" data-en="Highest (JPEG)">最高 (JPEG)</option>
+            <option value="0.85" selected data-en="High (JPEG)">高 (JPEG)</option>
+            <option value="0.70" data-en="Medium (JPEG)">中 (JPEG)</option>
+            <option value="0.50" data-en="Low (JPEG)">低 (JPEG)</option>
+          </select>
+          <label>
+            <input type="checkbox" id="losslessCheck" checked />
+            <span data-en="Lossless">无损</span>
+          </label>
+        </div>
 
-  <hr>
+        <div class="progress-wrap">
+          <div class="bar">
+            <div class="fill" id="progressFill"></div>
+          </div>
+          <div class="info">
+            <span id="progressText" data-en="Ready">就绪</span>
+            <span id="progressPercent">0%</span>
+          </div>
+        </div>
 
-  <h2>3. 删除广播 (需admin/superadmin)</h2>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <label>userId: <input id="deleteUserId" value="scripthub_superadmin"></label><br>
-    <label>broadcastId: <input id="deleteBroadcastId" placeholder="要删除的广播ID"></label><br>
-    <button onclick="deleteBroadcast()">删除广播</button>
-    <span id="deleteResult"></span>
-  </div>
-
-  <hr>
-
-  <h2>4. 获取所有广播 (admin-list)</h2>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <label>userId (admin/superadmin): <input id="adminListUserId" value="scripthub_superadmin"></label>
-    <button onclick="getAdminList()">获取所有广播</button>
-    <pre id="adminListResult" style="background:#f5f5f5;padding:10px;"></pre>
-  </div>
-
-  <hr>
-
-  <h2>5. 修改广播 (admin-update) - 支持所有字段</h2>
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    <label>userId: <input id="updateUserId" value="scripthub_superadmin"></label><br>
-    <label>broadcastId: <input id="updateBroadcastId" placeholder="要修改的广播ID"></label><br>
-    <br>
-    <p><b>以下字段留空表示不修改：</b></p>
-    <label>新标题: <input id="updateTitle" placeholder="新标题"></label><br>
-    <label>新内容: <input id="updateContent" placeholder="新内容"></label><br>
-    <label>新类型:
-      <select id="updateType">
-        <option value="">不修改</option>
-        <option value="text">text</option>
-        <option value="html">html</option>
-      </select>
-    </label><br>
-    <label>新结束时间: <input id="updateEndTime" placeholder="2026-12-31 23:59:59 (留空永久)"></label><br>
-    <label>新适用范围:
-      <select id="updateScope">
-        <option value="">不修改</option>
-        <option value="all">all (所有已登录)</option>
-        <option value="all_visitors">all_visitors (所有人)</option>
-        <option value="users">users (指定用户)</option>
-      </select>
-    </label><br>
-    <label>新指定用户ID (逗号分隔): <input id="updateTargetUsers" placeholder="user1,user2"></label><br>
-    <label>新展示次数:
-      <select id="updateDisplayCount">
-        <option value="">不修改</option>
-        <option value="once">once (一次)</option>
-        <option value="always">always (一直)</option>
-      </select>
-    </label><br>
-    <button onclick="updateBroadcast()">修改广播</button>
-    <span id="updateResult"></span>
+        <div class="log-box" id="logBox">
+          <span class="info" data-en="Waiting for video...">等待加载视频...</span>
+        </div>
+        <div class="frame-hint" id="frameHint">
+          <span data-en="Warning: Video has over 1000 frames, extraction may be slow. Consider using">当前视频帧数超过 1000
+            帧，浏览器提取可能较慢且易崩溃。</span>
+          <a href="/code.html?title=多线程视频帧提取器&file=/code/python/FrameExtractor.py" target="_blank"
+            data-en="Python multi-thread version">Python 多线程版本</a>
+          <span data-en="for faster and stable extraction.">提取，速度更快更稳定。</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const BASE_URL = 'http://192.168.1.2:3000';
-
-    function apiCall(method, url, body, callback) {
-      const options = {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
+    // ===== 中英文支持函数（外部可覆盖） =====
+    if (typeof getLocalizedText !== 'function') {
+      window.getLocalizedText = function (zh, en) {
+        if (window.__lang === 'en') {
+          return en;
+        }
+        return zh;
       };
-      if (body) options.body = JSON.stringify(body);
-
-      fetch(BASE_URL + url, options)
-        .then(res => res.json())
-        .then(data => callback(null, data))
-        .catch(err => callback(err, null));
     }
 
-    // 1. 创建
-    function createBroadcast() {
-      const userId = document.getElementById('createUserId').value;
-      const title = document.getElementById('createTitle').value;
-      const type = document.getElementById('createType').value;
-      const content = document.getElementById('createContent').value;
-      const endTime = document.getElementById('createEndTime').value;
-      const scope = document.getElementById('createScope').value;
-      const targetUsersRaw = document.getElementById('createTargetUsers').value;
-      const displayCount = document.getElementById('createDisplayCount').value;
+    // ===== 主代码 =====
+    (function () {
+      'use strict';
 
-      const targetUsers = targetUsersRaw ? targetUsersRaw.split(',').map(s => s.trim()) : [];
+      // ===== DOM =====
+      var video = document.getElementById('videoPlayer');
+      var emptyState = document.getElementById('emptyState');
+      var playBtn = document.getElementById('playBtn');
+      var rewindBtn = document.getElementById('rewindBtn');
+      var forwardBtn = document.getElementById('forwardBtn');
+      var seekSlider = document.getElementById('seekSlider');
+      var timeDisplay = document.getElementById('timeDisplay');
+      var fileInput = document.getElementById('fileInput');
+      var uploadTrigger = document.getElementById('uploadTrigger');
+      var fileNameDisplay = document.getElementById('fileNameDisplay');
+      var statusBadge = document.getElementById('statusBadge');
 
-      const body = { userId, title, type, content, endTime, scope, targetUsers, displayCount };
-      apiCall('POST', '/broadcast/create', body, (err, data) => {
-        document.getElementById('createResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
-        if (data && data.data) console.log('创建成功:', data.data);
-      });
-    }
+      var extractSingleBtn = document.getElementById('extractSingleBtn');
+      var extractKeyframesBtn = document.getElementById('extractKeyframesBtn');
+      var extractAllBtn = document.getElementById('extractAllBtn');
+      var qualitySelect = document.getElementById('qualitySelect');
+      var losslessCheck = document.getElementById('losslessCheck');
+      var progressFill = document.getElementById('progressFill');
+      var progressText = document.getElementById('progressText');
+      var progressPercent = document.getElementById('progressPercent');
+      var logBox = document.getElementById('logBox');
+      var frameHint = document.getElementById('frameHint');
 
-    // 2. 获取列表
-    function getBroadcastList() {
-      const userId = document.getElementById('listUserId').value;
-      const url = '/broadcast/list' + (userId ? '?userId=' + encodeURIComponent(userId) : '');
-      fetch(BASE_URL + url)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('listResult').textContent = JSON.stringify(data, null, 2);
-        })
-        .catch(err => {
-          document.getElementById('listResult').textContent = '❌ ' + err.message;
+      // ===== 状态 =====
+      var currentFile = null;
+      var videoUrl = null;
+      var isPlaying = false;
+      var videoDuration = 0;
+      var isProcessing = false;
+      var videoData = null;
+      var videoSamples = [];
+      var isDemuxReady = false;
+      var videoConfig = null;
+
+      // ===== 日志 =====
+      function log(msg, type) {
+        type = type || 'info';
+        var entry = document.createElement('div');
+        entry.className = type;
+        entry.textContent = msg;
+        logBox.appendChild(entry);
+        logBox.scrollTop = logBox.scrollHeight;
+        while (logBox.children.length > 100) logBox.removeChild(logBox.firstChild);
+      }
+
+      function setProgress(pct, text) {
+        var v = Math.min(100, Math.max(0, pct));
+        progressFill.style.width = v + '%';
+        progressPercent.textContent = v.toFixed(0) + '%';
+        if (text) progressText.textContent = text;
+      }
+
+      function setBadge(text, type) {
+        type = type || '';
+        statusBadge.textContent = text;
+        statusBadge.className = 'badge ' + type;
+      }
+
+      function fmtTime(sec) {
+        if (!sec || isNaN(sec) || !isFinite(sec)) return '00:00:00';
+        var h = Math.floor(sec / 3600);
+        var m = Math.floor((sec % 3600) / 60);
+        var s = Math.floor(sec % 60);
+        return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      function updatePlayerUI() {
+        if (!video.duration) return;
+        var pct = (video.currentTime / video.duration) * 100;
+        seekSlider.value = pct;
+        timeDisplay.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      }
+
+      // ===== 使用 MP4Box 解析视频 =====
+      function demuxWithMP4Box(data) {
+        return new Promise(function (resolve, reject) {
+          try {
+            var mp4box = MP4Box.createFile();
+            var videoTrackId = null;
+            var videoChunks = [];
+            var readyResolved = false;
+
+            mp4box.onError = function (e) {
+              log('MP4Box error: ' + e, 'error');
+              if (!readyResolved) reject(e);
+            };
+
+            mp4box.onReady = function (info) {
+              readyResolved = true;
+              info.tracks.forEach(function (t) {
+                if (t.type === 'video') {
+                  videoTrackId = t.id;
+                  videoConfig = {
+                    codec: t.codec || 'avc1.4D401E',
+                    width: t.width || 640,
+                    height: t.height || 360,
+                  };
+                  mp4box.setExtractionOptions(t.id);
+                }
+              });
+              mp4box.start();
+            };
+
+            mp4box.onSamples = function (trackId, user, samples) {
+              samples.forEach(function (sample) {
+                if (trackId === videoTrackId) {
+                  videoChunks.push({
+                    data: sample.data,
+                    is_sync: sample.is_sync,
+                    cts: sample.cts,
+                    dts: sample.dts
+                  });
+                }
+              });
+            };
+
+            var buffer = data;
+            buffer.fileStart = 0;
+            mp4box.appendBuffer(buffer);
+            mp4box.flush();
+
+            var checkReady = function () {
+              if (readyResolved) {
+                videoSamples = videoChunks;
+                isDemuxReady = true;
+                setBadge(getLocalizedText('就绪', 'Ready'), 'ready');
+                setProgress(100, getLocalizedText('就绪', 'Ready'));
+                enableButtons(true);
+                if (videoChunks.length > 1000) {
+                  frameHint.classList.add('show');
+                } else {
+                  frameHint.classList.remove('show');
+                }
+                resolve({ videoChunks: videoChunks });
+              } else {
+                setTimeout(checkReady, 100);
+              }
+            };
+            setTimeout(checkReady, 200);
+          } catch (e) {
+            log('Parse failed: ' + e.message, 'error');
+            reject(e);
+          }
         });
-    }
+      }
 
-    // 3. 删除
-    function deleteBroadcast() {
-      const userId = document.getElementById('deleteUserId').value;
-      const broadcastId = document.getElementById('deleteBroadcastId').value;
-      if (!broadcastId) { document.getElementById('deleteResult').textContent = '❌ 请填写broadcastId'; return; }
-      apiCall('POST', '/broadcast/delete', { userId, broadcastId }, (err, data) => {
-        document.getElementById('deleteResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
-      });
-    }
+      // ===== 加载视频 =====
+      function loadVideoFile(file) {
+        if (!file) return;
+        if (videoUrl) { URL.revokeObjectURL(videoUrl); }
+        currentFile = file;
+        fileNameDisplay.textContent = file.name;
+        setBadge(getLocalizedText('加载中...', 'Loading...'), '');
 
-    // 4. admin-list
-    function getAdminList() {
-      const userId = document.getElementById('adminListUserId').value;
-      const url = '/broadcast/admin-list?userId=' + encodeURIComponent(userId);
-      fetch(BASE_URL + url)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('adminListResult').textContent = JSON.stringify(data, null, 2);
-        })
-        .catch(err => {
-          document.getElementById('adminListResult').textContent = '❌ ' + err.message;
+        videoUrl = URL.createObjectURL(file);
+        video.src = videoUrl;
+
+        emptyState.style.display = 'none';
+        videoData = null;
+        videoSamples = [];
+        isDemuxReady = false;
+        frameHint.classList.remove('show');
+        enableButtons(false);
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var buffer = e.target.result;
+          videoData = buffer;
+          demuxWithMP4Box(buffer).then(function () {
+            if (isDemuxReady) {
+              setBadge(getLocalizedText('就绪', 'Ready'), 'ready');
+              enableButtons(true);
+            }
+          }).catch(function (err) {
+            log('Parse error: ' + err.message, 'error');
+            setBadge(getLocalizedText('解析失败', 'Parse failed'), 'error');
+          });
+        };
+        reader.readAsArrayBuffer(file);
+
+        video.addEventListener('loadedmetadata', function onMeta() {
+          video.removeEventListener('loadedmetadata', onMeta);
+          videoDuration = video.duration;
+          updatePlayerUI();
+          playBtn.disabled = false;
+          rewindBtn.disabled = false;
+          forwardBtn.disabled = false;
+          seekSlider.disabled = false;
         });
-    }
 
-    // 5. 修改 - 支持所有字段
-    function updateBroadcast() {
-      const userId = document.getElementById('updateUserId').value;
-      const broadcastId = document.getElementById('updateBroadcastId').value;
-
-      const title = document.getElementById('updateTitle').value;
-      const content = document.getElementById('updateContent').value;
-      const type = document.getElementById('updateType').value;
-      const endTime = document.getElementById('updateEndTime').value;
-      const scope = document.getElementById('updateScope').value;
-      const targetUsersRaw = document.getElementById('updateTargetUsers').value;
-      const displayCount = document.getElementById('updateDisplayCount').value;
-
-      if (!broadcastId) {
-        document.getElementById('updateResult').textContent = '❌ 请填写broadcastId';
-        return;
+        video.addEventListener('timeupdate', updatePlayerUI);
+        video.addEventListener('play', function () {
+          isPlaying = true;
+          playBtn.textContent = '⏸';
+        });
+        video.addEventListener('pause', function () {
+          isPlaying = false;
+          playBtn.textContent = '▶';
+        });
       }
 
-      const updates = {};
-      if (title) updates.title = title;
-      if (content) updates.content = content;
-      if (type) updates.type = type;
-      if (endTime) updates.endTime = endTime;
-      if (scope) updates.scope = scope;
-      if (targetUsersRaw) {
-        updates.targetUsers = targetUsersRaw.split(',').map(s => s.trim());
-      }
-      if (displayCount) updates.displayCount = displayCount;
-
-      if (Object.keys(updates).length === 0) {
-        document.getElementById('updateResult').textContent = '❌ 至少填一个要修改的字段';
-        return;
+      function enableButtons(enabled) {
+        var btns = [extractSingleBtn, extractKeyframesBtn, extractAllBtn];
+        btns.forEach(function (b) { b.disabled = !enabled; });
+        if (!enabled) {
+          btns.forEach(function (b) { b.disabled = true; });
+        }
+        if (videoData && isDemuxReady) {
+          btns.forEach(function (b) { b.disabled = false; });
+        }
       }
 
-      apiCall('POST', '/broadcast/admin-update', { userId, broadcastId, updates }, (err, data) => {
-        document.getElementById('updateResult').textContent = err ? '❌ ' + err.message : (data.success ? '✅ ' + data.message : '❌ ' + data.message);
+      // ===== 创建临时视频元素 =====
+      function createTempVideo(src) {
+        return new Promise(function (resolve, reject) {
+          var temp = document.createElement('video');
+          temp.preload = 'auto';
+          temp.muted = true;
+          temp.playsInline = true;
+          temp.crossOrigin = 'anonymous';
+          var timeout = setTimeout(function () {
+            reject(new Error('Load timeout'));
+          }, 30000);
+          temp.addEventListener('loadedmetadata', function () {
+            clearTimeout(timeout);
+            resolve(temp);
+          });
+          temp.addEventListener('error', function () {
+            clearTimeout(timeout);
+            reject(new Error('Load failed'));
+          });
+          temp.src = src;
+          temp.load();
+        });
+      }
+
+      // ===== 从临时视频截取帧 =====
+      function captureFrameFromTemp(tempVideo, time) {
+        return new Promise(function (resolve) {
+          if (time < 0) time = 0;
+          if (time > tempVideo.duration) time = tempVideo.duration - 0.001;
+          var handler = function () {
+            tempVideo.removeEventListener('seeked', handler);
+            var canvas = document.createElement('canvas');
+            var w = tempVideo.videoWidth || videoConfig?.width || 640;
+            var h = tempVideo.videoHeight || videoConfig?.height || 360;
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(tempVideo, 0, 0, w, h);
+            resolve(canvas);
+          };
+          tempVideo.addEventListener('seeked', handler);
+          tempVideo.currentTime = time;
+          setTimeout(function () {
+            tempVideo.removeEventListener('seeked', handler);
+            resolve(null);
+          }, 8000);
+        });
+      }
+
+      // ===== 单帧 =====
+      async function extractSingleFrame() {
+        if (!video || !video.duration) { log(getLocalizedText('请先加载视频', 'Please load video first'), 'warn'); return; }
+        if (!videoUrl) { log(getLocalizedText('视频 URL 未就绪', 'Video URL not ready'), 'warn'); return; }
+        var useLossless = losslessCheck.checked;
+        var quality = parseFloat(qualitySelect.value);
+        try {
+          var temp = await createTempVideo(videoUrl);
+          var canvas = await captureFrameFromTemp(temp, video.currentTime);
+          temp.src = '';
+          temp.load();
+          if (!canvas) {
+            log(getLocalizedText('截取帧失败', 'Frame capture failed'), 'error');
+            return;
+          }
+          var mime = useLossless ? 'image/png' : 'image/jpeg';
+          var blob = await new Promise(function (resolve) {
+            canvas.toBlob(resolve, mime, useLossless ? undefined : quality);
+          });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.download = 'frame_' + Date.now() + (useLossless ? '.png' : '.jpg');
+          a.href = url;
+          a.click();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+          log(getLocalizedText('单帧已提取', 'Single frame extracted'), 'success');
+        } catch (e) {
+          log(getLocalizedText('单帧提取失败: ', 'Single frame failed: ') + e.message, 'error');
+        }
+      }
+
+      // ===== 通用帧提取函数 =====
+      async function extractFrames(mode) {
+        if (!isDemuxReady || videoSamples.length === 0) {
+          log(getLocalizedText('请等待解析完成', 'Please wait for parsing to finish'), 'warn');
+          return;
+        }
+        if (!videoUrl) { log(getLocalizedText('视频 URL 未就绪', 'Video URL not ready'), 'warn'); return; }
+        if (isProcessing) { log(getLocalizedText('正在处理...', 'Processing...'), 'warn'); return; }
+
+        if (videoSamples.length > 1000) {
+          log(getLocalizedText('帧数超过1000，建议使用 Python 多线程版本', 'Frame count >1000, consider Python multi-thread version'), 'warn');
+        }
+
+        isProcessing = true;
+        var useLossless = losslessCheck.checked;
+        var quality = parseFloat(qualitySelect.value);
+        var ext = useLossless ? 'png' : 'jpg';
+        var mime = useLossless ? 'image/png' : 'image/jpeg';
+
+        setProgress(0, getLocalizedText('准备...', 'Preparing...'));
+        log(getLocalizedText('开始提取...', 'Extracting...'), 'info');
+
+        try {
+          var temp = await createTempVideo(videoUrl);
+          if (!temp) {
+            log(getLocalizedText('临时视频加载失败', 'Temp video load failed'), 'error');
+            isProcessing = false;
+            return;
+          }
+
+          var samplesToExtract;
+          var label;
+          if (mode === 'keyframes') {
+            samplesToExtract = videoSamples.filter(function (s) { return s.is_sync; });
+            label = getLocalizedText('关键帧', 'Keyframes');
+          } else {
+            samplesToExtract = videoSamples;
+            label = getLocalizedText('全部帧', 'All frames');
+          }
+
+          var total = samplesToExtract.length;
+          log(label + ' ' + getLocalizedText('总数: ', 'total: ') + total, 'info');
+
+          var zip = new JSZip();
+          var decodedCount = 0;
+          var lastTime = -1;
+
+          for (var j = 0; j < total; j++) {
+            var sample = samplesToExtract[j];
+            var time = sample.cts / 1000;
+            if (time === lastTime) time += 0.001;
+            lastTime = time;
+
+            var canvas = await captureFrameFromTemp(temp, time);
+            if (!canvas) {
+              continue;
+            }
+            var blob = await new Promise(function (resolve) {
+              canvas.toBlob(resolve, mime, useLossless ? undefined : quality);
+            });
+            var idx = String(decodedCount + 1).padStart(5, '0');
+            zip.file((mode === 'keyframes' ? 'keyframe_' : 'frame_') + idx + '.' + ext, blob);
+            decodedCount++;
+
+            setProgress((decodedCount / total) * 95 + 2, decodedCount + '/' + total);
+          }
+
+          temp.src = '';
+          temp.load();
+
+          setProgress(97, getLocalizedText('打包 ZIP...', 'Zipping...'));
+          var zipBlob = await zip.generateAsync({ type: 'blob' });
+          var url = URL.createObjectURL(zipBlob);
+          var a = document.createElement('a');
+          a.download = (mode === 'keyframes' ? 'keyframes_' : 'all_frames_') + Date.now() + '.zip';
+          a.href = url;
+          a.click();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+
+          setProgress(100, getLocalizedText('完成', 'Done'));
+          log(label + ' ' + getLocalizedText('提取完成: ', 'extracted: ') + decodedCount + ' ' + getLocalizedText('帧',
+            'frames'), 'success');
+
+        } catch (e) {
+          log(getLocalizedText('提取失败: ', 'Extract failed: ') + e.message, 'error');
+          console.error(e);
+        }
+        isProcessing = false;
+      }
+
+      function extractKeyframes() {
+        extractFrames('keyframes');
+      }
+
+      function extractAllFrames() {
+        extractFrames('all');
+      }
+
+      // ===== 清空日志 =====
+      function clearLog() {
+        logBox.innerHTML = '';
+      }
+
+      // ===== 事件绑定 =====
+      playBtn.addEventListener('click', function () {
+        if (video.paused) { video.play().catch(function () { }); } else { video.pause(); }
       });
-    }
+      rewindBtn.addEventListener('click', function () { video.currentTime = Math.max(0, video.currentTime - 5); });
+      forwardBtn.addEventListener('click', function () {
+        video.currentTime = Math.min(video.duration, video
+          .currentTime + 5);
+      });
 
-    console.log('广播系统测试页面已加载，请求地址: ' + BASE_URL);
+      seekSlider.addEventListener('input', function (e) {
+        if (video.duration) {
+          var pct = parseFloat(e.target.value);
+          video.currentTime = (pct / 100) * video.duration;
+          updatePlayerUI();
+        }
+      });
+
+      uploadTrigger.addEventListener('click', function () { fileInput.click(); });
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files.length) loadVideoFile(fileInput.files[0]);
+      });
+
+      var appEl = document.getElementById('app');
+      appEl.addEventListener('dragover', function (e) { e.preventDefault(); });
+      appEl.addEventListener('drop', function (e) {
+        e.preventDefault();
+        if (e.dataTransfer.files.length && e.dataTransfer.files[0].type.startsWith('video/')) {
+          loadVideoFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      extractSingleBtn.addEventListener('click', extractSingleFrame);
+      extractKeyframesBtn.addEventListener('click', extractKeyframes);
+      extractAllBtn.addEventListener('click', extractAllFrames);
+
+      losslessCheck.addEventListener('change', function () {
+        qualitySelect.disabled = losslessCheck.checked;
+        if (losslessCheck.checked) qualitySelect.value = '1.0';
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.target.tagName === 'INPUT') return;
+        if (e.key === ' ') {
+          e.preventDefault();
+          playBtn.click();
+        }
+        if (e.key === 'ArrowRight') { video.currentTime = Math.min(video.duration, video.currentTime + 1); }
+        if (e.key === 'ArrowLeft') { video.currentTime = Math.max(0, video.currentTime - 1); }
+        if (e.key === 's') { extractSingleBtn.click(); }
+      });
+
+      // ===== 双击标题清空日志 =====
+      document.querySelector('.brand').addEventListener('dblclick', function () {
+        clearLog();
+      });
+
+      // ===== 初始化 =====
+      log(getLocalizedText('视频帧提取器已启动', 'Video Frame Extractor started'), 'info');
+      setProgress(0, getLocalizedText('等待加载', 'Waiting for load'));
+      setBadge(getLocalizedText('等待', 'Waiting'), '');
+      qualitySelect.disabled = false;
+
+      window.__frameCut = {
+        video: video,
+        extractAll: extractAllFrames,
+        extractKeyframes: extractKeyframes,
+        extractSingle: extractSingleFrame,
+        clearLog: clearLog,
+        log: log,
+        setProgress: setProgress,
+        isDemuxReady: function () { return isDemuxReady; }
+      };
+
+    })();
   </script>
 
-  <hr>
-  <p style="color:#888;">注意: 需要后端服务正在运行，且已实现广播接口。</p>
 </body>
 
 </html>

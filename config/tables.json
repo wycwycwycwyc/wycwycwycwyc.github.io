@@ -387,6 +387,21 @@
         "en": "Can query weather information, English not supported yet"
       },
       "path": "/code/webapp/weatherForecast"
-    }       
+    },  
+      "tool9": {
+      "name": {
+        "zh": "视频帧提取器",
+        "en": "Video Frame Extractor"
+      },
+      "Introduction": {
+        "zh": "视频帧提取工具",
+        "en": "Video Frame Extraction Tool"
+      },
+      "note": {
+        "zh": "可以从视频中提取帧图像",
+        "en": "Can extract frame images from videos"
+      },
+      "path": "/code/webapp/FrameExtractor"
+    }
   }
 }
