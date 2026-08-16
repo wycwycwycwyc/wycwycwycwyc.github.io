@@ -402,6 +402,21 @@
         "en": "Can extract frame images from videos"
       },
       "path": "/code/webapp/FrameExtractor"
+    },
+      "tool10": {
+      "name": {
+        "zh": "音频剪辑器",
+        "en": "Audio Editor"
+      },
+      "Introduction": {
+        "zh": "音频剪辑工具",
+        "en": "Audio Editing Tool"
+      },
+      "note": {
+        "zh": "可以对音频进行剪辑和处理",
+        "en": "Can edit and process audio files"
+      },
+      "path": "/code/webapp/AudioEditor"
     }
   }
 }

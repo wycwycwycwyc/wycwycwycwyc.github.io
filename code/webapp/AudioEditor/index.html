@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <script src="/js/script7_setOpacityandBlur.js"></script>
+  <script src="/js/script8_setEyeCare.js"></script>
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <script src="/js/script11_setHighlight.js"></script>
+  <script src="/js/script13_checkIslogin.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="/js/script14_setLanguage.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
+  </script>
+  <title data-en="Audio Editor">音频剪辑器</title>
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- 头部 -->
+    <div class="header">
+      <div class="header-left">
+        <button class="back-btn" onclick="goBackOrHome()" data-en="Back">← 返回</button>
+        <h1 data-en="Audio Editor">音频剪辑器</h1>
+      </div>
+      <span class="status" id="statusLabel" data-en="Ready">就绪</span>
+    </div>
+
+    <!-- 上传 -->
+    <div class="dropzone" id="dropzone">
+      <span class="icon">🎧</span>
+      <p data-en="Click or drag to upload audio files">点击或拖拽上传音频文件</p>
+      <p style="font-size:12px;color:var(--text-muted);" data-en="Supports MP3, WAV, FLAC, AAC, OGG etc.">支持 MP3, WAV,
+        FLAC, AAC, OGG 等</p>
+      <input type="file" id="fileInput" accept="audio/*" multiple />
+    </div>
+
+    <!-- 文件列表 -->
+    <div class="file-bar" id="fileBar"></div>
+
+    <!-- 控制 -->
+    <div class="controls">
+      <div class="control-item">
+        <label data-en="Volume">音量</label>
+        <input type="range" id="volSlider" min="0" max="400" value="100" />
+        <span class="val" id="volVal">100%</span>
+      </div>
+      <div class="control-item">
+        <label data-en="Speed">速度</label>
+        <input type="range" id="spdSlider" min="25" max="300" value="100" />
+        <span class="val" id="spdVal">1.0x</span>
+      </div>
+    </div>
+
+    <!-- 波形 -->
+    <div class="wave-area" id="waveArea">
+      <canvas id="waveCanvas"></canvas>
+      <div class="playhead" id="playhead"></div>
+      <div class="sel-overlay" id="selOverlay">
+        <div class="hdl hdl-l" id="hdlL">◀</div>
+        <div class="hdl hdl-r" id="hdlR">▶</div>
+      </div>
+    </div>
+
+    <!-- 选区信息 -->
+    <div class="sel-info">
+      <span><span data-en="Keep">保留</span>: <span class="keep" id="keepStart">0.00</span>s — <span class="keep"
+          id="keepEnd">0.00</span>s</span>
+      <span><span data-en="Delete">删除</span>: <span class="del" id="delLeft">0.00</span>s — <span class="del"
+          id="delRight">0.00</span>s</span>
+      <span class="actions">
+        <button class="btn-keep" id="btnKeep" data-en="Keep Middle">保留中间</button>
+        <button class="btn-cut" id="btnCut" data-en="Cut Middle">切除中间</button>
+      </span>
+    </div>
+
+    <!-- 进度 -->
+    <div class="timeline">
+      <span class="t" id="curTime">00:00</span>
+      <input type="range" id="seekSlider" min="0" max="100" value="0" />
+      <span class="t" id="totTime">00:00</span>
+    </div>
+
+    <!-- 播放 -->
+    <div class="play-group">
+      <button class="primary" id="playBtn" data-en="Play">▶ 播放</button>
+      <button id="pauseBtn" data-en="Pause">⏸ 暂停</button>
+      <button id="stopBtn" data-en="Stop">⏹ 停止</button>
+      <button id="resetBtn" data-en="Reset">↺ 重置</button>
+    </div>
+
+    <!-- 导出 -->
+    <div class="convert-row">
+      <span data-en="Export format: WAV (applies volume & speed)">导出格式：WAV（应用当前音量和速度）</span>
+      <button id="convertBtn" data-en="Export WAV">导出 WAV</button>
+    </div>
+
+    <!-- 日志 -->
+    <div class="log" id="logBox">
+      <span class="info" data-en="● Ready">● 就绪</span>
+    </div>
+  </div>
+</body>
+<script src="./AudioEditor.js"></script>
+</html>
