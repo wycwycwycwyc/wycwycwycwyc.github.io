@@ -517,3 +517,94 @@
     background: var(--border-color);
     border-radius: 6px;
   }
+/* ===== 进入动画 ===== */
+.app {
+  animation: fadeInUp 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 操作动画：按钮反馈 ===== */
+.btn-keep,
+.btn-cut,
+.play-group button,
+.convert-row button,
+.back-btn {
+  transition: transform 0.15s ease, background 0.2s, box-shadow 0.2s;
+}
+
+.btn-keep:active,
+.btn-cut:active,
+.play-group button:active,
+.convert-row button:active,
+.back-btn:active {
+  transform: scale(0.94);
+}
+
+.btn-keep:hover,
+.btn-cut:hover,
+.play-group button:hover,
+.convert-row button:hover,
+.back-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 波形图区域过渡 ===== */
+.wave-area {
+  transition: background 0.3s, border-color 0.3s;
+}
+
+/* ===== 滑块手柄悬停放大 ===== */
+input[type="range"]::-webkit-slider-thumb {
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* ===== 文件标签悬停上浮 ===== */
+.file-chip {
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.file-chip:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== 日志新条目滑入动画 ===== */
+.log>div {
+  animation: slideIn 0.25s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
