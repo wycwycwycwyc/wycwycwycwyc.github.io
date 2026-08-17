@@ -182,6 +182,36 @@
         "en": "Supports various flashing needs, offers a convenient interface and rich feature options."
       },
       "path": "/code/python/FlashCraft.py"
+    },
+    "script12": {
+      "name": {
+        "zh": "反应测试辅助工具",
+        "en": "Reaction Test Helper"
+      },
+      "Introduction": {
+        "zh": "辅助反应测试的工具。",
+        "en": "Tool to assist with reaction tests."
+      },
+      "note": {
+        "zh": "仅支持由红变绿的反应测试，如有其他需求，请自行修改",
+        "en": "This program only supports red-to-green reaction tests, modify as needed for other requirements."
+      },
+      "path": "/code/python/ReactionTestHelp.py"
+    },
+    "script13": {
+      "name": {
+        "zh": "MC服务器监控",
+        "en": "MC Server Monitoring"
+      },
+      "Introduction": {
+        "zh": "用于监控Minecraft服务器的状态。",
+        "en": "For monitoring the status of Minecraft servers."
+      },
+      "note": {
+        "zh": "可以实时监控服务器状态，并在服务器上线时发送邮件通知。",
+        "en": "Can monitor server status in real-time and send email notifications when the server is online."
+      },
+      "path": "/code/python/MC_ServiceMonitoring.py"
     }    
   },
   "C++": {
