@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.location.href.includes('settings.html')) {
                             return;
                         }
-                        const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
+                        const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchbox');
                         targetElements.forEach(function(element) {
                             applyStyleToElement(element, selectedOpacity, selectedBlur + 'px', isDarkMode);
                         });
@@ -70,7 +70,7 @@ function isTargetElement(element) {
         window.location.href.includes('settings.html')) {
         return;
     }
-    const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time', '#searchInput'];
+    const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time', '#searchBox'];
     return targetSelectors.some(selector => {
         if (selector.startsWith('.') && element.classList.contains(selector.slice(1))) {
             return true;
@@ -98,7 +98,7 @@ function setElementsStyle(opacity, blur, isDarkMode) {
         window.location.href.includes('settings.html')) {
         return;
     }
-    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
+    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchBox');
 
     if (elements.length === 0) {
         return;

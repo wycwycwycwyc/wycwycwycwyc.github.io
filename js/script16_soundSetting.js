@@ -2,6 +2,7 @@
     const SOUND_KEY = 'soundlocalstorage';
     const ENABLED_KEY = 'soundEnabled';
     const SELECTED_KEY = 'selectedSound';
+    const VOLUME_KEY = 'soundVolume';
     const DEFAULT_SOUND = 'standard';
 
     function safeParseJSON(value, fallback) {
@@ -18,7 +19,8 @@
         library: {},
         state: {
             enabled: false,
-            selectedSound: DEFAULT_SOUND
+            selectedSound: DEFAULT_SOUND,
+            volume: 0.5
         },
         audioContext: null,
         observer: null,
@@ -42,11 +44,10 @@
         },
 
         loadSettings() {
-            // 关键修复：iframe 中直接使用默认值，不读写 localStorage
             if (window.self !== window.top) {
-                console.log('[SoundSystem] iframe 中跳过 localStorage 读取，使用默认值');
                 this.state.enabled = false;
                 this.state.selectedSound = DEFAULT_SOUND;
+                this.state.volume = 0.5;
                 return;
             }
 
@@ -58,33 +59,60 @@
             const selected = (saved && saved.selectedSound) 
                 || localStorage.getItem(SELECTED_KEY) 
                 || DEFAULT_SOUND;
+            
+            const volume = (saved && saved.volume !== undefined)
+                ? saved.volume
+                : (localStorage.getItem(VOLUME_KEY) !== null 
+                    ? parseFloat(localStorage.getItem(VOLUME_KEY)) 
+                    : 0.5);
 
             this.state.enabled = Boolean(enabled);
             this.state.selectedSound = selected;
+            this.state.volume = Math.max(0, Math.min(1, volume || 0.5));
+            
+            // 恢复选中的音效定义
+            if (saved && saved.soundDefinition) {
+                this.library[selected] = saved.soundDefinition;
+            }
             
             if (localStorage.getItem(SOUND_KEY) !== null 
                 || localStorage.getItem(ENABLED_KEY) !== null 
-                || localStorage.getItem(SELECTED_KEY) !== null) {
+                || localStorage.getItem(SELECTED_KEY) !== null
+                || localStorage.getItem(VOLUME_KEY) !== null) {
                 this.saveSettings();
             }
         },
 
         saveSettings() {
-            // 关键修复：iframe 中不写入 localStorage
             if (window.self !== window.top) {
-                console.log('[SoundSystem] iframe 中跳过 saveSettings');
                 return;
             }
+
+            // 只保存用户选中的那一个音效的定义
+            const selectedSoundDefinition = this.library[this.state.selectedSound] || null;
 
             const payload = {
                 enabled: Boolean(this.state.enabled),
                 selectedSound: this.state.selectedSound,
-                library: this.library
+                volume: this.state.volume,
+                soundDefinition: selectedSoundDefinition
             };
 
             localStorage.setItem(SOUND_KEY, JSON.stringify(payload));
             localStorage.setItem(ENABLED_KEY, String(payload.enabled));
             localStorage.setItem(SELECTED_KEY, payload.selectedSound);
+            localStorage.setItem(VOLUME_KEY, String(payload.volume));
+        },
+
+        setVolume(volume) {
+            this.state.volume = Math.max(0, Math.min(1, volume));
+            this.saveSettings();
+            this.applySettingsToControls();
+            return this.state.volume;
+        },
+
+        getVolume() {
+            return this.state.volume;
         },
 
         async loadLibrary() {
@@ -95,38 +123,65 @@
                 }
 
                 const data = await response.json();
+                
+                // 先保存从 localStorage 恢复的音效定义（如果有）
+                const saved = safeParseJSON(localStorage.getItem(SOUND_KEY), null);
+                const savedDefinition = saved && saved.soundDefinition ? saved.soundDefinition : null;
+                
+                // 加载完整音效库
                 this.library = data || {};
+                
+                // 如果 localStorage 里有保存的音效定义，用它覆盖对应音效
+                if (savedDefinition && saved.selectedSound) {
+                    this.library[saved.selectedSound] = savedDefinition;
+                }
+                
                 if (!this.library[this.state.selectedSound]) {
                     this.state.selectedSound = DEFAULT_SOUND;
                 }
                 
                 if (localStorage.getItem(SOUND_KEY) !== null 
                     || localStorage.getItem(ENABLED_KEY) !== null 
-                    || localStorage.getItem(SELECTED_KEY) !== null) {
+                    || localStorage.getItem(SELECTED_KEY) !== null
+                    || localStorage.getItem(VOLUME_KEY) !== null) {
                     this.saveSettings();
                 }
                 
                 return this.library;
             } catch (error) {
                 console.error('读取 sounds.json 失败:', error);
-                this.library = {
-                    standard: {
-                        label: '标准点击',
-                        impacts: [
-                            { duration: 0.008, frequency: 3800, q: 3, gain: 0.18, delay: 0 },
-                            { duration: 0.004, frequency: 6000, q: 2, gain: 0.065, delay: 0 }
-                        ],
-                        bodies: [
-                            { type: 'sine', duration: 0.03, frequency: 500, gain: 0.08, delay: 0.003 },
-                            { type: 'sine', duration: 0.05, frequency: 250, gain: 0.048, delay: 0.005 }
-                        ]
-                    }
-                };
-                this.state.selectedSound = DEFAULT_SOUND;
+                
+                // 尝试从 localStorage 恢复
+                const saved = safeParseJSON(localStorage.getItem(SOUND_KEY), null);
+                
+                if (saved && saved.soundDefinition && saved.selectedSound) {
+                    this.library = {
+                        [saved.selectedSound]: saved.soundDefinition
+                    };
+                } else {
+                    this.library = {
+                        standard: {
+                            label: '标准点击',
+                            impacts: [
+                                { duration: 0.008, frequency: 3800, q: 3, gain: 1.0, delay: 0 },
+                                { duration: 0.004, frequency: 6000, q: 2, gain: 1.0, delay: 0 }
+                            ],
+                            bodies: [
+                                { type: 'sine', duration: 0.03, frequency: 500, gain: 1.0, delay: 0.003 },
+                                { type: 'sine', duration: 0.05, frequency: 250, gain: 1.0, delay: 0.005 }
+                            ]
+                        }
+                    };
+                }
+                
+                if (!this.library[this.state.selectedSound]) {
+                    this.state.selectedSound = DEFAULT_SOUND;
+                }
                 
                 if (localStorage.getItem(SOUND_KEY) !== null 
                     || localStorage.getItem(ENABLED_KEY) !== null 
-                    || localStorage.getItem(SELECTED_KEY) !== null) {
+                    || localStorage.getItem(SELECTED_KEY) !== null
+                    || localStorage.getItem(VOLUME_KEY) !== null) {
                     this.saveSettings();
                 }
                 
@@ -149,6 +204,8 @@
         applySettingsToControls() {
             const toggle = document.getElementById('soundToggle');
             const select = document.getElementById('soundSelect');
+            const volumeSlider = document.getElementById('soundVolume');
+            const volumeNumber = document.getElementById('soundVolumeNumber');
 
             if (toggle) {
                 toggle.checked = this.state.enabled;
@@ -164,23 +221,53 @@
                 }
                 select.value = this.state.selectedSound;
             }
+
+            if (volumeSlider) {
+                volumeSlider.value = Math.round(this.state.volume * 100);
+            }
+            if (volumeNumber) {
+                volumeNumber.value = Math.round(this.state.volume * 100);
+            }
         },
 
-        populateSoundSelector(selectElement) {
-            if (!selectElement) return;
-            const names = Object.keys(this.library || {});
-            selectElement.innerHTML = names.map(function (name) {
-                const label = this.library[name] && this.library[name].label ? this.library[name].label : name;
-                return '<option value="' + name + '">' + label + '</option>';
-            }, this).join('');
-            const fallback = this.state.selectedSound && this.library[this.state.selectedSound] ? this.state.selectedSound : DEFAULT_SOUND;
-            selectElement.value = fallback;
-        },
+populateSoundSelector(selectElement) {
+    if (!selectElement) return;
+    
+    // 获取当前语言
+    const currentLang = localStorage.getItem('preferredLang') || 'auto';
+    let lang = 'zh';
+    if (currentLang === 'auto') {
+        lang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+    } else {
+        lang = currentLang;
+    }
+    
+    const names = Object.keys(this.library || {});
+    selectElement.innerHTML = names.map(function (name) {
+        const soundDef = this.library[name];
+        let label = name;
+        
+        if (soundDef && soundDef.label) {
+            if (typeof soundDef.label === 'object') {
+                label = soundDef.label[lang] || soundDef.label.zh || name;
+            } else {
+                label = soundDef.label;
+            }
+        }
+        
+        return '<option value="' + name + '">' + label + '</option>';
+    }, this).join('');
+    
+    const fallback = this.state.selectedSound && this.library[this.state.selectedSound] ? this.state.selectedSound : DEFAULT_SOUND;
+    selectElement.value = fallback;
+},
 
         bindSettingsControls() {
             const toggle = document.getElementById('soundToggle');
             const select = document.getElementById('soundSelect');
             const testButton = document.getElementById('soundTestBtn');
+            const volumeSlider = document.getElementById('soundVolume');
+            const volumeNumber = document.getElementById('soundVolumeNumber');
 
             if (toggle) {
                 toggle.addEventListener('change', function (event) {
@@ -200,6 +287,26 @@
                     event.preventDefault();
                     event.stopPropagation();
                     SoundSystem.playSelectedSound();
+                });
+            }
+
+            if (volumeSlider) {
+                volumeSlider.value = Math.round(this.state.volume * 100);
+                volumeSlider.addEventListener('input', function () {
+                    const vol = this.value / 100;
+                    SoundSystem.setVolume(vol);
+                    if (volumeNumber) volumeNumber.value = this.value;
+                });
+            }
+
+            if (volumeNumber) {
+                volumeNumber.value = Math.round(this.state.volume * 100);
+                volumeNumber.addEventListener('input', function () {
+                    let val = parseInt(this.value) || 0;
+                    val = Math.max(0, Math.min(100, val));
+                    const vol = val / 100;
+                    SoundSystem.setVolume(vol);
+                    if (volumeSlider) volumeSlider.value = val;
                 });
             }
         },
@@ -357,7 +464,7 @@
             filter.Q.value = layer.q || (layer.filter && layer.filter.q) || 3;
 
             const gain = context.createGain();
-            gain.gain.value = layer.gain || 0.2;
+            gain.gain.value = (layer.gain || 1.0) * this.state.volume;
 
             source.connect(filter);
             filter.connect(gain);
@@ -381,7 +488,7 @@
             oscillator.type = layer.type || 'sine';
             oscillator.frequency.value = layer.frequency || 400;
 
-            gain.gain.setValueAtTime(layer.gain || 0.12, startTime);
+            gain.gain.setValueAtTime((layer.gain || 1.0) * this.state.volume, startTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
             oscillator.start(startTime);
@@ -395,6 +502,12 @@
     };
     window.playSelectedSound = function () {
         return SoundSystem.playSelectedSound();
+    };
+    window.setSoundVolume = function (volume) {
+        return SoundSystem.setVolume(volume);
+    };
+    window.getSoundVolume = function () {
+        return SoundSystem.getVolume();
     };
 
     document.addEventListener('DOMContentLoaded', function () {

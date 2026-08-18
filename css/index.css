@@ -137,7 +137,7 @@
     max-width: 1200px;
     table-layout: fixed;
     /* 使用fixed布局，让列宽可控 */
-    margin: 20px auto;
+    margin: 0px auto 20px auto;
     border-collapse: collapse;
     position: relative;
     border-spacing: 0;
@@ -719,7 +719,21 @@
               .main-image {
                 max-width: 50%;
               }
-
+        #searchBox {
+          margin: 0 auto 0 auto;
+          /* 移动端更紧凑 */
+        }
+    
+        #searchInput {
+          padding: 8px 14px;
+          /* 输入框内边距也缩小 */
+          font-size: 13px;
+        }
+    
+        table {
+          margin: 0px auto 15px auto;
+          /* 表格上边距缩小 */
+        }
               .login-icon-container {
                 width: 50px;
                 height: 50px;
@@ -993,7 +1007,7 @@ body {
   /* 表格占满 wrapper */
 }
 #tables-container {
-  max-height: calc(100vh - 240px);
+  max-height: calc(100vh - 250px);
   overflow: hidden;
   /* 不显示滚动条 */
 }
@@ -1008,27 +1022,28 @@ body {
 #searchBox {
   width: 100%;
   max-width: 1200px;
-  /* 和表格一样宽 */
-  margin: 20px auto 10px auto;
-  /* 表格上方，靠近表格 */
+  margin: 0 auto 10px auto;
   padding: 0;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
-  animation-delay: 0s;
 }
-
 #searchInput {
   width: 100%;
   padding: 10px 20px;
   font-size: 14px;
   color: black;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: transparent;
+  /* 透明，不叠加 */
   border: none;
   border-radius: 10px;
   outline: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+  box-shadow: none;
+  backdrop-filter: none;
+  /* 不设置模糊 */
+  -webkit-backdrop-filter: none;
 }
 
 #searchInput::placeholder {
@@ -1052,4 +1067,49 @@ body.dark-mode #searchInput::placeholder {
 
 body.dark-mode #searchInput:focus {
   background-color: rgba(18, 18, 18, 0.8);
+}
+@media (max-width: 768px) {
+
+  /* 隐藏底部栏 */
+  .bottom-bar {
+    display: none;
+  }
+
+  /* 导航按钮容器放在 #time 下方 */
+  #navigation-buttons {
+    position: fixed;
+    top: 60px;
+    /* 根据 #time 的高度调整 */
+    left: 0;
+    right: 0;
+    width: 100%;
+    pointer-events: none;
+    /* 容器不拦截点击 */
+    z-index: 500;
+  }
+
+  /* 左按钮固定在屏幕左边 */
+  .more-button.left {
+    position: fixed;
+    left: 20px;
+    top: 60px;
+    transform: none;
+    font-size: 30px;
+    pointer-events: auto;
+  }
+
+  /* 右按钮固定在屏幕右边 */
+  .more-button:not(.left) {
+    position: fixed;
+    right: 20px;
+    top: 60px;
+    transform: none;
+    font-size: 30px;
+    pointer-events: auto;
+  }
+
+  /* 搜索框放在按钮下方 */
+  #searchBox {
+    margin: 10px auto 4px auto;
+  }
 }

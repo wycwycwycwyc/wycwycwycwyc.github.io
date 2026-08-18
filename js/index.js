@@ -293,7 +293,7 @@ const ThemeManager = {
     
     // 设置元素透明度
     setElementsOpacity: function(opacity, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time,#searchBox');
         
         elements.forEach(function(element) {
             if (isDarkMode) {
@@ -306,7 +306,7 @@ const ThemeManager = {
     
     // 设置元素模糊效果
     setElementsBlur: function(blur, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time,#searchBox');
         
         elements.forEach(function(element) {
             element.style.backdropFilter = `blur(${blur}px)`;
