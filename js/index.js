@@ -293,7 +293,7 @@ const ThemeManager = {
     
     // 设置元素透明度
     setElementsOpacity: function(opacity, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
         
         elements.forEach(function(element) {
             if (isDarkMode) {
@@ -306,7 +306,7 @@ const ThemeManager = {
     
     // 设置元素模糊效果
     setElementsBlur: function(blur, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
         
         elements.forEach(function(element) {
             element.style.backdropFilter = `blur(${blur}px)`;
@@ -877,17 +877,23 @@ function sa() {
         let currentTableIndex = 0;
 
         // 从服务器加载tables.json
-        fetch('/config/tables.json')
-            .then(response => response.json())
-            .then(data => {
-                Object.keys(data).forEach(tableType => {
-                    tableNames.push(tableType);
-                });
+fetch('/config/tables.json')
+    .then(response => response.json())
+    .then(data => {
+        // 保存数据供搜索使用
+        allTablesData = data;
+        
+        Object.keys(data).forEach(tableType => {
+            tableNames.push(tableType);
+        });
 
-                createTablesFromJSON(data);
-                createNavigationButtons();
-                showTable(0);
-            })
+        createTablesFromJSON(data);
+        createNavigationButtons();
+        showTable(0);
+        
+        // 初始化搜索
+        initSearch();
+    })
             .catch(error => {
                 console.error('加载表格数据失败:', error);
                 tablesContainer.innerHTML = '<p>加载表格数据失败，请刷新页面重试</p>';
@@ -901,7 +907,252 @@ function sa() {
                     return navigator.language.startsWith('zh') ? 'zh' : 'en';
                 }
                 return currentLang;
+        }
+// ==================== 搜索功能 ====================
+let allTablesData = null;  // 存储所有表格数据
+let currentLang = 'zh';
+
+// 获取当前语言
+function getCurrentLang() {
+    const savedLang = localStorage.getItem('preferredLang') || 'auto';
+    if (savedLang === 'auto') {
+        return navigator.language.startsWith('zh') ? 'zh' : 'en';
+    }
+    return savedLang;
+}
+
+// 高亮搜索词
+function highlightText(text, searchTerm) {
+    if (!searchTerm || !text) return text;
+    const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp('(' + escapedTerm + ')', 'gi');
+    return text.replace(regex, '<mark style="background: #ffeb3b; color: #000; padding: 0 2px; border-radius: 2px;">$1</mark>');
+}
+
+// 判断单元格是否匹配搜索词
+function cellMatchesSearch(cellData, searchTerm, lang) {
+    let text = '';
+    if (typeof cellData === 'object') {
+        text = cellData[lang] || cellData.zh || '';
+    } else {
+        text = String(cellData || '');
+    }
+    return text.toLowerCase().includes(searchTerm.toLowerCase());
+}
+
+// 执行搜索
+function performSearch(searchTerm) {
+    const resultsContainer = document.getElementById('searchResults');
+    const normalContainer = document.getElementById('tables-container');
+    
+    if (!searchTerm || searchTerm.trim() === '') {
+        resultsContainer.style.display = 'none';
+        resultsContainer.innerHTML = '';
+        normalContainer.style.display = '';
+        return;
+    }
+    
+    currentLang = getCurrentLang();
+    const term = searchTerm.trim();
+    const matchingRows = [];
+    
+    // 遍历所有表格数据
+    Object.entries(allTablesData || {}).forEach(([tableType, tableData]) => {
+        const headers = Object.keys(tableData.row1 || {});
+        
+        Object.entries(tableData).forEach(([rowKey, rowData]) => {
+            if (rowKey === 'row1') return;
+            
+            // 检查这一行是否有任何单元格匹配
+            const hasMatch = headers.some(header => {
+                if (header === 'view') return false;
+                return cellMatchesSearch(rowData[header], term, currentLang);
+            });
+            
+            if (hasMatch) {
+                matchingRows.push({
+                    tableType: tableType,
+                    headers: headers,
+                    rowData: rowData,
+                    tableData: tableData
+                });
             }
+        });
+    });
+    
+    // 渲染搜索结果
+    if (matchingRows.length === 0) {
+        resultsContainer.innerHTML = '<div style="text-align:center;padding:40px;color:#888;font-size:14px;" data-en="No results found">未找到匹配结果</div>';
+        // 注册翻译
+        if (window.i18n) {
+            const el = resultsContainer.querySelector('[data-en]');
+            if (el) window.i18n.register(el);
+        }
+    } else {
+        resultsContainer.innerHTML = renderSearchResults(matchingRows, term);
+        // 注册翻译
+        if (window.i18n) {
+            const els = resultsContainer.querySelectorAll('[data-en]');
+            els.forEach(el => window.i18n.register(el));
+        }
+    }
+    
+    resultsContainer.style.display = 'block';
+    normalContainer.style.display = 'none';
+    clearBtn.style.display = 'inline-block';
+}
+
+// 渲染搜索结果
+function renderSearchResults(matchingRows, searchTerm) {
+    const lang = currentLang;
+    
+    const table = document.createElement('table');
+    table.className = 'main-table';
+    table.style.animation = 'slideUp 1.5s forwards, blurIn 1.5s forwards';
+    
+    // 表头
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = matchingRows[0].headers;
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        
+        if (header === 'view') {
+            const viewInfo = matchingRows[0].tableData.row1.view;
+            if (typeof viewInfo === 'object') {
+                th.textContent = viewInfo[lang] || viewInfo.zh;
+                th.setAttribute('data-en', viewInfo.en);
+            } else {
+                th.textContent = '查看';
+                th.setAttribute('data-en', 'View');
+            }
+        } else {
+            const headerInfo = matchingRows[0].tableData.row1[header];
+            if (typeof headerInfo === 'object') {
+                th.textContent = headerInfo[lang] || headerInfo.zh;
+                th.setAttribute('data-en', headerInfo.en);
+            } else {
+                const headerDisplayNames = {
+                    'name': { zh: '脚本名', en: 'Script Name' },
+                    'Introduction': { zh: '简介', en: 'Introduction' },
+                    'note': { zh: '备注', en: 'Notes' },
+                    'view': { zh: '查看', en: 'View' },
+                    'author': { zh: '作者', en: 'Author' },
+                    'version': { zh: '版本', en: 'Version' },
+                    'date': { zh: '日期', en: 'Date' }
+                };
+                const info = headerDisplayNames[header] || { zh: header, en: header };
+                th.textContent = info[lang];
+                th.setAttribute('data-en', info.en);
+            }
+        }
+        
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // 表体
+    const tbody = document.createElement('tbody');
+    
+    matchingRows.forEach(({rowData}) => {
+        const tr = document.createElement('tr');
+        
+        headers.forEach(header => {
+            const td = document.createElement('td');
+            
+            if (header === 'view') {
+                const button = document.createElement('button');
+                button.className = 'custom-button';
+                button.style.whiteSpace = 'nowrap';
+                
+                const viewInfo = matchingRows[0].tableData.row1.view;
+                if (typeof viewInfo === 'object') {
+                    button.textContent = viewInfo[lang] || viewInfo.zh;
+                    button.setAttribute('data-en', viewInfo.en);
+                } else {
+                    button.textContent = '查看';
+                    button.setAttribute('data-en', 'View');
+                }
+                
+                if (rowData.path) {
+                    if (rowData.path.endsWith('.py') || rowData.path.endsWith('.cpp')) {
+                        const nameObj = rowData.name;
+                        const title = typeof nameObj === 'object' ? nameObj[lang] : nameObj;
+                        const encodedTitle = encodeURIComponent(title);
+                        const url = `/code.html?title=${encodedTitle}&file=${rowData.path}`;
+                        button.onclick = function() { openPage(url); };
+                    } else {
+                        button.onclick = function() { openPage(rowData.path); };
+                    }
+                }
+                
+                td.appendChild(button);
+            } else {
+                const cellData = rowData[header];
+                let cellText = '';
+                
+                if (typeof cellData === 'object') {
+                    cellText = cellData[lang] || cellData.zh || '';
+                } else {
+                    cellText = String(cellData || '');
+                }
+                
+                // 高亮搜索词
+                td.innerHTML = highlightText(cellText, searchTerm);
+                
+                // 保留翻译属性
+                if (typeof cellData === 'object' && cellData.en) {
+                    td.setAttribute('data-en', cellData.en);
+                }
+            }
+            
+            tr.appendChild(td);
+        });
+        
+        tbody.appendChild(tr);
+    });
+    
+    table.appendChild(tbody);
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-wrapper';
+    wrapper.style.display = 'block';
+    wrapper.appendChild(table);
+    
+    const container = document.createElement('div');
+    container.appendChild(wrapper);
+    
+    return container.innerHTML;
+}
+
+// 初始化搜索
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (!searchInput) return;
+    
+    let debounceTimer = null;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            performSearch(this.value);
+        }, 300);
+    });
+    
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            performSearch('');
+        }
+        if (e.key === 'Enter') {
+            clearTimeout(debounceTimer);
+            performSearch(this.value);
+        }
+    });
+}     
 // 根据JSON数据创建表格
 function createTablesFromJSON(data) {
     // 获取当前语言
@@ -998,59 +1249,87 @@ function createTablesFromJSON(data) {
 
             const tr = document.createElement('tr');
 
-            headers.forEach(header => {
-                const td = document.createElement('td');
+// 在 createTablesFromJSON 函数内部，替换 td 创建部分
 
-                if (header === 'view') {
-                    const button = document.createElement('button');
-                    button.className = 'custom-button';
-                    
-                    // 获取查看按钮的文本
-                    const viewInfo = tableData.row1.view;
-                    if (typeof viewInfo === 'object') {
-                        button.textContent = viewInfo[lang];
-                        button.setAttribute('data-en', viewInfo.en);
-                    } else {
-                        button.textContent = '查看';
-                        button.setAttribute('data-en', 'View');
-                    }
+headers.forEach(header => {
+    const td = document.createElement('td');
 
-                    // 根据是否有path字段构建URL
-                    if (rowData.path) {
-                        // 检查是否是代码文件（需要显示code.html）
-                        if (rowData.path.endsWith('.py') || rowData.path.endsWith('.cpp')) {
-                            const nameObj = rowData.name;
-                            const title = typeof nameObj === 'object' ? nameObj[lang] : nameObj;
-                            const encodedTitle = encodeURIComponent(title);
-                            const url = `/code.html?title=${encodedTitle}&file=${rowData.path}`;
-                            
-                            button.onclick = function() {
-                                openPage(url);
-                            };
-                        } else {
-                            // 直接跳转到path
-                            button.onclick = function() {
-                                openPage(rowData.path);
-                            };
-                        }
-                    }
+    if (header === 'view') {
+        const button = document.createElement('button');
+        button.className = 'custom-button';
+        
+        const viewInfo = tableData.row1.view;
+        if (typeof viewInfo === 'object') {
+            button.textContent = viewInfo[lang];
+            button.setAttribute('data-en', viewInfo.en);
+        } else {
+            button.textContent = '查看';
+            button.setAttribute('data-en', 'View');
+        }
 
-                    td.appendChild(button);
-                } else {
-                    // 根据语言设置单元格内容
-                    const cellData = rowData[header];
-                    if (typeof cellData === 'object') {
-                        td.textContent = cellData[lang] || cellData.zh;
-                        if (cellData.en) {
-                            td.setAttribute('data-en', cellData.en);
-                        }
-                    } else {
-                        td.textContent = cellData || '';
-                    }
-                }
+        if (rowData.path) {
+            if (rowData.path.endsWith('.py') || rowData.path.endsWith('.cpp')) {
+                const nameObj = rowData.name;
+                const title = typeof nameObj === 'object' ? nameObj[lang] : nameObj;
+                const encodedTitle = encodeURIComponent(title);
+                const url = `/code.html?title=${encodedTitle}&file=${rowData.path}`;
+                
+                button.onclick = function() {
+                    openPage(url);
+                };
+            } else {
+                button.onclick = function() {
+                    openPage(rowData.path);
+                };
+            }
+        }
 
-                tr.appendChild(td);
-            });
+        td.appendChild(button);
+    } else {
+        // 获取单元格内容
+        const cellData = rowData[header];
+        let cellText = '';
+        
+        if (typeof cellData === 'object') {
+            cellText = cellData[lang] || cellData.zh || '';
+        } else {
+            cellText = cellData || '';
+        }
+        
+        // 判断是否是简介或备注列
+        const isIntroOrNote = header === 'Introduction' || header === 'note';
+        
+        if (isIntroOrNote && cellText) {
+            // 创建带省略号的 span
+            const span = document.createElement('span');
+            span.className = 'table-cell-truncate';
+            span.textContent = cellText;
+            
+            // 设置 data-en 属性（如果有英文翻译）
+            if (typeof cellData === 'object' && cellData.en) {
+                span.setAttribute('data-en', cellData.en);
+                span.setAttribute('data-zh', cellData.zh || '');
+            } else {
+                span.setAttribute('data-full', cellText);
+            }
+            
+            // 点击弹窗显示完整内容
+            span.onclick = function() {
+                showCellDetail(header, cellData, lang);
+            };
+            
+            td.appendChild(span);
+        } else {
+            // 普通单元格
+            td.textContent = cellText;
+            if (typeof cellData === 'object' && cellData.en) {
+                td.setAttribute('data-en', cellData.en);
+            }
+        }
+    }
+
+    tr.appendChild(td);
+});
 
             tbody.appendChild(tr);
         });
@@ -1136,3 +1415,34 @@ function createTablesFromJSON(data) {
         }
     }
 });
+// 显示单元格完整内容
+function showCellDetail(header, cellData, lang) {
+    const headerNames = {
+        'Introduction': { zh: '简介', en: 'Introduction' },
+        'note': { zh: '备注', en: 'Notes' }
+    };
+    
+    const info = headerNames[header] || { zh: header, en: header };
+    const headerText = lang === 'en' ? info.en : info.zh;
+    
+    let fullText = '';
+    if (typeof cellData === 'object') {
+        fullText = cellData[lang] || cellData.zh || '';
+    } else {
+        fullText = cellData || '';
+    }
+    
+    Swal.fire({
+        title: headerText,
+        text: fullText,
+        confirmButtonText: lang === 'en' ? 'Close' : '关闭'
+    });
+}
+
+// HTML 转义
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}

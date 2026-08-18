@@ -458,5 +458,27 @@
       "zh": "修复<账户>界面未登录状态显示异常的问题",
       "en": "Fixed issue with <Account> interface displaying incorrectly when not logged in"
     }
+  },
+  "update21": {
+    "time": {
+      "zh": "2026年8月18日",
+      "en": "August 18, 2026"
+    },
+    "title": {
+      "zh": "更新",
+      "en": "Update"
+    },
+    "text1": {
+      "zh": "更新了按钮点击音效",
+      "en": "Updated button click sound effects"
+    },
+    "text2": {
+      "zh": "为主页新增了<搜索脚本>功能",
+      "en": "Added <search script> functionality to the homepage"
+    },
+    "text3": {
+      "zh": "更好地优化手机端体验",
+      "en": "Better optimized mobile device experience"
+    }
   }
 }

@@ -326,6 +326,20 @@ document.addEventListener('DOMContentLoaded', function() {
 var usertabletext;
 
 document.addEventListener('DOMContentLoaded', function () {
+    if (!localStorage.getItem('soundlocalstorage')) {
+        localStorage.setItem('soundlocalstorage', JSON.stringify({
+            enabled: false,
+            selectedSound: 'standard',
+            library: {}
+        }));
+    }
+    if (!localStorage.getItem('soundEnabled')) {
+        localStorage.setItem('soundEnabled', 'false');
+    }
+    if (!localStorage.getItem('selectedSound')) {
+        localStorage.setItem('selectedSound', 'standard');
+    }
+
     var darkModeToggle = document.getElementById('darkModeToggle');
     var animationToggle = document.getElementById('animationToggle');
     var lightModeBgUrlInput = document.getElementById('lightModeBgUrl');

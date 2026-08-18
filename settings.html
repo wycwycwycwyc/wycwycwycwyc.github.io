@@ -28,6 +28,7 @@
     <script src="/js/message.min.js"></script>
     <script src="/js/script14_setLanguage.js"></script>
     <script src="/js/script15_boardCast.js"></script>
+    <script src="/js/script16_soundSetting.js"></script>
 </head>
 
 <body>
@@ -35,6 +36,7 @@
         <button class="custom-button bake" onclick="goBackOrHome()" data-en="Back">返回</button>
         <a id="appearance-si" href="#appearance" data-en="Appearance">外观</a>
         <a id="display-si" href="#display" data-en="Display">显示</a>
+        <a id="sound-si" href="#sound" data-en="Sound">音效</a>
         <a id="settingsData-si" href="#settingsData" data-en="Settings Data">设置数据</a>
         <a id="account-si" href="#account" data-en="Account">账户</a>
         <a id="language-si" href="#language" data-en="Language">语言</a>
@@ -149,7 +151,24 @@
                 </div>
             </div>
         </div>
-
+        <div id="sound" class="section">
+            <h1 data-en="Sound">音效</h1>
+            <div class="input-group">
+                <h2 data-en="Sound Effects">音效设置</h2>
+                <label for="soundToggle" data-en="Enable Sound">启用音效</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="input-group">
+                <label for="soundSelect" data-en="Select sound">选择音效</label>
+                <select id="soundSelect" class="styled-select" style="width: 180px;">
+                    <option value="standard">standard</option>
+                </select>
+                <button id="soundTestBtn" class="custom-button" data-en="Preview Sound">试听</button>
+            </div>
+        </div>
         <div id="settingsData" class="section">
             <h1 data-en="Settings Data">设置数据</h1>
             <div>
@@ -250,7 +269,6 @@
                 <option value="en">English</option>
             </select>
         </div>
-        <br>
         <div id="section">
             <h1 data-en="Features">功能说明</h1>
             <div class="intro-box">

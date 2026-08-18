@@ -918,3 +918,138 @@
   margin: 4px 0;
   /* 减小分割线上下间距 */
 }
+/* ==================== 表格单元格省略号（不影响现有样式） ==================== */
+
+/* 只追加这一个类，不影响任何现有表格样式 */
+.table-cell-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.table-cell-truncate:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .table-cell-truncate {
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-cell-truncate {
+    max-width: 80px;
+  }
+}
+/* 表格容器底部留白 */
+#tables-container {
+  margin-bottom: 60px;
+  padding-bottom: 40px;
+}
+
+/* 或者给整个内容区加底部内边距 */
+.content {
+  padding-bottom: 60px;
+}
+
+/* 表格 wrapper 底部间距 */
+.table-wrapper {
+  margin-bottom: 40px;
+}
+/* 确保 html 和 body 至少占满视口 */
+html {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-width: 100vw;
+  min-height: 100vh;
+  background-attachment: fixed;
+  /* 背景固定，滚动时铺满 */
+  background-size: cover;
+}
+/* 查看按钮文字不换行 */
+.custom-button {
+  white-space: nowrap;
+}
+
+/* 或者只针对表格里的查看按钮 */
+.main-table .custom-button {
+  white-space: nowrap;
+}
+.table-wrapper {
+  height: 100%;
+  /* 占满容器 */
+  overflow: hidden;
+}
+
+.main-table {
+  height: 100%;
+  /* 表格占满 wrapper */
+}
+#tables-container {
+  max-height: calc(100vh - 240px);
+  overflow: hidden;
+  /* 不显示滚动条 */
+}
+#searchBox {
+  position: relative;
+  z-index: 100;
+}
+/* ==================== 搜索框样式 ==================== */
+
+/* ==================== 搜索框样式 ==================== */
+
+#searchBox {
+  width: 100%;
+  max-width: 1200px;
+  /* 和表格一样宽 */
+  margin: 20px auto 10px auto;
+  /* 表格上方，靠近表格 */
+  padding: 0;
+  animation: slideUp 1.5s forwards, blurIn 1.5s forwards;
+  animation-delay: 0s;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+#searchInput::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#searchInput:focus {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 深色模式 */
+body.dark-mode #searchInput {
+  color: #f4f4f4;
+  background-color: rgba(18, 18, 18, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode #searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body.dark-mode #searchInput:focus {
+  background-color: rgba(18, 18, 18, 0.8);
+}

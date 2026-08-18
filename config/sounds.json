@@ -1,0 +1,327 @@
+{
+  "light": {
+    "label": "轻触",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.006,
+        "frequency": 4500,
+        "q": 4,
+        "gain": 0.15,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 4500, "q": 4 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.015,
+        "frequency": 600,
+        "gain": 0.05,
+        "delay": 0.002,
+        "slideTo": null
+      }
+    ]
+  },
+
+"standard": {
+    "label": "标准点击",
+    "impacts": [
+        { "type": "noise", "duration": 0.008, "frequency": 3800, "q": 3, "gain": 0.18, "delay": 0, "filter": { "type": "bandpass", "frequency": 3800, "q": 3 }, "slideTo": null },
+        { "type": "noise", "duration": 0.004, "frequency": 6000, "q": 2, "gain": 0.065, "delay": 0, "filter": { "type": "bandpass", "frequency": 6000, "q": 2 }, "slideTo": null }
+    ],
+    "bodies": [
+        { "type": "sine", "duration": 0.03, "frequency": 500, "gain": 0.08, "delay": 0.003, "slideTo": null },
+        { "type": "sine", "duration": 0.05, "frequency": 250, "gain": 0.048, "delay": 0.005, "slideTo": null }
+    ]
+},
+
+  "heavy": {
+    "label": "重按",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.012,
+        "frequency": 2500,
+        "q": 2,
+        "gain": 0.28,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 2500, "q": 2 },
+        "slideTo": null
+      },
+      {
+        "type": "noise",
+        "duration": 0.008,
+        "frequency": 4500,
+        "q": 3,
+        "gain": 0.12,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 4500, "q": 3 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.06,
+        "frequency": 300,
+        "gain": 0.14,
+        "delay": 0.004,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.08,
+        "frequency": 150,
+        "gain": 0.08,
+        "delay": 0.008,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "soft": {
+    "label": "静音按键",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.005,
+        "frequency": 5000,
+        "q": 5,
+        "gain": 0.08,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 5000, "q": 5 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.01,
+        "frequency": 700,
+        "gain": 0.03,
+        "delay": 0.001,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "metal": {
+    "label": "金属按钮",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.006,
+        "frequency": 5200,
+        "q": 6,
+        "gain": 0.2,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 5200, "q": 6 },
+        "slideTo": null
+      },
+      {
+        "type": "noise",
+        "duration": 0.01,
+        "frequency": 7800,
+        "q": 4,
+        "gain": 0.1,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 7800, "q": 4 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.04,
+        "frequency": 1200,
+        "gain": 0.08,
+        "delay": 0.002,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.025,
+        "frequency": 2400,
+        "gain": 0.04,
+        "delay": 0.003,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "rubber": {
+    "label": "橡胶按键",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.015,
+        "frequency": 1800,
+        "q": 1.5,
+        "gain": 0.2,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 1800, "q": 1.5 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.07,
+        "frequency": 200,
+        "gain": 0.12,
+        "delay": 0.006,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "chime": {
+    "label": "风铃",
+    "impacts": [],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.7,
+        "frequency": 1318.5,
+        "gain": 0.1,
+        "delay": 0,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.5,
+        "frequency": 1975.5,
+        "gain": 0.05,
+        "delay": 0.01,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.35,
+        "frequency": 2637,
+        "gain": 0.025,
+        "delay": 0.02,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.25,
+        "frequency": 5274,
+        "gain": 0.012,
+        "delay": 0.03,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "pop": {
+    "label": "气泡",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.02,
+        "frequency": 3000,
+        "q": 3,
+        "gain": 0.04,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 3000, "q": 3 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.06,
+        "frequency": 900,
+        "gain": 0.2,
+        "delay": 0,
+        "slideTo": 250
+      },
+      {
+        "type": "sine",
+        "duration": 0.045,
+        "frequency": 1800,
+        "gain": 0.06,
+        "delay": 0,
+        "slideTo": 500
+      }
+    ]
+  },
+
+  "confirm": {
+    "label": "确认音",
+    "impacts": [],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.12,
+        "frequency": 784,
+        "gain": 0.12,
+        "delay": 0,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.08,
+        "frequency": 1568,
+        "gain": 0.04,
+        "delay": 0,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.16,
+        "frequency": 1046.5,
+        "gain": 0.1,
+        "delay": 0.07,
+        "slideTo": null
+      },
+      {
+        "type": "sine",
+        "duration": 0.1,
+        "frequency": 2093,
+        "gain": 0.03,
+        "delay": 0.07,
+        "slideTo": null
+      }
+    ]
+  },
+
+  "swoosh": {
+    "label": "扫过",
+    "impacts": [
+      {
+        "type": "noise",
+        "duration": 0.25,
+        "frequency": 400,
+        "q": 0.7,
+        "gain": 0.12,
+        "delay": 0,
+        "filter": { "type": "bandpass", "frequency": 400, "q": 0.7 },
+        "slideTo": null
+      },
+      {
+        "type": "noise",
+        "duration": 0.2,
+        "frequency": 1200,
+        "q": 0.7,
+        "gain": 0.1,
+        "delay": 0.05,
+        "filter": { "type": "bandpass", "frequency": 1200, "q": 0.7 },
+        "slideTo": null
+      }
+    ],
+    "bodies": [
+      {
+        "type": "sine",
+        "duration": 0.25,
+        "frequency": 300,
+        "gain": 0.06,
+        "delay": 0,
+        "slideTo": 900
+      }
+    ]
+  }
+}

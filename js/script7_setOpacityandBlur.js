@@ -40,19 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                // 检查新添加的节点中是否有我们需要设置样式的元素
                 mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeType === 1) { // 只处理元素节点
-                        // 检查当前节点是否是需要设置样式的元素
+                    if (node.nodeType === 1) {
                         if (isTargetElement(node)) {
                             applyStyleToElement(node, selectedOpacity, selectedBlur + 'px', isDarkMode);
                         }
-                            if (window.location.pathname.includes('settings.html') || 
-                                window.location.href.includes('settings.html')) {
-                                return;
-                            }//避免在设置页面设置表格颜色样式
-                        // 检查节点的子元素中是否有需要设置样式的元素
-                        const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+                        if (window.location.pathname.includes('settings.html') || 
+                            window.location.href.includes('settings.html')) {
+                            return;
+                        }
+                        const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
                         targetElements.forEach(function(element) {
                             applyStyleToElement(element, selectedOpacity, selectedBlur + 'px', isDarkMode);
                         });
@@ -62,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 开始观察文档主体及其子节点的变化
     observer.observe(document.body, {
         childList: true,
         subtree: true
@@ -70,11 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function isTargetElement(element) {
-        if (window.location.pathname.includes('settings.html') || 
+    if (window.location.pathname.includes('settings.html') || 
         window.location.href.includes('settings.html')) {
         return;
-    }//避免在设置页面设置表格颜色样式
-    const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time'];
+    }
+    const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time', '#searchInput'];
     return targetSelectors.some(selector => {
         if (selector.startsWith('.') && element.classList.contains(selector.slice(1))) {
             return true;
@@ -87,24 +83,22 @@ function isTargetElement(element) {
 }
 
 function applyStyleToElement(element, opacity, blur, isDarkMode) {
-    // 设置透明度
     if (isDarkMode) {
         element.style.backgroundColor = `rgba(16, 16, 16, ${opacity})`;
     } else {
         element.style.backgroundColor = `rgba(242, 242, 242, ${opacity})`;
     }
     
-    // 设置模糊效果
     element.style.backdropFilter = `blur(${blur})`;
-    element.style.webkitBackdropFilter = `blur(${blur})`; // 为了兼容Safari
+    element.style.webkitBackdropFilter = `blur(${blur})`;
 }
 
 function setElementsStyle(opacity, blur, isDarkMode) {
     if (window.location.pathname.includes('settings.html') || 
         window.location.href.includes('settings.html')) {
         return;
-    }//避免在设置页面设置表格颜色样式
-    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time');
+    }
+    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchInput');
 
     if (elements.length === 0) {
         return;

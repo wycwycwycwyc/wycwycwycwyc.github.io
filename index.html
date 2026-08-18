@@ -26,6 +26,7 @@
     <script src="/js/message.min.js"></script>
     <script src="/js/script14_setLanguage.js"></script><!-- 在页面底部引入，需要放在 SweetAlert2 之后 -->
     <script src="/js/script15_boardCast.js"></script>
+    <script src="/js/script16_soundSetting.js"></script>
 </head>
 
 <body>
@@ -43,7 +44,15 @@
     </div>
     <button id="darkModeToggle" class="custom-button ripple" data-en="ScriptHub">脚本存放站</button>
     <!-- 空的表格容器 -->
-    <div id="tables-container"></div>
+    <!-- 搜索框 -->
+<div id="searchBox">
+    <input type="text" id="searchInput" placeholder="搜索脚本..." data-en-placeholder="Search scripts...">
+</div>
+
+<div id="tables-container"></div>
+    
+    <!-- 搜索结果容器 -->
+    <div id="searchResults" style="display: none;"></div>
 
     <!-- 空的按钮容器 -->
     <div id="navigation-buttons"></div>
