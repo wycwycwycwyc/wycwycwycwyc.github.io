@@ -1014,7 +1014,7 @@ body {
 
 /* 表格本身限制高度，内部滚动 */
 table {
-  max-height: calc(100vh - 240px);
+  max-height: calc(100vh - 250px);
   /* 改这个值，原来是 500px */
   display: block;
   overflow-y: auto;
