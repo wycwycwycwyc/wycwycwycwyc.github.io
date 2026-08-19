@@ -1006,10 +1006,18 @@ body {
   height: 100%;
   /* 表格占满 wrapper */
 }
+/* 容器不滚动，高度自适应 */
 #tables-container {
-  max-height: calc(100vh - 250px);
-  overflow: hidden;
-  /* 不显示滚动条 */
+  max-height: none;
+  overflow: visible;
+}
+
+/* 表格本身限制高度，内部滚动 */
+table {
+  max-height: calc(100vh - 240px);
+  /* 改这个值，原来是 500px */
+  display: block;
+  overflow-y: auto;
 }
 #searchBox {
   position: relative;

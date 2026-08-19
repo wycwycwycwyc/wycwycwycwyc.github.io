@@ -1,0 +1,731 @@
+  /* ===== CSS变量 - 浅色模式（默认） ===== */
+  :root {
+    --bg-body: #f0f4f8;
+    --bg-container: #ffffff;
+    --bg-toolbar: #f8fafc;
+    --bg-hover: #fafbfc;
+    --bg-tab: #f0f4f8;
+    --bg-tab-hover: #e3e8ef;
+    --bg-tab-active: #e8edff;
+    --bg-summary: #f8fafc;
+    --bg-config: #f8fafc;
+    --bg-code: #f0f4f8;
+    --bg-input: #fafbfc;
+
+    --text-primary: #1a2332;
+    --text-secondary: #4a5a6e;
+    --text-muted: #6b7a8f;
+    --text-light: #9e9e9e;
+    --text-white: #ffffff;
+
+    --border-color: #e9edf2;
+    --border-light: #f0f4f8;
+    --border-input: #dce2ea;
+
+    --shadow-color: rgba(0, 0, 0, 0.06);
+
+    --cpk-excellent: #2e7d32;
+    --cpk-good: #e65100;
+    --cpk-poor: #c62828;
+    --cpk-na: #bdbdbd;
+
+    --badge-bg: #e8f5e9;
+    --badge-color: #2e7d32;
+
+    --btn-primary-bg: #4f7df3;
+    --btn-primary-hover: #3a66d9;
+    --btn-success-bg: #34a853;
+    --btn-success-hover: #2d9248;
+
+    --status-dot-excellent: #2e7d32;
+    --status-dot-good: #e65100;
+    --status-dot-poor: #c62828;
+    --status-dot-na: #bdbdbd;
+
+    --table-header-bg: #f8fafc;
+    --table-border: #e9edf2;
+
+    --spinner-color: #4f7df3;
+
+    --transition-speed: 0.3s;
+  }
+
+  /* ===== 深色模式（通过 .dark-mode 类适配） ===== */
+  .dark-mode {
+    --bg-body: #121212;
+    --bg-container: #1e1e1e;
+    --bg-toolbar: #2a2a2a;
+    --bg-hover: #2a2a2a;
+    --bg-tab: #2a2a2a;
+    --bg-tab-hover: #333333;
+    --bg-tab-active: #1a2a4a;
+    --bg-summary: #2a2a2a;
+    --bg-config: #2a2a2a;
+    --bg-code: #1a1a1a;
+    --bg-input: #1a1a1a;
+
+    --text-primary: #e8edf5;
+    --text-secondary: #b0b8c8;
+    --text-muted: #8a9aaa;
+    --text-light: #6a7a8a;
+    --text-white: #ffffff;
+
+    --border-color: #333333;
+    --border-light: #2a2a2a;
+    --border-input: #444444;
+
+    --shadow-color: rgba(0, 0, 0, 0.3);
+
+    --cpk-excellent: #66bb6a;
+    --cpk-good: #ffa726;
+    --cpk-poor: #ef5350;
+    --cpk-na: #666666;
+
+    --badge-bg: #1a3a1a;
+    --badge-color: #66bb6a;
+
+    --btn-primary-bg: #4f7df3;
+    --btn-primary-hover: #6a8ff5;
+    --btn-success-bg: #34a853;
+    --btn-success-hover: #4cbf6a;
+
+    --status-dot-excellent: #66bb6a;
+    --status-dot-good: #ffa726;
+    --status-dot-poor: #ef5350;
+    --status-dot-na: #666666;
+
+    --table-header-bg: #2a2a2a;
+    --table-border: #333333;
+
+    --spinner-color: #6a8ff5;
+  }
+
+  /* ===== 全局样式 ===== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease,
+      box-shadow var(--transition-speed) ease;
+  }
+
+  body {
+    font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-body);
+    padding: 20px;
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  }
+
+  /* ===== 进入动画 ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: var(--bg-container);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 2px 12px var(--shadow-color);
+    animation: fadeInUp 0.6s ease forwards;
+    border: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease,
+      box-shadow var(--transition-speed) ease;
+  }
+
+  /* ===== 操作动画（行进入） ===== */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .table-wrapper tbody tr {
+    animation: slideIn 0.3s ease forwards;
+    opacity: 0;
+  }
+
+  .table-wrapper tbody tr:nth-child(1) {
+    animation-delay: 0.02s;
+  }
+
+  .table-wrapper tbody tr:nth-child(2) {
+    animation-delay: 0.04s;
+  }
+
+  .table-wrapper tbody tr:nth-child(3) {
+    animation-delay: 0.06s;
+  }
+
+  .table-wrapper tbody tr:nth-child(4) {
+    animation-delay: 0.08s;
+  }
+
+  .table-wrapper tbody tr:nth-child(5) {
+    animation-delay: 0.10s;
+  }
+
+  .table-wrapper tbody tr:nth-child(6) {
+    animation-delay: 0.12s;
+  }
+
+  .table-wrapper tbody tr:nth-child(7) {
+    animation-delay: 0.14s;
+  }
+
+  .table-wrapper tbody tr:nth-child(8) {
+    animation-delay: 0.16s;
+  }
+
+  .table-wrapper tbody tr:nth-child(9) {
+    animation-delay: 0.18s;
+  }
+
+  .table-wrapper tbody tr:nth-child(10) {
+    animation-delay: 0.20s;
+  }
+
+  .table-wrapper tbody tr:nth-child(11) {
+    animation-delay: 0.22s;
+  }
+
+  .table-wrapper tbody tr:nth-child(12) {
+    animation-delay: 0.24s;
+  }
+
+  .table-wrapper tbody tr:nth-child(13) {
+    animation-delay: 0.26s;
+  }
+
+  .table-wrapper tbody tr:nth-child(14) {
+    animation-delay: 0.28s;
+  }
+
+  .table-wrapper tbody tr:nth-child(15) {
+    animation-delay: 0.30s;
+  }
+
+  .table-wrapper tbody tr:nth-child(16) {
+    animation-delay: 0.32s;
+  }
+
+  .table-wrapper tbody tr:nth-child(17) {
+    animation-delay: 0.34s;
+  }
+
+  .table-wrapper tbody tr:nth-child(18) {
+    animation-delay: 0.36s;
+  }
+
+  .table-wrapper tbody tr:nth-child(19) {
+    animation-delay: 0.38s;
+  }
+
+  .table-wrapper tbody tr:nth-child(20) {
+    animation-delay: 0.40s;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    transition: color var(--transition-speed) ease;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: color var(--transition-speed) ease;
+  }
+
+  .badge {
+    background: var(--badge-bg);
+    color: var(--badge-color);
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  }
+
+  /* ===== 配置区域 ===== */
+  .config-section {
+    background: var(--bg-config);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  }
+
+  .config-section summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color var(--transition-speed) ease;
+  }
+
+  .config-section pre {
+    background: var(--bg-code);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 11px;
+    margin-top: 8px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text-secondary);
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  }
+
+  .config-edit-area textarea {
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    padding: 8px;
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    resize: vertical;
+    min-height: 120px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    width: 100%;
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease;
+  }
+
+  .config-edit-area textarea:focus {
+    outline: none;
+    border-color: var(--btn-primary-bg);
+  }
+
+  .config-edit-area .btn-sm {
+    padding: 4px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--btn-primary-bg);
+    color: var(--text-white);
+    width: fit-content;
+    transition: background-color var(--transition-speed) ease;
+  }
+
+  .config-edit-area .btn-sm:hover {
+    background: var(--btn-primary-hover);
+  }
+
+  /* ===== 工具栏 ===== */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-bottom: 16px;
+    align-items: center;
+    background: var(--bg-toolbar);
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  }
+
+  .toolbar label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color var(--transition-speed) ease;
+  }
+
+  .toolbar select {
+    padding: 5px 10px;
+    border: 1.5px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--bg-container);
+    color: var(--text-primary);
+    outline: none;
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease;
+  }
+
+  .toolbar select:focus {
+    border-color: var(--btn-primary-bg);
+  }
+
+  /* ===== 按钮 ===== */
+  .btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    color: var(--text-white);
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  .btn-primary {
+    background: var(--btn-primary-bg);
+  }
+
+  .btn-primary:hover {
+    background: var(--btn-primary-hover);
+    box-shadow: 0 2px 8px rgba(79, 125, 243, 0.3);
+  }
+
+  .btn-success {
+    background: var(--btn-success-bg);
+  }
+
+  .btn-success:hover {
+    background: var(--btn-success-hover);
+    box-shadow: 0 2px 8px rgba(52, 168, 83, 0.3);
+  }
+
+  /* ===== 统计摘要 ===== */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .summary-card {
+    background: var(--bg-summary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: background-color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease;
+  }
+
+  .summary-card .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: color var(--transition-speed) ease;
+  }
+
+  .summary-card .value {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 2px;
+    color: var(--text-primary);
+    transition: color var(--transition-speed) ease;
+  }
+
+  /* ===== 表格 ===== */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-height: 580px;
+    overflow-y: auto;
+    transition: border-color var(--transition-speed) ease;
+  }
+
+  .table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-body);
+    border-radius: 4px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-input);
+    border-radius: 4px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 700px;
+  }
+
+  thead {
+    background: var(--table-header-bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    transition: background-color var(--transition-speed) ease;
+  }
+
+  th {
+    padding: 10px 12px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--table-border);
+    white-space: nowrap;
+    font-size: 12px;
+    background: var(--table-header-bg);
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease;
+  }
+
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: center;
+    color: var(--text-primary);
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease;
+  }
+
+  tr:hover td {
+    background: var(--bg-hover);
+  }
+
+  .col-model {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .cpk-value {
+    font-weight: 600;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+  }
+
+  .cpk-excellent {
+    color: var(--cpk-excellent);
+  }
+
+  .cpk-good {
+    color: var(--cpk-good);
+  }
+
+  .cpk-poor {
+    color: var(--cpk-poor);
+  }
+
+  .cpk-na {
+    color: var(--cpk-na);
+  }
+
+  /* ===== 状态点 ===== */
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    transition: background-color var(--transition-speed) ease;
+  }
+
+  .status-dot.excellent {
+    background: var(--status-dot-excellent);
+  }
+
+  .status-dot.good {
+    background: var(--status-dot-good);
+  }
+
+  .status-dot.poor {
+    background: var(--status-dot-poor);
+  }
+
+  .status-dot.na {
+    background: var(--status-dot-na);
+  }
+
+  /* ===== 空状态 ===== */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+    transition: color var(--transition-speed) ease;
+  }
+
+  .empty-state .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  /* ===== Loading ===== */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .loading.active {
+    display: block;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--spinner-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    transition: border-color var(--transition-speed) ease;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: border-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  }
+
+  .footer .hint {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .footer .hint span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  /* ===== 维度Tab ===== */
+  .dimension-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .dimension-tabs .tab {
+    padding: 5px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: var(--bg-tab);
+    color: var(--text-secondary);
+    transition: background-color var(--transition-speed) ease,
+      color var(--transition-speed) ease,
+      border-color var(--transition-speed) ease,
+      transform 0.2s ease;
+  }
+
+  .dimension-tabs .tab:hover {
+    background: var(--bg-tab-hover);
+    transform: translateY(-1px);
+  }
+
+  .dimension-tabs .tab:active {
+    transform: scale(0.96);
+  }
+
+  .dimension-tabs .tab.active {
+    border-color: var(--btn-primary-bg);
+    background: var(--bg-tab-active);
+    color: var(--text-primary);
+  }
+
+  .dimension-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-right: 8px;
+    transition: color var(--transition-speed) ease;
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+
+    .container {
+      padding: 14px;
+    }
+
+    h1 {
+      font-size: 18px;
+    }
+
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .summary {
+      grid-template-columns: 1fr 1fr;
+    }
+  }

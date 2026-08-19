@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-en="Four-Wheel Alignment Cpk">四轮定位Cpk</title>
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <script src="/js/script7_setOpacityandBlur.js"></script>
+  <script src="/js/script8_setEyeCare.js"></script>
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <script src="/js/script11_setHighlight.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="/js/script14_setLanguage.js"></script>
+  <title data-en="Four-Wheel Alignment Cpk">四轮定位cpk</title>
+  </script>
+</head>
+
+<body>
+<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+  data-en="Back">返回</button>
+  <div class="container">
+    <div class="header">
+      <h1 data-en="Four-Wheel Alignment Cpk Calculator">四轮定位 Cpk 计算</h1>
+      <div class="header-right">
+        <span class="badge" data-en="P Qualified Data Only">仅 P 合格数据</span>
+        <span id="dataStatus" style="color:var(--text-muted);" data-en="Not loaded">未加载</span>
+      </div>
+    </div>
+    <div class="subtitle"
+      data-en="Group by model, time, inspection line · Each model uses its own specification limits">
+      按车型、时间、检测线号分组 · 每个车型使用各自规格上下限
+    </div>
+
+    <!-- 配置 -->
+    <details class="config-section">
+      <summary data-en="Current Configuration (click to expand/collapse)">当前配置（点击展开/收起）</summary>
+      <div style="margin-top:8px;font-size:12px;">
+        <div><strong data-en="VIN Mapping (position 11-12 → model):">VIN映射表（第11-12位 → 车型）：</strong></div>
+        <div id="vinMapDisplay"
+          style="background:var(--bg-code);padding:6px 10px;border-radius:4px;margin:4px 0 8px 0;font-family:Consolas,monospace;font-size:12px;color:var(--text-secondary);">
+        </div>
+        <div><strong data-en="Specification Table (model → parameter: [LSL, USL]):">规格表（车型 → 项目: [下限, 上限]）：</strong>
+        </div>
+        <div id="specsDisplay"
+          style="background:var(--bg-code);padding:6px 10px;border-radius:4px;margin:4px 0 8px 0;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;color:var(--text-secondary);">
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-muted);"
+          data-en="Tip: Modify the JSON below and click 'Apply Config' to take effect immediately, no need to reload data.">
+          提示：修改下方JSON后点击「应用配置」即可生效，无需重新加载数据。
+        </div>
+        <div class="config-edit-area">
+          <label style="font-weight:600;font-size:12px;color:var(--text-secondary);"
+            data-en="Edit Configuration (JSON format):">编辑配置 (JSON格式):</label>
+          <textarea id="configEditor"></textarea>
+          <button class="btn-sm" id="applyConfigBtn" data-en="Apply Config">应用配置</button>
+        </div>
+      </div>
+    </details>
+
+    <!-- 维度切换 -->
+    <div class="dimension-tabs">
+      <span class="dimension-label" data-en="Time Dimension:">时间维度：</span>
+      <span class="tab active" data-dim="日" data-en="Day">日</span>
+      <span class="tab" data-dim="周" data-en="Week">周</span>
+      <span class="tab" data-dim="月" data-en="Month">月</span>
+      <span class="tab" data-dim="年" data-en="Year">年</span>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <label data-en="Model">车型 <select id="modelSelect">
+          <option value="all" data-en="All">全部</option>
+        </select></label>
+      <label data-en="Inspection Line">检测线号 <select id="lineFilter">
+          <option value="all" data-en="All">全部</option>
+        </select></label>
+      <button class="btn btn-primary" id="loadBtn" data-en="Load Excel">加载 Excel</button>
+      <button class="btn btn-success" id="exportBtn" data-en="Export All Data">导出全部数据</button>
+    </div>
+
+    <!-- 统计摘要 -->
+    <div class="summary">
+      <div class="summary-card">
+        <div class="label" data-en="Total Records">总记录</div>
+        <div class="value" id="totalRecords">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="Models">车型数</div>
+        <div class="value" id="totalModels">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="≥1.33">≥1.33</div>
+        <div class="value" id="cpkExcellent" style="color:var(--cpk-excellent);">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="1.0~1.33">1.0~1.33</div>
+        <div class="value" id="cpkGood" style="color:var(--cpk-good);">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="&lt;1.0">&lt;1.0</div>
+        <div class="value" id="cpkPoor" style="color:var(--cpk-poor);">-</div>
+      </div>
+    </div>
+
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <p style="margin-top:8px;color:var(--text-muted);" data-en="Calculating...">计算中...</p>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-wrapper" id="tableWrapper">
+      <div class="empty-state">
+        <div class="icon">📂</div>
+        <p style="font-size:16px;font-weight:500;" data-en="Please load data">请加载数据</p>
+        <p style="font-size:13px;color:var(--text-light);"
+          data-en="Click 'Load Excel' to select the vehicle inspection record file">
+          点击「加载 Excel」选择车辆检测记录文件
+        </p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="hint">
+        <span><span class="status-dot excellent"></span><span data-en="≥1.33 Adequate">≥1.33 充足</span></span>
+        <span><span class="status-dot good"></span><span data-en="1.0~1.33 Critical">1.0~1.33 临界</span></span>
+        <span><span class="status-dot poor"></span><span data-en="&lt;1.0 Insufficient">&lt;1.0 不足</span></span>
+        <span style="color:var(--cpk-na);"><span data-en="Insufficient Data">数据不足</span></span>
+      </div>
+      <div id="rowCount" style="font-size:12px;color:var(--text-muted);" data-en="Showing 0 rows">显示 0 行</div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+<script src="FourWheelAlignmentCpk.js"></script>
+</html>

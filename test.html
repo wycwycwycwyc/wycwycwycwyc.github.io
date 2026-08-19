@@ -2,1530 +2,1459 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/styles_button.css">
-    <link rel="stylesheet" href="/css/styles3_animation.css">
-    <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-    <link rel="stylesheet" href="/css/styles5_brightness.css">
-    <link rel="stylesheet" href="/css/styles6_glow.css">
-    <script src="/js/script3_darkMode.js"></script>
-    <script src="/js/script4_goBackOrHome.js"></script>
-    <script src="/js/script5_setAnimations.js"></script>
-    <script src="/js/script6_setFontSize.js"></script>
-    <script src="/js/script7_setOpacityandBlur.js"></script>
-    <script src="/js/script8_setEyeCare.js"></script>
-    <script src="/js/script9_setbrightness.js"></script>
-    <script src="/js/script10_setGlow.js"></script>
-    <script src="/js/script11_setHighlight.js"></script>
-    <script src="/js/script13_checkIslogin.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-    <link href="/css/message.min.css" rel="stylesheet" />
-    <script src="/js/message.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
-    <script src="/js/script14_setLanguage.js"></script>
-    <title>视频帧提取器</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
-    </script>
-  <title>音频剪辑器</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-en="Four-Wheel Alignment Cpk">四轮定位Cpk</title>
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <link rel="stylesheet" href="/css/styles3_animation.css">
+  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
+  <link rel="stylesheet" href="/css/styles5_brightness.css">
+  <link rel="stylesheet" href="/css/styles6_glow.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script5_setAnimations.js"></script>
+  <script src="/js/script6_setFontSize.js"></script>
+  <script src="/js/script7_setOpacityandBlur.js"></script>
+  <script src="/js/script8_setEyeCare.js"></script>
+  <script src="/js/script9_setbrightness.js"></script>
+  <script src="/js/script10_setGlow.js"></script>
+  <script src="/js/script11_setHighlight.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <script src="/js/script14_setLanguage.js"></script>
+  <title data-en="Four-Wheel Alignment Cpk">四轮定位cpk</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
+  </script>
   <style>
-    /* ===== CSS 变量（浅色默认） ===== */
+    /* ===== CSS变量 - 浅色模式（默认） ===== */
     :root {
-      --bg-body: #f0f2f5;
-      --bg-app: #ffffff;
-      --bg-control: #f8f9fa;
-      --bg-wave: #f1f5f9;
-      --bg-log: #f8f9fa;
-      --text-primary: #1a1a2e;
-      --text-secondary: #4b5563;
-      --text-muted: #6b7280;
-      --border-color: #d1d5db;
-      --border-light: #e5e7eb;
-      --shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --playhead-color: #ef4444;
-      --sel-bg: rgba(99, 102, 241, 0.18);
-      --sel-border: #6366f1;
-      --del-bg: rgba(239, 68, 68, 0.18);
-      --del-border: #ef4444;
-      --chip-bg: #f1f3f5;
-      --chip-active: #eef2ff;
-      --chip-border-active: #6366f1;
-      --log-info: #6366f1;
-      --log-ok: #16a34a;
-      --log-err: #dc2626;
-      --log-warn: #f59e0b;
+      --bg-body: #f0f4f8;
+      --bg-container: #ffffff;
+      --bg-toolbar: #f8fafc;
+      --bg-hover: #fafbfc;
+      --bg-tab: #f0f4f8;
+      --bg-tab-hover: #e3e8ef;
+      --bg-tab-active: #e8edff;
+      --bg-summary: #f8fafc;
+      --bg-config: #f8fafc;
+      --bg-code: #f0f4f8;
+      --bg-input: #fafbfc;
+
+      --text-primary: #1a2332;
+      --text-secondary: #4a5a6e;
+      --text-muted: #6b7a8f;
+      --text-light: #9e9e9e;
+      --text-white: #ffffff;
+
+      --border-color: #e9edf2;
+      --border-light: #f0f4f8;
+      --border-input: #dce2ea;
+
+      --shadow-color: rgba(0, 0, 0, 0.06);
+
+      --cpk-excellent: #2e7d32;
+      --cpk-good: #e65100;
+      --cpk-poor: #c62828;
+      --cpk-na: #bdbdbd;
+
+      --badge-bg: #e8f5e9;
+      --badge-color: #2e7d32;
+
+      --btn-primary-bg: #4f7df3;
+      --btn-primary-hover: #3a66d9;
+      --btn-success-bg: #34a853;
+      --btn-success-hover: #2d9248;
+
+      --status-dot-excellent: #2e7d32;
+      --status-dot-good: #e65100;
+      --status-dot-poor: #c62828;
+      --status-dot-na: #bdbdbd;
+
+      --table-header-bg: #f8fafc;
+      --table-border: #e9edf2;
+
+      --spinner-color: #4f7df3;
+
+      --transition-speed: 0.3s;
     }
 
-    /* ===== 深色模式（外部添加 body.dark-mode） ===== */
-    body.dark-mode {
-      --bg-body: #0c0f15;
-      --bg-app: #141b26;
-      --bg-control: #0a0e14;
-      --bg-wave: #0a0e14;
-      --bg-log: #0a0e14;
-      --text-primary: #eef2f8;
-      --text-secondary: #94a3b8;
-      --text-muted: #6a7e9e;
-      --border-color: #28303f;
-      --border-light: #1f2937;
-      --shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-      --accent: #3b82f6;
-      --accent-hover: #60a5fa;
-      --chip-bg: #1f2937;
-      --chip-active: #1e3a5f;
-      --chip-border-active: #3b82f6;
-      --log-info: #60a5fa;
-      --log-ok: #4ade80;
-      --log-err: #f87171;
-      --log-warn: #fbbf24;
-      --sel-bg: rgba(59, 130, 246, 0.2);
-      --sel-border: #3b82f6;
-      --del-bg: rgba(248, 113, 113, 0.15);
-      --del-border: #f87171;
-      --playhead-color: #f87171;
+    /* ===== 深色模式（通过 .dark-mode 类适配） ===== */
+    .dark-mode {
+      --bg-body: #121212;
+      --bg-container: #1e1e1e;
+      --bg-toolbar: #2a2a2a;
+      --bg-hover: #2a2a2a;
+      --bg-tab: #2a2a2a;
+      --bg-tab-hover: #333333;
+      --bg-tab-active: #1a2a4a;
+      --bg-summary: #2a2a2a;
+      --bg-config: #2a2a2a;
+      --bg-code: #1a1a1a;
+      --bg-input: #1a1a1a;
+
+      --text-primary: #e8edf5;
+      --text-secondary: #b0b8c8;
+      --text-muted: #8a9aaa;
+      --text-light: #6a7a8a;
+      --text-white: #ffffff;
+
+      --border-color: #333333;
+      --border-light: #2a2a2a;
+      --border-input: #444444;
+
+      --shadow-color: rgba(0, 0, 0, 0.3);
+
+      --cpk-excellent: #66bb6a;
+      --cpk-good: #ffa726;
+      --cpk-poor: #ef5350;
+      --cpk-na: #666666;
+
+      --badge-bg: #1a3a1a;
+      --badge-color: #66bb6a;
+
+      --btn-primary-bg: #4f7df3;
+      --btn-primary-hover: #6a8ff5;
+      --btn-success-bg: #34a853;
+      --btn-success-hover: #4cbf6a;
+
+      --status-dot-excellent: #66bb6a;
+      --status-dot-good: #ffa726;
+      --status-dot-poor: #ef5350;
+      --status-dot-na: #666666;
+
+      --table-header-bg: #2a2a2a;
+      --table-border: #333333;
+
+      --spinner-color: #6a8ff5;
     }
 
-    /* ===== 通用样式 ===== */
+    /* ===== 全局样式 ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease;
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
       background: var(--bg-body);
+      padding: 20px;
       color: var(--text-primary);
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      transition: background 0.3s, color 0.3s;
+      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
     }
 
-    .app {
-      max-width: 960px;
-      width: 100%;
-      background: var(--bg-app);
-      border-radius: 20px;
-      padding: 30px 32px;
-      box-shadow: var(--shadow);
-      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
+    /* ===== 进入动画 ===== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: var(--bg-container);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 12px var(--shadow-color);
+      animation: fadeInUp 0.6s ease forwards;
+      border: 1px solid var(--border-color);
+      transition: background-color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease;
+    }
+
+    /* ===== 操作动画（行进入） ===== */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .table-wrapper tbody tr {
+      animation: slideIn 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .table-wrapper tbody tr:nth-child(1) {
+      animation-delay: 0.02s;
+    }
+
+    .table-wrapper tbody tr:nth-child(2) {
+      animation-delay: 0.04s;
+    }
+
+    .table-wrapper tbody tr:nth-child(3) {
+      animation-delay: 0.06s;
+    }
+
+    .table-wrapper tbody tr:nth-child(4) {
+      animation-delay: 0.08s;
+    }
+
+    .table-wrapper tbody tr:nth-child(5) {
+      animation-delay: 0.10s;
+    }
+
+    .table-wrapper tbody tr:nth-child(6) {
+      animation-delay: 0.12s;
+    }
+
+    .table-wrapper tbody tr:nth-child(7) {
+      animation-delay: 0.14s;
+    }
+
+    .table-wrapper tbody tr:nth-child(8) {
+      animation-delay: 0.16s;
+    }
+
+    .table-wrapper tbody tr:nth-child(9) {
+      animation-delay: 0.18s;
+    }
+
+    .table-wrapper tbody tr:nth-child(10) {
+      animation-delay: 0.20s;
+    }
+
+    .table-wrapper tbody tr:nth-child(11) {
+      animation-delay: 0.22s;
+    }
+
+    .table-wrapper tbody tr:nth-child(12) {
+      animation-delay: 0.24s;
+    }
+
+    .table-wrapper tbody tr:nth-child(13) {
+      animation-delay: 0.26s;
+    }
+
+    .table-wrapper tbody tr:nth-child(14) {
+      animation-delay: 0.28s;
+    }
+
+    .table-wrapper tbody tr:nth-child(15) {
+      animation-delay: 0.30s;
+    }
+
+    .table-wrapper tbody tr:nth-child(16) {
+      animation-delay: 0.32s;
+    }
+
+    .table-wrapper tbody tr:nth-child(17) {
+      animation-delay: 0.34s;
+    }
+
+    .table-wrapper tbody tr:nth-child(18) {
+      animation-delay: 0.36s;
+    }
+
+    .table-wrapper tbody tr:nth-child(19) {
+      animation-delay: 0.38s;
+    }
+
+    .table-wrapper tbody tr:nth-child(20) {
+      animation-delay: 0.40s;
+    }
+
+    /* ===== Header ===== */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 12px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text-primary);
-    }
-
-    .header .status {
-      font-size: 14px;
-      color: var(--text-muted);
-      background: var(--bg-control);
-      padding: 6px 16px;
-      border-radius: 40px;
-    }
-
-    .back-btn {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--text-secondary);
-      transition: background 0.2s;
-    }
-
-    .back-btn:hover {
-      background: var(--chip-bg);
-    }
-
-    .dropzone {
-      border: 2px dashed var(--border-color);
-      border-radius: 16px;
-      padding: 32px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.25s, background 0.25s;
-      margin-bottom: 18px;
-    }
-
-    .dropzone:hover {
-      border-color: var(--accent);
-      background: var(--bg-control);
-    }
-
-    .dropzone .icon {
-      font-size: 36px;
-      display: block;
       margin-bottom: 6px;
     }
 
-    .dropzone p {
-      color: var(--text-secondary);
-      font-size: 15px;
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      transition: color var(--transition-speed) ease;
     }
 
-    .dropzone input[type="file"] {
-      display: none;
-    }
-
-    .file-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .file-chip {
-      background: var(--chip-bg);
-      padding: 6px 14px 6px 18px;
-      border-radius: 40px;
-      font-size: 13px;
+    .header-right {
       display: flex;
       align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.2s, background 0.2s;
-      color: var(--text-primary);
-    }
-
-    .file-chip.active {
-      border-color: var(--chip-border-active);
-      background: var(--chip-active);
-    }
-
-    .file-chip .remove {
-      font-weight: 700;
+      gap: 16px;
+      font-size: 13px;
       color: var(--text-muted);
+      transition: color var(--transition-speed) ease;
+    }
+
+    .badge {
+      background: var(--badge-bg);
+      color: var(--badge-color);
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 16px;
+      transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    /* ===== 配置区域 ===== */
+    .config-section {
+      background: var(--bg-config);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    .config-section summary {
       cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color var(--transition-speed) ease;
     }
 
-    .file-chip .remove:hover {
-      color: var(--danger);
+    .config-section pre {
+      background: var(--bg-code);
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 11px;
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-secondary);
+      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
     }
 
-    .controls {
+    .config-edit-area textarea {
+      font-family: 'Consolas', monospace;
+      font-size: 12px;
+      padding: 8px;
+      border: 1px solid var(--border-input);
+      border-radius: 6px;
+      resize: vertical;
+      min-height: 120px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      width: 100%;
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease;
+    }
+
+    .config-edit-area textarea:focus {
+      outline: none;
+      border-color: var(--btn-primary-bg);
+    }
+
+    .config-edit-area .btn-sm {
+      padding: 4px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: var(--btn-primary-bg);
+      color: var(--text-white);
+      width: fit-content;
+      transition: background-color var(--transition-speed) ease;
+    }
+
+    .config-edit-area .btn-sm:hover {
+      background: var(--btn-primary-hover);
+    }
+
+    /* ===== 工具栏 ===== */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-bottom: 16px;
+      align-items: center;
+      background: var(--bg-toolbar);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    .toolbar label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color var(--transition-speed) ease;
+    }
+
+    .toolbar select {
+      padding: 5px 10px;
+      border: 1.5px solid var(--border-input);
+      border-radius: 6px;
+      font-size: 13px;
+      background: var(--bg-container);
+      color: var(--text-primary);
+      outline: none;
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease;
+    }
+
+    .toolbar select:focus {
+      border-color: var(--btn-primary-bg);
+    }
+
+    /* ===== 按钮 ===== */
+    .btn {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition-speed) ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+      color: var(--text-white);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+      box-shadow: 0 2px 8px rgba(79, 125, 243, 0.3);
+    }
+
+    .btn-success {
+      background: var(--btn-success-bg);
+    }
+
+    .btn-success:hover {
+      background: var(--btn-success-hover);
+      box-shadow: 0 2px 8px rgba(52, 168, 83, 0.3);
+    }
+
+    /* ===== 统计摘要 ===== */
+    .summary {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
       margin-bottom: 16px;
     }
 
-    @media (max-width: 600px) {
-      .controls {
-        grid-template-columns: 1fr;
+    .summary-card {
+      background: var(--bg-summary);
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      transition: background-color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease;
+    }
+
+    .summary-card .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: color var(--transition-speed) ease;
+    }
+
+    .summary-card .value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 2px;
+      color: var(--text-primary);
+      transition: color var(--transition-speed) ease;
+    }
+
+    /* ===== 表格 ===== */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      max-height: 580px;
+      overflow-y: auto;
+      transition: border-color var(--transition-speed) ease;
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: var(--bg-body);
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: var(--border-input);
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 700px;
+    }
+
+    thead {
+      background: var(--table-header-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      transition: background-color var(--transition-speed) ease;
+    }
+
+    th {
+      padding: 10px 12px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--table-border);
+      white-space: nowrap;
+      font-size: 12px;
+      background: var(--table-header-bg);
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease;
+    }
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-light);
+      text-align: center;
+      color: var(--text-primary);
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease;
+    }
+
+    tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .col-model {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .cpk-value {
+      font-weight: 600;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+    }
+
+    .cpk-excellent {
+      color: var(--cpk-excellent);
+    }
+
+    .cpk-good {
+      color: var(--cpk-good);
+    }
+
+    .cpk-poor {
+      color: var(--cpk-poor);
+    }
+
+    .cpk-na {
+      color: var(--cpk-na);
+    }
+
+    /* ===== 状态点 ===== */
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+      transition: background-color var(--transition-speed) ease;
+    }
+
+    .status-dot.excellent {
+      background: var(--status-dot-excellent);
+    }
+
+    .status-dot.good {
+      background: var(--status-dot-good);
+    }
+
+    .status-dot.poor {
+      background: var(--status-dot-poor);
+    }
+
+    .status-dot.na {
+      background: var(--status-dot-na);
+    }
+
+    /* ===== 空状态 ===== */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+      transition: color var(--transition-speed) ease;
+    }
+
+    .empty-state .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    /* ===== Loading ===== */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--spinner-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      transition: border-color var(--transition-speed) ease;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
 
-    .control-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-control);
-      padding: 8px 14px;
-      border-radius: 12px;
-      flex-wrap: wrap;
-    }
-
-    .control-item label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      min-width: 36px;
-    }
-
-    .control-item input[type="range"] {
-      flex: 1;
-      min-width: 60px;
-      accent-color: var(--accent);
-    }
-
-    .control-item .val {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      min-width: 40px;
-      text-align: center;
-    }
-
-    /* 波形图区域 */
-    .wave-area {
-      position: relative;
-      width: 100%;
-      height: 160px;
-      background: var(--bg-wave);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      cursor: pointer;
-      user-select: none;
-      border: 1px solid var(--border-light);
-      transition: background 0.3s, border-color 0.3s;
-    }
-
-    .wave-area canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: var(--bg-wave);
-      /* 直接设置背景色 */
-    }
-
-    .playhead {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 2px;
-      background: var(--playhead-color);
-      pointer-events: none;
-      z-index: 10;
-      display: none;
-    }
-
-    .playhead::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: -5px;
-      width: 12px;
-      height: 12px;
-      background: var(--playhead-color);
-      border-radius: 50%;
-    }
-
-    .sel-overlay {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      pointer-events: none;
-      display: none;
-      background: var(--sel-bg);
-      border-left: 2px solid var(--sel-border);
-      border-right: 2px solid var(--sel-border);
-    }
-
-    .sel-overlay.show {
-      display: block;
-    }
-
-    .sel-overlay .hdl {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 4px;
-      color: #fff;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: auto;
-      cursor: ew-resize;
-    }
-
-    .sel-overlay .hdl-l {
-      left: -9px;
-    }
-
-    .sel-overlay .hdl-r {
-      right: -9px;
-    }
-
-    .del-left,
-    .del-right {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      background: var(--del-bg);
-      pointer-events: none;
-    }
-
-    .del-left {
-      border-right: 2px solid var(--del-border);
-    }
-
-    .del-right {
-      border-left: 2px solid var(--del-border);
-    }
-
-    .sel-info {
+    /* ===== Footer ===== */
+    .footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
       flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .sel-info .keep {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .sel-info .del {
-      color: var(--danger);
-      font-weight: 600;
-    }
-
-    .sel-info .actions button {
-      padding: 4px 14px;
-      border: none;
-      border-radius: 8px;
+      gap: 8px;
       font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
+      color: var(--text-muted);
+      transition: border-color var(--transition-speed) ease, color var(--transition-speed) ease;
     }
 
-    .sel-info .actions .btn-keep {
-      background: var(--accent);
-      color: #fff;
+    .footer .hint {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
-    .sel-info .actions .btn-keep:hover {
-      background: var(--accent-hover);
-    }
-
-    .sel-info .actions .btn-cut {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .sel-info .actions .btn-cut:hover {
-      background: var(--danger-hover);
-    }
-
-    .timeline {
+    .footer .hint span {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 4px;
+      font-size: 12px;
     }
 
-    .timeline input[type="range"] {
-      flex: 1;
-      accent-color: var(--accent);
-    }
-
-    .timeline .t {
-      font-size: 13px;
-      color: var(--text-secondary);
-      min-width: 64px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .play-group {
+    /* ===== 维度Tab ===== */
+    .dimension-tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 16px;
+      gap: 4px;
+      margin-bottom: 12px;
     }
 
-    .play-group button {
-      padding: 6px 18px;
-      border: none;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
+    .dimension-tabs .tab {
+      padding: 5px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, transform 0.12s;
-      background: var(--chip-bg);
+      border: 2px solid transparent;
+      background: var(--bg-tab);
+      color: var(--text-secondary);
+      transition: background-color var(--transition-speed) ease,
+        color var(--transition-speed) ease,
+        border-color var(--transition-speed) ease,
+        transform 0.2s ease;
+    }
+
+    .dimension-tabs .tab:hover {
+      background: var(--bg-tab-hover);
+      transform: translateY(-1px);
+    }
+
+    .dimension-tabs .tab:active {
+      transform: scale(0.96);
+    }
+
+    .dimension-tabs .tab.active {
+      border-color: var(--btn-primary-bg);
+      background: var(--bg-tab-active);
       color: var(--text-primary);
     }
 
-    .play-group button:hover {
-      background: var(--border-light);
-    }
-
-    .play-group button:active {
-      transform: scale(0.95);
-    }
-
-    .play-group .primary {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .play-group .primary:hover {
-      background: var(--accent-hover);
-    }
-
-    .convert-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .convert-row button {
-      padding: 6px 20px;
-      border: none;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--accent);
-      color: #fff;
-      transition: background 0.2s;
-    }
-
-    .convert-row button:hover {
-      background: var(--accent-hover);
-    }
-
-    .convert-row span {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .log {
-      background: var(--bg-log);
-      border-radius: 10px;
-      padding: 6px 14px;
-      max-height: 48px;
-      overflow-y: auto;
+    .dimension-label {
       font-size: 12px;
-      font-family: 'SF Mono', monospace;
-      color: var(--text-secondary);
-      margin-top: 6px;
-      border: 1px solid var(--border-light);
-      transition: background 0.3s, border-color 0.3s, color 0.3s;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-right: 8px;
+      transition: color var(--transition-speed) ease;
     }
 
-    .log .info {
-      color: var(--log-info);
-    }
+    /* ===== 响应式 ===== */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
 
-    .log .ok {
-      color: var(--log-ok);
-    }
+      .container {
+        padding: 14px;
+      }
 
-    .log .err {
-      color: var(--log-err);
-    }
+      h1 {
+        font-size: 18px;
+      }
 
-    .log .warn {
-      color: var(--log-warn);
-    }
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
 
-    .log::-webkit-scrollbar {
-      height: 3px;
-      width: 3px;
-    }
-
-    .log::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 6px;
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="app" id="app">
-    <!-- 头部 -->
+  <div class="container">
     <div class="header">
-      <div class="header-left">
-        <button class="back-btn" onclick="goBackOrHome()" data-en="Back">← 返回</button>
-        <h1 data-en="Audio Editor">音频剪辑器</h1>
-      </div>
-      <span class="status" id="statusLabel" data-en="Ready">就绪</span>
-    </div>
-
-    <!-- 上传 -->
-    <div class="dropzone" id="dropzone">
-      <span class="icon">🎧</span>
-      <p data-en="Click or drag to upload audio files">点击或拖拽上传音频文件</p>
-      <p style="font-size:12px;color:var(--text-muted);" data-en="Supports MP3, WAV, FLAC, AAC, OGG etc.">支持 MP3, WAV,
-        FLAC, AAC, OGG 等</p>
-      <input type="file" id="fileInput" accept="audio/*" multiple />
-    </div>
-
-    <!-- 文件列表 -->
-    <div class="file-bar" id="fileBar"></div>
-
-    <!-- 控制 -->
-    <div class="controls">
-      <div class="control-item">
-        <label data-en="Volume">音量</label>
-        <input type="range" id="volSlider" min="0" max="400" value="100" />
-        <span class="val" id="volVal">100%</span>
-      </div>
-      <div class="control-item">
-        <label data-en="Speed">速度</label>
-        <input type="range" id="spdSlider" min="25" max="300" value="100" />
-        <span class="val" id="spdVal">1.0x</span>
+      <h1 data-en="Four-Wheel Alignment Cpk Calculator">四轮定位 Cpk 计算</h1>
+      <div class="header-right">
+        <span class="badge" data-en="P Qualified Data Only">仅 P 合格数据</span>
+        <span id="dataStatus" style="color:var(--text-muted);" data-en="Not loaded">未加载</span>
       </div>
     </div>
+    <div class="subtitle"
+      data-en="Group by model, time, inspection line · Each model uses its own specification limits">
+      按车型、时间、检测线号分组 · 每个车型使用各自规格上下限
+    </div>
 
-    <!-- 波形 -->
-    <div class="wave-area" id="waveArea">
-      <canvas id="waveCanvas"></canvas>
-      <div class="playhead" id="playhead"></div>
-      <div class="sel-overlay" id="selOverlay">
-        <div class="hdl hdl-l" id="hdlL">◀</div>
-        <div class="hdl hdl-r" id="hdlR">▶</div>
+    <!-- 配置 -->
+    <details class="config-section">
+      <summary data-en="Current Configuration (click to expand/collapse)">当前配置（点击展开/收起）</summary>
+      <div style="margin-top:8px;font-size:12px;">
+        <div><strong data-en="VIN Mapping (position 11-12 → model):">VIN映射表（第11-12位 → 车型）：</strong></div>
+        <div id="vinMapDisplay"
+          style="background:var(--bg-code);padding:6px 10px;border-radius:4px;margin:4px 0 8px 0;font-family:Consolas,monospace;font-size:12px;color:var(--text-secondary);">
+        </div>
+        <div><strong data-en="Specification Table (model → parameter: [LSL, USL]):">规格表（车型 → 项目: [下限, 上限]）：</strong>
+        </div>
+        <div id="specsDisplay"
+          style="background:var(--bg-code);padding:6px 10px;border-radius:4px;margin:4px 0 8px 0;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;color:var(--text-secondary);">
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-muted);"
+          data-en="Tip: Modify the JSON below and click 'Apply Config' to take effect immediately, no need to reload data.">
+          提示：修改下方JSON后点击「应用配置」即可生效，无需重新加载数据。
+        </div>
+        <div class="config-edit-area">
+          <label style="font-weight:600;font-size:12px;color:var(--text-secondary);"
+            data-en="Edit Configuration (JSON format):">编辑配置 (JSON格式):</label>
+          <textarea id="configEditor"></textarea>
+          <button class="btn-sm" id="applyConfigBtn" data-en="Apply Config">应用配置</button>
+        </div>
+      </div>
+    </details>
+
+    <!-- 维度切换 -->
+    <div class="dimension-tabs">
+      <span class="dimension-label" data-en="Time Dimension:">时间维度：</span>
+      <span class="tab active" data-dim="日" data-en="Day">日</span>
+      <span class="tab" data-dim="周" data-en="Week">周</span>
+      <span class="tab" data-dim="月" data-en="Month">月</span>
+      <span class="tab" data-dim="年" data-en="Year">年</span>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <label data-en="Model">车型 <select id="modelSelect">
+          <option value="all" data-en="All">全部</option>
+        </select></label>
+      <label data-en="Inspection Line">检测线号 <select id="lineFilter">
+          <option value="all" data-en="All">全部</option>
+        </select></label>
+      <button class="btn btn-primary" id="loadBtn" data-en="Load Excel">加载 Excel</button>
+      <button class="btn btn-success" id="exportBtn" data-en="Export All Data">导出全部数据</button>
+    </div>
+
+    <!-- 统计摘要 -->
+    <div class="summary">
+      <div class="summary-card">
+        <div class="label" data-en="Total Records">总记录</div>
+        <div class="value" id="totalRecords">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="Models">车型数</div>
+        <div class="value" id="totalModels">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="≥1.33">≥1.33</div>
+        <div class="value" id="cpkExcellent" style="color:var(--cpk-excellent);">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="1.0~1.33">1.0~1.33</div>
+        <div class="value" id="cpkGood" style="color:var(--cpk-good);">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label" data-en="&lt;1.0">&lt;1.0</div>
+        <div class="value" id="cpkPoor" style="color:var(--cpk-poor);">-</div>
       </div>
     </div>
 
-    <!-- 选区信息 -->
-    <div class="sel-info">
-      <span><span data-en="Keep">保留</span>: <span class="keep" id="keepStart">0.00</span>s — <span class="keep"
-          id="keepEnd">0.00</span>s</span>
-      <span><span data-en="Delete">删除</span>: <span class="del" id="delLeft">0.00</span>s — <span class="del"
-          id="delRight">0.00</span>s</span>
-      <span class="actions">
-        <button class="btn-keep" id="btnKeep" data-en="Keep Middle">保留中间</button>
-        <button class="btn-cut" id="btnCut" data-en="Cut Middle">切除中间</button>
-      </span>
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <p style="margin-top:8px;color:var(--text-muted);" data-en="Calculating...">计算中...</p>
     </div>
 
-    <!-- 进度 -->
-    <div class="timeline">
-      <span class="t" id="curTime">00:00</span>
-      <input type="range" id="seekSlider" min="0" max="100" value="0" />
-      <span class="t" id="totTime">00:00</span>
+    <!-- 表格 -->
+    <div class="table-wrapper" id="tableWrapper">
+      <div class="empty-state">
+        <div class="icon">📂</div>
+        <p style="font-size:16px;font-weight:500;" data-en="Please load data">请加载数据</p>
+        <p style="font-size:13px;color:var(--text-light);"
+          data-en="Click 'Load Excel' to select the vehicle inspection record file">
+          点击「加载 Excel」选择车辆检测记录文件
+        </p>
+      </div>
     </div>
 
-    <!-- 播放 -->
-    <div class="play-group">
-      <button class="primary" id="playBtn" data-en="Play">▶ 播放</button>
-      <button id="pauseBtn" data-en="Pause">⏸ 暂停</button>
-      <button id="stopBtn" data-en="Stop">⏹ 停止</button>
-      <button id="resetBtn" data-en="Reset">↺ 重置</button>
-    </div>
-
-    <!-- 导出 -->
-    <div class="convert-row">
-      <span data-en="Export format: WAV (applies volume & speed)">导出格式：WAV（应用当前音量和速度）</span>
-      <button id="convertBtn" data-en="Export WAV">导出 WAV</button>
-    </div>
-
-    <!-- 日志 -->
-    <div class="log" id="logBox">
-      <span class="info" data-en="● Ready">● 就绪</span>
+    <div class="footer">
+      <div class="hint">
+        <span><span class="status-dot excellent"></span><span data-en="≥1.33 Adequate">≥1.33 充足</span></span>
+        <span><span class="status-dot good"></span><span data-en="1.0~1.33 Critical">1.0~1.33 临界</span></span>
+        <span><span class="status-dot poor"></span><span data-en="&lt;1.0 Insufficient">&lt;1.0 不足</span></span>
+        <span style="color:var(--cpk-na);"><span data-en="Insufficient Data">数据不足</span></span>
+      </div>
+      <div id="rowCount" style="font-size:12px;color:var(--text-muted);" data-en="Showing 0 rows">显示 0 行</div>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+  </script>
   <script>
-    (function () {
-      'use strict';
+    // ==================== 国际化工具 ====================
+    function getLocalizedText(zh, en) {
+      // 检测当前语言（默认中文）
+      // 可以通过外部设置 window.__lang = 'en' 来切换
+      const lang = window.__lang || 'zh';
+      return lang === 'en' ? en : zh;
+    }
 
-      // ============================
-      //  中英文支持（仅提供函数，无切换逻辑）
-      // ============================
-  
+    // ==================== 可配置区域 ====================
+    let VIN_MODEL_MAP = {
+      'C0': 'N111',
+      'C1': 'N111P',
+      'C5': 'CF510V',
+      'C6': 'CN115',
+      'C7': 'CN112',
+      'C8': 'CN110V',
+      'C9': 'CN110V',
+    };
 
-      // ============================
-      //  DOM 引用
-      // ============================
-      const dropzone = document.getElementById('dropzone');
-      const fileInput = document.getElementById('fileInput');
-      const fileBar = document.getElementById('fileBar');
-      const statusLabel = document.getElementById('statusLabel');
+    let SPECS = {
+      'CF510V': {
+        '左前前束': [-0.05, 0.05],
+        '右前前束': [-0.05, 0.05],
+        '左前外倾': [-0.25, 1.25],
+        '右前外倾': [-0.25, 1.25],
+        '方向盘角度': [-0.3, 0.3],
+      },
+      'CN110V': {
+        '左前前束': [-0.05, 0.05],
+        '右前前束': [-0.05, 0.05],
+        '左前外倾': [-0.25, 1.25],
+        '右前外倾': [-0.25, 1.25],
+        '方向盘角度': [-0.3, 0.3],
+      },
+      'CN112': {
+        '左前前束': [-0.05, 0.05],
+        '右前前束': [-0.05, 0.05],
+        '左前外倾': [-0.25, 1.25],
+        '右前外倾': [-0.25, 1.25],
+        '方向盘角度': [-0.3, 0.3],
+      },
+      'CN115': {
+        '左前前束': [-0.05, 0.05],
+        '右前前束': [-0.05, 0.05],
+        '左前外倾': [-0.25, 1.25],
+        '右前外倾': [-0.25, 1.25],
+        '方向盘角度': [-0.3, 0.3],
+      },
+      'N111': {
+        '左前前束': [0.133, 0.3],
+        '右前前束': [0.133, 0.3],
+        '左前外倾': [0.08, 1.58],
+        '右前外倾': [0.08, 1.58],
+        '方向盘角度': [-0.3, 0.3],
+      },
+      'N111P': {
+        '左前前束': [0.133, 0.3],
+        '右前前束': [0.133, 0.3],
+        '左前外倾': [0.08, 1.58],
+        '右前外倾': [0.08, 1.58],
+        '方向盘角度': [-0.3, 0.3],
+      },
+    };
 
-      const volSlider = document.getElementById('volSlider');
-      const volVal = document.getElementById('volVal');
-      const spdSlider = document.getElementById('spdSlider');
-      const spdVal = document.getElementById('spdVal');
+    const COLS = ['左前前束', '右前前束', '左前外倾', '右前外倾', '方向盘角度'];
+    const COL_LABELS = {
+      '左前前束': '左前前束CPK',
+      '右前前束': '右前前束CPK',
+      '左前外倾': '左前外倾CPK',
+      '右前外倾': '右前外倾CPK',
+      '方向盘角度': '方向盘角度CPK',
+    };
 
-      const waveCanvas = document.getElementById('waveCanvas');
-      const waveArea = document.getElementById('waveArea');
-      const playhead = document.getElementById('playhead');
-      const selOverlay = document.getElementById('selOverlay');
-      const hdlL = document.getElementById('hdlL');
-      const hdlR = document.getElementById('hdlR');
+    // ==================== 全局状态 ====================
+    let allData = [];
+    let currentRows = [];
+    let currentDim = '日';
 
-      const keepStart = document.getElementById('keepStart');
-      const keepEnd = document.getElementById('keepEnd');
-      const delLeft = document.getElementById('delLeft');
-      const delRight = document.getElementById('delRight');
-      const btnKeep = document.getElementById('btnKeep');
-      const btnCut = document.getElementById('btnCut');
+    // ==================== 工具函数 ====================
+    function getWeekOfMonth(date) {
+      const d = new Date(date);
+      const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+      const dayOfMonth = d.getDate();
+      const firstDayOfWeek = firstDay.getDay();
+      const adjusted = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
+      const weekNum = Math.ceil((dayOfMonth + adjusted) / 7);
+      return weekNum;
+    }
 
-      const seekSlider = document.getElementById('seekSlider');
-      const curTime = document.getElementById('curTime');
-      const totTime = document.getElementById('totTime');
+    function extractModel(v) {
+      if (!v || typeof v !== 'string') return '未知';
+      v = v.trim().toUpperCase();
+      if (v.length < 12) return '未知';
+      return VIN_MODEL_MAP[v.substring(10, 12)] || '未知';
+    }
 
-      const playBtn = document.getElementById('playBtn');
-      const pauseBtn = document.getElementById('pauseBtn');
-      const stopBtn = document.getElementById('stopBtn');
-      const resetBtn = document.getElementById('resetBtn');
+    function calcCpk(vals, lo, hi) {
+      const d = vals.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v));
+      if (d.length < 3) return null;
+      const m = d.reduce((a, b) => a + b, 0) / d.length;
+      const s = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / (d.length - 1));
+      if (s === 0) return null;
+      return Math.min((hi - m) / (3 * s), (m - lo) / (3 * s));
+    }
 
-      const convertBtn = document.getElementById('convertBtn');
+    function getStatus(c) {
+      if (c === null || c === undefined || isNaN(c)) return 'na';
+      if (c >= 1.33) return 'excellent';
+      if (c >= 1.0) return 'good';
+      return 'poor';
+    }
 
-      const logBox = document.getElementById('logBox');
+    function getCls(c) {
+      const s = getStatus(c);
+      if (s === 'excellent') return 'cpk-excellent';
+      if (s === 'good') return 'cpk-good';
+      if (s === 'poor') return 'cpk-poor';
+      return 'cpk-na';
+    }
 
-      // ============================
-      //  核心状态
-      // ============================
-      let ctx = null;
-      let buffer = null;
-      let fileMap = {};
-      let fileList = [];
-      let currentFile = null;
-
-      let isPlaying = false;
-      let srcNode = null;
-      let gainNode = null;
-      let playStart = 0;
-      let pausedAt = 0;
-
-      let sel = { start: 0, end: 1 };
-
-      // ============================
-      //  日志
-      // ============================
-      function log(msg, type) {
-        type = type || 'info';
-        const el = document.createElement('div');
-        el.className = type;
-        const enMap = {
-          '就绪': 'Ready',
-          '加载成功': 'Loaded',
-          '加载失败': 'Failed to load',
-          '保留中间完成': 'Keep middle completed',
-          '切除中间完成': 'Cut middle completed',
-          '导出 WAV 成功': 'WAV exported successfully',
-          '导出失败': 'Export failed',
-          '已重置': 'Reset',
-          '已移除': 'Removed',
-          '切换到': 'Switched to',
-          '请先加载音频': 'Please load audio first',
-          '选区太小': 'Selection too small',
-          '不能删除全部音频': 'Cannot delete entire audio',
-          '正在导出...': 'Exporting...'
+    function readExcelFile(file) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = function (e) {
+          try {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            resolve(XLSX.utils.sheet_to_json(ws, { defval: '' }));
+          } catch (err) { reject(err); }
         };
-        let translated = msg;
-        for (const [zh, en] of Object.entries(enMap)) {
-          if (msg.includes(zh)) {
-            translated = msg.replace(zh, window.getLocalizedText(zh, en));
-            break;
-          }
-        }
-        el.textContent = '● ' + translated;
-        logBox.appendChild(el);
-        logBox.scrollTop = logBox.scrollHeight;
-        while (logBox.children.length > 60) logBox.removeChild(logBox.firstChild);
-      }
+        r.onerror = reject;
+        r.readAsArrayBuffer(file);
+      });
+    }
 
-      function setStatus(key) {
-        const enMap = {
-          '就绪': 'Ready',
-          '导出中...': 'Exporting...',
-          '裁剪中...': 'Cutting...'
+    function loadFromFile(file) {
+      document.getElementById('loadingIndicator').classList.add('active');
+      readExcelFile(file).then(raw => {
+        document.getElementById('loadingIndicator').classList.remove('active');
+        processData(raw);
+        // SweetAlert2 成功提示
+        const msg = getLocalizedText(
+          '数据加载成功！共 ' + allData.length + ' 条合格记录',
+          'Data loaded successfully! ' + allData.length + ' qualified records'
+        );
+        Swal.fire({
+          icon: 'success',
+          title: getLocalizedText('成功', 'Success'),
+          text: msg,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }).catch(err => {
+        document.getElementById('loadingIndicator').classList.remove('active');
+        Swal.fire({
+          icon: 'error',
+          title: getLocalizedText('读取失败', 'Load Failed'),
+          text: err.message
+        });
+      });
+    }
+
+    function processData(raw) {
+      const cm = {};
+      const h = Object.keys(raw[0] || {});
+      h.forEach(k => {
+        const s = String(k).trim();
+        if (s.includes('VIN') || s.includes('车辆识别码')) cm['VIN'] = k;
+        else if (s.includes('检测结果')) cm['检测结果'] = k;
+        else if (s.includes('检测线号')) cm['检测线号'] = k;
+        else if (s.includes('检测结束时间')) cm['检测结束时间'] = k;
+        else if (s.includes('左前前束')) cm['左前前束'] = k;
+        else if (s.includes('右前前束')) cm['右前前束'] = k;
+        else if (s.includes('左前外倾')) cm['左前外倾'] = k;
+        else if (s.includes('右前外倾')) cm['右前外倾'] = k;
+        else if (s.includes('方向盘角度')) cm['方向盘角度'] = k;
+      });
+
+      const processed = raw.map(row => {
+        const item = {
+          VIN: String(row[cm['VIN']] || ''), 检测结果: String(row[cm['检测结果']] || ''),
+          检测线号: String(row[cm['检测线号']] || '')
         };
-        const zh = key;
-        const en = enMap[zh] || zh;
-        statusLabel.textContent = window.getLocalizedText(zh, en);
-      }
-
-      // ============================
-      //  工具
-      // ============================
-      function fmt(sec) {
-        if (!sec || isNaN(sec)) return '00:00';
-        const m = Math.floor(sec / 60);
-        const s = Math.floor(sec % 60);
-        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-      }
-
-      function fmtD(sec) {
-        if (!sec || isNaN(sec)) return '0.00';
-        return sec.toFixed(2);
-      }
-
-      function getCtx() {
-        if (!ctx) {
-          ctx = new (window.AudioContext || window.webkitAudioContext)();
+        COLS.forEach(c => {
+          const v = parseFloat(row[cm[c]]);
+          item[c] = isNaN(v) ? null : v;
+        });
+        item.车型 = extractModel(item.VIN);
+        let dt = row[cm['检测结束时间']];
+        if (typeof dt === 'string') {
+          const d = new Date(dt);
+          item.日期 = isNaN(d) ? null : d;
+        } else if (dt instanceof Date) { item.日期 = dt; } else {
+          item
+            .日期 = null;
         }
-        if (ctx.state === 'suspended') ctx.resume();
-        return ctx;
-      }
-
-      // ============================
-      //  波形绘制
-      // ============================
-      function drawWave() {
-        const canvas = waveCanvas;
-        const rect = waveArea.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        const w = rect.width || 600;
-        const h = rect.height || 160;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        const c = canvas.getContext('2d');
-        c.scale(dpr, dpr);
-
-        // 深色模式背景自适应：使用 CSS 变量
-        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-wave').trim() || '#f1f5f9';
-        c.fillStyle = bgColor;
-        c.fillRect(0, 0, w, h);
-
-        if (!buffer) {
-          playhead.style.display = 'none';
-          return;
-        }
-
-        const data = buffer.getChannelData(0);
-        const vol = parseFloat(volSlider.value) / 100;
-        const spd = parseFloat(spdSlider.value) / 100;
-        const len = data.length;
-        const displayLen = Math.min(len / spd, len);
-        const step = Math.max(1, Math.floor(displayLen / w));
-        const amp = h / 2 - 6;
-
-        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#6366f1';
-        c.beginPath();
-        c.strokeStyle = accentColor;
-        c.lineWidth = 1.5;
-        for (let i = 0; i < w; i++) {
-          const idx = Math.floor(i * step);
-          if (idx >= len) break;
-          const val = data[idx] || 0;
-          const scaled = Math.max(-1, Math.min(1, val * vol));
-          const x = i;
-          const y = amp + scaled * amp * 0.9;
-          if (i === 0) c.moveTo(x, y);
-          else c.lineTo(x, y);
-        }
-        c.stroke();
-
-        c.beginPath();
-        for (let i = 0; i < w; i++) {
-          const idx = Math.floor(i * step);
-          if (idx >= len) break;
-          const val = data[idx] || 0;
-          const scaled = Math.max(-1, Math.min(1, val * vol));
-          const x = i;
-          const y = amp - scaled * amp * 0.9;
-          if (i === 0) c.moveTo(x, y);
-          else c.lineTo(x, y);
-        }
-        c.stroke();
-
-        // 中线
-        c.beginPath();
-        c.strokeStyle = 'rgba(99,102,241,0.12)';
-        c.lineWidth = 1;
-        c.moveTo(0, amp);
-        c.lineTo(w, amp);
-        c.stroke();
-
-        updateSel(w);
-        updatePlayhead(w);
-      }
-
-      function updateSel(canvasWidth) {
-        const w = canvasWidth || waveArea.getBoundingClientRect().width || 600;
-        const s = Math.max(0, Math.min(1, sel.start));
-        const e = Math.max(0, Math.min(1, sel.end));
-
-        if (s < e) {
-          selOverlay.classList.add('show');
-          selOverlay.style.left = (s * w) + 'px';
-          selOverlay.style.width = ((e - s) * w) + 'px';
-          selOverlay.style.background = 'var(--sel-bg)';
-          selOverlay.style.borderLeftColor = 'var(--sel-border)';
-          selOverlay.style.borderRightColor = 'var(--sel-border)';
+        if (item.日期 && !isNaN(item.日期)) {
+          const d = new Date(item.日期);
+          item.年 = d.getFullYear();
+          item.月数字 = d.getMonth() + 1;
+          item.月 = String(item.月数字).padStart(2, '0');
+          item.日 = String(d.getDate()).padStart(2, '0');
+          item.年月日 = item.年 + '-' + item.月 + '-' + item.日;
+          const weekNum = getWeekOfMonth(d);
+          item.周 = item.月数字 + '月第' + weekNum + '周';
+          item.周排序 = item.年 * 100 + item.月数字 * 10 + weekNum;
+          item.月显示 = item.年 + '-' + item.月;
+          item.年显示 = String(item.年);
+          const s = new Date(d.getFullYear(), 0, 1);
+          const diff = (d - s + (s.getTimezoneOffset() - d.getTimezoneOffset()) * 60000) / 86400000;
+          const w = Math.ceil((diff + s.getDay() + 1) / 7);
+          item.年周原始 = item.年 + '-W' + String(w).padStart(2, '0');
         } else {
-          selOverlay.classList.remove('show');
+          item.年 = null;
+          item.月 = null;
+          item.月数字 = null;
+          item.日 = null;
+          item.年月日 = null;
+          item.周 = null;
+          item.周排序 = null;
+          item.月显示 = null;
+          item.年显示 = null;
+          item.年周原始 = null;
         }
-
-        const oldL = waveArea.querySelector('.del-left');
-        const oldR = waveArea.querySelector('.del-right');
-        if (oldL) oldL.remove();
-        if (oldR) oldR.remove();
-
-        if (s > 0) {
-          const d = document.createElement('div');
-          d.className = 'del-left';
-          d.style.left = '0';
-          d.style.width = (s * w) + 'px';
-          waveArea.appendChild(d);
-        }
-        if (e < 1) {
-          const d = document.createElement('div');
-          d.className = 'del-right';
-          d.style.left = (e * w) + 'px';
-          d.style.width = ((1 - e) * w) + 'px';
-          waveArea.appendChild(d);
-        }
-
-        if (buffer) {
-          const dur = buffer.duration;
-          const ss = s * dur,
-            ee = e * dur;
-          keepStart.textContent = fmtD(ss);
-          keepEnd.textContent = fmtD(ee);
-          delLeft.textContent = fmtD(0) + ' / ' + fmtD(ee);
-          delRight.textContent = fmtD(ss) + ' / ' + fmtD(dur);
-        }
-      }
-
-      function updatePlayhead(canvasWidth) {
-        const w = canvasWidth || waveArea.getBoundingClientRect().width || 600;
-        if (!buffer || !isPlaying) {
-          if (buffer && !isPlaying && pausedAt > 0) {
-            const pct = pausedAt / buffer.duration;
-            const x = pct * w;
-            playhead.style.display = 'block';
-            playhead.style.left = x + 'px';
-          } else {
-            playhead.style.display = 'none';
-          }
-          return;
-        }
-        const dur = buffer.duration;
-        const elapsed = Math.min(pausedAt || 0, dur);
-        const pct = dur > 0 ? elapsed / dur : 0;
-        const x = pct * w;
-        playhead.style.display = 'block';
-        playhead.style.left = x + 'px';
-      }
-
-      function setPlayheadPosition(percent) {
-        if (!buffer) return;
-        const w = waveArea.getBoundingClientRect().width || 600;
-        const x = percent * w;
-        playhead.style.display = 'block';
-        playhead.style.left = x + 'px';
-        seekSlider.value = percent * 100;
-        curTime.textContent = fmt(percent * buffer.duration);
-      }
-
-      // ============================
-      //  选区拖拽
-      // ============================
-      function initDrag() {
-        let down = false,
-          target = null,
-          sx = 0,
-          orig = { s: 0, e: 1 };
-
-        function onDown(e) {
-          if (!buffer) return;
-          const rect = waveArea.getBoundingClientRect();
-          const w = rect.width || 600;
-          const x = (e.clientX || e.pageX) - rect.left;
-          const pos = Math.max(0, Math.min(1, x / w));
-          const s = sel.start,
-            es = sel.end;
-          const ls = s * w,
-            rs = es * w;
-
-          if (Math.abs(x - ls) < 20) target = 'left';
-          else if (Math.abs(x - rs) < 20) target = 'right';
-          else if (x > ls && x < rs) target = 'move';
-          else target = 'new';
-
-          down = true;
-          sx = pos;
-          orig = { s: sel.start, e: sel.end };
-          e.preventDefault();
-        }
-
-        function onMove(e) {
-          if (!down || !buffer) return;
-          const rect = waveArea.getBoundingClientRect();
-          const w = rect.width || 600;
-          const x = (e.clientX || e.pageX) - rect.left;
-          const pos = Math.max(0, Math.min(1, x / w));
-
-          if (target === 'left') {
-            sel.start = Math.max(0, Math.min(sel.end - 0.001, pos));
-          } else if (target === 'right') {
-            sel.end = Math.min(1, Math.max(sel.start + 0.001, pos));
-          } else if (target === 'move') {
-            const delta = pos - sx;
-            const ns = Math.max(0, Math.min(1 - (orig.e - orig.s), orig.s + delta));
-            const ne = ns + (orig.e - orig.s);
-            sel.start = ns;
-            sel.end = ne;
-          } else if (target === 'new') {
-            if (pos < orig.s) {
-              sel.start = pos;
-              sel.end = orig.s;
-            } else {
-              sel.start = orig.s;
-              sel.end = pos;
-            }
-            if (sel.end - sel.start < 0.01) {
-              sel.start = Math.max(0, pos - 0.02);
-              sel.end = Math.min(1, pos + 0.02);
-            }
-          }
-          if (sel.start > sel.end) [sel.start, sel.end] = [sel.end, sel.start];
-          drawWave();
-          e.preventDefault();
-        }
-
-        function onUp() {
-          down = false;
-          target = null;
-        }
-
-        waveArea.addEventListener('mousedown', onDown);
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-        waveArea.addEventListener('touchstart', function (e) {
-          const t = e.touches[0];
-          onDown({
-            clientX: t.clientX, pageX: t.pageX, preventDefault: function () {
-              e
-                .preventDefault();
-            }
-          });
-        }, { passive: false });
-        document.addEventListener('touchmove', function (e) {
-          const t = e.touches[0];
-          onMove({
-            clientX: t.clientX, pageX: t.pageX, preventDefault: function () {
-              e
-                .preventDefault();
-            }
-          });
-        }, { passive: false });
-        document.addEventListener('touchend', onUp);
-      }
-
-      // ============================
-      //  播放头拖拽
-      // ============================
-      function initPlayheadDrag() {
-        let dragging = false;
-
-        function startDrag(e) {
-          if (!buffer) return;
-          dragging = true;
-          movePlayhead(e);
-          e.preventDefault();
-        }
-
-        function movePlayhead(e) {
-          if (!dragging || !buffer) return;
-          const rect = waveArea.getBoundingClientRect();
-          const w = rect.width || 600;
-          const x = (e.clientX || e.pageX) - rect.left;
-          const pct = Math.max(0, Math.min(1, x / w));
-          const time = pct * buffer.duration;
-          setPlayheadPosition(pct);
-          seekSlider.value = pct * 100;
-          curTime.textContent = fmt(time);
-          if (isPlaying && srcNode) {
-            const wasPlaying = isPlaying;
-            pauseAudio();
-            pausedAt = time;
-            if (wasPlaying) playAudio();
-          } else {
-            pausedAt = time;
-          }
-        }
-
-        function endDrag() {
-          dragging = false;
-        }
-
-        waveArea.addEventListener('mousedown', function (e) {
-          const rect = waveArea.getBoundingClientRect();
-          const w = rect.width || 600;
-          const x = (e.clientX || e.pageX) - rect.left;
-          const s = sel.start,
-            es = sel.end;
-          const ls = s * w,
-            rs = es * w;
-          if (Math.abs(x - ls) < 20 || Math.abs(x - rs) < 20) return;
-          startDrag(e);
-        });
-        document.addEventListener('mousemove', function (e) {
-          if (dragging) movePlayhead(e);
-        });
-        document.addEventListener('mouseup', endDrag);
-
-        waveArea.addEventListener('touchstart', function (e) {
-          const t = e.touches[0];
-          const rect = waveArea.getBoundingClientRect();
-          const w = rect.width || 600;
-          const x = t.clientX - rect.left;
-          const s = sel.start,
-            es = sel.end;
-          const ls = s * w,
-            rs = es * w;
-          if (Math.abs(x - ls) < 20 || Math.abs(x - rs) < 20) return;
-          startDrag({
-            clientX: t.clientX, pageX: t.pageX, preventDefault: function () {
-              e
-                .preventDefault();
-            }
-          });
-        }, { passive: false });
-        document.addEventListener('touchmove', function (e) {
-          if (dragging) {
-            const t = e.touches[0];
-            movePlayhead({
-              clientX: t.clientX, pageX: t.pageX, preventDefault: function () {
-                e
-                  .preventDefault();
-              }
-            });
-          }
-        }, { passive: false });
-        document.addEventListener('touchend', endDrag);
-      }
-
-      // ============================
-      //  裁剪操作
-      // ============================
-      function doKeep() {
-        if (!buffer) { log('请先加载音频', 'warn'); return; }
-        const dur = buffer.duration;
-        const s = sel.start * dur,
-          e = sel.end * dur;
-        if (e - s < 0.05) { log('选区太小', 'warn'); return; }
-        setStatus('裁剪中...');
-        const ch = buffer.numberOfChannels;
-        const sr = buffer.sampleRate;
-        const ss = Math.floor(s * sr),
-          ee = Math.floor(e * sr);
-        const len = ee - ss;
-        const nb = getCtx().createBuffer(ch, len, sr);
-        for (let c = 0; c < ch; c++) {
-          const src = buffer.getChannelData(c);
-          const dst = nb.getChannelData(c);
-          for (let i = 0; i < len; i++) dst[i] = src[ss + i];
-        }
-        const newName = currentFile + '_keep.wav';
-        addFile(newName, nb);
-        switchFile(newName);
-        log('保留中间完成', 'ok');
-        setStatus('就绪');
-      }
-
-      function doCut() {
-        if (!buffer) { log('请先加载音频', 'warn'); return; }
-        const dur = buffer.duration;
-        const s = sel.start * dur,
-          e = sel.end * dur;
-        if (e - s < 0.05) { log('选区太小', 'warn'); return; }
-        if (s < 0.001 && e > dur - 0.001) { log('不能删除全部音频', 'warn'); return; }
-        setStatus('裁剪中...');
-        const ch = buffer.numberOfChannels;
-        const sr = buffer.sampleRate;
-        const ss = Math.floor(s * sr),
-          ee = Math.floor(e * sr);
-        const total = buffer.length;
-        const leftLen = ss,
-          rightLen = total - ee;
-        const nb = getCtx().createBuffer(ch, leftLen + rightLen, sr);
-        for (let c = 0; c < ch; c++) {
-          const src = buffer.getChannelData(c);
-          const dst = nb.getChannelData(c);
-          for (let i = 0; i < leftLen; i++) dst[i] = src[i];
-          for (let i = 0; i < rightLen; i++) dst[leftLen + i] = src[ee + i];
-        }
-        const newName = currentFile + '_cut.wav';
-        addFile(newName, nb);
-        switchFile(newName);
-        log('切除中间完成', 'ok');
-        setStatus('就绪');
-      }
-
-      // ============================
-      //  文件管理
-      // ============================
-      function addFile(name, buf) {
-        fileMap[name] = buf;
-        if (!fileList.includes(name)) fileList.push(name);
-        renderFiles();
-      }
-
-      function switchFile(name) {
-        if (name === currentFile) return;
-        if (isPlaying) stopAudio();
-        currentFile = name;
-        buffer = fileMap[name];
-        sel = { start: 0, end: 1 };
-        pausedAt = 0;
-        drawWave();
-        updateTimeDisplay(buffer.duration);
-        setStatus('就绪');
-        renderFiles();
-        log('切换到: ' + name, 'info');
-      }
-
-      function removeFile(name) {
-        if (fileList.length <= 1) { log('至少保留一个文件', 'warn'); return; }
-        const idx = fileList.indexOf(name);
-        if (idx > -1) fileList.splice(idx, 1);
-        delete fileMap[name];
-        if (currentFile === name) {
-          currentFile = fileList[0] || null;
-          buffer = currentFile ? fileMap[currentFile] : null;
-          if (buffer) {
-            drawWave();
-            updateTimeDisplay(buffer.duration);
-          } else {
-            drawWave();
-            updateTimeDisplay(0);
-          }
-        }
-        renderFiles();
-        log('已移除: ' + name, 'info');
-      }
-
-      function renderFiles() {
-        fileBar.innerHTML = '';
-        fileList.forEach(name => {
-          const chip = document.createElement('span');
-          chip.className = 'file-chip' + (name === currentFile ? ' active' : '');
-          chip.innerHTML = name + ' <span class="remove" data-name="' + name + '">×</span>';
-          chip.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove')) return;
-            switchFile(name);
-          });
-          const rm = chip.querySelector('.remove');
-          rm.addEventListener('click', function (e) {
-            e.stopPropagation();
-            removeFile(name);
-          });
-          fileBar.appendChild(chip);
-        });
-      }
-
-      function updateTimeDisplay(dur) {
-        totTime.textContent = fmt(dur);
-        curTime.textContent = '00:00';
-        seekSlider.value = 0;
-        if (dur > 0) {
-          sel = { start: 0, end: 1 };
-          drawWave();
-        }
-      }
-
-      // ============================
-      //  加载音频
-      // ============================
-      async function loadFile(file) {
-        try {
-          const ab = await file.arrayBuffer();
-          const c = getCtx();
-          const buf = await c.decodeAudioData(ab);
-          const name = file.name;
-          addFile(name, buf);
-          if (!currentFile) {
-            currentFile = name;
-            buffer = buf;
-            sel = { start: 0, end: 1 };
-            pausedAt = 0;
-            drawWave();
-            updateTimeDisplay(buf.duration);
-            setStatus('就绪');
-          }
-          renderFiles();
-          log('加载成功: ' + name + ' (时长 ' + fmt(buf.duration) + ')', 'ok');
-        } catch (e) {
-          log('加载失败: ' + file.name + ' - ' + e.message, 'err');
-        }
-      }
-
-      // ============================
-      //  WAV 导出（直接根据原始 buffer）
-      // ============================
-      function toWav(buf) {
-        const numChannels = buf.numberOfChannels;
-        const sampleRate = buf.sampleRate;
-        const bitDepth = 16;
-        const bytesPerSample = bitDepth / 8;
-        const blockAlign = numChannels * bytesPerSample;
-
-        const channelData = [];
-        let totalSamples = 0;
-        for (let ch = 0; ch < numChannels; ch++) {
-          const data = buf.getChannelData(ch);
-          channelData.push(data);
-          totalSamples += data.length;
-        }
-        const dataSize = totalSamples * bytesPerSample;
-
-        const arrayBuffer = new ArrayBuffer(44 + dataSize);
-        const view = new DataView(arrayBuffer);
-
-        view.setUint32(0, 0x52494646);
-        view.setUint32(4, 36 + dataSize, true);
-        view.setUint32(8, 0x57415645);
-        view.setUint32(12, 0x666D7420);
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * blockAlign, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitDepth, true);
-        view.setUint32(36, 0x64617461);
-        view.setUint32(40, dataSize, true);
-
-        let offset = 44;
-        const numFrames = buf.length;
-        for (let i = 0; i < numFrames; i++) {
-          for (let ch = 0; ch < numChannels; ch++) {
-            const sample = Math.max(-1, Math.min(1, channelData[ch][i]));
-            const int16 = Math.round(sample * 0x7FFF);
-            view.setInt16(offset, int16, true);
-            offset += 2;
-          }
-        }
-
-        return new Blob([arrayBuffer], { type: 'audio/wav' });
-      }
-
-      // ============================
-      //  导出 WAV（应用音量和速度）
-      // ============================
-      async function doConvert() {
-        if (!buffer) { log('请先加载音频', 'warn'); return; }
-        const vol = parseFloat(volSlider.value) / 100;
-        const speed = parseFloat(spdSlider.value) / 100;
-        setStatus('导出中...');
-        log('正在导出...', 'info');
-        try {
-          const sampleRate = buffer.sampleRate;
-          const channels = buffer.numberOfChannels;
-          const length = buffer.length;
-          const newLength = Math.ceil(length / speed);
-          const offlineCtx = new OfflineAudioContext(channels, newLength, sampleRate);
-          const source = offlineCtx.createBufferSource();
-          source.buffer = buffer;
-          source.playbackRate.value = speed;
-          const gain = offlineCtx.createGain();
-          gain.gain.value = vol;
-          source.connect(gain);
-          gain.connect(offlineCtx.destination);
-          source.start();
-          const renderedBuffer = await offlineCtx.startRendering();
-          const blob = toWav(renderedBuffer);
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'audio_processed.wav';
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 5000);
-          log('导出 WAV 成功', 'ok');
-          setStatus('就绪');
-        } catch (e) {
-          log('导出失败: ' + e.message, 'err');
-          setStatus('就绪');
-        }
-      }
-
-      // ============================
-      //  播放控制
-      // ============================
-      function playAudio() {
-        if (!buffer) { log('请先加载音频', 'warn'); return; }
-        const c = getCtx();
-        if (isPlaying) return;
-        srcNode = c.createBufferSource();
-        gainNode = c.createGain();
-        srcNode.buffer = buffer;
-        const spd = parseFloat(spdSlider.value) / 100;
-        srcNode.playbackRate.value = spd;
-        gainNode.gain.value = parseFloat(volSlider.value) / 100;
-        srcNode.connect(gainNode);
-        gainNode.connect(c.destination);
-        const off = pausedAt || 0;
-        srcNode.start(0, off);
-        playStart = c.currentTime - off;
-        isPlaying = true;
-        playBtn.textContent = '⏸ 播放中';
-
-        playhead.style.display = 'block';
-
-        srcNode.onended = () => stopAudio();
-
-        function updateProgress() {
-          if (!isPlaying) return;
-          const elapsed = c.currentTime - playStart;
-          const dur = buffer.duration;
-          const pct = Math.min(100, (elapsed / dur) * 100);
-          seekSlider.value = pct;
-          curTime.textContent = fmt(Math.min(elapsed, dur));
-          const w = waveArea.getBoundingClientRect().width || 600;
-          const x = (pct / 100) * w;
-          playhead.style.left = x + 'px';
-          if (elapsed >= dur) { stopAudio(); return; }
-          requestAnimationFrame(updateProgress);
-        }
-        updateProgress();
-      }
-
-      function pauseAudio() {
-        if (!isPlaying || !srcNode) return;
-        const c = getCtx();
-        pausedAt = c.currentTime - playStart;
-        srcNode.stop();
-        srcNode.disconnect();
-        srcNode = null;
-        isPlaying = false;
-        playBtn.textContent = '▶ 播放';
-      }
-
-      function stopAudio() {
-        if (srcNode) {
-          try { srcNode.stop(); } catch (e) { } srcNode.disconnect();
-          srcNode = null;
-        }
-        isPlaying = false;
-        pausedAt = 0;
-        seekSlider.value = 0;
-        curTime.textContent = '00:00';
-        playBtn.textContent = '▶ 播放';
-        playhead.style.display = 'none';
-        if (buffer) drawWave();
-      }
-
-      function resetAudio() {
-        stopAudio();
-        pausedAt = 0;
-        seekSlider.value = 0;
-        curTime.textContent = '00:00';
-        if (buffer) drawWave();
-        log('已重置', 'info');
-      }
-
-      // ============================
-      //  事件绑定
-      // ============================
-      // 上传点击
-      dropzone.addEventListener('click', () => fileInput.click());
-      // 拖拽上传
-      dropzone.addEventListener('dragover', e => {
-        e.preventDefault();
-        dropzone.style.borderColor = 'var(--accent)';
-      });
-      dropzone.addEventListener('dragleave', () => {
-        dropzone.style.borderColor = '';
-      });
-      dropzone.addEventListener('drop', e => {
-        e.preventDefault();
-        dropzone.style.borderColor = '';
-        const files = e.dataTransfer.files;
-        for (const f of files) {
-          if (f.type.startsWith('audio/')) loadFile(f);
-        }
-      });
-      fileInput.addEventListener('change', function () {
-        for (const f of this.files) loadFile(f);
-        this.value = '';
+        return item;
       });
 
-      playBtn.addEventListener('click', () => {
-        if (isPlaying) pauseAudio();
-        else playAudio();
-      });
-      pauseBtn.addEventListener('click', pauseAudio);
-      stopBtn.addEventListener('click', stopAudio);
-      resetBtn.addEventListener('click', resetAudio);
+      allData = processed.filter(r => r.检测结果 === 'P');
+      updateDropdowns();
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('[data-dim="日"]')?.classList.add('active');
+      currentDim = '日';
+      computeAndRender('日');
+      document.getElementById('dataStatus').textContent = getLocalizedText(
+        '已加载 ' + allData.length + ' 条',
+        'Loaded ' + allData.length + ' records'
+      );
 
-      volSlider.addEventListener('input', function () {
-        volVal.textContent = this.value + '%';
-        if (gainNode) gainNode.gain.value = parseFloat(this.value) / 100;
-        if (buffer) drawWave();
-      });
-      spdSlider.addEventListener('input', function () {
-        const v = parseFloat(this.value) / 100;
-        spdVal.textContent = v.toFixed(1) + 'x';
-        if (srcNode) srcNode.playbackRate.value = v;
-        if (buffer) drawWave();
-      });
+      displayConfig();
+    }
 
-      seekSlider.addEventListener('input', function () {
-        if (!buffer) return;
-        const pct = parseFloat(this.value) / 100;
-        const time = pct * buffer.duration;
-        curTime.textContent = fmt(time);
-        if (!isPlaying) {
-          setPlayheadPosition(pct);
+    function displayConfig() {
+      let vinHtml = '';
+      for (const [key, val] of Object.entries(VIN_MODEL_MAP)) {
+        vinHtml += key + ' → ' + val + '  ';
+      }
+      document.getElementById('vinMapDisplay').textContent = vinHtml || getLocalizedText('（请配置VIN映射）',
+        '(Please configure VIN mapping)');
+
+      let specHtml = '';
+      for (const [model, specs] of Object.entries(SPECS)) {
+        specHtml += model + ':\n';
+        for (const [col, [lo, hi]] of Object.entries(specs)) {
+          specHtml += '  ' + col + ': [' + lo + ', ' + hi + ']\n';
         }
-      });
-      seekSlider.addEventListener('change', function () {
-        if (!buffer || !isPlaying) return;
-        const pct = parseFloat(this.value) / 100;
-        const t = pct * buffer.duration;
-        if (srcNode) {
-          const was = isPlaying;
-          pauseAudio();
-          pausedAt = t;
-          if (was) playAudio();
-        }
-      });
+      }
+      document.getElementById('specsDisplay').textContent = specHtml || getLocalizedText('（请配置规格）',
+        '(Please configure specifications)');
 
-      btnKeep.addEventListener('click', doKeep);
-      btnCut.addEventListener('click', doCut);
-      convertBtn.addEventListener('click', doConvert);
-
-      window.addEventListener('resize', () => { if (buffer) drawWave(); });
-
-      // ============================
-      //  初始化
-      // ============================
-      initDrag();
-      initPlayheadDrag();
-      log('就绪', 'info');
-      setStatus('就绪');
-      drawWave();
-      updateTimeDisplay(0);
-
-      // 深色模式由外部添加 body.dark-mode 类控制
-
-      // 暴露一些常用函数便于调试
-      window.__editor = {
-        loadFile,
-        playAudio,
-        pauseAudio,
-        stopAudio,
-        resetAudio,
-        doConvert,
-        doKeep,
-        doCut
+      const configObj = {
+        VIN_MODEL_MAP: VIN_MODEL_MAP,
+        SPECS: SPECS
       };
+      document.getElementById('configEditor').value = JSON.stringify(configObj, null, 2);
+    }
 
-    })();
+    function updateDropdowns() {
+      const models = [...new Set(allData.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
+      const sel = document.getElementById('modelSelect');
+      const cur = sel.value;
+      sel.innerHTML = '<option value="all">' + getLocalizedText('全部', 'All') + '</option>';
+      models.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+      if (cur && models.includes(cur)) sel.value = cur;
+
+      const lines = [...new Set(allData.map(r => r.检测线号).filter(l => l && l !== ''))];
+      const sl = document.getElementById('lineFilter');
+      const cl = sl.value;
+      sl.innerHTML = '<option value="all">' + getLocalizedText('全部', 'All') + '</option>';
+      lines.forEach(l => sl.innerHTML += `<option value="${l}">${l}</option>`);
+      if (cl && lines.includes(cl)) sl.value = cl;
+    }
+
+    function computeDimensionData(dim, modelFilter, lineFilter) {
+      let data = allData;
+      if (modelFilter !== 'all') data = data.filter(r => r.车型 === modelFilter);
+      if (lineFilter !== 'all') data = data.filter(r => r.检测线号 === lineFilter);
+
+      const models = [...new Set(data.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
+      models.sort();
+
+      let groupKey, sortKey;
+      if (dim === '日') {
+        groupKey = '年月日';
+        sortKey = '年月日';
+      } else if (dim === '周') {
+        groupKey = '周';
+        sortKey = '周排序';
+      } else if (dim === '月') {
+        groupKey = '月显示';
+        sortKey = '月显示';
+      } else {
+        groupKey = '年显示';
+        sortKey = '年显示';
+      }
+
+      const timeVals = new Set();
+      data.forEach(r => {
+        if (r[groupKey] !== null && r[groupKey] !== undefined && r[groupKey] !== '') timeVals.add(r[
+          groupKey]);
+      });
+      let times = [...timeVals];
+      times.sort((a, b) => {
+        if (dim === '周') {
+          const aData = data.find(r => r[groupKey] === a);
+          const bData = data.find(r => r[groupKey] === b);
+          const aSort = aData ? aData[sortKey] : 0;
+          const bSort = bData ? bData[sortKey] : 0;
+          return (aSort || 0) - (bSort || 0);
+        }
+        return String(a).localeCompare(String(b));
+      });
+
+      const rows = [];
+      models.forEach(model => {
+        const modelData = data.filter(r => r.车型 === model);
+        times.forEach(t => {
+          const groupData = modelData.filter(r => r[groupKey] === t);
+          if (groupData.length < 3) return;
+          const row = { '时间': String(t), '车型': model, '检测线号': groupData[0].检测线号 || '-' };
+          COLS.forEach(c => {
+            const spec = SPECS[model] ? SPECS[model][c] : null;
+            if (spec) {
+              const vals = groupData.map(r => r[c]).filter(v => v !== null && !isNaN(v));
+              const cpk = calcCpk(vals, spec[0], spec[1]);
+              row[COL_LABELS[c]] = (cpk !== null && !isNaN(cpk)) ? cpk : null;
+            } else {
+              row[COL_LABELS[c]] = null;
+            }
+          });
+          rows.push(row);
+        });
+      });
+
+      rows.sort((a, b) => {
+        if (a['车型'] !== b['车型']) return a['车型'].localeCompare(b['车型']);
+        if (dim === '周') {
+          const aSort = data.find(r => r['周'] === a['时间'])?.周排序 || 0;
+          const bSort = data.find(r => r['周'] === b['时间'])?.周排序 || 0;
+          return aSort - bSort;
+        }
+        return String(a['时间']).localeCompare(String(b['时间']));
+      });
+
+      return rows;
+    }
+
+    function computeAndRender(dim) {
+      currentDim = dim || '日';
+      const modelFilter = document.getElementById('modelSelect').value;
+      const lineFilter = document.getElementById('lineFilter').value;
+      currentRows = computeDimensionData(currentDim, modelFilter, lineFilter);
+      renderTable(currentRows);
+      updateSummary(currentRows);
+      const countText = getLocalizedText('显示 ' + currentRows.length + ' 行', 'Showing ' + currentRows.length +
+        ' rows');
+      document.getElementById('rowCount').textContent = countText;
+    }
+
+    function renderTable(rows) {
+      const wrapper = document.getElementById('tableWrapper');
+      if (rows.length === 0) {
+        wrapper.innerHTML =
+          `<div class="empty-state"><div class="icon">📭</div><p style="font-size:16px;font-weight:500;" data-en="No data">没有数据</p><p style="font-size:13px;color:var(--text-light);" data-en="Each group needs at least 3 records to calculate Cpk">每组至少需要3条记录才能计算Cpk</p></div>`;
+        return;
+      }
+
+      let html = `<table>
+                <thead><tr>
+                        <th data-en="Model">车型</th>
+                        <th data-en="Time">时间</th>
+                        <th data-en="Inspection Line">检测线号</th>
+                        <th data-en="Left Front Toe CPK">左前前束CPK</th>
+                        <th data-en="Right Front Toe CPK">右前前束CPK</th>
+                        <th data-en="Left Front Camber CPK">左前外倾CPK</th>
+                        <th data-en="Right Front Camber CPK">右前外倾CPK</th>
+                        <th data-en="Steering Angle CPK">方向盘角度CPK</th>
+                    </tr></thead><tbody>`;
+
+      rows.forEach(row => {
+        html += `<tr>
+                        <td class="col-model">${row['车型']}</td>
+                        <td>${row['时间']}</td>
+                        <td>${row['检测线号']}</td>`;
+        COLS.forEach(c => {
+          const v = row[COL_LABELS[c]];
+          if (v !== null && v !== undefined && !isNaN(v) && isFinite(v)) {
+            html += `<td class="cpk-value ${getCls(v)}">${v.toFixed(4)}</td>`;
+          } else {
+            html += `<td class="cpk-na">—</td>`;
+          }
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table>`;
+      wrapper.innerHTML = html;
+    }
+
+    function updateSummary(rows) {
+      const totalText = getLocalizedText('总记录', 'Total Records');
+      document.getElementById('totalRecords').textContent = allData.length;
+      const models = [...new Set(allData.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
+      document.getElementById('totalModels').textContent = models.length;
+      let ex = 0,
+        gd = 0,
+        pr = 0;
+      rows.forEach(row => {
+        COLS.forEach(c => {
+          const v = row[COL_LABELS[c]];
+          if (v !== null && v !== undefined && !isNaN(v) && isFinite(v)) {
+            const s = getStatus(v);
+            if (s === 'excellent') ex++;
+            else if (s === 'good') gd++;
+            else if (s === 'poor') pr++;
+          }
+        });
+      });
+      document.getElementById('cpkExcellent').textContent = ex;
+      document.getElementById('cpkGood').textContent = gd;
+      document.getElementById('cpkPoor').textContent = pr;
+    }
+
+    // ==================== 导出 ====================
+    function exportAllData() {
+      if (allData.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: getLocalizedText('没有数据', 'No Data'),
+          text: getLocalizedText('请先加载数据', 'Please load data first')
+        });
+        return;
+      }
+
+      const allRows = [];
+      const dimOrder = ['日', '周', '月', '年'];
+      dimOrder.forEach(dim => {
+        const rows = computeDimensionData(dim, 'all', 'all');
+        if (rows.length === 0) return;
+        rows.forEach(row => {
+          const exportRow = {
+            '车型': row['车型'],
+            '时间': row['时间'],
+            '检测线号': row['检测线号'],
+          };
+          COLS.forEach(c => {
+            const v = row[COL_LABELS[c]];
+            exportRow[COL_LABELS[c]] = (v !== null && v !== undefined && !isNaN(v) &&
+              isFinite(v)) ? v.toFixed(4) : '';
+          });
+          allRows.push(exportRow);
+        });
+      });
+
+      if (allRows.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: getLocalizedText('没有数据', 'No Data'),
+          text: getLocalizedText('没有可导出的数据', 'No data to export')
+        });
+        return;
+      }
+
+      allRows.sort((a, b) => {
+        if (a['车型'] !== b['车型']) return a['车型'].localeCompare(b['车型']);
+        return String(a['时间']).localeCompare(String(b['时间']));
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(allRows);
+      XLSX.utils.book_append_sheet(wb, ws);
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'Cpk全部数据.xlsx';
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      Swal.fire({
+        icon: 'success',
+        title: getLocalizedText('导出成功', 'Export Success'),
+        text: getLocalizedText('已导出 ' + allRows.length + ' 行数据', 'Exported ' + allRows.length + ' rows'),
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
+    // ==================== 应用配置 ====================
+    function applyConfig() {
+      try {
+        const editor = document.getElementById('configEditor');
+        const config = JSON.parse(editor.value);
+
+        if (config.VIN_MODEL_MAP) {
+          VIN_MODEL_MAP = config.VIN_MODEL_MAP;
+        }
+        if (config.SPECS) {
+          SPECS = config.SPECS;
+        }
+
+        displayConfig();
+
+        if (allData.length > 0) {
+          updateDropdowns();
+          computeAndRender(currentDim);
+        }
+
+        Swal.fire({
+          icon: 'success',
+          title: getLocalizedText('配置已应用', 'Config Applied'),
+          timer: 1500,
+          showConfirmButton: false
+        });
+      } catch (e) {
+        Swal.fire({
+          icon: 'error',
+          title: getLocalizedText('JSON格式错误', 'JSON Format Error'),
+          text: e.message
+        });
+      }
+    }
+
+    // ==================== 事件绑定 ====================
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        computeAndRender(this.dataset.dim);
+      });
+    });
+
+    document.getElementById('modelSelect').addEventListener('change', function () {
+      computeAndRender(currentDim);
+    });
+    document.getElementById('lineFilter').addEventListener('change', function () {
+      computeAndRender(currentDim);
+    });
+
+    document.getElementById('loadBtn').addEventListener('click', function () {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xlsx,.xls';
+      input.onchange = function (e) {
+        if (this.files && this.files[0]) loadFromFile(this.files[0]);
+      };
+      input.click();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportAllData);
+    document.getElementById('applyConfigBtn').addEventListener('click', applyConfig);
+
+    document.addEventListener('dragover', e => e.preventDefault());
+    document.addEventListener('drop', e => {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0 && (files[0].name.endsWith('.xlsx') || files[0].name.endsWith('.xls'))) {
+        loadFromFile(files[0]);
+      }
+    });
+
+    // 初始化显示配置
+    displayConfig();
+    console.log('Cpk工具已加载');
   </script>
 
 </body>
