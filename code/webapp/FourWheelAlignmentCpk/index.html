@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="/css/styles6_glow.css">
   <script src="/js/script3_darkMode.js"></script>
   <script src="/js/script4_goBackOrHome.js"></script>
-  <script src="/js/script5_setAnimations.js"></script>
   <script src="/js/script6_setFontSize.js"></script>
   <script src="/js/script7_setOpacityandBlur.js"></script>
   <script src="/js/script8_setEyeCare.js"></script>
@@ -24,14 +23,12 @@
   <link href="/css/message.min.css" rel="stylesheet" />
   <script src="/js/message.min.js"></script>
   <link rel="stylesheet" href="./style.css">
-  <script src="/js/script14_setLanguage.js"></script>
   <title data-en="Four-Wheel Alignment Cpk">四轮定位cpk</title>
   </script>
 </head>
 
 <body>
-<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
-  data-en="Back">返回</button>
+
   <div class="container">
     <div class="header">
       <h1 data-en="Four-Wheel Alignment Cpk Calculator">四轮定位 Cpk 计算</h1>
@@ -45,7 +42,6 @@
       按车型、时间、检测线号分组 · 每个车型使用各自规格上下限
     </div>
 
-    <!-- 配置 -->
     <details class="config-section">
       <summary data-en="Current Configuration (click to expand/collapse)">当前配置（点击展开/收起）</summary>
       <div style="margin-top:8px;font-size:12px;">
@@ -71,7 +67,6 @@
       </div>
     </details>
 
-    <!-- 维度切换 -->
     <div class="dimension-tabs">
       <span class="dimension-label" data-en="Time Dimension:">时间维度：</span>
       <span class="tab active" data-dim="日" data-en="Day">日</span>
@@ -80,7 +75,6 @@
       <span class="tab" data-dim="年" data-en="Year">年</span>
     </div>
 
-    <!-- 工具栏 -->
     <div class="toolbar">
       <label data-en="Model">车型 <select id="modelSelect">
           <option value="all" data-en="All">全部</option>
@@ -92,7 +86,6 @@
       <button class="btn btn-success" id="exportBtn" data-en="Export All Data">导出全部数据</button>
     </div>
 
-    <!-- 统计摘要 -->
     <div class="summary">
       <div class="summary-card">
         <div class="label" data-en="Total Records">总记录</div>
@@ -103,15 +96,15 @@
         <div class="value" id="totalModels">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="≥1.33">≥1.33</div>
+        <div class="label" data-en="≥1.0">≥1.0</div>
         <div class="value" id="cpkExcellent" style="color:var(--cpk-excellent);">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="1.0~1.33">1.0~1.33</div>
+        <div class="label" data-en="0.67~1.0">0.67~1.0</div>
         <div class="value" id="cpkGood" style="color:var(--cpk-good);">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="&lt;1.0">&lt;1.0</div>
+        <div class="label" data-en="&lt;0.67">&lt;0.67</div>
         <div class="value" id="cpkPoor" style="color:var(--cpk-poor);">-</div>
       </div>
     </div>
@@ -121,7 +114,6 @@
       <p style="margin-top:8px;color:var(--text-muted);" data-en="Calculating...">计算中...</p>
     </div>
 
-    <!-- 表格 -->
     <div class="table-wrapper" id="tableWrapper">
       <div class="empty-state">
         <div class="icon">📂</div>
@@ -135,16 +127,17 @@
 
     <div class="footer">
       <div class="hint">
-        <span><span class="status-dot excellent"></span><span data-en="≥1.33 Adequate">≥1.33 充足</span></span>
-        <span><span class="status-dot good"></span><span data-en="1.0~1.33 Critical">1.0~1.33 临界</span></span>
-        <span><span class="status-dot poor"></span><span data-en="&lt;1.0 Insufficient">&lt;1.0 不足</span></span>
+        <span><span class="status-dot excellent"></span><span data-en="≥1.0 Adequate">≥1.0 充足</span></span>
+        <span><span class="status-dot good"></span><span data-en="0.67~1.0 Critical">0.67~1.0 临界</span></span>
+        <span><span class="status-dot poor"></span><span data-en="&lt;0.67 Insufficient">&lt;0.67 不足</span></span>
         <span style="color:var(--cpk-na);"><span data-en="Insufficient Data">数据不足</span></span>
       </div>
       <div id="rowCount" style="font-size:12px;color:var(--text-muted);" data-en="Showing 0 rows">显示 0 行</div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+  </script>
 </body>
 <script src="FourWheelAlignmentCpk.js"></script>
 </html>

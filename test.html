@@ -4,34 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-en="Four-Wheel Alignment Cpk">四轮定位Cpk</title>
-  <link rel="stylesheet" href="/css/styles_button.css">
-  <link rel="stylesheet" href="/css/styles3_animation.css">
-  <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
-  <link rel="stylesheet" href="/css/styles5_brightness.css">
-  <link rel="stylesheet" href="/css/styles6_glow.css">
-  <script src="/js/script3_darkMode.js"></script>
-  <script src="/js/script4_goBackOrHome.js"></script>
-  <script src="/js/script5_setAnimations.js"></script>
-  <script src="/js/script6_setFontSize.js"></script>
-  <script src="/js/script7_setOpacityandBlur.js"></script>
-  <script src="/js/script8_setEyeCare.js"></script>
-  <script src="/js/script9_setbrightness.js"></script>
-  <script src="/js/script10_setGlow.js"></script>
-  <script src="/js/script11_setHighlight.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-  <link href="/css/message.min.css" rel="stylesheet" />
-  <script src="/js/message.min.js"></script>
-  <link rel="stylesheet" href="./style.css">
-  <script src="/js/script14_setLanguage.js"></script>
-  <title data-en="Four-Wheel Alignment Cpk">四轮定位cpk</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js">
+  <title>四轮定位Cpk计算</title>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
   </script>
   <style>
-    /* ===== CSS变量 - 浅色模式（默认） ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     :root {
       --bg-body: #f0f4f8;
       --bg-container: #ffffff;
@@ -83,7 +66,6 @@
       --transition-speed: 0.3s;
     }
 
-    /* ===== 深色模式（通过 .dark-mode 类适配） ===== */
     .dark-mode {
       --bg-body: #121212;
       --bg-container: #1e1e1e;
@@ -133,17 +115,6 @@
       --spinner-color: #6a8ff5;
     }
 
-    /* ===== 全局样式 ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      transition: background-color var(--transition-speed) ease,
-        color var(--transition-speed) ease,
-        border-color var(--transition-speed) ease,
-        box-shadow var(--transition-speed) ease;
-    }
-
     body {
       font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
       background: var(--bg-body);
@@ -153,7 +124,6 @@
       transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
     }
 
-    /* ===== 进入动画 ===== */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -180,7 +150,6 @@
         box-shadow var(--transition-speed) ease;
     }
 
-    /* ===== 操作动画（行进入） ===== */
     @keyframes slideIn {
       from {
         opacity: 0;
@@ -278,7 +247,6 @@
       animation-delay: 0.40s;
     }
 
-    /* ===== Header ===== */
     .header {
       display: flex;
       justify-content: space-between;
@@ -323,7 +291,6 @@
       transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
     }
 
-    /* ===== 配置区域 ===== */
     .config-section {
       background: var(--bg-config);
       border-radius: 8px;
@@ -391,7 +358,6 @@
       background: var(--btn-primary-hover);
     }
 
-    /* ===== 工具栏 ===== */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -432,7 +398,6 @@
       border-color: var(--btn-primary-bg);
     }
 
-    /* ===== 按钮 ===== */
     .btn {
       padding: 6px 16px;
       border: none;
@@ -468,7 +433,6 @@
       box-shadow: 0 2px 8px rgba(52, 168, 83, 0.3);
     }
 
-    /* ===== 统计摘要 ===== */
     .summary {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -500,7 +464,6 @@
       transition: color var(--transition-speed) ease;
     }
 
-    /* ===== 表格 ===== */
     .table-wrapper {
       overflow-x: auto;
       border-radius: 8px;
@@ -599,7 +562,6 @@
       color: var(--cpk-na);
     }
 
-    /* ===== 状态点 ===== */
     .status-dot {
       display: inline-block;
       width: 8px;
@@ -625,7 +587,6 @@
       background: var(--status-dot-na);
     }
 
-    /* ===== 空状态 ===== */
     .empty-state {
       text-align: center;
       padding: 50px 20px;
@@ -638,7 +599,6 @@
       margin-bottom: 10px;
     }
 
-    /* ===== Loading ===== */
     .loading {
       display: none;
       text-align: center;
@@ -666,7 +626,6 @@
       }
     }
 
-    /* ===== Footer ===== */
     .footer {
       margin-top: 14px;
       padding-top: 12px;
@@ -693,7 +652,6 @@
       font-size: 12px;
     }
 
-    /* ===== 维度Tab ===== */
     .dimension-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -739,7 +697,6 @@
       transition: color var(--transition-speed) ease;
     }
 
-    /* ===== 响应式 ===== */
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -780,7 +737,6 @@
       按车型、时间、检测线号分组 · 每个车型使用各自规格上下限
     </div>
 
-    <!-- 配置 -->
     <details class="config-section">
       <summary data-en="Current Configuration (click to expand/collapse)">当前配置（点击展开/收起）</summary>
       <div style="margin-top:8px;font-size:12px;">
@@ -806,7 +762,6 @@
       </div>
     </details>
 
-    <!-- 维度切换 -->
     <div class="dimension-tabs">
       <span class="dimension-label" data-en="Time Dimension:">时间维度：</span>
       <span class="tab active" data-dim="日" data-en="Day">日</span>
@@ -815,7 +770,6 @@
       <span class="tab" data-dim="年" data-en="Year">年</span>
     </div>
 
-    <!-- 工具栏 -->
     <div class="toolbar">
       <label data-en="Model">车型 <select id="modelSelect">
           <option value="all" data-en="All">全部</option>
@@ -827,7 +781,6 @@
       <button class="btn btn-success" id="exportBtn" data-en="Export All Data">导出全部数据</button>
     </div>
 
-    <!-- 统计摘要 -->
     <div class="summary">
       <div class="summary-card">
         <div class="label" data-en="Total Records">总记录</div>
@@ -838,15 +791,15 @@
         <div class="value" id="totalModels">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="≥1.33">≥1.33</div>
+        <div class="label" data-en="≥1.0">≥1.0</div>
         <div class="value" id="cpkExcellent" style="color:var(--cpk-excellent);">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="1.0~1.33">1.0~1.33</div>
+        <div class="label" data-en="0.67~1.0">0.67~1.0</div>
         <div class="value" id="cpkGood" style="color:var(--cpk-good);">-</div>
       </div>
       <div class="summary-card">
-        <div class="label" data-en="&lt;1.0">&lt;1.0</div>
+        <div class="label" data-en="&lt;0.67">&lt;0.67</div>
         <div class="value" id="cpkPoor" style="color:var(--cpk-poor);">-</div>
       </div>
     </div>
@@ -856,7 +809,6 @@
       <p style="margin-top:8px;color:var(--text-muted);" data-en="Calculating...">计算中...</p>
     </div>
 
-    <!-- 表格 -->
     <div class="table-wrapper" id="tableWrapper">
       <div class="empty-state">
         <div class="icon">📂</div>
@@ -870,9 +822,9 @@
 
     <div class="footer">
       <div class="hint">
-        <span><span class="status-dot excellent"></span><span data-en="≥1.33 Adequate">≥1.33 充足</span></span>
-        <span><span class="status-dot good"></span><span data-en="1.0~1.33 Critical">1.0~1.33 临界</span></span>
-        <span><span class="status-dot poor"></span><span data-en="&lt;1.0 Insufficient">&lt;1.0 不足</span></span>
+        <span><span class="status-dot excellent"></span><span data-en="≥1.0 Adequate">≥1.0 充足</span></span>
+        <span><span class="status-dot good"></span><span data-en="0.67~1.0 Critical">0.67~1.0 临界</span></span>
+        <span><span class="status-dot poor"></span><span data-en="&lt;0.67 Insufficient">&lt;0.67 不足</span></span>
         <span style="color:var(--cpk-na);"><span data-en="Insufficient Data">数据不足</span></span>
       </div>
       <div id="rowCount" style="font-size:12px;color:var(--text-muted);" data-en="Showing 0 rows">显示 0 行</div>
@@ -882,16 +834,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
   </script>
   <script>
-    // ==================== 国际化工具 ====================
+    // ==================== 国际化 ====================
     function getLocalizedText(zh, en) {
-      // 检测当前语言（默认中文）
-      // 可以通过外部设置 window.__lang = 'en' 来切换
-      const lang = window.__lang || 'zh';
+      var lang = window.__lang || 'zh';
       return lang === 'en' ? en : zh;
     }
 
     // ==================== 可配置区域 ====================
-    let VIN_MODEL_MAP = {
+    var VIN_MODEL_MAP = {
       'C0': 'N111',
       'C1': 'N111P',
       'C5': 'CF510V',
@@ -901,7 +851,7 @@
       'C9': 'CN110V',
     };
 
-    let SPECS = {
+    var SPECS = {
       'CF510V': {
         '左前前束': [-0.05, 0.05],
         '右前前束': [-0.05, 0.05],
@@ -946,8 +896,8 @@
       },
     };
 
-    const COLS = ['左前前束', '右前前束', '左前外倾', '右前外倾', '方向盘角度'];
-    const COL_LABELS = {
+    var COLS = ['左前前束', '右前前束', '左前外倾', '右前外倾', '方向盘角度'];
+    var COL_LABELS = {
       '左前前束': '左前前束CPK',
       '右前前束': '右前前束CPK',
       '左前外倾': '左前外倾CPK',
@@ -956,18 +906,18 @@
     };
 
     // ==================== 全局状态 ====================
-    let allData = [];
-    let currentRows = [];
-    let currentDim = '日';
+    var allData = [];
+    var currentRows = [];
+    var currentDim = '日';
 
     // ==================== 工具函数 ====================
     function getWeekOfMonth(date) {
-      const d = new Date(date);
-      const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
-      const dayOfMonth = d.getDate();
-      const firstDayOfWeek = firstDay.getDay();
-      const adjusted = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
-      const weekNum = Math.ceil((dayOfMonth + adjusted) / 7);
+      var d = new Date(date);
+      var firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+      var dayOfMonth = d.getDate();
+      var firstDayOfWeek = firstDay.getDay();
+      var adjusted = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
+      var weekNum = Math.ceil((dayOfMonth + adjusted) / 7);
       return weekNum;
     }
 
@@ -979,23 +929,23 @@
     }
 
     function calcCpk(vals, lo, hi) {
-      const d = vals.filter(v => typeof v === 'number' && !isNaN(v) && isFinite(v));
+      var d = vals.filter(function (v) { return typeof v === 'number' && !isNaN(v) && isFinite(v); });
       if (d.length < 3) return null;
-      const m = d.reduce((a, b) => a + b, 0) / d.length;
-      const s = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / (d.length - 1));
+      var m = d.reduce(function (a, b) { return a + b; }, 0) / d.length;
+      var s = Math.sqrt(d.reduce(function (a, b) { return a + (b - m) * (b - m); }, 0) / (d.length - 1));
       if (s === 0) return null;
       return Math.min((hi - m) / (3 * s), (m - lo) / (3 * s));
     }
 
     function getStatus(c) {
       if (c === null || c === undefined || isNaN(c)) return 'na';
-      if (c >= 1.33) return 'excellent';
-      if (c >= 1.0) return 'good';
+      if (c >= 1.0) return 'excellent';
+      if (c >= 0.67) return 'good';
       return 'poor';
     }
 
     function getCls(c) {
-      const s = getStatus(c);
+      var s = getStatus(c);
       if (s === 'excellent') return 'cpk-excellent';
       if (s === 'good') return 'cpk-good';
       if (s === 'poor') return 'cpk-poor';
@@ -1003,12 +953,12 @@
     }
 
     function readExcelFile(file) {
-      return new Promise((resolve, reject) => {
-        const r = new FileReader();
+      return new Promise(function (resolve, reject) {
+        var r = new FileReader();
         r.onload = function (e) {
           try {
-            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            const ws = wb.Sheets[wb.SheetNames[0]];
+            var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            var ws = wb.Sheets[wb.SheetNames[0]];
             resolve(XLSX.utils.sheet_to_json(ws, { defval: '' }));
           } catch (err) { reject(err); }
         };
@@ -1019,11 +969,10 @@
 
     function loadFromFile(file) {
       document.getElementById('loadingIndicator').classList.add('active');
-      readExcelFile(file).then(raw => {
+      readExcelFile(file).then(function (raw) {
         document.getElementById('loadingIndicator').classList.remove('active');
         processData(raw);
-        // SweetAlert2 成功提示
-        const msg = getLocalizedText(
+        var msg = getLocalizedText(
           '数据加载成功！共 ' + allData.length + ' 条合格记录',
           'Data loaded successfully! ' + allData.length + ' qualified records'
         );
@@ -1034,7 +983,7 @@
           timer: 2000,
           showConfirmButton: false
         });
-      }).catch(err => {
+      }).catch(function (err) {
         document.getElementById('loadingIndicator').classList.remove('active');
         Swal.fire({
           icon: 'error',
@@ -1045,55 +994,53 @@
     }
 
     function processData(raw) {
-      const cm = {};
-      const h = Object.keys(raw[0] || {});
-      h.forEach(k => {
-        const s = String(k).trim();
-        if (s.includes('VIN') || s.includes('车辆识别码')) cm['VIN'] = k;
-        else if (s.includes('检测结果')) cm['检测结果'] = k;
-        else if (s.includes('检测线号')) cm['检测线号'] = k;
-        else if (s.includes('检测结束时间')) cm['检测结束时间'] = k;
-        else if (s.includes('左前前束')) cm['左前前束'] = k;
-        else if (s.includes('右前前束')) cm['右前前束'] = k;
-        else if (s.includes('左前外倾')) cm['左前外倾'] = k;
-        else if (s.includes('右前外倾')) cm['右前外倾'] = k;
-        else if (s.includes('方向盘角度')) cm['方向盘角度'] = k;
+      var cm = {};
+      var h = Object.keys(raw[0] || {});
+      h.forEach(function (k) {
+        var s = String(k).trim();
+        if (s.indexOf('VIN') !== -1 || s.indexOf('车辆识别码') !== -1) cm['VIN'] = k;
+        else if (s.indexOf('检测结果') !== -1) cm['检测结果'] = k;
+        else if (s.indexOf('检测线号') !== -1) cm['检测线号'] = k;
+        else if (s.indexOf('检测结束时间') !== -1) cm['检测结束时间'] = k;
+        else if (s.indexOf('左前前束') !== -1) cm['左前前束'] = k;
+        else if (s.indexOf('右前前束') !== -1) cm['右前前束'] = k;
+        else if (s.indexOf('左前外倾') !== -1) cm['左前外倾'] = k;
+        else if (s.indexOf('右前外倾') !== -1) cm['右前外倾'] = k;
+        else if (s.indexOf('方向盘角度') !== -1) cm['方向盘角度'] = k;
       });
 
-      const processed = raw.map(row => {
-        const item = {
-          VIN: String(row[cm['VIN']] || ''), 检测结果: String(row[cm['检测结果']] || ''),
+      var processed = raw.map(function (row) {
+        var item = {
+          VIN: String(row[cm['VIN']] || ''),
+          检测结果: String(row[cm['检测结果']] || ''),
           检测线号: String(row[cm['检测线号']] || '')
         };
-        COLS.forEach(c => {
-          const v = parseFloat(row[cm[c]]);
+        COLS.forEach(function (c) {
+          var v = parseFloat(row[cm[c]]);
           item[c] = isNaN(v) ? null : v;
         });
         item.车型 = extractModel(item.VIN);
-        let dt = row[cm['检测结束时间']];
+        var dt = row[cm['检测结束时间']];
         if (typeof dt === 'string') {
-          const d = new Date(dt);
+          var d = new Date(dt);
           item.日期 = isNaN(d) ? null : d;
-        } else if (dt instanceof Date) { item.日期 = dt; } else {
-          item
-            .日期 = null;
+        } else if (dt instanceof Date) {
+          item.日期 = dt;
+        } else {
+          item.日期 = null;
         }
         if (item.日期 && !isNaN(item.日期)) {
-          const d = new Date(item.日期);
+          var d = new Date(item.日期);
           item.年 = d.getFullYear();
           item.月数字 = d.getMonth() + 1;
           item.月 = String(item.月数字).padStart(2, '0');
           item.日 = String(d.getDate()).padStart(2, '0');
           item.年月日 = item.年 + '-' + item.月 + '-' + item.日;
-          const weekNum = getWeekOfMonth(d);
+          var weekNum = getWeekOfMonth(d);
           item.周 = item.月数字 + '月第' + weekNum + '周';
           item.周排序 = item.年 * 100 + item.月数字 * 10 + weekNum;
           item.月显示 = item.年 + '-' + item.月;
           item.年显示 = String(item.年);
-          const s = new Date(d.getFullYear(), 0, 1);
-          const diff = (d - s + (s.getTimezoneOffset() - d.getTimezoneOffset()) * 60000) / 86400000;
-          const w = Math.ceil((diff + s.getDay() + 1) / 7);
-          item.年周原始 = item.年 + '-W' + String(w).padStart(2, '0');
         } else {
           item.年 = null;
           item.月 = null;
@@ -1104,44 +1051,50 @@
           item.周排序 = null;
           item.月显示 = null;
           item.年显示 = null;
-          item.年周原始 = null;
         }
         return item;
       });
 
-      allData = processed.filter(r => r.检测结果 === 'P');
+      allData = processed.filter(function (r) { return r.检测结果 === 'P'; });
       updateDropdowns();
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector('[data-dim="日"]')?.classList.add('active');
+      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelector('[data-dim="日"]').classList.add('active');
       currentDim = '日';
       computeAndRender('日');
       document.getElementById('dataStatus').textContent = getLocalizedText(
         '已加载 ' + allData.length + ' 条',
         'Loaded ' + allData.length + ' records'
       );
-
       displayConfig();
     }
 
     function displayConfig() {
-      let vinHtml = '';
-      for (const [key, val] of Object.entries(VIN_MODEL_MAP)) {
-        vinHtml += key + ' → ' + val + '  ';
+      var vinHtml = '';
+      for (var key in VIN_MODEL_MAP) {
+        if (VIN_MODEL_MAP.hasOwnProperty(key)) {
+          vinHtml += key + ' → ' + VIN_MODEL_MAP[key] + '  ';
+        }
       }
       document.getElementById('vinMapDisplay').textContent = vinHtml || getLocalizedText('（请配置VIN映射）',
         '(Please configure VIN mapping)');
 
-      let specHtml = '';
-      for (const [model, specs] of Object.entries(SPECS)) {
-        specHtml += model + ':\n';
-        for (const [col, [lo, hi]] of Object.entries(specs)) {
-          specHtml += '  ' + col + ': [' + lo + ', ' + hi + ']\n';
+      var specHtml = '';
+      for (var model in SPECS) {
+        if (SPECS.hasOwnProperty(model)) {
+          specHtml += model + ':\n';
+          for (var col in SPECS[model]) {
+            if (SPECS[model].hasOwnProperty(col)) {
+              var lo = SPECS[model][col][0];
+              var hi = SPECS[model][col][1];
+              specHtml += '  ' + col + ': [' + lo + ', ' + hi + ']\n';
+            }
+          }
         }
       }
       document.getElementById('specsDisplay').textContent = specHtml || getLocalizedText('（请配置规格）',
         '(Please configure specifications)');
 
-      const configObj = {
+      var configObj = {
         VIN_MODEL_MAP: VIN_MODEL_MAP,
         SPECS: SPECS
       };
@@ -1149,73 +1102,153 @@
     }
 
     function updateDropdowns() {
-      const models = [...new Set(allData.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
-      const sel = document.getElementById('modelSelect');
-      const cur = sel.value;
-      sel.innerHTML = '<option value="all">' + getLocalizedText('全部', 'All') + '</option>';
-      models.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
-      if (cur && models.includes(cur)) sel.value = cur;
-
-      const lines = [...new Set(allData.map(r => r.检测线号).filter(l => l && l !== ''))];
-      const sl = document.getElementById('lineFilter');
-      const cl = sl.value;
-      sl.innerHTML = '<option value="all">' + getLocalizedText('全部', 'All') + '</option>';
-      lines.forEach(l => sl.innerHTML += `<option value="${l}">${l}</option>`);
-      if (cl && lines.includes(cl)) sl.value = cl;
-    }
-
-    function computeDimensionData(dim, modelFilter, lineFilter) {
-      let data = allData;
-      if (modelFilter !== 'all') data = data.filter(r => r.车型 === modelFilter);
-      if (lineFilter !== 'all') data = data.filter(r => r.检测线号 === lineFilter);
-
-      const models = [...new Set(data.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
+      var models = [];
+      var seen = {};
+      allData.forEach(function (r) {
+        if (r.车型 !== '未知' && SPECS[r.车型] && !seen[r.车型]) {
+          seen[r.车型] = true;
+          models.push(r.车型);
+        }
+      });
       models.sort();
 
-      let groupKey, sortKey;
-      if (dim === '日') {
-        groupKey = '年月日';
-        sortKey = '年月日';
-      } else if (dim === '周') {
-        groupKey = '周';
-        sortKey = '周排序';
-      } else if (dim === '月') {
-        groupKey = '月显示';
-        sortKey = '月显示';
+      var sel = document.getElementById('modelSelect');
+      var cur = sel.value;
+      sel.innerHTML = '';
+      var allOpt = document.createElement('option');
+      allOpt.value = 'all';
+      allOpt.textContent = getLocalizedText('全部', 'All');
+      sel.appendChild(allOpt);
+      models.forEach(function (m) {
+        var opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        sel.appendChild(opt);
+      });
+      if (cur && models.indexOf(cur) !== -1) {
+        sel.value = cur;
       } else {
-        groupKey = '年显示';
-        sortKey = '年显示';
+        sel.value = 'all';
       }
 
-      const timeVals = new Set();
-      data.forEach(r => {
-        if (r[groupKey] !== null && r[groupKey] !== undefined && r[groupKey] !== '') timeVals.add(r[
-          groupKey]);
+      var lines = [];
+      var seenLines = {};
+      allData.forEach(function (r) {
+        if (r.检测线号 && r.检测线号 !== '' && !seenLines[r.检测线号]) {
+          seenLines[r.检测线号] = true;
+          lines.push(r.检测线号);
+        }
       });
-      let times = [...timeVals];
-      times.sort((a, b) => {
+      lines.sort();
+
+      var sl = document.getElementById('lineFilter');
+      var cl = sl.value;
+      sl.innerHTML = '';
+      var allLineOpt = document.createElement('option');
+      allLineOpt.value = 'all';
+      allLineOpt.textContent = getLocalizedText('全部', 'All');
+      sl.appendChild(allLineOpt);
+      lines.forEach(function (l) {
+        var opt = document.createElement('option');
+        opt.value = l;
+        opt.textContent = l;
+        sl.appendChild(opt);
+      });
+      if (cl && lines.indexOf(cl) !== -1) {
+        sl.value = cl;
+      } else {
+        sl.value = 'all';
+      }
+    }
+
+    // ==================== 核心计算 ====================
+    function computeDimensionData(dim, modelFilter, lineFilter) {
+      var data = allData;
+
+      if (modelFilter && modelFilter !== 'all') {
+        data = data.filter(function (r) { return r.车型 === modelFilter; });
+      }
+      if (lineFilter && lineFilter !== 'all') {
+        data = data.filter(function (r) { return r.检测线号 === lineFilter; });
+      }
+
+      if (data.length === 0) {
+        return [];
+      }
+
+      // 获取所有车型
+      var models = [];
+      var seenModels = {};
+      data.forEach(function (r) {
+        if (r.车型 !== '未知' && SPECS[r.车型] && !seenModels[r.车型]) {
+          seenModels[r.车型] = true;
+          models.push(r.车型);
+        }
+      });
+      models.sort();
+
+      // 获取所有检测线号（用于单独计算）
+      var allLines = [];
+      var seenLines2 = {};
+      data.forEach(function (r) {
+        if (r.检测线号 && r.检测线号 !== '' && !seenLines2[r.检测线号]) {
+          seenLines2[r.检测线号] = true;
+          allLines.push(r.检测线号);
+        }
+      });
+      allLines.sort();
+
+      var groupKey, sortKey;
+      if (dim === '日') { groupKey = '年月日'; sortKey = '年月日'; } else if (dim === '周') {
+        groupKey = '周';
+        sortKey = '周排序';
+      } else if (dim === '月') { groupKey = '月显示'; sortKey = '月显示'; } else {
+        groupKey =
+        '年显示'; sortKey = '年显示';
+      }
+
+      // 获取所有时间值
+      var timeVals = new Set();
+      data.forEach(function (r) {
+        if (r[groupKey] !== null && r[groupKey] !== undefined && r[groupKey] !== '') {
+          timeVals.add(r[groupKey]);
+        }
+      });
+      var times = Array.from(timeVals);
+      times.sort(function (a, b) {
         if (dim === '周') {
-          const aData = data.find(r => r[groupKey] === a);
-          const bData = data.find(r => r[groupKey] === b);
-          const aSort = aData ? aData[sortKey] : 0;
-          const bSort = bData ? bData[sortKey] : 0;
+          var aData = data.find(function (r) { return r[groupKey] === a; });
+          var bData = data.find(function (r) { return r[groupKey] === b; });
+          var aSort = aData ? aData[sortKey] : 0;
+          var bSort = bData ? bData[sortKey] : 0;
           return (aSort || 0) - (bSort || 0);
         }
         return String(a).localeCompare(String(b));
       });
 
-      const rows = [];
-      models.forEach(model => {
-        const modelData = data.filter(r => r.车型 === model);
-        times.forEach(t => {
-          const groupData = modelData.filter(r => r[groupKey] === t);
+      var rows = [];
+
+      models.forEach(function (model) {
+        var modelData = data.filter(function (r) { return r.车型 === model; });
+
+        // 先添加"全部"汇总行
+        times.forEach(function (t) {
+          var groupData = modelData.filter(function (r) { return r[groupKey] === t; });
           if (groupData.length < 3) return;
-          const row = { '时间': String(t), '车型': model, '检测线号': groupData[0].检测线号 || '-' };
-          COLS.forEach(c => {
-            const spec = SPECS[model] ? SPECS[model][c] : null;
+
+          var row = {
+            '时间': String(t),
+            '车型': model,
+            '检测线号': '全部',
+            '_isTotal': true
+          };
+          COLS.forEach(function (c) {
+            var spec = SPECS[model] ? SPECS[model][c] : null;
             if (spec) {
-              const vals = groupData.map(r => r[c]).filter(v => v !== null && !isNaN(v));
-              const cpk = calcCpk(vals, spec[0], spec[1]);
+              var vals = groupData.map(function (r) { return r[c]; }).filter(function (v) {
+                return v !== null && !isNaN(v);
+              });
+              var cpk = calcCpk(vals, spec[0], spec[1]);
               row[COL_LABELS[c]] = (cpk !== null && !isNaN(cpk)) ? cpk : null;
             } else {
               row[COL_LABELS[c]] = null;
@@ -1223,13 +1256,53 @@
           });
           rows.push(row);
         });
+
+        // 再按每个检测线号单独计算
+        allLines.forEach(function (line) {
+          var lineData = modelData.filter(function (r) { return r.检测线号 === line; });
+          if (lineData.length === 0) return;
+
+          times.forEach(function (t) {
+            var groupData = lineData.filter(function (r) { return r[groupKey] === t; });
+            if (groupData.length < 3) return;
+
+            var row = {
+              '时间': String(t),
+              '车型': model,
+              '检测线号': line,
+              '_isTotal': false
+            };
+            COLS.forEach(function (c) {
+              var spec = SPECS[model] ? SPECS[model][c] : null;
+              if (spec) {
+                var vals = groupData.map(function (r) { return r[c]; }).filter(function (v) {
+                  return v !== null && !isNaN(v);
+                });
+                var cpk = calcCpk(vals, spec[0], spec[1]);
+                row[COL_LABELS[c]] = (cpk !== null && !isNaN(cpk)) ? cpk : null;
+              } else {
+                row[COL_LABELS[c]] = null;
+              }
+            });
+            rows.push(row);
+          });
+        });
       });
 
-      rows.sort((a, b) => {
+      // 排序：先按车型，再按时间，全部行排在最前面
+      rows.sort(function (a, b) {
         if (a['车型'] !== b['车型']) return a['车型'].localeCompare(b['车型']);
+        // 同一车型内，全部行排在前面
+        if (a['检测线号'] === '全部' && b['检测线号'] !== '全部') return -1;
+        if (a['检测线号'] !== '全部' && b['检测线号'] === '全部') return 1;
+        // 按时间排序
         if (dim === '周') {
-          const aSort = data.find(r => r['周'] === a['时间'])?.周排序 || 0;
-          const bSort = data.find(r => r['周'] === b['时间'])?.周排序 || 0;
+          var aSort = 0,
+            bSort = 0;
+          data.forEach(function (r) {
+            if (r['周'] === a['时间']) aSort = r.周排序 || 0;
+            if (r['周'] === b['时间']) bSort = r.周排序 || 0;
+          });
           return aSort - bSort;
         }
         return String(a['时间']).localeCompare(String(b['时间']));
@@ -1240,69 +1313,80 @@
 
     function computeAndRender(dim) {
       currentDim = dim || '日';
-      const modelFilter = document.getElementById('modelSelect').value;
-      const lineFilter = document.getElementById('lineFilter').value;
+      var modelFilter = document.getElementById('modelSelect').value;
+      var lineFilter = document.getElementById('lineFilter').value;
+
       currentRows = computeDimensionData(currentDim, modelFilter, lineFilter);
       renderTable(currentRows);
       updateSummary(currentRows);
-      const countText = getLocalizedText('显示 ' + currentRows.length + ' 行', 'Showing ' + currentRows.length +
-        ' rows');
+
+      var countText = getLocalizedText('显示 ' + currentRows.length + ' 行', 'Showing ' + currentRows.length + ' rows');
       document.getElementById('rowCount').textContent = countText;
     }
 
     function renderTable(rows) {
-      const wrapper = document.getElementById('tableWrapper');
+      var wrapper = document.getElementById('tableWrapper');
       if (rows.length === 0) {
         wrapper.innerHTML =
-          `<div class="empty-state"><div class="icon">📭</div><p style="font-size:16px;font-weight:500;" data-en="No data">没有数据</p><p style="font-size:13px;color:var(--text-light);" data-en="Each group needs at least 3 records to calculate Cpk">每组至少需要3条记录才能计算Cpk</p></div>`;
+          '<div class="empty-state"><div class="icon">📭</div><p style="font-size:16px;font-weight:500;" data-en="No data">没有数据</p><p style="font-size:13px;color:var(--text-light);" data-en="Each group needs at least 3 records to calculate Cpk">每组至少需要3条记录才能计算Cpk</p></div>';
         return;
       }
 
-      let html = `<table>
-                <thead><tr>
-                        <th data-en="Model">车型</th>
-                        <th data-en="Time">时间</th>
-                        <th data-en="Inspection Line">检测线号</th>
-                        <th data-en="Left Front Toe CPK">左前前束CPK</th>
-                        <th data-en="Right Front Toe CPK">右前前束CPK</th>
-                        <th data-en="Left Front Camber CPK">左前外倾CPK</th>
-                        <th data-en="Right Front Camber CPK">右前外倾CPK</th>
-                        <th data-en="Steering Angle CPK">方向盘角度CPK</th>
-                    </tr></thead><tbody>`;
+      var html = '<table><thead><tr>' +
+        '<th data-en="Model">车型</th>' +
+        '<th data-en="Time">时间</th>' +
+        '<th data-en="Inspection Line">检测线号</th>' +
+        '<th data-en="Left Front Toe CPK">左前前束CPK</th>' +
+        '<th data-en="Right Front Toe CPK">右前前束CPK</th>' +
+        '<th data-en="Left Front Camber CPK">左前外倾CPK</th>' +
+        '<th data-en="Right Front Camber CPK">右前外倾CPK</th>' +
+        '<th data-en="Steering Angle CPK">方向盘角度CPK</th>' +
+        '</tr></thead><tbody>';
 
-      rows.forEach(row => {
-        html += `<tr>
-                        <td class="col-model">${row['车型']}</td>
-                        <td>${row['时间']}</td>
-                        <td>${row['检测线号']}</td>`;
-        COLS.forEach(c => {
-          const v = row[COL_LABELS[c]];
+      rows.forEach(function (row) {
+        var isTotal = row['检测线号'] === '全部';
+        var bgStyle = isTotal ? 'background:var(--bg-tab);font-weight:600;' : '';
+
+        html += '<tr style="' + bgStyle + '">' +
+          '<td class="col-model">' + row['车型'] + '</td>' +
+          '<td>' + row['时间'] + '</td>' +
+          '<td>' + (isTotal ? '全部' : row['检测线号']) + '</td>';
+
+        COLS.forEach(function (c) {
+          var v = row[COL_LABELS[c]];
           if (v !== null && v !== undefined && !isNaN(v) && isFinite(v)) {
-            html += `<td class="cpk-value ${getCls(v)}">${v.toFixed(4)}</td>`;
+            html += '<td class="cpk-value ' + getCls(v) + '">' + v.toFixed(4) + '</td>';
           } else {
-            html += `<td class="cpk-na">—</td>`;
+            html += '<td class="cpk-na">—</td>';
           }
         });
-        html += `</tr>`;
+        html += '</tr>';
       });
 
-      html += `</tbody></table>`;
+      html += '</tbody></table>';
       wrapper.innerHTML = html;
     }
 
     function updateSummary(rows) {
-      const totalText = getLocalizedText('总记录', 'Total Records');
       document.getElementById('totalRecords').textContent = allData.length;
-      const models = [...new Set(allData.map(r => r.车型).filter(m => m !== '未知' && SPECS[m]))];
+      var models = [];
+      var seen = {};
+      allData.forEach(function (r) {
+        if (r.车型 !== '未知' && SPECS[r.车型] && !seen[r.车型]) {
+          seen[r.车型] = true;
+          models.push(r.车型);
+        }
+      });
       document.getElementById('totalModels').textContent = models.length;
-      let ex = 0,
+
+      var ex = 0,
         gd = 0,
         pr = 0;
-      rows.forEach(row => {
-        COLS.forEach(c => {
-          const v = row[COL_LABELS[c]];
+      rows.forEach(function (row) {
+        COLS.forEach(function (c) {
+          var v = row[COL_LABELS[c]];
           if (v !== null && v !== undefined && !isNaN(v) && isFinite(v)) {
-            const s = getStatus(v);
+            var s = getStatus(v);
             if (s === 'excellent') ex++;
             else if (s === 'good') gd++;
             else if (s === 'poor') pr++;
@@ -1325,19 +1409,19 @@
         return;
       }
 
-      const allRows = [];
-      const dimOrder = ['日', '周', '月', '年'];
-      dimOrder.forEach(dim => {
-        const rows = computeDimensionData(dim, 'all', 'all');
+      var allRows = [];
+      var dimOrder = ['日', '周', '月', '年'];
+      dimOrder.forEach(function (dim) {
+        var rows = computeDimensionData(dim, 'all', 'all');
         if (rows.length === 0) return;
-        rows.forEach(row => {
-          const exportRow = {
+        rows.forEach(function (row) {
+          var exportRow = {
             '车型': row['车型'],
             '时间': row['时间'],
             '检测线号': row['检测线号'],
           };
-          COLS.forEach(c => {
-            const v = row[COL_LABELS[c]];
+          COLS.forEach(function (c) {
+            var v = row[COL_LABELS[c]];
             exportRow[COL_LABELS[c]] = (v !== null && v !== undefined && !isNaN(v) &&
               isFinite(v)) ? v.toFixed(4) : '';
           });
@@ -1354,17 +1438,17 @@
         return;
       }
 
-      allRows.sort((a, b) => {
+      allRows.sort(function (a, b) {
         if (a['车型'] !== b['车型']) return a['车型'].localeCompare(b['车型']);
         return String(a['时间']).localeCompare(String(b['时间']));
       });
 
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(allRows);
+      var wb = XLSX.utils.book_new();
+      var ws = XLSX.utils.json_to_sheet(allRows);
       XLSX.utils.book_append_sheet(wb, ws);
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      const link = document.createElement('a');
+      var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      var blob = new Blob([wbout], { type: 'application/octet-stream' });
+      var link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = 'Cpk全部数据.xlsx';
       link.click();
@@ -1382,8 +1466,8 @@
     // ==================== 应用配置 ====================
     function applyConfig() {
       try {
-        const editor = document.getElementById('configEditor');
-        const config = JSON.parse(editor.value);
+        var editor = document.getElementById('configEditor');
+        var config = JSON.parse(editor.value);
 
         if (config.VIN_MODEL_MAP) {
           VIN_MODEL_MAP = config.VIN_MODEL_MAP;
@@ -1415,9 +1499,9 @@
     }
 
     // ==================== 事件绑定 ====================
-    document.querySelectorAll('.tab').forEach(tab => {
+    document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
         this.classList.add('active');
         computeAndRender(this.dataset.dim);
       });
@@ -1426,12 +1510,13 @@
     document.getElementById('modelSelect').addEventListener('change', function () {
       computeAndRender(currentDim);
     });
+
     document.getElementById('lineFilter').addEventListener('change', function () {
       computeAndRender(currentDim);
     });
 
     document.getElementById('loadBtn').addEventListener('click', function () {
-      const input = document.createElement('input');
+      var input = document.createElement('input');
       input.type = 'file';
       input.accept = '.xlsx,.xls';
       input.onchange = function (e) {
@@ -1443,16 +1528,47 @@
     document.getElementById('exportBtn').addEventListener('click', exportAllData);
     document.getElementById('applyConfigBtn').addEventListener('click', applyConfig);
 
-    document.addEventListener('dragover', e => e.preventDefault());
-    document.addEventListener('drop', e => {
+    document.addEventListener('dragover', function (e) { e.preventDefault(); });
+    document.addEventListener('drop', function (e) {
       e.preventDefault();
-      const files = e.dataTransfer.files;
+      var files = e.dataTransfer.files;
       if (files && files.length > 0 && (files[0].name.endsWith('.xlsx') || files[0].name.endsWith('.xls'))) {
         loadFromFile(files[0]);
       }
     });
 
-    // 初始化显示配置
+    // ==================== 外部控制 ====================
+    window.__setLanguage = function (lang) {
+      window.__lang = lang;
+      document.querySelectorAll('[data-en]').forEach(function (el) {
+        var zh = el.getAttribute('data-zh') || el.textContent.trim();
+        var en = el.getAttribute('data-en');
+        if (lang === 'en' && en) {
+          el.textContent = en;
+        } else {
+          el.textContent = zh;
+        }
+      });
+      if (allData.length > 0) {
+        document.getElementById('dataStatus').textContent = getLocalizedText(
+          '已加载 ' + allData.length + ' 条',
+          'Loaded ' + allData.length + ' records'
+        );
+        var countText = getLocalizedText('显示 ' + currentRows.length + ' 行', 'Showing ' + currentRows.length +
+          ' rows');
+        document.getElementById('rowCount').textContent = countText;
+      }
+      updateDropdowns();
+    };
+
+    window.__setDarkMode = function (isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark-mode');
+      } else {
+        document.documentElement.classList.remove('dark-mode');
+      }
+    };
+
     displayConfig();
     console.log('Cpk工具已加载');
   </script>

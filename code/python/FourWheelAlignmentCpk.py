@@ -1,6 +1,3 @@
-"""该程序需要numpy和pandas库，请确保已安装
-请自行修改VIN_MODEL_MAP和SPECS字典以适应不同车型和规格要求
-"""
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -76,9 +73,9 @@ COL_LABELS = {
     '右前外倾': '右前外倾CPK',
     '方向盘角度': '方向盘角度CPK',
 }
-DIM_NAMES = {'日': '日', '周': '周', '月': '月', '年': '年'}
 
 
+# ==================== 工具函数 ====================
 def get_week_of_month(date):
     """计算某日是当月第几周（周一为一周开始）"""
     first_day = date.replace(day=1)
@@ -86,11 +83,6 @@ def get_week_of_month(date):
     day_of_month = date.day
     week_num = (day_of_month + first_day_of_week - 1) // 7 + 1
     return week_num
-
-
-def format_week_display(year, month, week_num):
-    """格式化为 X月第X周 """
-    return f"{month}月第{week_num}周"
 
 
 def extract_model_from_vin(vin):
@@ -122,6 +114,18 @@ def calculate_cpk(data, spec_lower, spec_upper):
     return min(cpu, cpl)
 
 
+def get_status(cpk):
+    """根据Cpk值返回状态: excellent/good/poor/na"""
+    if pd.isna(cpk) or cpk is None:
+        return 'na'
+    if cpk >= 1.0:
+        return 'excellent'
+    if cpk >= 0.67:
+        return 'good'
+    return 'poor'
+
+
+# ==================== 读取数据 ====================
 def read_excel_data(file_path):
     """读取Excel数据 - 只保留合格数据(P)"""
     print(f"正在读取文件: {file_path}")
@@ -216,10 +220,12 @@ def read_excel_data(file_path):
     return df
 
 
+# ==================== 核心计算 ====================
 def compute_dimension_data(df, dim_key, model_filter=None, line_filter=None):
     """
     按维度计算Cpk
     dim_key: '日', '周', '月', '年'
+    每个检测线号单独计算，同时保留"全部"汇总行
     """
     data = df.copy()
 
@@ -227,6 +233,17 @@ def compute_dimension_data(df, dim_key, model_filter=None, line_filter=None):
         data = data[data['车型'] == model_filter]
     if line_filter and line_filter != 'all':
         data = data[data['检测线号'] == line_filter]
+
+    if len(data) == 0:
+        return pd.DataFrame()
+
+    # 获取所有车型
+    models = [m for m in data['车型'].unique() if m in SPECS and m != '未知']
+    models.sort()
+
+    # 获取所有检测线号
+    all_lines = [l for l in data['检测线号'].unique() if l and l != '']
+    all_lines.sort()
 
     # 确定分组字段
     if dim_key == '日':
@@ -238,35 +255,32 @@ def compute_dimension_data(df, dim_key, model_filter=None, line_filter=None):
     elif dim_key == '月':
         group_col = '年月'
         sort_col = '年月'
-    elif dim_key == '年':
+    else:  # 年
         group_col = '年显示'
         sort_col = '年显示'
-    else:
-        return pd.DataFrame()
 
-    # 获取所有车型（有规格的）
-    models = [m for m in data['车型'].unique() if m in SPECS]
-    models.sort()
+    # 获取所有时间值
+    time_values = data[group_col].dropna().unique()
+    if dim_key == '周':
+        # 按周排序
+        time_list = []
+        for t in time_values:
+            if pd.isna(t):
+                continue
+            sample = data[data[group_col] == t].iloc[0] if len(data[data[group_col] == t]) > 0 else None
+            if sample is not None:
+                time_list.append((t, sample.get(sort_col, 0)))
+        time_list.sort(key=lambda x: x[1])
+        times = [t[0] for t in time_list]
+    else:
+        times = sorted([str(t) for t in time_values if str(t) != 'nan'])
 
     rows = []
+
     for model in models:
         model_data = data[data['车型'] == model]
-        # 获取该车型的所有时间值
-        time_values = model_data[group_col].dropna().unique()
-        # 排序
-        if dim_key == '周':
-            # 按周排序字段排序
-            time_list = []
-            for t in time_values:
-                if pd.isna(t):
-                    continue
-                sample = model_data[model_data[group_col] == t].iloc[0]
-                time_list.append((t, sample.get('周排序', 0)))
-            time_list.sort(key=lambda x: x[1])
-            times = [t[0] for t in time_list]
-        else:
-            times = sorted([str(t) for t in time_values if str(t) != 'nan'])
 
+        # 1. 先添加"全部"汇总行
         for t in times:
             group_data = model_data[model_data[group_col] == t]
             if len(group_data) < 3:
@@ -275,7 +289,8 @@ def compute_dimension_data(df, dim_key, model_filter=None, line_filter=None):
             row = {
                 '车型': model,
                 '时间': t,
-                '检测线号': group_data.iloc[0]['检测线号'] if '检测线号' in group_data.columns else '-'
+                '检测线号': '全部',
+                '_is_total': True
             }
 
             for col in MEASUREMENT_COLS:
@@ -288,25 +303,64 @@ def compute_dimension_data(df, dim_key, model_filter=None, line_filter=None):
 
             rows.append(row)
 
-    # 按车型排序，再按时间排序
+        # 2. 再按每个检测线号单独计算
+        for line in all_lines:
+            line_data = model_data[model_data['检测线号'] == line]
+            if len(line_data) == 0:
+                continue
+
+            for t in times:
+                group_data = line_data[line_data[group_col] == t]
+                if len(group_data) < 3:
+                    continue
+
+                row = {
+                    '车型': model,
+                    '时间': t,
+                    '检测线号': line,
+                    '_is_total': False
+                }
+
+                for col in MEASUREMENT_COLS:
+                    if col in SPECS[model]:
+                        lower, upper = SPECS[model][col]
+                        cpk = calculate_cpk(group_data[col], lower, upper)
+                        row[COL_LABELS[col]] = round(cpk, 4) if not np.isnan(cpk) else ''
+                    else:
+                        row[COL_LABELS[col]] = ''
+
+                rows.append(row)
+
+    # 转换为DataFrame
     result = pd.DataFrame(rows)
-    if not result.empty:
-        if dim_key == '周':
-            # 周需要按周排序字段排序
-            result['_sort'] = result['车型'].apply(lambda x: list(SPECS.keys()).index(x) if x in SPECS else 999)
-            # 添加周排序辅助
-            sort_map = {}
-            for _, r in result.iterrows():
-                key = (r['车型'], r['时间'])
-                sample = data[(data['车型'] == r['车型']) & (data[group_col] == r['时间'])]
-                if not sample.empty:
-                    sort_map[key] = sample.iloc[0].get('周排序', 0)
-                else:
-                    sort_map[key] = 0
-            result['_week_sort'] = result.apply(lambda r: sort_map.get((r['车型'], r['时间']), 0), axis=1)
-            result = result.sort_values(['车型', '_week_sort']).drop(columns=['_sort', '_week_sort']).reset_index(drop=True)
-        else:
-            result = result.sort_values(['车型', '时间']).reset_index(drop=True)
+
+    if result.empty:
+        return result
+
+    # 排序：先按车型，再按时间，全部行排在最前面
+    # 添加辅助排序列
+    result['_model_order'] = result['车型'].apply(lambda x: models.index(x) if x in models else 999)
+    result['_is_total_order'] = result['_is_total'].apply(lambda x: 0 if x else 1)
+
+    if dim_key == '周':
+        # 周排序
+        week_sort_map = {}
+        for _, row in result.iterrows():
+            key = (row['车型'], row['时间'])
+            sample = data[(data['车型'] == row['车型']) & (data[group_col] == row['时间'])]
+            if not sample.empty:
+                week_sort_map[key] = sample.iloc[0].get(sort_col, 0)
+            else:
+                week_sort_map[key] = 0
+        result['_time_sort'] = result.apply(lambda r: week_sort_map.get((r['车型'], r['时间']), 0), axis=1)
+        result = result.sort_values(['_model_order', '_is_total_order', '_time_sort']).reset_index(drop=True)
+    else:
+        # 按时间字符串排序
+        result['_time_sort'] = result['时间']
+        result = result.sort_values(['_model_order', '_is_total_order', '_time_sort']).reset_index(drop=True)
+
+    # 删除辅助列
+    result = result.drop(columns=['_model_order', '_is_total_order', '_time_sort', '_is_total'])
 
     return result
 
@@ -373,6 +427,7 @@ def main():
     output_file = desktop / 'Cpk全部数据.xlsx'
 
     print(f"\n开始计算Cpk（日/周/月/年四个维度）...")
+    print("  每个检测线号单独计算，同时保留'全部'汇总行")
 
     # 计算四个维度
     dims = ['日', '周', '月', '年']
@@ -391,9 +446,6 @@ def main():
     # 合并所有维度数据
     final_df = pd.concat(all_rows, ignore_index=True)
 
-    # 按车型排序，相同车型放一起
-    final_df = final_df.sort_values(['车型', '时间']).reset_index(drop=True)
-
     # 保存到Excel
     final_df.to_excel(output_file, index=False)
 
@@ -404,18 +456,40 @@ def main():
     print("【Cpk计算结果摘要】")
     print("=" * 70)
 
+    # 按车型分组显示
     for model in final_df['车型'].unique():
         model_data = final_df[final_df['车型'] == model]
         print(f"\n【{model}】共 {len(model_data)} 条记录")
-        for _, row in model_data.head(5).iterrows():
-            cpk_values = []
-            for col in MEASUREMENT_COLS:
-                val = row[COL_LABELS[col]]
-                if val != '' and not pd.isna(val):
-                    cpk_values.append(f"{COL_LABELS[col]}={val:.4f}")
-            print(f"  {row['时间']} | {row['检测线号']} | {' | '.join(cpk_values)}")
-        if len(model_data) > 5:
-            print(f"  ... 共 {len(model_data)} 条记录")
+
+        # 先显示"全部"行
+        total_rows = model_data[model_data['检测线号'] == '全部']
+        detail_rows = model_data[model_data['检测线号'] != '全部']
+
+        if not total_rows.empty:
+            print("  [汇总]")
+            for _, row in total_rows.iterrows():
+                cpk_values = []
+                for col in MEASUREMENT_COLS:
+                    val = row[COL_LABELS[col]]
+                    if val != '' and not pd.isna(val):
+                        cpk_values.append(f"{COL_LABELS[col]}={val:.4f}")
+                print(f"    {row['时间']} | 全部 | {' | '.join(cpk_values)}")
+
+        if not detail_rows.empty:
+            print("  [各线号明细]")
+            for _, row in detail_rows.head(10).iterrows():
+                cpk_values = []
+                for col in MEASUREMENT_COLS:
+                    val = row[COL_LABELS[col]]
+                    if val != '' and not pd.isna(val):
+                        cpk_values.append(f"{COL_LABELS[col]}={val:.4f}")
+                print(f"    {row['时间']} | {row['检测线号']} | {' | '.join(cpk_values)}")
+            if len(detail_rows) > 10:
+                print(f"    ... 共 {len(detail_rows)} 条明细记录")
+
+    print("\n" + "=" * 70)
+    print("分级标准: ≥1.0 充足 | 0.67~1.0 临界 | <0.67 不足")
+    print("=" * 70)
 
 
 if __name__ == "__main__":
