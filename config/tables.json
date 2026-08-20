@@ -215,18 +215,18 @@
     },
     "script14": {
       "name": {
-        "zh": "四轮定位Cpk计算",
-        "en": "Four-Wheel Alignment Cpk Calculation"
+        "zh": "汽车质量分析",
+        "en": "Car Quality Analysis"
       },
       "Introduction": {
-        "zh": "用于计算四轮定位的Cpk值。",
-        "en": "For calculating the Cpk value of four-wheel alignment."
+        "zh": "用于分析汽车质量数据。",
+        "en": "For analyzing car quality data."
       },
       "note": {
         "zh": "根据需要修改VIN_MODEL_MAP和SPECS字典。",
         "en": "Modify VIN_MODEL_MAP and SPECS dictionaries as needed."
       },
-      "path": "/code/python/FourWheelAlignmentCpk.py"
+      "path": "/code/python/CarQualityAnalysis.py"
     }
   },
   "C++": {
@@ -466,18 +466,18 @@
     
       "tool11": {
       "name": {
-        "zh": "四轮定位Cpk计算",
-        "en": "Four-Wheel Alignment Cpk Calculation"
+        "zh": "汽车质量分析",
+        "en": "Car Quality Analysis"
       },
       "Introduction": {
-        "zh": "用于计算四轮定位的Cpk值。",
-        "en": "For calculating the Cpk value of four-wheel alignment."
+        "zh": "用于计算四轮定位，大灯的Cpk和Cp值。",
+        "en": "For calculating the Cpk and Cp values of four-wheel alignment and headlamps."
       },
       "note": {
         "zh": "根据需要修改VIN_MODEL_MAP和SPECS字典。",
         "en": "Modify VIN_MODEL_MAP and SPECS dictionaries as needed."
       },
-      "path": "/code/webapp/FourWheelAlignmentCpk"
+      "path": "/code/webapp/CarQualityAnalysis"
     }
   }
 }

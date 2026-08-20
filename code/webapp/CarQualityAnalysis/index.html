@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-en="Four-Wheel Alignment Cpk">四轮定位Cpk</title>
+  <title>汽车质量控制分析</title>
   <link rel="stylesheet" href="/css/styles_button.css">
   <link rel="stylesheet" href="/css/styles3_animation.css">
   <link rel="stylesheet" href="/css/styles4_eyeCare.js.css">
@@ -23,32 +23,36 @@
   <link href="/css/message.min.css" rel="stylesheet" />
   <script src="/js/message.min.js"></script>
   <link rel="stylesheet" href="./style.css">
-  <title data-en="Four-Wheel Alignment Cpk">四轮定位cpk</title>
   </script>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-  <div class="container">
+<button class="custom-button" style="position: fixed; top: 10px; left: 10px;" onclick="goBackOrHome()"
+  data-en="Back">返回</button>
+  <div class="container" id="app">
     <div class="header">
-      <h1 data-en="Four-Wheel Alignment Cpk Calculator">四轮定位 Cpk 计算</h1>
+      <h1 id="pageTitle" data-en="Cpk Calculation Tool">汽车质量分析</h1>
       <div class="header-right">
-        <span class="badge" data-en="P Qualified Data Only">仅 P 合格数据</span>
+        <span class="badge" id="moduleBadge" data-en="Qualified Data Only">仅合格数据</span>
         <span id="dataStatus" style="color:var(--text-muted);" data-en="Not loaded">未加载</span>
       </div>
     </div>
-    <div class="subtitle"
+    <div class="subtitle" id="pageSubtitle"
       data-en="Group by model, time, inspection line · Each model uses its own specification limits">
       按车型、时间、检测线号分组 · 每个车型使用各自规格上下限
     </div>
 
+    <!-- 模块切换 -->
+    <div class="module-tabs">
+      <span class="module-tab active" data-module="alignment" id="tabAlignment">四轮定位</span>
+      <span class="module-tab" data-module="lamp" id="tabLamp">大灯</span>
+    </div>
+
+    <!-- 配置显示 -->
     <details class="config-section">
       <summary data-en="Current Configuration (click to expand/collapse)">当前配置（点击展开/收起）</summary>
       <div style="margin-top:8px;font-size:12px;">
-        <div><strong data-en="VIN Mapping (position 11-12 → model):">VIN映射表（第11-12位 → 车型）：</strong></div>
-        <div id="vinMapDisplay"
-          style="background:var(--bg-code);padding:6px 10px;border-radius:4px;margin:4px 0 8px 0;font-family:Consolas,monospace;font-size:12px;color:var(--text-secondary);">
-        </div>
         <div><strong data-en="Specification Table (model → parameter: [LSL, USL]):">规格表（车型 → 项目: [下限, 上限]）：</strong>
         </div>
         <div id="specsDisplay"
@@ -67,6 +71,7 @@
       </div>
     </details>
 
+    <!-- 维度切换 -->
     <div class="dimension-tabs">
       <span class="dimension-label" data-en="Time Dimension:">时间维度：</span>
       <span class="tab active" data-dim="日" data-en="Day">日</span>
@@ -75,17 +80,19 @@
       <span class="tab" data-dim="年" data-en="Year">年</span>
     </div>
 
-    <div class="toolbar">
-      <label data-en="Model">车型 <select id="modelSelect">
-          <option value="all" data-en="All">全部</option>
-        </select></label>
-      <label data-en="Inspection Line">检测线号 <select id="lineFilter">
-          <option value="all" data-en="All">全部</option>
-        </select></label>
-      <button class="btn btn-primary" id="loadBtn" data-en="Load Excel">加载 Excel</button>
-      <button class="btn btn-success" id="exportBtn" data-en="Export All Data">导出全部数据</button>
-    </div>
+    <!-- 工具栏 -->
+<div class="toolbar">
+  <label>车型 <select id="modelSelect">...</select></label>
+  <label>检测线号 <select id="lineFilter">...</select></label>
+  <label>计算方法 <select id="methodSelect">
+      <option value="cpk">Cpk</option>
+      <option value="cp">Cp</option>
+    </select></label>
+  <button class="btn btn-primary" id="loadBtn">加载 Excel</button>
+  <button class="btn btn-success" id="exportBtn">导出全部数据</button>
+</div>
 
+    <!-- 统计摘要 -->
     <div class="summary">
       <div class="summary-card">
         <div class="label" data-en="Total Records">总记录</div>
@@ -114,13 +121,14 @@
       <p style="margin-top:8px;color:var(--text-muted);" data-en="Calculating...">计算中...</p>
     </div>
 
+    <!-- 表格 -->
     <div class="table-wrapper" id="tableWrapper">
       <div class="empty-state">
         <div class="icon">📂</div>
         <p style="font-size:16px;font-weight:500;" data-en="Please load data">请加载数据</p>
         <p style="font-size:13px;color:var(--text-light);"
-          data-en="Click 'Load Excel' to select the vehicle inspection record file">
-          点击「加载 Excel」选择车辆检测记录文件
+          data-en="Click 'Load Excel' to select the inspection record file">
+          点击「加载 Excel」选择检测记录文件
         </p>
       </div>
     </div>
@@ -138,6 +146,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
   </script>
+  <script src="CarQualityAnalysis.js"></script>
+  </script>
 </body>
-<script src="FourWheelAlignmentCpk.js"></script>
+
 </html>
