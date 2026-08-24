@@ -323,7 +323,7 @@
         "en": "Simple web calculator"
       },
       "note": {
-        "zh": "支持基本运算，科学运算，函数画图等功能，不需下载，是网页计算的不错选择",
+        "zh": "支持基本运算，科学运算，函数画图等功能，不需下载",
         "en": "Supports basic operations, scientific calculations, function graphing, no download required, great choice for web calculations"
       },
       "path": "/code/webapp/calculator"
