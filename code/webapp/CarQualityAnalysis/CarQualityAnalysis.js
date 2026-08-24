@@ -1089,7 +1089,63 @@ var item = {
             showConfirmButton: false
         });
     }
+function exportFilteredData() {
+  var currentData = getCurrentData();
+  var rows = currentData.currentRows || [];
+  
+  if (rows.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: '没有数据',
+      text: '请先加载并筛选数据'
+    });
+    return;
+  }
 
+  var method = getCurrentMethod();
+  var methodLabel = method === 'cp' ? 'Cp' : 'CPK';
+
+  var cols = getModuleCols();
+  var colLabels = getModuleColLabels();
+  var exportColLabels = {};
+  cols.forEach(function(c) {
+    var baseName = colLabels[c].replace('CPK', '');
+    exportColLabels[c] = baseName + methodLabel;
+  });
+
+  var exportRows = [];
+  rows.forEach(function(row) {
+    var exportRow = {
+      '车型': row['车型'],
+      '时间': row['时间'],
+      '检测线号': row['检测线号']
+    };
+    cols.forEach(function(c) {
+      var v = row[colLabels[c]];
+      exportRow[exportColLabels[c]] = (v !== null && v !== undefined && !isNaN(v) && isFinite(v)) ? v.toFixed(4) : '';
+    });
+    exportRows.push(exportRow);
+  });
+
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.json_to_sheet(exportRows);
+  XLSX.utils.book_append_sheet(wb, ws);
+  var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  var blob = new Blob([wbout], { type: 'application/octet-stream' });
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = (currentModule === 'alignment' ? '四轮定位' : '大灯') + methodLabel + '筛选数据.xlsx';
+  link.click();
+  URL.revokeObjectURL(link.href);
+
+  Swal.fire({
+    icon: 'success',
+    title: '导出成功',
+    text: '已导出 ' + exportRows.length + ' 行筛选数据',
+    timer: 1500,
+    showConfirmButton: false
+  });
+}
     // ==================== 应用配置 ====================
     function applyConfig() {
         try {
@@ -1234,7 +1290,7 @@ var item = {
         document.getElementById('exportBtn').addEventListener('click', exportAllData);
 
         document.getElementById('applyConfigBtn').addEventListener('click', applyConfig);
-
+document.getElementById('exportFilteredBtn').addEventListener('click', exportFilteredData);
         document.addEventListener('dragover', function(e) { e.preventDefault(); });
         document.addEventListener('drop', function(e) {
             e.preventDefault();

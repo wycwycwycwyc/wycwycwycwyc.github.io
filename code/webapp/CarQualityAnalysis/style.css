@@ -639,7 +639,14 @@ tr:hover td {
 .loading.active {
   display: block;
 }
+.btn-info {
+  background: #17a2b8;
+}
 
+.btn-info:hover {
+  background: #138496;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+}
 .spinner {
   display: inline-block;
   width: 28px;
