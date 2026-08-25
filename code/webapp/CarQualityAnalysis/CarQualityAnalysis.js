@@ -195,19 +195,26 @@
         return s;
     }
 
-    function calcCpk(vals, lo, hi) {
-        var d = vals.filter(function(v) { return typeof v === 'number' && !isNaN(v) && isFinite(v); });
-        if (d.length < 3) return null;
-        
-        var m = d.reduce(function(a, b) { return a + b; }, 0) / d.length;
-        var s = Math.sqrt(d.reduce(function(a, b) { return a + (b - m) * (b - m); }, 0) / (d.length - 1));
-        
-        if (s === 0) return null;
-        
-        var cpu = (hi - m) / (3 * s);
-        var cpl = (m - lo) / (3 * s);
-        return Math.min(cpu, cpl);
+function calcCpk(vals, lo, hi, method) {
+    var d = vals.filter(function(v) { return typeof v === 'number' && !isNaN(v) && isFinite(v); });
+    if (d.length < 3) return null;
+    
+    var m = d.reduce(function(a, b) { return a + b; }, 0) / d.length;
+    var s = Math.sqrt(d.reduce(function(a, b) { return a + (b - m) * (b - m); }, 0) / (d.length - 1));
+    
+    if (s === 0) return null;
+    
+    // Cp = (USL - LSL) / (6 * sigma)
+    if (method === 'cp') {
+        var cp = (hi - lo) / (6 * s);
+        return cp;
     }
+    
+    // Cpk = min((USL - mean) / (3 * sigma), (mean - LSL) / (3 * sigma))
+    var cpu = (hi - m) / (3 * s);
+    var cpl = (m - lo) / (3 * s);
+    return Math.min(cpu, cpl);
+}
 
     function getStatus(c) {
         if (c === null || c === undefined || isNaN(c)) return 'na';
@@ -715,7 +722,7 @@ var item = {
                             var vals = groupData.map(function(r) { return r[c]; }).filter(function(v) {
                                 return v !== null && !isNaN(v);
                             });
-                            var idx = calcCpk(vals, spec[0], spec[1]);
+                            var idx = calcCpk(vals, spec[0], spec[1], method);
                             row[colLabels[c]] = (idx !== null && !isNaN(idx)) ? idx : null;
                         } else {
                             row[colLabels[c]] = null;
@@ -770,7 +777,7 @@ var item = {
                             var vals = groupData.map(function(r) { return r[c]; }).filter(function(v) {
                                 return v !== null && !isNaN(v);
                             });
-                            var idx = calcCpk(vals, spec[0], spec[1]);
+                            var idx = calcCpk(vals, spec[0], spec[1], method);
                             row[colLabels[c]] = (idx !== null && !isNaN(idx)) ? idx : null;
                         } else {
                             row[colLabels[c]] = null;
