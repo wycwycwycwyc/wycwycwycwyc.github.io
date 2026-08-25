@@ -386,7 +386,7 @@ var item = {
                 var weekNum = getWeekOfMonth(d);
                 item.周 = item.月数字 + '月第' + weekNum + '周';
                 item.周排序 = item.年 * 100 + item.月数字 * 10 + weekNum;
-                item.月显示 = item.年 + '-' + item.月;
+                item.月显示 = item.年 + '/' + item.月数字;
                 item.年显示 = String(item.年);
             } else {
                 item.年 = null;
