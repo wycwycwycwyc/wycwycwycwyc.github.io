@@ -570,7 +570,7 @@ var item = {
 
         var totalOpt = document.createElement('option');
         totalOpt.value = 'total';
-        totalOpt.textContent = '全部';
+        totalOpt.textContent = 'ALL';
         sl.appendChild(totalOpt);
 
         lines.forEach(function(l) {
@@ -701,14 +701,14 @@ var item = {
         rawDataMap[detailKey] = detailData;
     }
 
-                    var row = {
-                        '车型': model,
-                        '时间': String(t),
-                        '检测线号': '全部',
-                        '_isTotal': true,
-                        '_sampleCount': groupData.length,
-                        '_detailKey': detailKey
-                    };
+    var row = {
+        '车型': model,
+        '时间': String(t),
+        '检测线号': 'ALL',
+        '_isTotal': true,
+        '_sampleCount': groupData.length,
+        '_detailKey': detailKey
+    };
                     cols.forEach(function(c) {
                         var spec = specs[model] ? specs[model][c] : null;
                         if (spec) {
@@ -786,8 +786,8 @@ var item = {
 
         rows.sort(function(a, b) {
             if (a['车型'] !== b['车型']) return a['车型'].localeCompare(b['车型']);
-            if (a['检测线号'] === '全部' && b['检测线号'] !== '全部') return -1;
-            if (a['检测线号'] !== '全部' && b['检测线号'] === '全部') return 1;
+            if (a['检测线号'] === 'ALL' && b['检测线号'] !== 'ALL') return -1;
+            if (a['检测线号'] !== 'ALL' && b['检测线号'] === 'ALL') return 1;
             if (dim === '周') {
                 var aSort = 0, bSort = 0;
                 data.forEach(function(r) {
@@ -855,14 +855,14 @@ var item = {
         html += '</tr></thead><tbody>';
 
         rows.forEach(function(row, index) {
-            var isTotal = row['检测线号'] === '全部';
+            var isTotal = row['检测线号'] === 'ALL';
             var bgStyle = isTotal ? 'background:var(--bg-tab);font-weight:600;' : '';
             var sampleCount = row['_sampleCount'] || 0;
 
             html += '<tr style="' + bgStyle + 'cursor:pointer;" data-rowindex="' + index + '" class="clickable-row">' +
                 '<td class="col-model">' + row['车型'] + '</td>' +
                 '<td>' + row['时间'] + '</td>' +
-                '<td>' + (isTotal ? '全部' : row['检测线号']) + '</td>';
+                '<td>' + (isTotal ? 'ALL' : row['检测线号']) + '</td>';
 
             cols.forEach(function(c) {
                 var v = row[colLabels[c]];
