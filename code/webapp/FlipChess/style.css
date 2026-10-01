@@ -13,7 +13,40 @@ body {
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
   padding: 20px;
 }
+@media (max-width: 700px) {
+  body {
+    justify-content: flex-start;
+    /* ★ 窄屏改为靠左排，不再居中 */
+   
+  }
+}
+/* 平板 */
+@media (max-width: 720px) {
+  #gamePanel {
+    zoom: 0.85;
+  }
+}
 
+/* 大手机 */
+@media (max-width: 520px) {
+  #gamePanel {
+    zoom: 0.72;
+  }
+}
+
+/* 小手机 */
+@media (max-width: 420px) {
+  #gamePanel {
+    zoom: 0.62;
+  }
+}
+
+/* 超小屏 */
+@media (max-width: 360px) {
+  #gamePanel {
+    zoom: 0.55;
+  }
+}
 .panel {
   background: linear-gradient(160deg, #e2c49a, #c9a87c 40%, #b58b5a);
   background-image:
