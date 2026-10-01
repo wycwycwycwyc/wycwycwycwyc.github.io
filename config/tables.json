@@ -478,6 +478,22 @@
         "en": "Modify VIN_MODEL_MAP and SPECS dictionaries as needed."
       },
       "path": "/code/webapp/CarQualityAnalysis"
+    },
+    
+      "tool12": {
+      "name": {
+        "zh": "象棋翻旗",
+        "en": "Flip Chess"
+      },
+      "Introduction": {
+        "zh": "一个网页版的翻旗象棋",
+        "en": "A web version of Flip Chess."
+      },
+      "note": {
+        "zh": "可以多人在线游玩，无需下载，记录分数",
+        "en": "Play online, no download required, score tracking"
+      },
+      "path": "/code/webapp/FlipChess"
     }
   }
 }

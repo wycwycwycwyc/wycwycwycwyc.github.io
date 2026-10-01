@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>象棋翻棋</title>
+      <script src="/config/serverUrl.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="/css/styles_button.css">
+      <script src="/js/script4_goBackOrHome.js"></script>
+      <script src="/js/script13_checkIslogin.js"></script>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+      <link href="/css/message.min.css" rel="stylesheet" />
+      <script src="/js/message.min.js"></script>
+      <link rel="stylesheet" href="./style.css">
+      <script src="/js/script14_setLanguage.js"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <div class="banner" id="globalBanner"></div>
+
+  <div class="modal-mask" id="confirmModal">
+    <div class="modal-box">
+      <h3 id="confirmText"></h3>
+      <div class="modal-btns">
+        <button class="btn btn-undo" onclick="confirmYes()">同意</button>
+        <button class="btn btn-back" onclick="confirmNo()">拒绝</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="winnerModal">
+    <div class="modal-box winner-box">
+      <div class="winner-icon" id="winnerIcon">🏆</div>
+      <h3 class="winner-title" id="winnerTitle">红方获胜！</h3>
+      <div class="modal-btns">
+        <button class="btn btn-reset" onclick="closeWinnerModal()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主菜单 -->
+  <div class="panel" id="menuPanel">
+    <h1>象棋翻棋</h1>
+    <button class="menu-btn" onclick="showOffline()">离线对弈</button>
+    <button class="menu-btn secondary" onclick="showOnline()">在线对弈</button>
+    <button class="menu-btn secondary" onclick="showRecords()">排行榜</button>
+  </div>
+
+  <!-- 大厅 -->
+  <div class="panel hidden" id="lobbyPanel">
+    <h2>在线对弈</h2>
+    <div class="field-row">
+      <label>当前用户</label>
+      <div class="user-badge" id="lobbyUserLabel">—</div>
+    </div>
+    <div class="field-row">
+      <label>房间号（6位数字）</label>
+      <div style="display:flex; gap:8px;">
+        <input id="lobbyRoom" placeholder="输入房间号或创建" style="flex:1;" maxlength="6">
+        <button class="btn btn-reset" onclick="createRoom()">创建</button>
+      </div>
+    </div>
+    <button class="menu-btn" onclick="joinRoom()">加入房间</button>
+    <button class="menu-btn secondary" onclick="backToMenu()">返回</button>
+    <div class="hint" id="lobbyHint"></div>
+  </div>
+
+  <!-- 等待房间 -->
+  <div class="panel hidden" id="waitPanel">
+    <h2>房间：<span id="waitRoomLabel">------</span></h2>
+    <div style="text-align:center; color:#3d2a1a; font-weight:bold;" id="waitStatus">等待对手加入...</div>
+    <div class="ready-area">
+      <div><span class="ready-dot" id="dotSelf"></span>我</div>
+      <div><span class="ready-dot" id="dotOpp"></span>对手</div>
+    </div>
+    <button class="menu-btn" id="readyBtn" onclick="toggleReady()" disabled>准备</button>
+    <button class="menu-btn secondary" onclick="leaveRoom()">离开房间</button>
+    <div class="hint" id="waitHint"></div>
+    <div class="log-panel" id="netLog"></div>
+  </div>
+
+  <!-- 对局 -->
+  <div class="game-panel hidden" id="gamePanel">
+    <div class="room-info">
+      <span>房间：</span><span class="badge" id="gameRoomLabel">----</span>
+      <span id="gameRoleLabel"></span>
+      <span id="gameColorLabel" style="color:#f3d37c;"></span>
+      <span id="gameOppLabel" style="color:#b32b2b;"></span>
+      <span id="connDot" class="conn-indicator"></span>
+    </div>
+
+    <div class="main-content">
+      <div class="graveyard">
+        <div class="graveyard-list" id="redGraveyard"></div>
+      </div>
+      <div class="board-container">
+        <div class="board" id="board"></div>
+      </div>
+      <div class="graveyard">
+        <div class="graveyard-list" id="blackGraveyard"></div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="turn-icon unknown-icon" id="turnIcon"></div>
+      <div id="statusText"></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="yieldBtn" onclick="yieldFirst()" disabled>让先</button>
+        <button class="btn btn-undo" id="undoBtn" disabled>悔棋</button>
+        <button class="btn btn-draw" id="drawBtn" onclick="requestDraw()" disabled>和棋</button>
+        <button class="btn btn-resign" id="resignBtn" onclick="resign()" disabled>认输</button>
+        <button class="btn btn-reset" id="resetBtn">重新开局</button>
+        <button class="btn btn-back" onclick="exitGame()">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 排行榜 -->
+  <div class="panel hidden" id="recordsPanel">
+    <h2>象棋翻棋排行榜</h2>
+    <div class="records-list" id="recordsList">
+      <div style="text-align:center; padding:20px; color:#5a3f28;">加载中...</div>
+    </div>
+    <button class="menu-btn secondary" onclick="refreshRecords()">刷新</button>
+    <button class="menu-btn secondary" onclick="backToMenu()">返回</button>
+    <div class="hint" id="recordsHint"></div>
+  </div>
+
+  <script src="./FlipChess.js"></script>
+</body>
+
+</html>
