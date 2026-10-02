@@ -5,17 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
   <title>象棋翻棋</title>
-      <script src="/config/serverUrl.js"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <link rel="stylesheet" href="/css/styles_button.css">
-      <script src="/js/script4_goBackOrHome.js"></script>
-      <script src="/js/script13_checkIslogin.js"></script>
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-      <link href="/css/message.min.css" rel="stylesheet" />
-      <script src="/js/message.min.js"></script>
-      <link rel="stylesheet" href="./style.css">
-      <script src="/js/script14_setLanguage.js"></script>
+  <script src="/config/serverUrl.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script13_checkIslogin.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <script src="/js/script14_setLanguage.js"></script>
   <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -23,6 +22,16 @@
 
   <div class="banner" id="globalBanner"></div>
 
+  <!-- 聊天悬浮按钮 -->
+  <button class="chat-fab hidden" id="chatFab" onclick="openChatModal()" title="聊天">
+    <i class="fas fa-comment-dots"></i>
+    <span class="chat-fab-badge hidden" id="chatBadge">0</span>
+  </button>
+
+  <!-- 聊天通知横幅 -->
+  <div class="chat-notice-container" id="chatNoticeContainer"></div>
+
+  <!-- 确认弹窗（同意/拒绝）-->
   <div class="modal-mask" id="confirmModal">
     <div class="modal-box">
       <h3 id="confirmText"></h3>
@@ -43,6 +52,62 @@
     </div>
   </div>
 
+  <!-- 对方断线等待弹窗 -->
+  <div class="modal-mask" id="oppDisconnectModal">
+    <div class="modal-box">
+      <h3 style="color:#b32b2b;">⚠ 对方断线</h3>
+      <p style="color:#3d2a1a; font-weight:bold;">等待对方重新加入... <span id="oppWaitTime">120</span> 秒</p>
+      <p style="color:#5a3f28; font-size:0.85rem;">超时未归则判对方负</p>
+      <div class="modal-btns">
+        <button class="btn btn-resign" id="giveUpBtn" onclick="giveUpWaiting()">放弃等待，判我胜</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 时间控制选择 -->
+  <div class="modal-mask" id="timeControlModal">
+    <div class="modal-box time-box">
+      <h3>选择时间控制</h3>
+      <div class="time-options">
+        <button class="time-option-btn" onclick="selectTimeOption('standard')">
+          <div class="time-option-title">标准</div>
+          <div class="time-option-desc">15分 + 60秒</div>
+        </button>
+        <button class="time-option-btn" onclick="selectTimeOption('fast')">
+          <div class="time-option-title">快棋</div>
+          <div class="time-option-desc">10分 + 30秒</div>
+        </button>
+        <button class="time-option-btn" onclick="selectTimeOption('blitz')">
+          <div class="time-option-title">超快</div>
+          <div class="time-option-desc">5分 + 20秒</div>
+        </button>
+        <button class="time-option-btn" onclick="selectTimeOption('none')">
+          <div class="time-option-title">关闭</div>
+          <div class="time-option-desc">仅正计时，不超时</div>
+        </button>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-back" onclick="cancelTimeSelect()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 聊天模态框 -->
+  <div class="modal-mask" id="chatModal">
+    <div class="modal-box chat-modal-box">
+      <h3>聊天</h3>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-presets" id="chatPresets"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" maxlength="50" placeholder="输入消息...">
+        <button class="btn btn-reset" id="chatSendBtn">发送</button>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-back" onclick="closeChatModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 主菜单 -->
   <div class="panel" id="menuPanel">
     <h1>象棋翻棋</h1>
@@ -57,6 +122,12 @@
     <div class="field-row">
       <label>当前用户</label>
       <div class="user-badge" id="lobbyUserLabel">—</div>
+    </div>
+    <div class="field-row">
+      <label>在线用户 <span style="font-weight:normal;font-size:0.78rem;color:#5a3f28;">（点击可邀请）</span></label>
+      <div class="online-users-list" id="onlineUsersList">
+        <div style="text-align:center; color:#5a3f28; font-size:0.85rem; padding:8px;">加载中...</div>
+      </div>
     </div>
     <div class="field-row">
       <label>房间号（6位数字）</label>
@@ -86,12 +157,15 @@
 
   <!-- 对局 -->
   <div class="game-panel hidden" id="gamePanel">
-    <div class="room-info">
-      <span>房间：</span><span class="badge" id="gameRoomLabel">----</span>
-      <span id="gameRoleLabel"></span>
-      <span id="gameColorLabel" style="color:#f3d37c;"></span>
-      <span id="gameOppLabel" style="color:#b32b2b;"></span>
-      <span id="connDot" class="conn-indicator"></span>
+    <div class="room-info-wrap">
+      <div class="room-info">
+        <span>房间：</span><span class="badge" id="gameRoomLabel">----</span>
+        <span id="gameRoleLabel"></span>
+        <span id="gameColorLabel" style="color:#f3d37c;"></span>
+        <span id="gameOppLabel" style="color:#b32b2b;"></span>
+        <span id="connDot" class="conn-indicator"></span>
+      </div>
+      <div class="time-info" id="timeInfo"></div>
     </div>
 
     <div class="main-content">
@@ -134,4 +208,4 @@
   <script src="./FlipChess.js"></script>
 </body>
 
-</html>
+</html> 
