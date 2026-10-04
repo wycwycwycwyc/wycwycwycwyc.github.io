@@ -482,11 +482,11 @@
     
       "tool12": {
       "name": {
-        "zh": "象棋翻旗",
+        "zh": "象棋翻棋",
         "en": "Flip Chess"
       },
       "Introduction": {
-        "zh": "一个网页版的翻旗象棋",
+        "zh": "一个网页版的翻棋象棋",
         "en": "A web version of Flip Chess."
       },
       "note": {
