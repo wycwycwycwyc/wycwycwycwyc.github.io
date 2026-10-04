@@ -230,6 +230,106 @@ body {
   min-height: 1.2em;
 }
 
+/* ★ 同步栏限制宽度，不撑开棋盘 */
+.sync-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #3d2a1a, #2a1e10);
+  border-radius: 14px;
+  border: 1px solid #7a5a3a;
+  color: #eedbba;
+  font-size: 0.86rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.sync-phase {
+  font-weight: bold;
+  color: #ffcc44;
+  padding: 4px 10px;
+  background: rgba(255, 204, 68, 0.12);
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.sync-steps {
+  font-family: monospace;
+  font-weight: bold;
+  color: #eedbba;
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+
+.sync-buttons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.step-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.step-opt {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  background: linear-gradient(180deg, #e2c49a, #c9a87c);
+  color: #2d1f12;
+  box-shadow: 0 3px 0 #8b6b4b;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.step-opt:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0;
+}
+
+.mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.mode-option-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 18px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  background: linear-gradient(180deg, #e2c49a, #c9a87c);
+  color: #2d1f12;
+  box-shadow: 0 3px 0 #8b6b4b;
+  transition: transform 0.1s;
+}
+
+.mode-option-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0;
+}
+
+.mode-option-title {
+  font-weight: bold;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.mode-option-desc {
+  font-size: 0.78rem;
+  color: #5a3f28;
+  line-height: 1.35;
+}
+
 .main-content {
   display: flex;
   gap: 16px;
@@ -260,14 +360,10 @@ body {
   max-height: 608px;
 }
 
-/* ============================================================
-   ★ 棋盘：木质深框
-   ============================================================ */
 .board-container {
   position: relative;
   padding: 12px;
-  background:
-    linear-gradient(135deg, #6b4a2a 0%, #4a3220 50%, #3a2515 100%);
+  background: linear-gradient(135deg, #6b4a2a 0%, #4a3220 50%, #3a2515 100%);
   border-radius: 18px;
   box-shadow:
     inset 0 0 0 3px #a78664,
@@ -292,6 +388,32 @@ body {
     inset 0 0 30px rgba(140, 90, 40, 0.25);
 }
 
+.board-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: calc(4 * 76px);
+  height: calc(8 * 76px);
+  pointer-events: none;
+  z-index: 25;
+}
+
+.sync-parabola {
+  animation: parabolaPulse 1s ease-in-out infinite;
+}
+
+@keyframes parabolaPulse {
+
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .cell {
   position: absolute;
   width: 76px;
@@ -301,9 +423,7 @@ body {
     linear-gradient(160deg, #f2dfb0 0%, #e8d19a 45%, #d2b177 100%);
   cursor: pointer;
   border-radius: 3px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 240, 200, 0.7),
-    inset 0 -1px 0 rgba(120, 80, 40, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.7), inset 0 -1px 0 rgba(120, 80, 40, 0.3);
 }
 
 .cell::before {
@@ -328,9 +448,29 @@ body {
 }
 
 .cell.highlight {
+  box-shadow: inset 0 0 0 3px #f3d37c, inset 0 0 20px rgba(255, 220, 120, 0.6);
+}
+
+.cell.sync-target {
   box-shadow:
-    inset 0 0 0 3px #f3d37c,
-    inset 0 0 20px rgba(255, 220, 120, 0.6);
+    inset 0 0 0 3px #ffaa00,
+    inset 0 0 25px rgba(255, 200, 60, 0.6);
+}
+
+.cell.sync-target::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe28c, #ffaa00 70%, #b37600);
+  box-shadow: 0 0 14px #ffcc44;
+  pointer-events: none;
+  z-index: 6;
+  animation: targetPulse 1.2s ease-in-out infinite;
 }
 
 .cell.move-target::after {
@@ -379,9 +519,6 @@ body {
   }
 }
 
-/* ============================================================
-   ★ 棋子：木纹立体圆柱 + 大字
-   ============================================================ */
 .piece {
   position: absolute;
   width: 68px;
@@ -390,7 +527,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* ★ 字号调大：从 34 → 44，汉字占比更饱满 */
   font-size: 44px;
   line-height: 1;
   font-weight: 900;
@@ -398,59 +534,42 @@ body {
   cursor: pointer;
   z-index: 10;
   padding-bottom: 2px;
-  /* 视觉居中微调 */
   transition:
     left 0.34s cubic-bezier(0.4, 0.1, 0.3, 1),
     top 0.34s cubic-bezier(0.4, 0.1, 0.3, 1),
     transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.18s ease-out,
-    filter 0.18s ease-out;
+    box-shadow 0.18s ease-out;
 }
 
-/* ★ 木纹底 + 边缘高光 */
 .piece::before {
   content: '';
   position: absolute;
   inset: 3px;
   border-radius: 50%;
   pointer-events: none;
-  /* 多层模拟木纹线条（斜向平行细线）+ 边缘高光阴影 */
   background:
     radial-gradient(circle at 30% 25%, rgba(255, 250, 230, 0.55) 0%, transparent 45%),
     repeating-linear-gradient(28deg,
-      rgba(120, 70, 25, 0.10) 0px,
-      rgba(120, 70, 25, 0.10) 1px,
-      rgba(120, 70, 25, 0.00) 1px,
-      rgba(120, 70, 25, 0.00) 4px),
+      rgba(120, 70, 25, 0.10) 0px, rgba(120, 70, 25, 0.10) 1px,
+      rgba(120, 70, 25, 0.00) 1px, rgba(120, 70, 25, 0.00) 4px),
     repeating-linear-gradient(115deg,
-      rgba(160, 100, 40, 0.08) 0px,
-      rgba(160, 100, 40, 0.08) 1px,
-      rgba(160, 100, 40, 0.00) 1px,
-      rgba(160, 100, 40, 0.00) 5px);
+      rgba(160, 100, 40, 0.08) 0px, rgba(160, 100, 40, 0.08) 1px,
+      rgba(160, 100, 40, 0.00) 1px, rgba(160, 100, 40, 0.00) 5px);
   z-index: 1;
 }
 
-/* 木底主色 + 纹理（radial 高光 + 多层木纹线 + 底色渐变） */
 .piece.red-piece,
 .piece.black-piece {
   background:
-    /* 左上高光 */
     radial-gradient(circle at 32% 26%, #fff7e6 0%, #f3dcb3 22%, transparent 55%),
-    /* 木纹细线：两组不同角度的细纹 */
     repeating-linear-gradient(35deg,
-      rgba(140, 85, 30, 0.14) 0px,
-      rgba(140, 85, 30, 0.14) 1px,
-      rgba(140, 85, 30, 0.00) 1px,
-      rgba(140, 85, 30, 0.00) 4px),
+      rgba(140, 85, 30, 0.14) 0px, rgba(140, 85, 30, 0.14) 1px,
+      rgba(140, 85, 30, 0.00) 1px, rgba(140, 85, 30, 0.00) 4px),
     repeating-linear-gradient(120deg,
-      rgba(160, 105, 45, 0.10) 0px,
-      rgba(160, 105, 45, 0.10) 1px,
-      rgba(160, 105, 45, 0.00) 1px,
-      rgba(160, 105, 45, 0.00) 6px),
-    /* 底色渐变：木色 */
+      rgba(160, 105, 45, 0.10) 0px, rgba(160, 105, 45, 0.10) 1px,
+      rgba(160, 105, 45, 0.00) 1px, rgba(160, 105, 45, 0.00) 6px),
     radial-gradient(circle at 55% 65%, #eccf9a 0%, #d8b37a 55%, #b88f56 100%);
   border: none;
-  /* ★ 更厚的圆柱边 + 更深的投影 */
   box-shadow:
     0 7px 0 #8a6437,
     0 8px 0 #5a3f22,
@@ -458,7 +577,6 @@ body {
     0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
-/* 红方：印章红 + 立体字 */
 .piece.red-piece {
   color: #9e1e19;
   text-shadow:
@@ -468,7 +586,6 @@ body {
     0 -1px 1px rgba(255, 230, 200, 0.6);
 }
 
-/* 黑方：墨黑 + 银边立体字 */
 .piece.black-piece {
   color: #161616;
   text-shadow:
@@ -478,15 +595,12 @@ body {
     0 -1px 1px rgba(255, 255, 255, 0.45);
 }
 
-/* 暗棋：深色木盖 + 木纹 */
 .piece.hidden-piece {
   background:
     radial-gradient(circle at 32% 26%, #c9a678 0%, #95724a 35%, #5a3d22 78%, #3a2413 100%),
     repeating-linear-gradient(35deg,
-      rgba(60, 30, 10, 0.20) 0px,
-      rgba(60, 30, 10, 0.20) 1px,
-      rgba(60, 30, 10, 0.00) 1px,
-      rgba(60, 30, 10, 0.00) 4px);
+      rgba(60, 30, 10, 0.20) 0px, rgba(60, 30, 10, 0.20) 1px,
+      rgba(60, 30, 10, 0.00) 1px, rgba(60, 30, 10, 0.00) 4px);
   color: transparent;
   box-shadow:
     0 7px 0 #2a1a0d,
@@ -500,17 +614,14 @@ body {
   background:
     radial-gradient(circle at 30% 25%, rgba(240, 200, 150, 0.45) 0%, transparent 50%),
     repeating-linear-gradient(35deg,
-      rgba(80, 40, 15, 0.22) 0px,
-      rgba(80, 40, 15, 0.22) 1px,
-      rgba(80, 40, 15, 0.00) 1px,
-      rgba(80, 40, 15, 0.00) 4px);
+      rgba(80, 40, 15, 0.22) 0px, rgba(80, 40, 15, 0.22) 1px,
+      rgba(80, 40, 15, 0.00) 1px, rgba(80, 40, 15, 0.00) 4px);
   box-shadow:
     inset 0 2px 3px rgba(230, 190, 140, 0.4),
     inset 0 -3px 5px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1.5px rgba(40, 25, 10, 0.75);
 }
 
-/* 选中：金色描边 + 上浮 */
 .piece.selected {
   transform: translateY(-4px) scale(1.1);
   box-shadow:
@@ -521,7 +632,15 @@ body {
   z-index: 20;
 }
 
-/* 最近一步：橙色描边 */
+.piece.sync-selected {
+  box-shadow:
+    0 0 0 4px #00e0ff,
+    0 0 30px #00e0ff,
+    0 7px 0 #6b4d2a,
+    0 12px 20px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
 .piece.last-moved {
   box-shadow:
     0 0 0 4px #ffaa00,
@@ -549,9 +668,68 @@ body {
   }
 }
 
-/* ============================================================
-   ★ 阵亡棋子：小号木片
-   ============================================================ */
+.piece.flying-piece {
+  filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 20px rgba(255, 220, 120, 0.6));
+  animation: flyBob 0.6s ease-in-out infinite;
+}
+
+@keyframes flyBob {
+
+  0%,
+  100% {
+    transform: scale(1.12);
+  }
+
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+.piece.dead-anim {
+  animation: pieceDeath 0.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes pieceDeath {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.9;
+    filter: brightness(2.5);
+  }
+
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+    filter: brightness(0.5);
+  }
+}
+
+.piece.collide-flash {
+  animation: collideFlash 0.4s ease-out;
+}
+
+@keyframes collideFlash {
+  0% {
+    box-shadow: 0 0 0 0 #ff3333, 0 0 30px #ff3333;
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px #ff3333, 0 0 50px #ff3333;
+    transform: scale(1.15);
+  }
+
+  100% {
+    box-shadow: 0 7px 0 #8a6437;
+    transform: scale(1);
+  }
+}
+
 .dead-piece {
   width: 32px;
   height: 32px;
@@ -559,7 +737,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* ★ 字号调大 */
   font-size: 20px;
   line-height: 1;
   font-weight: 900;
@@ -569,10 +746,8 @@ body {
   background:
     radial-gradient(circle at 30% 25%, #fff5e0 0%, #ecd0a0 45%, #c9a370 100%),
     repeating-linear-gradient(35deg,
-      rgba(140, 85, 30, 0.12) 0px,
-      rgba(140, 85, 30, 0.12) 1px,
-      rgba(140, 85, 30, 0.00) 1px,
-      rgba(140, 85, 30, 0.00) 4px);
+      rgba(140, 85, 30, 0.12) 0px, rgba(140, 85, 30, 0.12) 1px,
+      rgba(140, 85, 30, 0.00) 1px, rgba(140, 85, 30, 0.00) 4px);
   box-shadow:
     0 2px 0 #4a3520,
     0 3px 6px rgba(0, 0, 0, 0.55),
@@ -606,9 +781,6 @@ body {
   text-shadow: 0 1px 0 #cfcfcf, 0 2px 2px rgba(0, 0, 0, 0.4);
 }
 
-/* ============================================================
-   状态栏 / 按钮 / 房间信息
-   ============================================================ */
 .status-bar {
   display: flex;
   justify-content: space-between;
@@ -1237,5 +1409,9 @@ body {
 
   .chat-notice-container {
     max-width: 260px;
+  }
+
+  .sync-bar {
+    font-size: 0.78rem;
   }
 }

@@ -22,16 +22,13 @@
 
   <div class="banner" id="globalBanner"></div>
 
-  <!-- 聊天悬浮按钮 -->
   <button class="chat-fab hidden" id="chatFab" onclick="openChatModal()" title="聊天">
     <i class="fas fa-comment-dots"></i>
     <span class="chat-fab-badge hidden" id="chatBadge">0</span>
   </button>
 
-  <!-- 聊天通知横幅 -->
   <div class="chat-notice-container" id="chatNoticeContainer"></div>
 
-  <!-- 确认弹窗（同意/拒绝）-->
   <div class="modal-mask" id="confirmModal">
     <div class="modal-box">
       <h3 id="confirmText"></h3>
@@ -52,7 +49,6 @@
     </div>
   </div>
 
-  <!-- 对方断线等待弹窗 -->
   <div class="modal-mask" id="oppDisconnectModal">
     <div class="modal-box">
       <h3 style="color:#b32b2b;">⚠ 对方断线</h3>
@@ -64,7 +60,6 @@
     </div>
   </div>
 
-  <!-- 时间控制选择 -->
   <div class="modal-mask" id="timeControlModal">
     <div class="modal-box time-box">
       <h3>选择时间控制</h3>
@@ -92,7 +87,43 @@
     </div>
   </div>
 
-  <!-- 聊天模态框 -->
+  <div class="modal-mask" id="modeSelectModal">
+    <div class="modal-box time-box">
+      <h3>选择游戏模式</h3>
+      <div class="mode-options">
+        <button class="mode-option-btn" onclick="pickMode('classic')">
+          <div class="mode-option-title">经典模式</div>
+          <div class="mode-option-desc">轮流走棋<br>传统规则</div>
+        </button>
+        <button class="mode-option-btn" onclick="pickMode('sync')">
+          <div class="mode-option-title">同步规划模式</div>
+          <div class="mode-option-desc">同时规划，一起播放<br>棋子有速度、碰撞</div>
+        </button>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-back" onclick="cancelModeSelect()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="syncModeModal">
+    <div class="modal-box time-box">
+      <h3>同步规划模式设置</h3>
+      <div class="field-row" style="text-align:left;">
+        <label>每回合可操作步数</label>
+        <div class="step-options">
+          <button class="step-opt" onclick="pickSyncSteps(1)">1 步</button>
+          <button class="step-opt" onclick="pickSyncSteps(2)">2 步</button>
+          <button class="step-opt" onclick="pickSyncSteps(3)">3 步</button>
+          <button class="step-opt" onclick="pickSyncSteps(4)">4 步</button>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-back" onclick="cancelSyncMode()">取消</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-mask" id="chatModal">
     <div class="modal-box chat-modal-box">
       <h3>聊天</h3>
@@ -108,7 +139,6 @@
     </div>
   </div>
 
-  <!-- 主菜单 -->
   <div class="panel" id="menuPanel">
     <h1>象棋翻棋</h1>
     <button class="menu-btn" onclick="showOffline()">离线对弈</button>
@@ -116,7 +146,6 @@
     <button class="menu-btn secondary" onclick="showRecords()">排行榜</button>
   </div>
 
-  <!-- 大厅 -->
   <div class="panel hidden" id="lobbyPanel">
     <h2>在线对弈</h2>
     <div class="field-row">
@@ -141,7 +170,6 @@
     <div class="hint" id="lobbyHint"></div>
   </div>
 
-  <!-- 等待房间 -->
   <div class="panel hidden" id="waitPanel">
     <h2>房间：<span id="waitRoomLabel">------</span></h2>
     <div style="text-align:center; color:#3d2a1a; font-weight:bold;" id="waitStatus">等待对手加入...</div>
@@ -155,7 +183,6 @@
     <div class="log-panel" id="netLog"></div>
   </div>
 
-  <!-- 对局 -->
   <div class="game-panel hidden" id="gamePanel">
     <div class="room-info-wrap">
       <div class="room-info">
@@ -168,12 +195,23 @@
       <div class="time-info" id="timeInfo"></div>
     </div>
 
+    <div class="sync-bar hidden" id="syncBar">
+      <div class="sync-phase" id="syncPhase">规划阶段</div>
+      <div class="sync-steps" id="syncSteps">步数：0 / 3</div>
+      <div class="sync-buttons">
+        <button class="btn btn-back" id="syncReplayBtn" onclick="replayLastPlayback()" style="display:none;">回放</button>
+        <button class="btn btn-back" onclick="clearSyncQueue()">清空</button>
+        <button class="btn btn-primary" id="syncSubmitBtn" onclick="submitSyncPlan()">完成</button>
+      </div>
+    </div>
+
     <div class="main-content">
       <div class="graveyard">
         <div class="graveyard-list" id="redGraveyard"></div>
       </div>
       <div class="board-container">
         <div class="board" id="board"></div>
+        <svg class="board-overlay" id="boardOverlay" viewBox="0 0 304 608" preserveAspectRatio="none"></svg>
       </div>
       <div class="graveyard">
         <div class="graveyard-list" id="blackGraveyard"></div>
@@ -194,7 +232,6 @@
     </div>
   </div>
 
-  <!-- 排行榜 -->
   <div class="panel hidden" id="recordsPanel">
     <h2>象棋翻棋排行榜</h2>
     <div class="records-list" id="recordsList">
@@ -208,4 +245,4 @@
   <script src="./FlipChess.js"></script>
 </body>
 
-</html> 
+</html>

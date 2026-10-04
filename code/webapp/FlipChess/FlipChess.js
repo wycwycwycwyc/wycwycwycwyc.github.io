@@ -113,6 +113,28 @@ function playDrawSound() {
     osc.start(t); osc.stop(t + 0.4);
   });
 }
+function playCollisionSound() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(300, now);
+  osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.5, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.32);
+  const dur = 0.15;
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+  const noise = ctx.createBufferSource(); noise.buffer = buf;
+  const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1000;
+  const nGain = ctx.createGain(); nGain.gain.value = 0.25;
+  noise.connect(hp).connect(nGain).connect(ctx.destination);
+  noise.start(now);
+}
 
 // ============================================================
 //                        全局状态
@@ -165,6 +187,26 @@ let pendingInviteTargetId = null;
 
 let onlineUsers = {};
 
+let gameMode = 'classic';
+let syncStepsPerRound = 3;
+let syncRoundNum = 0;
+let syncMyQueue = [];
+let syncMySubmitted = false;
+let syncOppSubmitted = false;
+let syncPlaying = false;
+let syncPlaybackTimer = null;
+let syncStepOption = 3;
+let syncOppQueue = [];
+let colorTipShown = false;
+let lastPlaybackScript = null;
+let lastPlaybackStartState = null;
+
+let roomHeartbeatTimer = null;
+let oppLastSeen = 0;
+let roomHeartbeatCheckTimer = null;
+const HEARTBEAT_SEND_MS = 5000;
+const HEARTBEAT_TIMEOUT_MS = 15000;
+
 const ROWS = 8, COLS = 4;
 const CELL_SIZE = 76, PIECE_SIZE = 68;
 const OFFSET = (CELL_SIZE - PIECE_SIZE) / 2;
@@ -179,6 +221,21 @@ const RANK = {
   '車': 4, '俥': 4, '馬': 3, '傌': 3, '炮': 2, '砲': 2, '卒': 1, '兵': 1
 };
 
+const SPEED = {
+  '兵': 1.0, '卒': 1.0,
+  '炮': 1.0, '砲': 1.0,
+  '馬': 1.0, '傌': 1.0,
+  '車': 1.0, '俥': 1.0,
+  '士': 1.0, '仕': 1.0,
+  '象': 1.0, '相': 1.0,
+  '將': 1.0, '帥': 1.0
+};
+
+const FLYING_PIECES = ['炮', '砲'];
+
+function isFlying(piece) { return FLYING_PIECES.includes(piece); }
+function getPieceSpeed(piece) { return SPEED[piece] || 1.0; }
+
 function getPieceColor(piece) {
   if (!piece) return null;
   if ('帥仕相俥傌炮兵'.includes(piece)) return 'red';
@@ -186,10 +243,20 @@ function getPieceColor(piece) {
   return null;
 }
 function getRank(piece) { return RANK[piece] || 0; }
+
 function canCapture(piece, target) {
   if (!piece || !target) return false;
   if (getPieceColor(piece) === getPieceColor(target)) return false;
   if (piece === '炮' || piece === '砲') return true;
+  if ((piece === '兵' || piece === '卒') && (target === '將' || target === '帥')) return true;
+  if ((piece === '將' || piece === '帥') && (target === '兵' || target === '卒')) return false;
+  return getRank(piece) >= getRank(target);
+}
+
+// 碰撞判定专用：炮按普通等级判
+function canCaptureInCollision(piece, target) {
+  if (!piece || !target) return false;
+  if (getPieceColor(piece) === getPieceColor(target)) return false;
   if ((piece === '兵' || piece === '卒') && (target === '將' || target === '帥')) return true;
   if ((piece === '將' || piece === '帥') && (target === '兵' || target === '卒')) return false;
   return getRank(piece) >= getRank(target);
@@ -213,9 +280,18 @@ let turnStartTs = 0;
 let timerInterval = null;
 let timeoutHandled = false;
 
-const CHAT_PRESETS = ['快点吧', '好棋！','再来一局？', '厉害了'];
-let unreadChatCount = 0;
-
+const CHAT_PRESETS = [
+  '请神速些吧！',
+  '容我再思量思量！',
+  '一着不慎，满盘皆输！',
+  '再与我对弈一局？',
+  '观棋不语真君子，落子无悔大丈夫！',
+  '胜败乃兵家常事！',
+  '快点吧，等的花儿都谢了！',
+  '对不起，刚才卡了！',
+  '下次再玩吧，我要走了。'
+];
+// ============================================================
 async function fetchUserIdByUsername(username) {
   const res = await fetch(`${SERVER_URL}/get-user-id-by-username`, {
     method: 'POST',
@@ -252,6 +328,9 @@ function updateLobbyUserLabel() {
   if (el) el.textContent = myUsername;
 }
 
+// ============================================================
+//                        界面
+// ============================================================
 const menuPanel = document.getElementById('menuPanel');
 const lobbyPanel = document.getElementById('lobbyPanel');
 const waitPanel = document.getElementById('waitPanel');
@@ -282,6 +361,7 @@ function showOffline() {
   hideAll();
   gamePanel.classList.remove('hidden');
   onlineMode = false;
+  gameMode = 'classic';
   myColor = null; hostColor = null; myRole = '';
   roomId = ''; opponentUserId = ''; opponentUsername = '';
   lastOpponentUserId = '';
@@ -292,6 +372,7 @@ function showOffline() {
   document.getElementById('gameOppLabel').textContent = '';
   document.getElementById('connDot').style.display = 'none';
   document.getElementById('timeInfo').textContent = '';
+  document.getElementById('syncBar').classList.add('hidden');
   resetGame();
   applyModeButtons();
 }
@@ -326,6 +407,9 @@ function applyModeButtons() {
   updateButtons();
 }
 
+// ============================================================
+//                    大厅
+// ============================================================
 function connectLobby() {
   if (lobbyWs && (lobbyWs.readyState === WebSocket.OPEN || lobbyWs.readyState === WebSocket.CONNECTING)) return;
   if (!myUserId) return;
@@ -351,7 +435,6 @@ function sendLobby(obj) {
   lobbyWs.send(typeof obj === 'string' ? obj : JSON.stringify(obj));
   return true;
 }
-
 function queryOnlineUsers() {
   if (!lobbyWs || lobbyWs.readyState !== 1) return;
   sendLobby({ type: 'lobbyQuery', userId: myUserId, username: myUsername });
@@ -370,7 +453,6 @@ function handleLobbyMessage(raw) {
       };
       renderOnlineUsers();
       break;
-
     case 'lobbyQuery':
       if (msg.userId === myUserId) break;
       sendLobby({
@@ -386,7 +468,6 @@ function handleLobbyMessage(raw) {
       };
       renderOnlineUsers();
       break;
-
     case 'lobbyQueryReply':
       if (msg.toUserId !== myUserId) break;
       if (msg.userId === myUserId) break;
@@ -396,13 +477,11 @@ function handleLobbyMessage(raw) {
       };
       renderOnlineUsers();
       break;
-
     case 'exit':
       if (msg.userId === myUserId) break;
       delete onlineUsers[msg.userId];
       renderOnlineUsers();
       break;
-
     case 'busy':
       if (msg.userId === myUserId) break;
       if (onlineUsers[msg.userId]) {
@@ -410,7 +489,6 @@ function handleLobbyMessage(raw) {
         renderOnlineUsers();
       }
       break;
-
     case 'idle':
       if (msg.userId === myUserId) break;
       if (onlineUsers[msg.userId]) {
@@ -418,7 +496,6 @@ function handleLobbyMessage(raw) {
         renderOnlineUsers();
       }
       break;
-
     case 'invite':
       if (msg.toUserId === myUserId) handleIncomingInvite(msg);
       break;
@@ -437,7 +514,6 @@ function handleLobbyMessage(raw) {
         if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
       }
       break;
-
     case 'joinGame':
       if (msg.toUserId === myUserId) handleIncomingJoin(msg);
       break;
@@ -491,11 +567,12 @@ function inviteUser(toUserId) {
     connectLobby();
     return;
   }
-  timeSelectMode = 'invite';
   pendingInviteTargetId = toUserId;
-  document.getElementById('timeControlModal').classList.add('show');
+  timeSelectMode = 'invite';
+  document.getElementById('modeSelectModal').classList.add('show');
 }
-function doInvite(toUserId) {
+
+function doInviteWithMode(toUserId) {
   if (!lobbyWs || lobbyWs.readyState !== 1) {
     showBanner('大厅未连接，请稍候', 'error', 2000);
     connectLobby();
@@ -509,9 +586,12 @@ function doInvite(toUserId) {
     fromUsername: myUsername,
     toUserId: toUserId,
     roomId: newRoomId,
-    timeSettings: { ...timeSettings }
+    timeSettings: { ...timeSettings },
+    gameMode: gameMode,
+    syncStepsPerRound: syncStepsPerRound
   });
-  showBanner('邀请已发送，等待对方接受...', 'info', 4000);
+  const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
+  showBanner(modeText + ' 邀请已发送，等待对方接受...', 'info', 4000);
   if (pendingInviteTimer) clearTimeout(pendingInviteTimer);
   pendingInviteTimer = setTimeout(() => {
     pendingInviteTimer = null;
@@ -519,7 +599,10 @@ function doInvite(toUserId) {
   }, 30000);
 }
 
-// ★ 请求加入对方棋局
+function doInvite(toUserId) {
+  doInviteWithMode(toUserId);
+}
+
 function requestJoinGame(toUserId) {
   if (gameStarted && !gameOver && onlineMode) {
     showBanner('你正在对局中，无法加入他人棋局', 'error', 2000);
@@ -540,12 +623,9 @@ function requestJoinGame(toUserId) {
   showBanner('已请求加入，等待对方确认...', 'info', 4000);
 }
 
-// ★ 收到加入请求（我是棋局中的人）
 function handleIncomingJoin(msg) {
   showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
-    // ★ 我在房间里的角色决定对方的角色
     const requesterRole = (myRole === 'host') ? 'guest' : 'host';
-
     sendLobby({
       type: 'joinGameAccept',
       fromUserId: myUserId,
@@ -554,16 +634,15 @@ function handleIncomingJoin(msg) {
       continueGame: true,
       hostColor: hostColor,
       timeSettings: { ...timeSettings },
-      assignRole: requesterRole   // ★ 告诉对方他的角色
+      gameMode: gameMode,
+      syncStepsPerRound: syncStepsPerRound,
+      assignRole: requesterRole
     });
-
-    // ★ 若我是房主，主动多次广播棋盘，确保对方能收到
     if (myRole === 'host') {
       setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
       setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
       setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 3000);
     }
-
     showBanner('已允许对方加入棋局', 'info', 2000);
   }, () => {
     sendLobby({
@@ -575,19 +654,17 @@ function handleIncomingJoin(msg) {
   });
 }
 
-// ★ 加入请求被允许（我是请求者）
 function handleJoinAccepted(msg) {
   if (!msg.continueGame) {
     showBanner('对方拒绝了加入请求', 'error', 2500);
     return;
   }
   if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
-
-  // ★ 从对方消息获知我的角色
+  if (msg.gameMode) gameMode = msg.gameMode;
+  if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
   if (msg.assignRole) {
     myRole = msg.assignRole;
   } else {
-    // 兜底：加入者默认为客机
     if (!myRole) myRole = 'guest';
   }
   roomId = msg.roomId;
@@ -595,8 +672,10 @@ function handleJoinAccepted(msg) {
   setTimeout(() => enterRoom(true), 150);
 }
 
-// ★ 收到邀请
 function handleIncomingInvite(msg) {
+  if (msg.gameMode) gameMode = msg.gameMode;
+  if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
+
   if (gameStarted && !gameOver && onlineMode) {
     showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
       const requesterRole = (myRole === 'host') ? 'guest' : 'host';
@@ -608,9 +687,10 @@ function handleIncomingInvite(msg) {
         continueGame: true,
         hostColor: hostColor,
         timeSettings: { ...timeSettings },
+        gameMode: gameMode,
+        syncStepsPerRound: syncStepsPerRound,
         assignRole: requesterRole
       });
-      // 房主主动多次广播
       if (myRole === 'host') {
         setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
         setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
@@ -627,8 +707,8 @@ function handleIncomingInvite(msg) {
     return;
   }
 
-  // 我不在对局中 → 正常邀请流程
-  showConfirm(`${msg.fromUsername} 邀请你下棋，是否接受？`, () => {
+  const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
+  showConfirm(`${msg.fromUsername} ${modeText} 邀请你下棋，是否接受？`, () => {
     if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
     sendLobby({
       type: 'inviteAccept',
@@ -650,7 +730,6 @@ function handleIncomingInvite(msg) {
   });
 }
 
-// ★ 邀请被接受（我是邀请者）
 function handleInviteAccepted(msg) {
   if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
   if (msg.continueGame) {
@@ -666,7 +745,8 @@ function handleInviteAccepted(msg) {
   } else {
     myRole = 'host';
     roomId = msg.roomId;
-    showBanner('对方接受邀请，进入房间...', 'info', 2000);
+    const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
+    showBanner(modeText + ' 对方接受邀请，进入房间...', 'info', 2000);
     setTimeout(() => enterRoom(), 150);
   }
 }
@@ -735,6 +815,7 @@ function connectWS(room, userId, isReconnect) {
       netLog('关闭 code=' + e.code);
       setConnIndicator('dead');
       ws = null;
+      stopRoomHeartbeat();
       if (!intentionalClose) handleDisconnect(e.code);
     };
     ws.onmessage = (e) => handleMessage(e.data);
@@ -759,6 +840,29 @@ function send(obj) {
   return true;
 }
 
+function startRoomHeartbeat() {
+  stopRoomHeartbeat();
+  oppLastSeen = Date.now();
+  roomHeartbeatTimer = setInterval(() => {
+    if (ws && ws.readyState === 1) {
+      try { ws.send(JSON.stringify({ type: 'ping', userId: myUserId })); } catch (e) { }
+    }
+  }, HEARTBEAT_SEND_MS);
+  roomHeartbeatCheckTimer = setInterval(() => {
+    if (!gameStarted || gameOver) return;
+    if (!opponentUserId) return;
+    if (Date.now() - oppLastSeen > HEARTBEAT_TIMEOUT_MS) {
+      if (!oppDisconnectTimer) {
+        handleOpponentDisconnect();
+      }
+    }
+  }, 3000);
+}
+function stopRoomHeartbeat() {
+  if (roomHeartbeatTimer) { clearInterval(roomHeartbeatTimer); roomHeartbeatTimer = null; }
+  if (roomHeartbeatCheckTimer) { clearInterval(roomHeartbeatCheckTimer); roomHeartbeatCheckTimer = null; }
+}
+
 function startReconnect() {
   if (isReconnecting) return;
   isReconnecting = true;
@@ -767,6 +871,7 @@ function startReconnect() {
   setConnIndicator('dead');
   showBanner('⚠ 网络断开，正在重连...', 'error', 0);
   stopTimer();
+  stopRoomHeartbeat();
   attemptReconnect();
 }
 
@@ -788,12 +893,15 @@ function attemptReconnect() {
       userId: myUserId,
       username: myUsername,
       role: myRole,
-      reconnect: true
+      reconnect: true,
+      gameMode: gameMode,
+      syncStepsPerRound: syncStepsPerRound
     });
     isReconnecting = false;
     hideBanner();
     showBanner('已重新连接', 'info', 2000);
     startTimer();
+    startRoomHeartbeat();
 
     if (reconnectWasInGame && gameStarted) {
       hideAll();
@@ -812,6 +920,9 @@ function attemptReconnect() {
   });
 }
 
+// ============================================================
+//                        计时
+// ============================================================
 function resetTimersForNewGame() {
   hostTimeLeft = timeSettings.totalMs;
   guestTimeLeft = timeSettings.totalMs;
@@ -819,6 +930,7 @@ function resetTimersForNewGame() {
   timeoutHandled = false;
 }
 function startTimer() {
+  if (gameMode === 'sync') return;
   stopTimer();
   if (!turnStartTs) turnStartTs = performance.now();
   timerInterval = setInterval(tickTimer, 200);
@@ -828,6 +940,7 @@ function stopTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 }
 function commitTurnTime() {
+  if (gameMode === 'sync') return;
   if (!turnStartTs) return;
   const elapsed = performance.now() - turnStartTs;
   const noLimit = !timeSettings.enabled;
@@ -851,6 +964,7 @@ function formatMs(ms) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 function tickTimer() {
+  if (gameMode === 'sync') return;
   if (gameOver || !gameStarted || isReconnecting) return;
   const info = document.getElementById('timeInfo');
   if (!info) return;
@@ -888,10 +1002,14 @@ function tickTimer() {
 }
 function onMyTimeout(reason) {
   if (gameOver) return;
+  stopTimer();
   send({ type: 'timeout', userId: myUserId, reason });
   endGame('你' + reason + '，判负', 'loss');
 }
 
+// ============================================================
+//                        聊天
+// ============================================================
 function openChatModal() {
   document.getElementById('chatModal').classList.add('show');
   unreadChatCount = 0;
@@ -978,7 +1096,6 @@ function appendChatMessage(name, text, kind) {
 function showChatNotice(from, text) {
   const container = document.getElementById('chatNoticeContainer');
   if (!container) return;
-
   const notice = document.createElement('div');
   notice.className = 'chat-notice';
   notice.innerHTML = `
@@ -988,42 +1105,13 @@ function showChatNotice(from, text) {
   `;
   const closeBtn = notice.querySelector('.notice-close');
   closeBtn.onclick = (e) => { e.stopPropagation(); dismissNotice(notice); };
-
-  notice.onclick = () => {
-    openChatModal();
-    dismissNotice(notice);
-  };
-
-  let startX = 0, startY = 0, moved = false, isSwiping = false;
-  notice.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    startX = t.clientX; startY = t.clientY;
-    moved = false; isSwiping = false;
-  }, { passive: true });
-  notice.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-    if (!isSwiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) isSwiping = true;
-    if (isSwiping) {
-      moved = true;
-      if (dx > 0) notice.style.transform = `translateX(${dx}px)`;
-      if (dx > 60) dismissNotice(notice);
-    }
-  }, { passive: true });
-  notice.addEventListener('touchend', () => {
-    if (isSwiping && !moved) return;
-    notice.style.transform = '';
-  });
-
+  notice.onclick = () => { openChatModal(); dismissNotice(notice); };
   container.appendChild(notice);
-
   if (document.getElementById('chatModal').classList.contains('show')) {
   } else {
     unreadChatCount++;
     updateChatBadge();
   }
-
   setTimeout(() => { dismissNotice(notice); }, 8000);
 }
 function dismissNotice(notice) {
@@ -1034,14 +1122,24 @@ function dismissNotice(notice) {
   }, 300);
 }
 
+// ============================================================
+//                  消息处理（游戏房间）
+// ============================================================
 function handleMessage(raw) {
   let msg;
   try { msg = JSON.parse(raw); } catch (e) { return; }
   netLog('收到: ' + msg.type);
 
   switch (msg.type) {
+    case 'ping':
+      if (msg.userId !== myUserId) {
+        oppLastSeen = Date.now();
+      }
+      break;
+
     case 'hello': {
       if (msg.userId === myUserId) break;
+      oppLastSeen = Date.now();
 
       if (myRole === 'host') {
         if (opponentUserId && opponentUserId !== msg.userId) {
@@ -1066,7 +1164,14 @@ function handleMessage(raw) {
           oppLabel.style.color = '#b32b2b';
         }
 
-        send({ type: 'hello-ack', userId: myUserId, username: myUsername, role: myRole });
+        send({
+          type: 'hello-ack',
+          userId: myUserId,
+          username: myUsername,
+          role: myRole,
+          gameMode: gameMode,
+          syncStepsPerRound: syncStepsPerRound
+        });
 
         if (gameStarted && !gameOver) {
           broadcastSync();
@@ -1074,13 +1179,18 @@ function handleMessage(raw) {
           gamePanel.classList.remove('hidden');
           chatFab.classList.remove('hidden');
           startTimer();
+          startRoomHeartbeat();
           appendChatMessage('', (msg.username || '对手') + ' 已重新加入，对局继续', 'sys');
           showBanner('对手已重新加入，对局继续', 'info', 2500);
         } else {
           updateWaitUI();
           waitHint('对手已加入：' + opponentUsername, 'ok');
+          startRoomHeartbeat();
         }
       } else if (myRole === 'guest') {
+        if (msg.gameMode) gameMode = msg.gameMode;
+        if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
+
         opponentUserId = msg.userId;
         opponentUsername = msg.username || msg.userId;
 
@@ -1090,17 +1200,26 @@ function handleMessage(raw) {
           oppLabel.style.color = '#b32b2b';
         }
 
-        send({ type: 'hello-ack', userId: myUserId, username: myUsername, role: myRole });
+        send({
+          type: 'hello-ack',
+          userId: myUserId,
+          username: myUsername,
+          role: myRole,
+          gameMode: gameMode,
+          syncStepsPerRound: syncStepsPerRound
+        });
 
         if (gameStarted && !gameOver) {
           hideAll();
           gamePanel.classList.remove('hidden');
           chatFab.classList.remove('hidden');
           startTimer();
+          startRoomHeartbeat();
           send({ type: 'requestSync', userId: myUserId });
         } else {
           updateWaitUI();
           waitHint('对手已加入：' + opponentUsername, 'ok');
+          startRoomHeartbeat();
         }
       }
       break;
@@ -1108,6 +1227,11 @@ function handleMessage(raw) {
 
     case 'hello-ack': {
       if (msg.userId === myUserId) break;
+      oppLastSeen = Date.now();
+      if (myRole === 'guest') {
+        if (msg.gameMode) gameMode = msg.gameMode;
+        if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
+      }
       opponentUserId = msg.userId;
       opponentUsername = msg.username || msg.userId;
       const oppLabel = document.getElementById('gameOppLabel');
@@ -1122,12 +1246,14 @@ function handleMessage(raw) {
           chatFab.classList.remove('hidden');
           startTimer();
         }
+        startRoomHeartbeat();
         if (myRole === 'guest') {
           send({ type: 'requestSync', userId: myUserId });
         }
       } else {
         updateWaitUI();
         waitHint('对手已加入：' + opponentUsername, 'ok');
+        startRoomHeartbeat();
       }
       break;
     }
@@ -1149,22 +1275,41 @@ function handleMessage(raw) {
       break;
 
     case 'start':
-      if (myRole === 'guest') applyStartState(msg.state);
+      if (myRole === 'guest') {
+        if (msg.gameMode) gameMode = msg.gameMode;
+        if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
+        applyStartState(msg.state);
+      }
       break;
 
     case 'move':
     case 'flip':
-      if (myRole === 'host') handleGuestAction(msg);
+      if (myRole === 'host' && gameMode === 'classic') handleGuestAction(msg);
       break;
 
     case 'sync':
-      // ★ 只要收到 sync，无论角色，都接受（这样即使 myRole 丢了也能恢复）
       gameStarted = true;
       applySyncState(msg.state);
       hideAll();
       gamePanel.classList.remove('hidden');
       chatFab.classList.remove('hidden');
-      if (!msg.state.gameOver) startTimer();
+      startRoomHeartbeat();
+      if (gameMode !== 'sync' && !msg.state.gameOver) startTimer();
+      if (gameMode === 'sync') {
+        document.getElementById('syncBar').classList.remove('hidden');
+        if (myColor && !colorTipShown) {
+          colorTipShown = true;
+          setTimeout(() => {
+            Swal.fire({
+              icon: 'info',
+              title: '颜色分配',
+              text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
+              confirmButtonText: '知道了'
+            });
+          }, 300);
+        }
+        if (!syncMySubmitted) renderSyncBar();
+      }
       break;
 
     case 'requestSync':
@@ -1203,6 +1348,7 @@ function handleMessage(raw) {
       break;
     case 'timeout':
       if (msg.userId !== myUserId && !gameOver) {
+        stopTimer();
         endGame('对方超时，你赢了', 'win');
       }
       break;
@@ -1217,6 +1363,35 @@ function handleMessage(raw) {
     case 'exit':
       handleOpponentDisconnect();
       break;
+
+    case 'syncModeSet':
+      gameMode = msg.gameMode;
+      syncStepsPerRound = msg.syncStepsPerRound;
+      showBanner('房主选择了「同步规划模式」', 'info', 3000);
+      break;
+
+    case 'syncPlan':
+      if (myRole === 'host') {
+        handleOpponentSyncPlan(msg);
+      }
+      break;
+
+    case 'syncPlayback':
+      if (myRole === 'guest') {
+        playSyncPlayback(msg.script);
+      }
+      break;
+
+    case 'syncOppSubmitted':
+      if (msg.userId !== myUserId) {
+        syncOppSubmitted = true;
+        renderSyncBar();
+        if (!syncMySubmitted) {
+          showBanner('对手已提交规划，请尽快完成', 'info', 3000);
+        }
+      }
+      break;
+
     default:
       break;
   }
@@ -1255,7 +1430,6 @@ function handleOpponentManualLeave() {
 
 function handleOpponentDisconnect() {
   if (leavingToHome) return;
-
   if (opponentUserId) lastOpponentUserId = opponentUserId;
   opponentUserId = '';
   opponentUsername = '';
@@ -1319,12 +1493,14 @@ function giveUpWaiting() {
 
 function goHome() {
   intentionalClose = true;
+  stopRoomHeartbeat();
   if (ws) { try { ws.close(); } catch (e) { } ws = null; }
   window.removeEventListener('beforeunload', onBeforeUnload);
   stopTimer();
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
+  if (syncPlaybackTimer) { clearTimeout(syncPlaybackTimer); syncPlaybackTimer = null; }
   const modal = document.getElementById('oppDisconnectModal');
   if (modal) modal.classList.remove('show');
   isReconnecting = false;
@@ -1337,6 +1513,7 @@ function goHome() {
   selfReady = false; oppReady = false;
   gameStarted = false;
   onlineMode = false;
+  gameMode = 'classic';
   myColor = null; hostColor = null;
   gameOver = false; gameEndReason = '';
   leavingToHome = false;
@@ -1345,6 +1522,13 @@ function goHome() {
   pendingDrawRequest = false;
   recordUploaded = false;
   unreadChatCount = 0;
+  colorTipShown = false;
+  lastPlaybackScript = null;
+  lastPlaybackStartState = null;
+  syncMyQueue = [];
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  syncPlaying = false;
   updateChatBadge();
   const log = document.getElementById('chatLog');
   if (log) log.innerHTML = '';
@@ -1356,6 +1540,9 @@ function goHome() {
   connectLobby();
 }
 
+// ============================================================
+//                        确认弹窗
+// ============================================================
 function showConfirm(text, onYes, onNo) {
   const disModal = document.getElementById('oppDisconnectModal');
   let wasShown = false;
@@ -1363,7 +1550,6 @@ function showConfirm(text, onYes, onNo) {
     wasShown = true;
     disModal.style.visibility = 'hidden';
   }
-
   document.getElementById('confirmText').textContent = text;
   document.getElementById('confirmModal').classList.add('show');
   confirmCallback = {
@@ -1392,6 +1578,9 @@ function confirmNo() {
   confirmCallback = null;
 }
 
+// ============================================================
+//                        房间 / 模式选择
+// ============================================================
 function generateRoomId() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
@@ -1399,8 +1588,44 @@ function generateRoomId() {
 function createRoom() {
   timeSelectMode = 'create';
   pendingInviteTargetId = null;
-  document.getElementById('timeControlModal').classList.add('show');
+  document.getElementById('modeSelectModal').classList.add('show');
 }
+function cancelModeSelect() {
+  document.getElementById('modeSelectModal').classList.remove('show');
+  timeSelectMode = 'create';
+  pendingInviteTargetId = null;
+}
+function pickMode(mode) {
+  document.getElementById('modeSelectModal').classList.remove('show');
+  gameMode = mode;
+
+  if (mode === 'sync') {
+    document.getElementById('syncModeModal').classList.add('show');
+  } else {
+    document.getElementById('timeControlModal').classList.add('show');
+  }
+}
+function cancelSyncMode() {
+  document.getElementById('syncModeModal').classList.remove('show');
+  timeSelectMode = 'create';
+  pendingInviteTargetId = null;
+}
+function pickSyncSteps(n) {
+  syncStepOption = n;
+  gameMode = 'sync';
+  syncStepsPerRound = n;
+  document.getElementById('syncModeModal').classList.remove('show');
+
+  if (timeSelectMode === 'invite') {
+    const target = pendingInviteTargetId;
+    timeSelectMode = 'create';
+    pendingInviteTargetId = null;
+    doInviteWithMode(target);
+  } else {
+    doCreateRoom();
+  }
+}
+
 function cancelTimeSelect() {
   document.getElementById('timeControlModal').classList.remove('show');
   timeSelectMode = 'create';
@@ -1420,7 +1645,7 @@ function selectTimeOption(opt) {
     const target = pendingInviteTargetId;
     timeSelectMode = 'create';
     pendingInviteTargetId = null;
-    doInvite(target);
+    doInviteWithMode(target);
   } else {
     doCreateRoom();
   }
@@ -1447,6 +1672,7 @@ async function enterRoom(directEnter) {
   leavingToHome = false;
   roomFullHandled = false;
   reconnectWasInGame = false;
+  colorTipShown = false;
   try {
     await connectWS(roomId, myUserId, false);
   } catch (e) {
@@ -1455,6 +1681,7 @@ async function enterRoom(directEnter) {
   }
   onlineMode = true;
   applyModeButtons();
+  startRoomHeartbeat();
 
   if (directEnter) {
     hideAll();
@@ -1467,21 +1694,20 @@ async function enterRoom(directEnter) {
       renderFullBoard();
       renderGraveyards();
     }
-    // ★ 立即请求同步 + 500ms 后再请求一次
     setTimeout(() => {
-      if (myRole === 'host') {
-        broadcastSync();
-      } else {
-        send({ type: 'requestSync', userId: myUserId });
-      }
+      if (myRole === 'host') broadcastSync();
+      else send({ type: 'requestSync', userId: myUserId });
     }, 300);
     setTimeout(() => {
-      if (myRole === 'host') {
-        broadcastSync();
-      } else {
-        send({ type: 'requestSync', userId: myUserId });
-      }
+      if (myRole === 'host') broadcastSync();
+      else send({ type: 'requestSync', userId: myUserId });
     }, 1200);
+    if (gameMode === 'sync') {
+      document.getElementById('syncBar').classList.remove('hidden');
+      renderSyncBar();
+    } else {
+      document.getElementById('syncBar').classList.add('hidden');
+    }
   } else {
     hideAll();
     waitPanel.classList.remove('hidden');
@@ -1495,15 +1721,28 @@ async function enterRoom(directEnter) {
     waitHint('等待对手加入...');
   }
 
-  send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole });
+  send({
+    type: 'hello',
+    userId: myUserId,
+    username: myUsername,
+    role: myRole,
+    gameMode: gameMode,
+    syncStepsPerRound: syncStepsPerRound
+  });
   setTimeout(() => {
     if (ws && ws.readyState === 1 && !opponentUserId) {
-      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, reHello: true });
+      send({
+        type: 'hello', userId: myUserId, username: myUsername, role: myRole,
+        gameMode: gameMode, syncStepsPerRound: syncStepsPerRound, reHello: true
+      });
     }
   }, 800);
   setTimeout(() => {
     if (ws && ws.readyState === 1 && !opponentUserId) {
-      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, reHello: true });
+      send({
+        type: 'hello', userId: myUserId, username: myUsername, role: myRole,
+        gameMode: gameMode, syncStepsPerRound: syncStepsPerRound, reHello: true
+      });
     }
   }, 2000);
 
@@ -1551,13 +1790,24 @@ function checkBothReady() {
   }
 }
 
+// ============================================================
+//                    开局
+// ============================================================
 function startGameAsHost() {
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   lastOpponentUserId = '';
 
   initBoard();
   myColor = null; hostColor = null;
-  currentPlayer = 'host';
+
+  if (gameMode === 'sync') {
+    hostColor = Math.random() < 0.5 ? 'red' : 'black';
+    myColor = hostColor;
+    currentPlayer = null;
+  } else {
+    currentPlayer = 'host';
+  }
+
   gameOver = false; gameEndReason = '';
   selectedRow = -1; selectedCol = -1;
   lastMovedRow = -1; lastMovedCol = -1;
@@ -1565,6 +1815,13 @@ function startGameAsHost() {
   history = [];
   recordUploaded = false;
   gameStarted = true;
+  syncRoundNum = 0;
+  syncMyQueue = [];
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  colorTipShown = false;
+  lastPlaybackScript = null;
+  lastPlaybackStartState = null;
   resetTimersForNewGame();
 
   enterGameUI();
@@ -1573,24 +1830,76 @@ function startGameAsHost() {
   renderGraveyards();
   const log = document.getElementById('chatLog');
   if (log) log.innerHTML = '';
-  startTimer();
 
-  send({ type: 'start', state: serializeState(), firstMover: 'host', timeSettings });
+  if (gameMode === 'sync') {
+    document.getElementById('syncBar').classList.remove('hidden');
+    updateColorLabel();
+    setTimeout(() => {
+      colorTipShown = true;
+      Swal.fire({
+        icon: 'info',
+        title: '颜色分配',
+        text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
+        confirmButtonText: '知道了'
+      });
+    }, 300);
+    startSyncRound();
+  } else {
+    document.getElementById('syncBar').classList.add('hidden');
+    startTimer();
+  }
+
+  send({
+    type: 'start',
+    state: serializeState(),
+    firstMover: 'host',
+    timeSettings,
+    gameMode: gameMode,
+    syncStepsPerRound: syncStepsPerRound
+  });
 }
 function applyStartState(state) {
   deserializeState(state);
   gameStarted = true;
   gameOver = false; gameEndReason = '';
   recordUploaded = false;
+  syncRoundNum = 0;
+  syncMyQueue = [];
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  lastPlaybackScript = null;
+  lastPlaybackStartState = null;
   enterGameUI();
   buildBoardDOM();
   renderFullBoard();
   renderGraveyards();
   const log = document.getElementById('chatLog');
   if (log) log.innerHTML = '';
-  startTimer();
+
+  if (gameMode === 'sync') {
+    document.getElementById('syncBar').classList.remove('hidden');
+    updateColorLabel();
+    if (myColor && !colorTipShown) {
+      colorTipShown = true;
+      setTimeout(() => {
+        Swal.fire({
+          icon: 'info',
+          title: '颜色分配',
+          text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
+          confirmButtonText: '知道了'
+        });
+      }, 300);
+    }
+    renderSyncBar();
+  } else {
+    document.getElementById('syncBar').classList.add('hidden');
+    startTimer();
+  }
 }
 
+// ============================================================
+//                        序列化
+// ============================================================
 function serializeState() {
   return {
     board: board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id } : null)),
@@ -1604,7 +1913,10 @@ function serializeState() {
     hostColor,
     hostTimeLeft,
     guestTimeLeft,
-    timeSettings: { ...timeSettings }
+    timeSettings: { ...timeSettings },
+    gameMode: gameMode,
+    syncStepsPerRound: syncStepsPerRound,
+    syncRoundNum: syncRoundNum
   };
 }
 function deserializeState(state) {
@@ -1619,6 +1931,9 @@ function deserializeState(state) {
   history = [];
 
   if (state.timeSettings) Object.assign(timeSettings, state.timeSettings);
+  if (state.gameMode) gameMode = state.gameMode;
+  if (state.syncStepsPerRound) syncStepsPerRound = state.syncStepsPerRound;
+  if (typeof state.syncRoundNum === 'number') syncRoundNum = state.syncRoundNum;
 
   hostColor = state.hostColor || null;
   if (typeof state.hostTimeLeft === 'number') hostTimeLeft = state.hostTimeLeft;
@@ -1627,7 +1942,6 @@ function deserializeState(state) {
 
   if (myRole === 'host') myColor = hostColor;
   else if (myRole === 'guest') myColor = hostColor ? (hostColor === 'red' ? 'black' : 'red') : null;
-  else myColor = null;
 }
 function broadcastSync() {
   if (myRole !== 'host') return;
@@ -1647,6 +1961,9 @@ function updateColorLabel() {
   else el.textContent = myColor === 'red' ? '我执红方' : '我执黑方';
 }
 
+// ============================================================
+//                        游戏界面
+// ============================================================
 function enterGameUI() {
   hideAll();
   gamePanel.classList.remove('hidden');
@@ -1671,6 +1988,719 @@ function exitGame() {
   leaveRoom();
 }
 
+// ============================================================
+//                    ★ 同步规划模式
+// ============================================================
+
+function renderSyncBar() {
+  const bar = document.getElementById('syncBar');
+  if (!bar) return;
+  if (gameMode !== 'sync') { bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+
+  const phaseEl = document.getElementById('syncPhase');
+  const stepsEl = document.getElementById('syncSteps');
+  const submitBtn = document.getElementById('syncSubmitBtn');
+  const replayBtn = document.getElementById('syncReplayBtn');
+
+  if (replayBtn) {
+    if (lastPlaybackScript && !syncPlaying && !syncMySubmitted) {
+      replayBtn.style.display = '';
+    } else {
+      replayBtn.style.display = 'none';
+    }
+  }
+
+  if (syncPlaying) {
+    phaseEl.textContent = '播放中...';
+    phaseEl.style.color = '#ffcc44';
+  } else if (syncMySubmitted) {
+    if (syncOppSubmitted) {
+      phaseEl.textContent = '双方已完成，准备播放';
+      phaseEl.style.color = '#1faa1f';
+    } else {
+      phaseEl.textContent = '你已完成，等待对手...';
+      phaseEl.style.color = '#00e0ff';
+    }
+  } else {
+    if (syncOppSubmitted) {
+      phaseEl.textContent = '对手已完成，请尽快完成';
+      phaseEl.style.color = '#ffaa00';
+    } else {
+      phaseEl.textContent = '规划阶段';
+      phaseEl.style.color = '#eedbba';
+    }
+  }
+
+  stepsEl.textContent = `步数：${syncMyQueue.length} / ${syncStepsPerRound}`;
+  submitBtn.disabled = syncMySubmitted || syncPlaying || syncMyQueue.length === 0;
+  submitBtn.textContent = syncMySubmitted ? '已提交' : '完成';
+}
+
+function clearSyncQueue() {
+  if (syncMySubmitted || syncPlaying) return;
+  syncMyQueue = [];
+  selectedRow = -1; selectedCol = -1;
+  highlightSyncQueue();
+  renderSyncBar();
+}
+
+function submitSyncPlan() {
+  if (syncMySubmitted || syncPlaying) return;
+  if (syncMyQueue.length === 0) { showBanner('请至少规划一步', 'error', 1500); return; }
+  syncMySubmitted = true;
+  selectedRow = -1; selectedCol = -1;
+  highlightSyncQueue();
+  renderSyncBar();
+
+  if (myRole === 'host') {
+    checkBothSyncSubmitted();
+  } else {
+    send({ type: 'syncPlan', userId: myUserId, actions: syncMyQueue });
+    send({ type: 'syncOppSubmitted', userId: myUserId });
+    showBanner('已提交，等待对手...', 'info', 2000);
+  }
+}
+
+function handleOpponentSyncPlan(msg) {
+  syncOppQueue = msg.actions || [];
+  syncOppSubmitted = true;
+  checkBothSyncSubmitted();
+}
+
+function checkBothSyncSubmitted() {
+  if (myRole !== 'host') return;
+  if (!syncMySubmitted || !syncOppSubmitted) return;
+  setTimeout(() => hostSimulateAndPlay(), 200);
+}
+
+function startSyncRound() {
+  syncRoundNum++;
+  syncMyQueue = [];
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  syncOppQueue = [];
+  selectedRow = -1; selectedCol = -1;
+  clearParabolas();
+  highlightSyncQueue();
+  renderSyncBar();
+  // 不再设置 statusText，避免显示"请规划你的操作"
+}
+
+function hostSimulateAndPlay() {
+  const allActions = [];
+  syncMyQueue.forEach(a => allActions.push({ ...a, by: 'host' }));
+  syncOppQueue.forEach(a => allActions.push({ ...a, by: 'guest' }));
+
+  const script = simulateSyncRound(allActions);
+  playSyncPlayback(script);
+  send({ type: 'syncPlayback', script });
+
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  syncOppQueue = [];
+}
+
+function replayLastPlayback() {
+  if (syncPlaying) { showBanner('播放中，请稍候', 'info', 1200); return; }
+  if (gameOver) { showBanner('对局已结束', 'error', 1200); return; }
+  if (!lastPlaybackScript) { showBanner('没有可回放的记录', 'error', 1200); return; }
+
+  if (lastPlaybackStartState) {
+    board = lastPlaybackStartState.board.map(row => row.map(c => c ? { ...c } : null));
+    deadRed = [...lastPlaybackStartState.deadRed];
+    deadBlack = [...lastPlaybackStartState.deadBlack];
+    prevDeadRedCount = -1;
+    prevDeadBlackCount = -1;
+    renderFullBoard();
+    renderGraveyards();
+  }
+
+  playSyncPlayback(lastPlaybackScript);
+}
+
+function getPieceIdAt(row, col) {
+  const d = board[row]?.[col];
+  return d ? d.id : -1;
+}
+
+function checkSyncQueueConflict(newAction, skipIdx) {
+  const queue = syncMyQueue;
+
+  let targetRow, targetCol;
+  if (newAction.type === 'flip') {
+    targetRow = newAction.row; targetCol = newAction.col;
+  } else {
+    targetRow = newAction.toRow; targetCol = newAction.toCol;
+  }
+
+  for (let i = 0; i < queue.length; i++) {
+    if (i === skipIdx) continue;
+    const a = queue[i];
+    let aTargetRow, aTargetCol;
+    if (a.type === 'flip') {
+      aTargetRow = a.row; aTargetCol = a.col;
+    } else {
+      aTargetRow = a.toRow; aTargetCol = a.toCol;
+    }
+    if (aTargetRow === targetRow && aTargetCol === targetCol) {
+      return '这个格子已经被本回合其他操作占用了';
+    }
+  }
+
+  if (newAction.type === 'move' || newAction.type === 'capture') {
+    const fromId = getPieceIdAt(newAction.fromRow, newAction.fromCol);
+    if (fromId !== -1) {
+      const alreadyPlanned = queue.some((a, idx) => {
+        if (idx === skipIdx) return false;
+        if (a.type !== 'move' && a.type !== 'capture') return false;
+        const aFromId = getPieceIdAt(a.fromRow, a.fromCol);
+        return aFromId === fromId;
+      });
+      if (alreadyPlanned) return '这个棋子已经被本回合其他操作占用了';
+    }
+  }
+
+  return null;
+}
+
+function removeSyncActionWithDeps(idx) {
+  const target = syncMyQueue[idx];
+  if (!target) return;
+
+  const toRemove = new Set([idx]);
+  if (target.type === 'move' || target.type === 'capture') {
+    syncMyQueue.forEach((a, i) => {
+      if (i === idx) return;
+      if (a.type !== 'move' && a.type !== 'capture') return;
+      if (a.toRow === target.fromRow && a.toCol === target.fromCol) {
+        toRemove.add(i);
+      }
+    });
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    syncMyQueue.forEach((a, i) => {
+      if (toRemove.has(i)) return;
+      if (a.type !== 'move' && a.type !== 'capture') return;
+      for (const ri of Array.from(toRemove)) {
+        const rt = syncMyQueue[ri];
+        if (!rt) continue;
+        if ((rt.type === 'move' || rt.type === 'capture') &&
+            a.toRow === rt.fromRow && a.toCol === rt.fromCol) {
+          toRemove.add(i); changed = true; break;
+        }
+      }
+    });
+  }
+
+  const arr = Array.from(toRemove).sort((a, b) => b - a);
+  arr.forEach(i => syncMyQueue.splice(i, 1));
+
+  selectedRow = -1; selectedCol = -1;
+  highlightSyncQueue();
+  renderSyncBar();
+
+  if (toRemove.size > 1) {
+    showBanner(`已取消 ${toRemove.size} 个相关操作`, 'info', 1500);
+  }
+}
+
+// ★ 核心模拟
+function simulateSyncRound(actions) {
+  const events = [];
+  const workBoard = board.map(row => row.map(c => c ? { ...c } : null));
+  const workDeadRed = [...deadRed];
+  const workDeadBlack = [...deadBlack];
+
+  const moves = [];
+  const flippedKeys = new Set();
+
+  actions.forEach(act => {
+    if (act.type === 'flip') {
+      const key = act.row + ',' + act.col;
+      if (flippedKeys.has(key)) return;
+      const cell = workBoard[act.row]?.[act.col];
+      if (!cell || !cell.hidden || !cell.piece) return;
+      flippedKeys.add(key);
+      cell.hidden = false;
+      const color = getPieceColor(cell.piece);
+      events.push({
+        t: 0, type: 'flip',
+        row: act.row, col: act.col,
+        piece: cell.piece, color,
+        by: act.by
+      });
+    } else if (act.type === 'move' || act.type === 'capture') {
+      const fromCell = workBoard[act.fromRow]?.[act.fromCol];
+      if (!fromCell) return;
+      const piece = fromCell.piece;
+      const speed = getPieceSpeed(piece);
+      const dist = Math.abs(act.toRow - act.fromRow) + Math.abs(act.toCol - act.fromCol);
+      const duration = (dist / speed) * 1000;
+      moves.push({
+        ...act, piece, speed, duration,
+        startT: 0, endT: duration
+      });
+    }
+  });
+
+  const STEP = 20;
+  const maxT = moves.reduce((m, mv) => Math.max(m, mv.endT), 0) + 200;
+  const pieceStates = {};
+  moves.forEach((mv, i) => {
+    const cell = workBoard[mv.fromRow][mv.fromCol];
+    const pieceId = cell.id;
+    pieceStates[pieceId] = {
+      pieceId,
+      flying: isFlying(mv.piece),
+      startT: mv.startT,
+      endT: mv.endT,
+      from: { row: mv.fromRow, col: mv.fromCol },
+      to: { row: mv.toRow, col: mv.toCol },
+      by: mv.by,
+      piece: mv.piece,
+      dead: false,
+      hasLanded: false
+    };
+    events.push({
+      t: mv.startT, type: 'moveStart',
+      pieceId,
+      from: { row: mv.fromRow, col: mv.fromCol },
+      to: { row: mv.toRow, col: mv.toCol },
+      piece: mv.piece,
+      flying: isFlying(mv.piece),
+      duration: mv.duration,
+      by: mv.by
+    });
+  });
+
+  // 时间轴推进 + 碰撞判定
+  for (let now = 0; now <= maxT; now += STEP) {
+    const activePieces = [];
+    Object.values(pieceStates).forEach(ps => {
+      if (ps.dead) return;
+      if (ps.hasLanded) return;
+      if (now >= ps.startT && now < ps.endT) {
+        const prog = (now - ps.startT) / (ps.endT - ps.startT);
+        const r = ps.from.row + (ps.to.row - ps.from.row) * prog;
+        const c = ps.from.col + (ps.to.col - ps.from.col) * prog;
+        activePieces.push({ ps, r, c });
+      } else if (now >= ps.endT) {
+        ps.hasLanded = true;
+      }
+    });
+
+    for (let i = 0; i < activePieces.length; i++) {
+      for (let j = i + 1; j < activePieces.length; j++) {
+        const a = activePieces[i], b = activePieces[j];
+        if (a.ps.by === b.ps.by) continue;
+
+        // ★ 双保险：直接按棋子类型判断飞行状态
+        const aFlying = isFlying(a.ps.piece);
+        const bFlying = isFlying(b.ps.piece);
+        if (aFlying !== bFlying) continue;   // 一方飞、一方不飞 → 不碰撞
+
+        const dr = a.r - b.r, dc = a.c - b.c;
+        if (Math.sqrt(dr * dr + dc * dc) >= 0.6) continue;
+
+        const pieceA = a.ps.piece;
+        const pieceB = b.ps.piece;
+        const colorA = getPieceColor(pieceA);
+        const colorB = getPieceColor(pieceB);
+        if (colorA === colorB) continue;
+
+        const aEatsB = canCaptureInCollision(pieceA, pieceB);
+        const bEatsA = canCaptureInCollision(pieceB, pieceA);
+
+        if (aEatsB && bEatsA) {
+          a.ps.dead = true; b.ps.dead = true;
+          events.push({
+            t: now, type: 'collision',
+            pieceIds: [a.ps.pieceId, b.ps.pieceId],
+            deadIds: [a.ps.pieceId, b.ps.pieceId],
+            result: 'bothDead'
+          });
+          if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
+          if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
+        } else if (aEatsB) {
+          b.ps.dead = true;
+          events.push({
+            t: now, type: 'collision',
+            pieceIds: [b.ps.pieceId],
+            deadIds: [b.ps.pieceId],
+            result: 'oneDead'
+          });
+          if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
+        } else if (bEatsA) {
+          a.ps.dead = true;
+          events.push({
+            t: now, type: 'collision',
+            pieceIds: [a.ps.pieceId],
+            deadIds: [a.ps.pieceId],
+            result: 'oneDead'
+          });
+          if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
+        }
+      }
+    }
+  }
+
+  // 落地：分两遍
+  const sortedStates = Object.values(pieceStates).sort((a, b) => a.endT - b.endT);
+
+  sortedStates.forEach(ps => {
+    if (ps.dead) {
+      const cell = workBoard[ps.from.row][ps.from.col];
+      if (cell && cell.id === ps.pieceId) {
+        workBoard[ps.from.row][ps.from.col] = null;
+      }
+    }
+  });
+
+  sortedStates.forEach(ps => {
+    if (ps.dead) return;
+
+    const targetCell = workBoard[ps.to.row][ps.to.col];
+    const fromCell = workBoard[ps.from.row][ps.from.col];
+    const movingPiece = ps.piece;
+    const movingId = ps.pieceId;
+
+    if (targetCell && !targetCell.hidden) {
+      const targetPiece = targetCell.piece;
+      if (getPieceColor(movingPiece) === getPieceColor(targetPiece)) {
+        workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
+        events.push({
+          t: ps.endT, type: 'moveEnd',
+          pieceId: ps.pieceId,
+          result: 'blocked',
+          from: { row: ps.from.row, col: ps.from.col },
+          to: { row: ps.to.row, col: ps.to.col }
+        });
+        return;
+      }
+      let canEat = false;
+      if (movingPiece === '炮' || movingPiece === '砲') {
+        canEat = isValidCannonCapture(ps.from.row, ps.from.col, ps.to.row, ps.to.col, workBoard);
+      } else {
+        canEat = canCapture(movingPiece, targetPiece);
+      }
+      if (canEat) {
+        const targetColor = getPieceColor(targetPiece);
+        if (targetColor === 'red') workDeadRed.push(targetPiece);
+        else if (targetColor === 'black') workDeadBlack.push(targetPiece);
+        workBoard[ps.to.row][ps.to.col] = { piece: movingPiece, hidden: false, id: movingId };
+        workBoard[ps.from.row][ps.from.col] = null;
+        events.push({
+          t: ps.endT, type: 'moveEnd',
+          pieceId: ps.pieceId,
+          result: 'capture',
+          targetPiece,
+          targetPieceId: targetCell.id,
+          from: { row: ps.from.row, col: ps.from.col },
+          to: { row: ps.to.row, col: ps.to.col }
+        });
+      } else {
+        workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
+        events.push({
+          t: ps.endT, type: 'moveEnd',
+          pieceId: ps.pieceId,
+          result: 'blocked',
+          from: { row: ps.from.row, col: ps.from.col },
+          to: { row: ps.to.row, col: ps.to.col }
+        });
+      }
+    } else if (targetCell && targetCell.hidden) {
+      workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
+      events.push({
+        t: ps.endT, type: 'moveEnd',
+        pieceId: ps.pieceId,
+        result: 'blocked',
+        from: { row: ps.from.row, col: ps.from.col },
+        to: { row: ps.to.row, col: ps.to.col }
+      });
+    } else {
+      workBoard[ps.to.row][ps.to.col] = { piece: movingPiece, hidden: false, id: movingId };
+      const startCell = workBoard[ps.from.row][ps.from.col];
+      if (startCell && startCell.id === movingId) {
+        workBoard[ps.from.row][ps.from.col] = null;
+      }
+      events.push({
+        t: ps.endT, type: 'moveEnd',
+        pieceId: ps.pieceId,
+        result: 'ok',
+        from: { row: ps.from.row, col: ps.from.col },
+        to: { row: ps.to.row, col: ps.to.col }
+      });
+    }
+  });
+
+  events.sort((a, b) => a.t - b.t);
+
+  return {
+    events,
+    finalBoard: workBoard,
+    deadRed: workDeadRed,
+    deadBlack: workDeadBlack,
+    totalDuration: maxT
+  };
+}
+
+function isValidCannonCapture(fromRow, fromCol, toRow, toCol, b) {
+  if (fromRow !== toRow && fromCol !== toCol) return false;
+  if (fromRow === toRow && fromCol === toCol) return false;
+  let count = 0;
+  if (fromRow === toRow) {
+    const minCol = Math.min(fromCol, toCol), maxCol = Math.max(fromCol, toCol);
+    for (let c = minCol + 1; c < maxCol; c++) if (b[fromRow][c] !== null) count++;
+  } else {
+    const minRow = Math.min(fromRow, toRow), maxRow = Math.max(fromRow, toRow);
+    for (let r = minRow + 1; r < maxRow; r++) if (b[r][fromCol] !== null) count++;
+  }
+  return count === 1;
+}
+
+function playSyncPlayback(script) {
+  lastPlaybackScript = script;
+  lastPlaybackStartState = {
+    board: board.map(row => row.map(c => c ? { ...c } : null)),
+    deadRed: [...deadRed],
+    deadBlack: [...deadBlack]
+  };
+
+  syncPlaying = true;
+  renderSyncBar();
+  document.getElementById('statusText').textContent = '播放中...';
+
+  renderFullBoard();
+
+  script.events.forEach(ev => {
+    if (ev.type === 'moveStart') {
+      const el = pieceElMap[ev.pieceId];
+      if (el && ev.from && ev.to) {
+        const fromPos = getPiecePos(ev.from.row, ev.from.col);
+        el.style.transition = 'none';
+        el.style.left = fromPos.left + 'px';
+        el.style.top = fromPos.top + 'px';
+      }
+    }
+  });
+  void document.body.offsetWidth;
+
+  script.events.forEach(ev => {
+    setTimeout(() => {
+      applyPlaybackEvent(ev);
+    }, ev.t);
+  });
+
+  syncPlaybackTimer = setTimeout(() => {
+    for (let id = 0; id < 32; id++) {
+      const el = pieceElMap[id];
+      if (el) {
+        el.style.transition = 'none';
+        el.classList.remove('flying-piece');
+        el.classList.remove('dead-anim');
+        el.style.zIndex = '';
+      }
+    }
+    void document.body.offsetWidth;
+
+    board = script.finalBoard.map(row => row.map(c => c ? { ...c } : null));
+    deadRed = [...script.deadRed];
+    deadBlack = [...script.deadBlack];
+    prevDeadRedCount = -1;
+    prevDeadBlackCount = -1;
+    renderFullBoard();
+    renderGraveyards();
+    syncPlaying = false;
+
+    const redCount = countPiecesByColor('red');
+    const blackCount = countPiecesByColor('black');
+    if (redCount === 0 || blackCount === 0) {
+      const winnerColor = redCount === 0 ? 'black' : 'red';
+      gameOver = true;
+      currentPlayer = null;
+      if (onlineMode && myColor) {
+        const myWin = (myColor === winnerColor);
+        gameEndReason = myWin ? '你赢了！' : '你输了';
+        if (myWin) playVictorySound(); else playDefeatSound();
+        uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
+      } else {
+        playVictorySound();
+      }
+      showWinnerModal(winnerColor);
+      stopTimer();
+      return;
+    }
+
+    if (myRole === 'host') {
+      startSyncRound();
+    } else {
+      syncMyQueue = [];
+      syncMySubmitted = false;
+      syncOppSubmitted = false;
+      selectedRow = -1; selectedCol = -1;
+      clearParabolas();
+      highlightSyncQueue();
+      renderSyncBar();
+    }
+  }, script.totalDuration + 200);
+}
+
+function applyPlaybackEvent(ev) {
+  switch (ev.type) {
+    case 'flip':
+      playFlipSound();
+      break;
+    case 'moveStart':
+      playMoveSound();
+      animatePieceMove(ev.pieceId, ev.from, ev.to, ev.duration, ev.flying);
+      break;
+    case 'collision':
+      playCollisionSound();
+      (ev.deadIds || ev.pieceIds).forEach(pid => {
+        const el = pieceElMap[pid];
+        if (el) {
+          el.classList.add('dead-anim');
+          el.style.zIndex = '70';
+        }
+      });
+      break;
+    case 'moveEnd': {
+      const moverEl = pieceElMap[ev.pieceId];
+      if (!moverEl) break;
+
+      if (ev.result === 'capture') {
+        playCaptureSound();
+        if (ev.to) {
+          const toPos = getPiecePos(ev.to.row, ev.to.col);
+          moverEl.style.transition = 'none';
+          moverEl.style.left = toPos.left + 'px';
+          moverEl.style.top = toPos.top + 'px';
+          moverEl.style.zIndex = '';
+        }
+        if (ev.targetPieceId !== undefined) {
+          const deadEl = pieceElMap[ev.targetPieceId];
+          if (deadEl) {
+            deadEl.classList.add('dead-anim');
+            deadEl.style.zIndex = '70';
+          }
+        }
+      } else if (ev.result === 'blocked') {
+        if (ev.from) {
+          const fromPos = getPiecePos(ev.from.row, ev.from.col);
+          moverEl.style.transition = 'none';
+          moverEl.style.left = fromPos.left + 'px';
+          moverEl.style.top = fromPos.top + 'px';
+          moverEl.style.zIndex = '';
+        }
+      } else {
+        if (ev.to) {
+          const toPos = getPiecePos(ev.to.row, ev.to.col);
+          moverEl.style.transition = 'none';
+          moverEl.style.left = toPos.left + 'px';
+          moverEl.style.top = toPos.top + 'px';
+        }
+        moverEl.style.zIndex = '';
+      }
+      break;
+    }
+  }
+}
+
+function animatePieceMove(pieceId, from, to, duration, flying) {
+  const el = pieceElMap[pieceId];
+  if (!el) return;
+  if (!from || !to) return;
+  const toPos = getPiecePos(to.row, to.col);
+  el.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
+  el.style.zIndex = flying ? '60' : '50';
+  if (flying) el.classList.add('flying-piece');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.left = toPos.left + 'px';
+      el.style.top = toPos.top + 'px';
+    });
+  });
+  setTimeout(() => {
+    el.style.transition = '';
+    el.classList.remove('flying-piece');
+    el.style.zIndex = '';
+  }, duration);
+}
+
+function highlightSyncQueue() {
+  document.querySelectorAll('.piece.sync-selected').forEach(el => el.classList.remove('sync-selected'));
+  document.querySelectorAll('.cell.sync-target').forEach(el => el.classList.remove('sync-target'));
+  clearParabolas();
+
+  if (selectedRow !== -1 && selectedCol !== -1) {
+    const d = board[selectedRow][selectedCol];
+    if (d && !d.hidden && d.id !== undefined) {
+      const el = pieceElMap[d.id];
+      if (el) el.classList.add('sync-selected');
+    }
+  }
+
+  syncMyQueue.forEach(act => {
+    if (act.type === 'flip') {
+      const cell = cellEls[act.row]?.[act.col];
+      if (cell) cell.classList.add('sync-target');
+    } else if (act.type === 'move' || act.type === 'capture') {
+      const fromData = board[act.fromRow]?.[act.fromCol];
+      if (fromData && fromData.id !== undefined) {
+        const el = pieceElMap[fromData.id];
+        if (el) el.classList.add('sync-selected');
+      }
+      const toCell = cellEls[act.toRow]?.[act.toCol];
+      if (toCell) toCell.classList.add('sync-target');
+      if (act.type === 'capture') {
+        drawParabola(act.fromRow, act.fromCol, act.toRow, act.toCol);
+      }
+    }
+  });
+}
+
+function drawParabola(fromRow, fromCol, toRow, toCol) {
+  const svg = document.getElementById('boardOverlay');
+  if (!svg) return;
+  const CELL = 76;
+  const x1 = fromCol * CELL + CELL / 2;
+  const y1 = fromRow * CELL + CELL / 2;
+  const x2 = toCol * CELL + CELL / 2;
+  const y2 = toRow * CELL + CELL / 2;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2 - 40;
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
+  path.setAttribute('stroke', '#ffaa00');
+  path.setAttribute('stroke-width', '3');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke-dasharray', '6 4');
+  path.setAttribute('opacity', '0.9');
+  path.classList.add('sync-parabola');
+  svg.appendChild(path);
+  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circle.setAttribute('cx', x2);
+  circle.setAttribute('cy', y2);
+  circle.setAttribute('r', '6');
+  circle.setAttribute('fill', '#ffaa00');
+  circle.setAttribute('opacity', '0.85');
+  circle.classList.add('sync-parabola');
+  svg.appendChild(circle);
+}
+
+function clearParabolas() {
+  const svg = document.getElementById('boardOverlay');
+  if (!svg) return;
+  svg.innerHTML = '';
+}
+
+// ============================================================
+//                        游戏逻辑
+// ============================================================
 function initBoard() {
   const redPieces = ['帥', '仕', '仕', '相', '相', '俥', '俥', '傌', '傌', '炮', '炮', '兵', '兵', '兵', '兵', '兵'];
   const blackPieces = ['將', '士', '士', '象', '象', '車', '車', '馬', '馬', '砲', '砲', '卒', '卒', '卒', '卒', '卒'];
@@ -1763,6 +2793,7 @@ function doUndoLocal() {
 }
 function undo() {
   if (gameOver) return;
+  if (gameMode === 'sync') { showBanner('同步模式不支持悔棋', 'error', 1500); return; }
   if (!onlineMode) { doUndoLocal(); return; }
   if (pendingUndoRequest) { showBanner('已发送悔棋请求，等待确认...', 'info', 2000); return; }
   pendingUndoRequest = true;
@@ -1794,6 +2825,7 @@ function renderGraveyards() {
   }
 }
 function isMyTurn() {
+  if (gameMode === 'sync') return !syncMySubmitted && !syncPlaying;
   if (!onlineMode) return true;
   if (currentPlayer === 'host') return myRole === 'host';
   if (currentPlayer === 'guest') return myRole === 'guest';
@@ -1823,7 +2855,7 @@ function getValidMoves(row, col) {
       const targetColor = getPieceColor(target.piece);
       if (targetColor !== color) {
         if (isCannon) {
-          if (isValidCannonCapture(row, col, nr, nc)) moves.push({ row: nr, col: nc, isCapture: true });
+          if (isValidCannonCapture(row, col, nr, nc, board)) moves.push({ row: nr, col: nc, isCapture: true });
         } else {
           if (canCapture(piece, target.piece)) moves.push({ row: nr, col: nc, isCapture: true });
         }
@@ -1928,6 +2960,9 @@ function renderFullBoard() {
   updateCellHighlights();
   updateTurnIcon();
   updateButtons();
+  if (gameMode === 'sync' && !syncPlaying) {
+    highlightSyncQueue();
+  }
 }
 function playAnim(el, cls) {
   el.classList.remove(cls);
@@ -1943,6 +2978,11 @@ function updateTurnIcon() {
   if (gameOver) {
     el.classList.add('unknown-icon'); el.textContent = '';
     st.textContent = gameEndReason || '对局结束';
+    return;
+  }
+  if (gameMode === 'sync') {
+    el.classList.add('unknown-icon'); el.textContent = '';
+    // ★ 不再设置 statusText
     return;
   }
   if (currentPlayer === 'red') { el.classList.add('red-icon'); el.textContent = '帥'; }
@@ -1970,7 +3010,7 @@ function updateButtons() {
   }
   if (!onlineMode) { undoBtn.disabled = history.length === 0; return; }
   yieldBtn.disabled = !(myRole === 'host' && currentPlayer === 'host');
-  undoBtn.disabled = history.length === 0;
+  undoBtn.disabled = history.length === 0 || gameMode === 'sync';
   drawBtn.disabled = false;
   resignBtn.disabled = false;
 }
@@ -1993,7 +3033,9 @@ function checkGameOver() {
       const myWin = (myColor === winnerColor);
       const reason = myWin ? '你赢了！' : '你输了';
       gameEndReason = reason + `（${winnerColor === 'red' ? '红方' : '黑方'}获胜）`;
-      uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
+      if (!recordUploaded) {
+        uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
+      }
     } else {
       gameEndReason = (winnerColor === 'red' ? '红方胜' : '黑方胜');
     }
@@ -2007,23 +3049,17 @@ function checkGameOver() {
   }
   return false;
 }
-function isValidCannonCapture(fromRow, fromCol, toRow, toCol) {
-  if (fromRow !== toRow && fromCol !== toCol) return false;
-  if (fromRow === toRow && fromCol === toCol) return false;
-  let count = 0;
-  if (fromRow === toRow) {
-    const minCol = Math.min(fromCol, toCol), maxCol = Math.max(fromCol, toCol);
-    for (let c = minCol + 1; c < maxCol; c++) if (board[fromRow][c] !== null) count++;
-  } else {
-    const minRow = Math.min(fromRow, toRow), maxRow = Math.max(fromRow, toRow);
-    for (let r = minRow + 1; r < maxRow; r++) if (board[r][fromCol] !== null) count++;
-  }
-  return count === 1;
-}
 
+// ============================================================
+//                        点击处理
+// ============================================================
 function handleCellClick(row, col) {
   if (gameOver) return;
   if (isReconnecting) { showBanner('正在重连，请稍候...', 'error', 1500); return; }
+  if (gameMode === 'sync') {
+    handleSyncCellClick(row, col);
+    return;
+  }
   if (onlineMode && !isMyTurn()) {
     if (currentPlayer === 'host') showBanner('等待房主先翻棋...', 'info', 1000);
     else if (currentPlayer === 'guest') showBanner('等待客机先翻棋...', 'info', 1000);
@@ -2078,7 +3114,7 @@ function handleCellClick(row, col) {
     if (movingColor !== currentPlayer) { selectedRow = -1; selectedCol = -1; refreshSelection(); return; }
     const targetPiece = cellData.piece;
     if (movingPiece === '炮' || movingPiece === '砲') {
-      if (!isValidCannonCapture(fromRow, fromCol, row, col)) { refreshSelection(); return; }
+      if (!isValidCannonCapture(fromRow, fromCol, row, col, board)) { refreshSelection(); return; }
     } else {
       if (!canCapture(movingPiece, targetPiece)) { refreshSelection(); return; }
       const rowDiff = Math.abs(fromRow - row), colDiff = Math.abs(fromCol - col);
@@ -2096,6 +3132,116 @@ function handleCellClick(row, col) {
   }
   refreshSelection();
 }
+
+function handleSyncCellClick(row, col) {
+  if (syncPlaying) { showBanner('播放中，请稍候', 'info', 1200); return; }
+  if (syncMySubmitted) { showBanner('已提交，等待对手', 'info', 1200); return; }
+
+  const cellData = board[row][col];
+
+  if (cellData && cellData.hidden) {
+    const idx = syncMyQueue.findIndex(a => a.type === 'flip' && a.row === row && a.col === col);
+    if (idx >= 0) {
+      removeSyncActionWithDeps(idx);
+      return;
+    }
+    if (!cellData.piece) { showBanner('这里没有棋子', 'error', 1200); return; }
+    if (syncMyQueue.length >= syncStepsPerRound) {
+      showBanner('已达本回合步数上限', 'error', 1500);
+      return;
+    }
+    const act = { type: 'flip', row, col };
+    const conflict = checkSyncQueueConflict(act);
+    if (conflict) { showBanner(conflict, 'error', 1500); return; }
+    syncMyQueue.push(act);
+    selectedRow = -1; selectedCol = -1;
+    highlightSyncQueue();
+    renderSyncBar();
+    return;
+  }
+
+  if (cellData && !cellData.hidden) {
+    const mvIdx = syncMyQueue.findIndex(a =>
+      (a.type === 'move' || a.type === 'capture') &&
+      a.fromRow === row && a.fromCol === col
+    );
+    if (mvIdx >= 0) {
+      removeSyncActionWithDeps(mvIdx);
+      return;
+    }
+  }
+
+  if (selectedRow !== -1 && selectedCol !== -1) {
+    if (selectedRow === row && selectedCol === col) {
+      selectedRow = -1; selectedCol = -1;
+      highlightSyncQueue();
+      return;
+    }
+    const fromData = board[selectedRow][selectedCol];
+    const fromPiece = fromData?.piece;
+
+    if (cellData === null && fromPiece) {
+      const rd = Math.abs(selectedRow - row), cd = Math.abs(selectedCol - col);
+      if (rd + cd !== 1) { showBanner('只能走一格', 'error', 1200); return; }
+      if (syncMyQueue.length >= syncStepsPerRound) {
+        showBanner('已达本回合步数上限', 'error', 1500);
+        return;
+      }
+      const act = {
+        type: 'move',
+        fromRow: selectedRow, fromCol: selectedCol,
+        toRow: row, toCol: col
+      };
+      const conflict = checkSyncQueueConflict(act);
+      if (conflict) { showBanner(conflict, 'error', 1500); return; }
+      syncMyQueue.push(act);
+      selectedRow = -1; selectedCol = -1;
+      highlightSyncQueue();
+      renderSyncBar();
+      return;
+    }
+
+    if (cellData && !cellData.hidden && fromPiece &&
+        getPieceColor(fromPiece) !== getPieceColor(cellData.piece)) {
+      const rd = Math.abs(selectedRow - row), cd = Math.abs(selectedCol - col);
+      let canEat = false;
+      if (fromPiece === '炮' || fromPiece === '砲') {
+        canEat = isValidCannonCapture(selectedRow, selectedCol, row, col, board);
+      } else {
+        canEat = (rd + cd === 1) && canCapture(fromPiece, cellData.piece);
+      }
+      if (!canEat) { showBanner('无法吃这个棋子', 'error', 1200); return; }
+      if (syncMyQueue.length >= syncStepsPerRound) {
+        showBanner('已达本回合步数上限', 'error', 1500);
+        return;
+      }
+      const act = {
+        type: 'capture',
+        fromRow: selectedRow, fromCol: selectedCol,
+        toRow: row, toCol: col
+      };
+      const conflict = checkSyncQueueConflict(act);
+      if (conflict) { showBanner(conflict, 'error', 1500); return; }
+      syncMyQueue.push(act);
+      selectedRow = -1; selectedCol = -1;
+      highlightSyncQueue();
+      renderSyncBar();
+      return;
+    }
+  }
+
+  if (cellData && !cellData.hidden) {
+    const color = getPieceColor(cellData.piece);
+    if (color !== myColor) {
+      showBanner('只能操作自己的棋子', 'error', 1200);
+      return;
+    }
+    selectedRow = row; selectedCol = col;
+    highlightSyncQueue();
+    return;
+  }
+}
+
 function executeMove(fromRow, fromCol, toRow, toCol, movingPiece, targetPiece, skipBroadcast) {
   const targetColor = targetPiece ? getPieceColor(targetPiece) : null;
   if (targetPiece) {
@@ -2158,7 +3304,7 @@ function handleGuestAction(msg) {
     const rd = Math.abs(from.row - to.row), cd = Math.abs(from.col - to.col);
     if (movingPiece === '炮' || movingPiece === '砲') {
       if (targetPiece) {
-        if (!isValidCannonCapture(from.row, from.col, to.row, to.col)) { broadcastSync(); return; }
+        if (!isValidCannonCapture(from.row, from.col, to.row, to.col, board)) { broadcastSync(); return; }
       } else {
         if (rd + cd !== 1) { broadcastSync(); return; }
       }
@@ -2193,13 +3339,27 @@ function resetGame() {
   pendingUndoRequest = false;
   pendingDrawRequest = false;
   recordUploaded = false;
+  syncRoundNum = 0;
+  syncMyQueue = [];
+  syncMySubmitted = false;
+  syncOppSubmitted = false;
+  syncPlaying = false;
+  lastPlaybackScript = null;
+  lastPlaybackStartState = null;
   resetTimersForNewGame();
   buildBoardDOM();
   renderFullBoard();
   renderGraveyards();
   const log = document.getElementById('chatLog');
   if (log) log.innerHTML = '';
-  startTimer();
+  if (gameMode === 'sync') {
+    document.getElementById('syncBar').classList.remove('hidden');
+    renderSyncBar();
+    startSyncRound();
+  } else {
+    document.getElementById('syncBar').classList.add('hidden');
+    startTimer();
+  }
 }
 document.getElementById('resetBtn').addEventListener('click', () => {
   if (onlineMode) {
@@ -2210,8 +3370,12 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 });
 document.getElementById('undoBtn').addEventListener('click', undo);
 
+// ============================================================
+//                    让先 / 和棋 / 认输
+// ============================================================
 function yieldFirst() {
   if (gameOver) return;
+  if (gameMode === 'sync') { showBanner('同步模式无需让先', 'info', 1500); return; }
   if (!onlineMode) { showBanner('离线模式无需让先', 'error', 1500); return; }
   if (myRole !== 'host') { showBanner('只有房主可以让先', 'error', 1500); return; }
   if (currentPlayer !== 'host') { showBanner('开局后才能让先', 'error', 1500); return; }
@@ -2245,6 +3409,7 @@ function endGame(reason, type) {
   gameEndReason = reason;
   selectedRow = -1; selectedCol = -1;
   stopTimer();
+  stopRoomHeartbeat();
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   const modal = document.getElementById('oppDisconnectModal');
   if (modal) modal.classList.remove('show');
@@ -2271,6 +3436,9 @@ function endGame(reason, type) {
   }
 }
 
+// ============================================================
+//                    胜利弹窗
+// ============================================================
 function getPlayerNameByColor(color) {
   if (!onlineMode) return color === 'red' ? '红方' : '黑方';
   if (hostColor === color) {
@@ -2301,6 +3469,9 @@ function closeWinnerModal() {
   document.getElementById('winnerModal').classList.remove('show');
 }
 
+// ============================================================
+//                    战绩上传 & 排行榜
+// ============================================================
 async function getUserCustomData(userId) {
   try {
     const res = await fetch(`${SERVER_URL}/get-custom-data-by-id`, {
@@ -2427,6 +3598,9 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// ============================================================
+//                    页面加载 / 卸载
+// ============================================================
 window.addEventListener('load', async () => {
   hideAll();
   menuPanel.classList.remove('hidden');
