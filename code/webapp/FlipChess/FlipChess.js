@@ -315,6 +315,7 @@ function findPieceById(id) {
 }
 
 function trySpawnBall() {
+  if(gameMode !== "sync") return;
   if (skillBalls.length >= 2) return;
   const empty = [];
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
@@ -330,6 +331,7 @@ function trySpawnBall() {
 
 function renderSkillBalls() {
   document.querySelectorAll('.skill-ball').forEach(el => el.remove());
+  if(gameMode !== "sync") return;
   const boardEl = document.getElementById('board');
   if (!boardEl) return;
   skillBalls.forEach(ball => {
@@ -352,6 +354,7 @@ function addEffect(ef) {
 }
 
 function onTurnAdvance() {
+  if(gameMode !== "sync") return;
   // guest 只做效果计时，不生成球、不重算 nextBallSpawnAt
   if (onlineMode && myRole === 'guest') {
     tickSkillEffects();
@@ -2648,13 +2651,15 @@ function renderFullBoard() {
     if (lastMovedRow === r && lastMovedCol === c) el.classList.add('last-moved');
     if (wasHidden && !data.hidden) playAnim(el, 'flip-in');
     const efs = getPieceEffects(id);
-    if (efs.length > 0) {
-      const badge = document.createElement('span');
-      badge.className = 'effect-badge';
-      const types = efs.map(e => e.type).join('');
-      badge.textContent = types;
-      badge.classList.add(types[0] === '+' ? 'plus' : 'minus');
-      el.appendChild(badge);
+    if (gameMode === "sync") {
+      if (efs.length > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'effect-badge';
+        const types = efs.map(e => e.type).join('');
+        badge.textContent = types;
+        badge.classList.add(types[0] === '+' ? 'plus' : 'minus');
+        el.appendChild(badge);
+      }
     }
     if (targetPickMode && !data.hidden) el.classList.add('target-pick-hint');
   }
@@ -2909,14 +2914,6 @@ function executeMove(fromRow, fromCol, toRow, toCol, movingPiece, targetPiece, s
   lastMovedRow = toRow; lastMovedCol = toCol;
   selectedRow = -1; selectedCol = -1;
   if (targetPiece) playCaptureSound(); else playMoveSound();
-  if (gameMode === 'classic') {
-    const ball = ballAt(toRow, toCol);
-    if (ball) {
-      const side = getPieceColor(movingPiece) === hostColor ? 'host' : 'guest';
-      const eaterSide = !onlineMode ? (myRole || 'host') : side;
-      handleBallEatenClassic(ball, movingId, eaterSide);
-    }
-  }
   checkGameOver();
   if (!gameOver) { currentPlayer = (currentPlayer === 'red' ? 'black' : 'red'); turnStartTs = performance.now(); }
   if (!gameOver) onTurnAdvance();
