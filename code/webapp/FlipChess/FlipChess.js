@@ -9,9 +9,7 @@ function getAudioCtx() {
       if (AC) audioCtx = new AC();
     } catch (e) { }
   }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => { });
-  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
   return audioCtx;
 }
 function playMoveSound() {
@@ -135,6 +133,20 @@ function playCollisionSound() {
   noise.connect(hp).connect(nGain).connect(ctx.destination);
   noise.start(now);
 }
+function playSkillSound() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const now = ctx.currentTime;
+  [660, 880, 1100].forEach((f, i) => {
+    const t = now + i * 0.08;
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = f;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.3);
+  });
+}
 
 // ============================================================
 //                        全局状态
@@ -171,7 +183,6 @@ let intentionalClose = false;
 let leavingToHome = false;
 let roomFullHandled = false;
 let recordUploaded = false;
-
 let prevDeadRedCount = 0;
 let prevDeadBlackCount = 0;
 
@@ -184,7 +195,6 @@ let inviteRoomId = '';
 let pendingInviteTimer = null;
 let timeSelectMode = 'create';
 let pendingInviteTargetId = null;
-
 let onlineUsers = {};
 
 let gameMode = 'classic';
@@ -201,11 +211,24 @@ let colorTipShown = false;
 let lastPlaybackScript = null;
 let lastPlaybackStartState = null;
 
-let roomHeartbeatTimer = null;
-let oppLastSeen = 0;
-let roomHeartbeatCheckTimer = null;
-const HEARTBEAT_SEND_MS = 5000;
-const HEARTBEAT_TIMEOUT_MS = 15000;
+let syncPathPieceId = -1;
+let syncPathPiece = null;
+let syncPathCurrentPos = { row: -1, col: -1 };
+
+// ★ 状态版本号：防止客机播放结束后用旧脚本覆盖新同步状态
+let syncStateVersion = 0;
+
+const activeAnimations = {};
+
+let skillBalls = [];
+let skillEffects = [];
+let skillTurnCounter = 0;
+let nextBallSpawnAt = 3;
+let stepBonus = { host: 0, guest: 0 };
+
+let pendingDisconnectCheck = null;
+let lastOppActivity = Date.now();
+let targetPickMode = null;
 
 const ROWS = 8, COLS = 4;
 const CELL_SIZE = 76, PIECE_SIZE = 68;
@@ -213,29 +236,29 @@ const OFFSET = (CELL_SIZE - PIECE_SIZE) / 2;
 
 const WS_BASE = 'wss://scripthub.serveousercontent.com/ws';
 const SERVER_URL = (typeof serverurl !== 'undefined') ? serverurl : 'https://scripthub.serveousercontent.com';
-
 const LOBBY_ROOM = 'lobby';
 
 const RANK = {
   '將': 7, '帥': 7, '士': 6, '仕': 6, '象': 5, '相': 5,
   '車': 4, '俥': 4, '馬': 3, '傌': 3, '炮': 2, '砲': 2, '卒': 1, '兵': 1
 };
-
 const SPEED = {
-  '兵': 1.0, '卒': 1.0,
-  '炮': 1.0, '砲': 1.0,
-  '馬': 1.0, '傌': 1.0,
-  '車': 1.0, '俥': 1.0,
-  '士': 1.0, '仕': 1.0,
-  '象': 1.0, '相': 1.0,
+  '兵': 1.0, '卒': 1.0, '炮': 1.0, '砲': 1.0,
+  '馬': 1.0, '傌': 1.0, '車': 1.0, '俥': 1.0,
+  '士': 1.0, '仕': 1.0, '象': 1.0, '相': 1.0,
   '將': 1.0, '帥': 1.0
 };
+const UPGRADE = {
+  '兵': '炮', '炮': '傌', '傌': '俥', '俥': '相', '相': '仕', '仕': '帥',
+  '卒': '砲', '砲': '馬', '馬': '車', '車': '象', '象': '士', '士': '將',
+  '帥': null, '將': null
+};
+const DOWNGRADE = {
+  '帥': '仕', '仕': '相', '相': '俥', '俥': '傌', '傌': '炮', '炮': '兵', '兵': null,
+  '將': '士', '士': '象', '象': '車', '車': '馬', '馬': '砲', '砲': '卒', '卒': null
+};
 
-const FLYING_PIECES = ['炮', '砲'];
-
-function isFlying(piece) { return FLYING_PIECES.includes(piece); }
 function getPieceSpeed(piece) { return SPEED[piece] || 1.0; }
-
 function getPieceColor(piece) {
   if (!piece) return null;
   if ('帥仕相俥傌炮兵'.includes(piece)) return 'red';
@@ -243,7 +266,6 @@ function getPieceColor(piece) {
   return null;
 }
 function getRank(piece) { return RANK[piece] || 0; }
-
 function canCapture(piece, target) {
   if (!piece || !target) return false;
   if (getPieceColor(piece) === getPieceColor(target)) return false;
@@ -252,8 +274,6 @@ function canCapture(piece, target) {
   if ((piece === '將' || piece === '帥') && (target === '兵' || target === '卒')) return false;
   return getRank(piece) >= getRank(target);
 }
-
-// 碰撞判定专用：炮按普通等级判
 function canCaptureInCollision(piece, target) {
   if (!piece || !target) return false;
   if (getPieceColor(piece) === getPieceColor(target)) return false;
@@ -269,34 +289,256 @@ const RECONNECT_TIMEOUT_MS = 120 * 1000;
 const RECONNECT_INTERVAL_MS = 3000;
 let reconnectWasInGame = false;
 
-let timeSettings = {
-  enabled: true,
-  totalMs: 15 * 60 * 1000,
-  stepMs: 60 * 1000
-};
-let hostTimeLeft = 0;
-let guestTimeLeft = 0;
-let turnStartTs = 0;
-let timerInterval = null;
-let timeoutHandled = false;
+let timeSettings = { enabled: true, totalMs: 15 * 60 * 1000, stepMs: 60 * 1000 };
+let hostTimeLeft = 0, guestTimeLeft = 0, turnStartTs = 0;
+let timerInterval = null, timeoutHandled = false;
+let unreadChatCount = 0;
 
 const CHAT_PRESETS = [
-  '请神速些吧！',
-  '容我再思量思量！',
-  '一着不慎，满盘皆输！',
-  '再与我对弈一局？',
-  '观棋不语真君子，落子无悔大丈夫！',
-  '胜败乃兵家常事！',
-  '快点吧，等的花儿都谢了！',
-  '对不起，刚才卡了！',
-  '下次再玩吧，我要走了。'
+  '请神速些吧！', '容我再思量思量！', '一着不慎，满盘皆输！',
+  '再与我对弈一局？', '观棋不语真君子，落子无悔大丈夫！',
+  '胜败乃兵家常事！', '快点吧，等的花儿都谢了！',
+  '对不起，刚才卡了！', '下次再玩吧，我要走了。'
 ];
+
+// ============================================================
+//                    技能球系统
+// ============================================================
+const SKILL_TYPES = ['+L', '-L', '+S', '-S', '+N', '-N'];
+
+function findPieceById(id) {
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    const cell = board[r][c];
+    if (cell && cell.id === id) return { r, c, cell };
+  }
+  return null;
+}
+
+function trySpawnBall() {
+  if (skillBalls.length >= 2) return;
+  const empty = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (board[r][c] === null && !skillBalls.some(b => b.row === r && b.col === c)) empty.push({ r, c });
+  }
+  if (empty.length === 0) return;
+  const pos = empty[Math.floor(Math.random() * empty.length)];
+  const type = SKILL_TYPES[Math.floor(Math.random() * SKILL_TYPES.length)];
+  const golden = Math.random() < 0.2;
+  skillBalls.push({ row: pos.r, col: pos.c, type, golden });
+  renderSkillBalls();
+}
+
+function renderSkillBalls() {
+  document.querySelectorAll('.skill-ball').forEach(el => el.remove());
+  const boardEl = document.getElementById('board');
+  if (!boardEl) return;
+  skillBalls.forEach(ball => {
+    const el = document.createElement('div');
+    el.className = 'skill-ball ' + (ball.type[0] === '+' ? 'plus' : 'minus');
+    if (ball.golden) el.classList.add('golden');
+    el.textContent = ball.type;
+    const pos = getPiecePos(ball.row, ball.col);
+    el.style.left = pos.left + 'px';
+    el.style.top = pos.top + 'px';
+    boardEl.appendChild(el);
+  });
+}
+
+function ballAt(row, col) { return skillBalls.find(b => b.row === row && b.col === col); }
+
+function addEffect(ef) {
+  applyEffectNow(ef);
+  skillEffects.push(ef);
+}
+
+function onTurnAdvance() {
+  // guest 只做效果计时，不生成球、不重算 nextBallSpawnAt
+  if (onlineMode && myRole === 'guest') {
+    tickSkillEffects();
+    return;
+  }
+  skillTurnCounter++;
+  if (skillTurnCounter >= nextBallSpawnAt) {
+    trySpawnBall();
+    nextBallSpawnAt = skillTurnCounter + 3 + Math.floor(Math.random() * 3);
+  }
+  tickSkillEffects();
+}
+
+function tickSkillEffects() {
+  let changed = false;
+  const toRemove = [];
+  skillEffects.forEach((ef, i) => {
+    ef.roundsLeft--;
+    if (ef.roundsLeft <= 0) {
+      restoreEffectNow(ef);
+      toRemove.push(i);
+      changed = true;
+    }
+  });
+  for (let i = toRemove.length - 1; i >= 0; i--) skillEffects.splice(toRemove[i], 1);
+  if (changed) {
+    Promise.resolve().then(() => {
+      if (gameMode === 'sync' && syncPlaying) return;
+      renderFullBoard();
+      if (gameMode === 'sync') renderSyncBar();
+    });
+  }
+}
+
+function applyEffectNow(ef) {
+  const { type, targetId } = ef;
+  if (type === '+N' || type === '-N') {
+    if (targetId === 'host' || targetId === 'guest') {
+      const delta = type === '+N' ? 1 : -1;
+      stepBonus[targetId] = (stepBonus[targetId] || 0) + delta;
+      ef.delta = delta;
+      if (gameMode === 'sync') renderSyncBar();
+    }
+    return;
+  }
+  const found = findPieceById(targetId);
+  if (!found) { ef.cancelled = true; return; }
+  const { cell } = found;
+  if (type === '+L') {
+    const np = UPGRADE[cell.piece];
+    if (np === null) { ef.cancelled = true; return; }
+    ef.delta = +1;
+    cell.piece = np;
+  } else if (type === '-L') {
+    const np = DOWNGRADE[cell.piece];
+    ef.delta = -1;
+    if (np === null) {
+      board[found.r][found.c] = null;
+      ef.killed = true;
+      const col = getPieceColor(cell.piece);
+      if (col === 'red') deadRed.push(cell.piece); else deadBlack.push(cell.piece);
+      prevDeadRedCount = -1; prevDeadBlackCount = -1;
+      return;
+    }
+    cell.piece = np;
+  } else if (type === '+S') {
+    ef.delta = 2;
+    cell.speedMul = (cell.speedMul || 1) * 2;
+  } else if (type === '-S') {
+    ef.delta = 0.5;
+    cell.speedMul = (cell.speedMul || 1) * 0.5;
+  }
+}
+
+function restoreEffectNow(ef) {
+  if (ef.cancelled) return;
+  if (ef.type === '+N' || ef.type === '-N') {
+    stepBonus[ef.targetId] = (stepBonus[ef.targetId] || 0) - (ef.delta || 0);
+    if (gameMode === 'sync') renderSyncBar();
+    return;
+  }
+  if (ef.killed) return;
+  const found = findPieceById(ef.targetId);
+  if (!found) return;
+  const { cell } = found;
+  if (ef.type === '+L') {
+    const np = DOWNGRADE[cell.piece];
+    if (np !== null) cell.piece = np;
+  } else if (ef.type === '-L') {
+    const np = UPGRADE[cell.piece];
+    if (np !== null) cell.piece = np;
+  } else if (ef.type === '+S') {
+    cell.speedMul = (cell.speedMul || 1) / 2;
+  } else if (ef.type === '-S') {
+    cell.speedMul = (cell.speedMul || 1) * 2;
+  }
+}
+
+function getPieceEffects(pieceId) {
+  return skillEffects.filter(ef => ef.targetId === pieceId && ef.type !== '+N' && ef.type !== '-N');
+}
+
+function handleBallEatenClassic(ball, eaterPieceId, eaterSide) {
+  const idx = skillBalls.indexOf(ball);
+  if (idx >= 0) skillBalls.splice(idx, 1);
+  renderSkillBalls();
+  playSkillSound();
+
+  const isStep = (ball.type === '+N' || ball.type === '-N');
+
+  if (ball.golden && !isStep) {
+    enterTargetPickMode(ball.type, eaterSide, (targetPieceId) => {
+      const picked = findPieceById(targetPieceId);
+      if (ball.type === '+L' && picked && (picked.cell.piece === '帥' || picked.cell.piece === '將')) {
+        showBanner('帥/將已是最高等级', 'error', 1500);
+        return;
+      }
+      const ef = { type: ball.type, targetId: targetPieceId, roundsLeft: 10, golden: true, by: eaterSide };
+      addEffect(ef);
+      if (onlineMode && myRole === 'host') broadcastSync();
+      renderFullBoard();
+    });
+  } else {
+    const duration = ball.golden ? 10 : 5;
+    const targetId = isStep ? eaterSide : eaterPieceId;
+    const ef = { type: ball.type, targetId, roundsLeft: duration, golden: ball.golden, by: eaterSide };
+    addEffect(ef);
+    if (onlineMode && myRole === 'host') broadcastSync();
+  }
+}
+
+// ============================================================
+//                    棋盘点选模式
+// ============================================================
+function enterTargetPickMode(effectType, side, callback) {
+  targetPickMode = { effectType, side, callback };
+  document.querySelectorAll('.piece').forEach(el => el.classList.add('target-pick-hint'));
+  showBanner(`请点击任意棋子应用 ${effectType}（点空位取消）`, 'info', 0);
+}
+function cancelTargetPickMode() {
+  targetPickMode = null;
+  document.querySelectorAll('.piece').forEach(el => el.classList.remove('target-pick-hint'));
+  hideBanner();
+}
+function handleTargetPickClick(row, col) {
+  if (!targetPickMode) return false;
+  const cell = board[row]?.[col];
+  if (!cell || cell.hidden) { cancelTargetPickMode(); return true; }
+  const { effectType, side, callback } = targetPickMode;
+  const targetId = cell.id;
+  cancelTargetPickMode();
+  callback(targetId, effectType, side);
+  return true;
+}
+
+// ============================================================
+//                    断线检测
+// ============================================================
+function checkOpponentAlive() {
+  if (!onlineMode || !ws || ws.readyState !== 1) { showBanner('未连接', 'error', 1500); return; }
+  if (pendingDisconnectCheck) { showBanner('已有检测进行中...', 'info', 1500); return; }
+  pendingDisconnectCheck = {
+    timer: setTimeout(() => {
+      pendingDisconnectCheck = null;
+      handleOpponentDisconnect();
+    }, 5000)
+  };
+  send({ type: 'checkDisconnect', userId: myUserId });
+  showBanner('已发送检测信号，等待回应...', 'info', 3000);
+}
+function onReceiveCheckDisconnect(msg) {
+  send({ type: 'checkDisconnectReply', userId: myUserId, toUserId: msg.userId });
+  lastOppActivity = Date.now();
+}
+function onReceiveCheckDisconnectReply(msg) {
+  if (pendingDisconnectCheck) {
+    clearTimeout(pendingDisconnectCheck.timer);
+    pendingDisconnectCheck = null;
+    showBanner('对方在线 ✓', 'info', 2000);
+  }
+}
+
 // ============================================================
 async function fetchUserIdByUsername(username) {
   const res = await fetch(`${SERVER_URL}/get-user-id-by-username`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username })
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username })
   });
   if (!res.ok) throw new Error('Network response was not ok');
   const data = await res.json();
@@ -307,10 +549,8 @@ async function loadUserInfo() {
   let uname = localStorage.getItem('username') || '';
   let uid = localStorage.getItem('userid') || '';
   if (!uid && uname) {
-    try {
-      uid = await fetchUserIdByUsername(uname);
-      localStorage.setItem('userid', uid);
-    } catch (e) { console.error('获取 userId 失败:', e); }
+    try { uid = await fetchUserIdByUsername(uname); localStorage.setItem('userid', uid); }
+    catch (e) { console.error('获取 userId 失败:', e); }
   }
   if (!uid) {
     uid = 'p' + Math.random().toString(36).slice(2, 8);
@@ -320,8 +560,7 @@ async function loadUserInfo() {
     uname = '玩家' + uid.slice(-4);
     try { localStorage.setItem('username', uname); } catch (e) { }
   }
-  myUserId = uid;
-  myUsername = uname;
+  myUserId = uid; myUsername = uname;
 }
 function updateLobbyUserLabel() {
   const el = document.getElementById('lobbyUserLabel');
@@ -358,10 +597,8 @@ function showBanner(text, type = 'error', ms = 4000) {
 function hideBanner() { globalBanner.classList.remove('show'); }
 
 function showOffline() {
-  hideAll();
-  gamePanel.classList.remove('hidden');
-  onlineMode = false;
-  gameMode = 'classic';
+  hideAll(); gamePanel.classList.remove('hidden');
+  onlineMode = false; gameMode = 'classic';
   myColor = null; hostColor = null; myRole = '';
   roomId = ''; opponentUserId = ''; opponentUsername = '';
   lastOpponentUserId = '';
@@ -376,20 +613,14 @@ function showOffline() {
   resetGame();
   applyModeButtons();
 }
-
 function showOnline() {
-  hideAll();
-  lobbyPanel.classList.remove('hidden');
+  hideAll(); lobbyPanel.classList.remove('hidden');
   document.getElementById('lobbyHint').textContent = '';
   updateLobbyUserLabel();
   connectLobby();
   setTimeout(() => queryOnlineUsers(), 200);
 }
-
-function backToMenu() {
-  hideAll();
-  menuPanel.classList.remove('hidden');
-}
+function backToMenu() { hideAll(); menuPanel.classList.remove('hidden'); }
 
 function applyModeButtons() {
   const yieldBtn = document.getElementById('yieldBtn');
@@ -408,7 +639,7 @@ function applyModeButtons() {
 }
 
 // ============================================================
-//                    大厅
+//                        大厅
 // ============================================================
 function connectLobby() {
   if (lobbyWs && (lobbyWs.readyState === WebSocket.OPEN || lobbyWs.readyState === WebSocket.CONNECTING)) return;
@@ -422,11 +653,7 @@ function connectLobby() {
   lobbyWs.onmessage = (e) => handleLobbyMessage(e.data);
   lobbyWs.onclose = () => {
     lobbyWs = null;
-    if (!window._pageUnloading) {
-      setTimeout(() => {
-        if (!window._pageUnloading) connectLobby();
-      }, 3000);
-    }
+    if (!window._pageUnloading) setTimeout(() => { if (!window._pageUnloading) connectLobby(); }, 3000);
   };
   lobbyWs.onerror = () => { };
 }
@@ -439,95 +666,52 @@ function queryOnlineUsers() {
   if (!lobbyWs || lobbyWs.readyState !== 1) return;
   sendLobby({ type: 'lobbyQuery', userId: myUserId, username: myUsername });
 }
-
 function handleLobbyMessage(raw) {
-  let msg;
-  try { msg = JSON.parse(raw); } catch (e) { return; }
-
+  let msg; try { msg = JSON.parse(raw); } catch (e) { return; }
   switch (msg.type) {
     case 'hello':
       if (msg.userId === myUserId) break;
-      onlineUsers[msg.userId] = {
-        username: msg.username || msg.userId,
-        status: onlineUsers[msg.userId] ? onlineUsers[msg.userId].status : 'idle'
-      };
-      renderOnlineUsers();
-      break;
+      onlineUsers[msg.userId] = { username: msg.username || msg.userId, status: onlineUsers[msg.userId] ? onlineUsers[msg.userId].status : 'idle' };
+      renderOnlineUsers(); break;
     case 'lobbyQuery':
       if (msg.userId === myUserId) break;
-      sendLobby({
-        type: 'lobbyQueryReply',
-        toUserId: msg.userId,
-        userId: myUserId,
-        username: myUsername,
-        status: (gameStarted && !gameOver && onlineMode) ? 'busy' : 'idle'
-      });
-      onlineUsers[msg.userId] = {
-        username: msg.username || msg.userId,
-        status: onlineUsers[msg.userId] ? onlineUsers[msg.userId].status : 'idle'
-      };
-      renderOnlineUsers();
-      break;
+      sendLobby({ type: 'lobbyQueryReply', toUserId: msg.userId, userId: myUserId, username: myUsername, status: (gameStarted && !gameOver && onlineMode) ? 'busy' : 'idle' });
+      onlineUsers[msg.userId] = { username: msg.username || msg.userId, status: onlineUsers[msg.userId] ? onlineUsers[msg.userId].status : 'idle' };
+      renderOnlineUsers(); break;
     case 'lobbyQueryReply':
-      if (msg.toUserId !== myUserId) break;
-      if (msg.userId === myUserId) break;
-      onlineUsers[msg.userId] = {
-        username: msg.username || msg.userId,
-        status: msg.status || 'idle'
-      };
-      renderOnlineUsers();
-      break;
+      if (msg.toUserId !== myUserId || msg.userId === myUserId) break;
+      onlineUsers[msg.userId] = { username: msg.username || msg.userId, status: msg.status || 'idle' };
+      renderOnlineUsers(); break;
     case 'exit':
       if (msg.userId === myUserId) break;
-      delete onlineUsers[msg.userId];
-      renderOnlineUsers();
-      break;
+      delete onlineUsers[msg.userId]; renderOnlineUsers(); break;
     case 'busy':
       if (msg.userId === myUserId) break;
-      if (onlineUsers[msg.userId]) {
-        onlineUsers[msg.userId].status = 'busy';
-        renderOnlineUsers();
-      }
+      if (onlineUsers[msg.userId]) { onlineUsers[msg.userId].status = 'busy'; renderOnlineUsers(); }
       break;
     case 'idle':
       if (msg.userId === myUserId) break;
-      if (onlineUsers[msg.userId]) {
-        onlineUsers[msg.userId].status = 'idle';
-        renderOnlineUsers();
-      }
+      if (onlineUsers[msg.userId]) { onlineUsers[msg.userId].status = 'idle'; renderOnlineUsers(); }
       break;
-    case 'invite':
-      if (msg.toUserId === myUserId) handleIncomingInvite(msg);
-      break;
-    case 'inviteAccept':
-      if (msg.toUserId === myUserId) handleInviteAccepted(msg);
-      break;
+    case 'invite': if (msg.toUserId === myUserId) handleIncomingInvite(msg); break;
+    case 'inviteAccept': if (msg.toUserId === myUserId) handleInviteAccepted(msg); break;
     case 'inviteReject':
       if (msg.toUserId === myUserId) {
         showBanner('对方拒绝了邀请', 'error', 2500);
         if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
-      }
-      break;
+      } break;
     case 'inviteBusy':
       if (msg.toUserId === myUserId) {
         showBanner('对方在棋局中，无法接受邀请', 'error', 2500);
         if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
-      }
-      break;
-    case 'joinGame':
-      if (msg.toUserId === myUserId) handleIncomingJoin(msg);
-      break;
-    case 'joinGameAccept':
-      if (msg.toUserId === myUserId) handleJoinAccepted(msg);
-      break;
+      } break;
+    case 'joinGame': if (msg.toUserId === myUserId) handleIncomingJoin(msg); break;
+    case 'joinGameAccept': if (msg.toUserId === myUserId) handleJoinAccepted(msg); break;
     case 'joinGameReject':
-      if (msg.toUserId === myUserId) {
-        showBanner('对方拒绝了你加入棋局', 'error', 2500);
-      }
+      if (msg.toUserId === myUserId) showBanner('对方拒绝了你加入棋局', 'error', 2500);
       break;
   }
 }
-
 function renderOnlineUsers() {
   const el = document.getElementById('onlineUsersList');
   if (!el) return;
@@ -545,51 +729,24 @@ function renderOnlineUsers() {
     item.innerHTML = `<span class="online-user-name">${escapeHtml(info.username)}<span class="online-user-status">${statusText}</span></span>`;
     const btn = document.createElement('button');
     btn.className = 'invite-btn';
-    if (isBusy) {
-      btn.textContent = '加入';
-      btn.onclick = () => requestJoinGame(uid);
-    } else {
-      btn.textContent = '邀请';
-      btn.onclick = () => inviteUser(uid);
-    }
+    if (isBusy) { btn.textContent = '加入'; btn.onclick = () => requestJoinGame(uid); }
+    else { btn.textContent = '邀请'; btn.onclick = () => inviteUser(uid); }
     item.appendChild(btn);
     el.appendChild(item);
   });
 }
-
 function inviteUser(toUserId) {
-  if (gameStarted && !gameOver && onlineMode) {
-    showBanner('你正在对局中，无法邀请他人', 'error', 2000);
-    return;
-  }
-  if (!lobbyWs || lobbyWs.readyState !== 1) {
-    showBanner('大厅未连接，请稍候', 'error', 2000);
-    connectLobby();
-    return;
-  }
+  if (gameStarted && !gameOver && onlineMode) { showBanner('你正在对局中，无法邀请他人', 'error', 2000); return; }
+  if (!lobbyWs || lobbyWs.readyState !== 1) { showBanner('大厅未连接，请稍候', 'error', 2000); connectLobby(); return; }
   pendingInviteTargetId = toUserId;
   timeSelectMode = 'invite';
   document.getElementById('modeSelectModal').classList.add('show');
 }
-
 function doInviteWithMode(toUserId) {
-  if (!lobbyWs || lobbyWs.readyState !== 1) {
-    showBanner('大厅未连接，请稍候', 'error', 2000);
-    connectLobby();
-    return;
-  }
+  if (!lobbyWs || lobbyWs.readyState !== 1) { showBanner('大厅未连接，请稍候', 'error', 2000); connectLobby(); return; }
   const newRoomId = generateRoomId();
   inviteRoomId = newRoomId;
-  sendLobby({
-    type: 'invite',
-    fromUserId: myUserId,
-    fromUsername: myUsername,
-    toUserId: toUserId,
-    roomId: newRoomId,
-    timeSettings: { ...timeSettings },
-    gameMode: gameMode,
-    syncStepsPerRound: syncStepsPerRound
-  });
+  sendLobby({ type: 'invite', fromUserId: myUserId, fromUsername: myUsername, toUserId, roomId: newRoomId, timeSettings: { ...timeSettings }, gameMode, syncStepsPerRound });
   const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
   showBanner(modeText + ' 邀请已发送，等待对方接受...', 'info', 4000);
   if (pendingInviteTimer) clearTimeout(pendingInviteTimer);
@@ -598,46 +755,16 @@ function doInviteWithMode(toUserId) {
     showBanner('对方未响应，邀请已过期', 'error', 2500);
   }, 30000);
 }
-
-function doInvite(toUserId) {
-  doInviteWithMode(toUserId);
-}
-
 function requestJoinGame(toUserId) {
-  if (gameStarted && !gameOver && onlineMode) {
-    showBanner('你正在对局中，无法加入他人棋局', 'error', 2000);
-    return;
-  }
-  if (!lobbyWs || lobbyWs.readyState !== 1) {
-    showBanner('大厅未连接，请稍候', 'error', 2000);
-    connectLobby();
-    return;
-  }
-  sendLobby({
-    type: 'joinGame',
-    fromUserId: myUserId,
-    fromUsername: myUsername,
-    toUserId: toUserId,
-    originalRole: myRole
-  });
+  if (gameStarted && !gameOver && onlineMode) { showBanner('你正在对局中，无法加入他人棋局', 'error', 2000); return; }
+  if (!lobbyWs || lobbyWs.readyState !== 1) { showBanner('大厅未连接，请稍候', 'error', 2000); connectLobby(); return; }
+  sendLobby({ type: 'joinGame', fromUserId: myUserId, fromUsername: myUsername, toUserId, originalRole: myRole });
   showBanner('已请求加入，等待对方确认...', 'info', 4000);
 }
-
 function handleIncomingJoin(msg) {
   showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
     const requesterRole = (myRole === 'host') ? 'guest' : 'host';
-    sendLobby({
-      type: 'joinGameAccept',
-      fromUserId: myUserId,
-      toUserId: msg.fromUserId,
-      roomId: roomId,
-      continueGame: true,
-      hostColor: hostColor,
-      timeSettings: { ...timeSettings },
-      gameMode: gameMode,
-      syncStepsPerRound: syncStepsPerRound,
-      assignRole: requesterRole
-    });
+    sendLobby({ type: 'joinGameAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId, continueGame: true, hostColor, timeSettings: { ...timeSettings }, gameMode, syncStepsPerRound, assignRole: requesterRole });
     if (myRole === 'host') {
       setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
       setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
@@ -645,106 +772,57 @@ function handleIncomingJoin(msg) {
     }
     showBanner('已允许对方加入棋局', 'info', 2000);
   }, () => {
-    sendLobby({
-      type: 'joinGameReject',
-      fromUserId: myUserId,
-      toUserId: msg.fromUserId,
-      reason: 'refused'
-    });
+    sendLobby({ type: 'joinGameReject', fromUserId: myUserId, toUserId: msg.fromUserId, reason: 'refused' });
   });
 }
-
 function handleJoinAccepted(msg) {
-  if (!msg.continueGame) {
-    showBanner('对方拒绝了加入请求', 'error', 2500);
-    return;
-  }
+  if (!msg.continueGame) { showBanner('对方拒绝了加入请求', 'error', 2500); return; }
   if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
   if (msg.gameMode) gameMode = msg.gameMode;
   if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
-  if (msg.assignRole) {
-    myRole = msg.assignRole;
-  } else {
-    if (!myRole) myRole = 'guest';
-  }
+  if (msg.assignRole) myRole = msg.assignRole;
+  else if (!myRole) myRole = 'guest';
   roomId = msg.roomId;
   showBanner('对方已允许你加入，正在进入对局...', 'info', 2000);
   setTimeout(() => enterRoom(true), 150);
 }
-
 function handleIncomingInvite(msg) {
   if (msg.gameMode) gameMode = msg.gameMode;
   if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
-
   if (gameStarted && !gameOver && onlineMode) {
     showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
       const requesterRole = (myRole === 'host') ? 'guest' : 'host';
-      sendLobby({
-        type: 'joinGameAccept',
-        fromUserId: myUserId,
-        toUserId: msg.fromUserId,
-        roomId: roomId,
-        continueGame: true,
-        hostColor: hostColor,
-        timeSettings: { ...timeSettings },
-        gameMode: gameMode,
-        syncStepsPerRound: syncStepsPerRound,
-        assignRole: requesterRole
-      });
+      sendLobby({ type: 'joinGameAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId, continueGame: true, hostColor, timeSettings: { ...timeSettings }, gameMode, syncStepsPerRound, assignRole: requesterRole });
       if (myRole === 'host') {
         setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
         setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
         setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 3000);
       }
     }, () => {
-      sendLobby({
-        type: 'joinGameReject',
-        fromUserId: myUserId,
-        toUserId: msg.fromUserId,
-        reason: 'refused'
-      });
+      sendLobby({ type: 'joinGameReject', fromUserId: myUserId, toUserId: msg.fromUserId, reason: 'refused' });
     });
     return;
   }
-
   const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
   showConfirm(`${msg.fromUsername} ${modeText} 邀请你下棋，是否接受？`, () => {
     if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
-    sendLobby({
-      type: 'inviteAccept',
-      fromUserId: myUserId,
-      toUserId: msg.fromUserId,
-      roomId: msg.roomId
-    });
-    setTimeout(() => {
-      myRole = 'guest';
-      roomId = msg.roomId;
-      enterRoom();
-    }, 150);
+    sendLobby({ type: 'inviteAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId: msg.roomId });
+    setTimeout(() => { myRole = 'guest'; roomId = msg.roomId; enterRoom(); }, 150);
   }, () => {
-    sendLobby({
-      type: 'inviteReject',
-      fromUserId: myUserId,
-      toUserId: msg.fromUserId
-    });
+    sendLobby({ type: 'inviteReject', fromUserId: myUserId, toUserId: msg.fromUserId });
   });
 }
-
 function handleInviteAccepted(msg) {
   if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
   if (msg.continueGame) {
     if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
-    if (msg.assignRole) {
-      myRole = msg.assignRole;
-    } else if (!myRole) {
-      myRole = 'guest';
-    }
+    if (msg.assignRole) myRole = msg.assignRole;
+    else if (!myRole) myRole = 'guest';
     roomId = msg.roomId;
     showBanner('对方已允许你重新加入对局', 'info', 2000);
     setTimeout(() => enterRoom(true), 150);
   } else {
-    myRole = 'host';
-    roomId = msg.roomId;
+    myRole = 'host'; roomId = msg.roomId;
     const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
     showBanner(modeText + ' 对方接受邀请，进入房间...', 'info', 2000);
     setTimeout(() => enterRoom(), 150);
@@ -752,7 +830,7 @@ function handleInviteAccepted(msg) {
 }
 
 // ============================================================
-//                        网络（游戏房间）
+//                        网络
 // ============================================================
 function netLog(s) {
   const el = document.getElementById('netLog');
@@ -772,19 +850,15 @@ function setConnIndicator(state) {
   const dot = document.getElementById('connDot');
   if (dot) dot.className = 'conn-indicator' + (state ? ' ' + state : '');
 }
-
 function closeExistingWS() {
   if (ws) {
     try {
       ws.onopen = null; ws.onclose = null; ws.onerror = null; ws.onmessage = null;
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-        ws.close(1000, 'client closing');
-      }
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) ws.close(1000, 'client closing');
     } catch (e) { }
     ws = null;
   }
 }
-
 function connectWS(room, userId, isReconnect) {
   return new Promise((resolve, reject) => {
     closeExistingWS();
@@ -813,56 +887,25 @@ function connectWS(room, userId, isReconnect) {
     ws.onclose = (e) => {
       clearTimeout(timeout);
       netLog('关闭 code=' + e.code);
-      setConnIndicator('dead');
-      ws = null;
-      stopRoomHeartbeat();
+      setConnIndicator('dead'); ws = null;
       if (!intentionalClose) handleDisconnect(e.code);
     };
     ws.onmessage = (e) => handleMessage(e.data);
   });
 }
-
 function handleDisconnect() {
   if (leavingToHome) return;
-  if (gameStarted && onlineMode) {
-    startReconnect();
-    return;
-  }
+  if (gameStarted && onlineMode) { startReconnect(); return; }
   if (!gameStarted && waitPanel.classList.contains('hidden')) return;
   leavingToHome = true;
   showBanner('⚠ 网络连接断开，即将返回主页...', 'error', 2500);
   setTimeout(() => goHome(), 2000);
 }
-
 function send(obj) {
   if (!ws || ws.readyState !== 1) { netLog('未连接'); return false; }
   ws.send(typeof obj === 'string' ? obj : JSON.stringify(obj));
   return true;
 }
-
-function startRoomHeartbeat() {
-  stopRoomHeartbeat();
-  oppLastSeen = Date.now();
-  roomHeartbeatTimer = setInterval(() => {
-    if (ws && ws.readyState === 1) {
-      try { ws.send(JSON.stringify({ type: 'ping', userId: myUserId })); } catch (e) { }
-    }
-  }, HEARTBEAT_SEND_MS);
-  roomHeartbeatCheckTimer = setInterval(() => {
-    if (!gameStarted || gameOver) return;
-    if (!opponentUserId) return;
-    if (Date.now() - oppLastSeen > HEARTBEAT_TIMEOUT_MS) {
-      if (!oppDisconnectTimer) {
-        handleOpponentDisconnect();
-      }
-    }
-  }, 3000);
-}
-function stopRoomHeartbeat() {
-  if (roomHeartbeatTimer) { clearInterval(roomHeartbeatTimer); roomHeartbeatTimer = null; }
-  if (roomHeartbeatCheckTimer) { clearInterval(roomHeartbeatCheckTimer); roomHeartbeatCheckTimer = null; }
-}
-
 function startReconnect() {
   if (isReconnecting) return;
   isReconnecting = true;
@@ -871,10 +914,8 @@ function startReconnect() {
   setConnIndicator('dead');
   showBanner('⚠ 网络断开，正在重连...', 'error', 0);
   stopTimer();
-  stopRoomHeartbeat();
   attemptReconnect();
 }
-
 function attemptReconnect() {
   if (!isReconnecting) return;
   if (Date.now() > reconnectDeadline) {
@@ -886,32 +927,15 @@ function attemptReconnect() {
   }
   const remain = Math.ceil((reconnectDeadline - Date.now()) / 1000);
   showBanner(`⚠ 网络断开，正在重连...（剩余 ${remain}s）`, 'error', 0);
-
   connectWS(roomId, myUserId, true).then(() => {
-    send({
-      type: 'hello',
-      userId: myUserId,
-      username: myUsername,
-      role: myRole,
-      reconnect: true,
-      gameMode: gameMode,
-      syncStepsPerRound: syncStepsPerRound
-    });
-    isReconnecting = false;
-    hideBanner();
+    send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, reconnect: true, gameMode, syncStepsPerRound });
+    isReconnecting = false; hideBanner();
     showBanner('已重新连接', 'info', 2000);
     startTimer();
-    startRoomHeartbeat();
-
     if (reconnectWasInGame && gameStarted) {
-      hideAll();
-      gamePanel.classList.remove('hidden');
-      chatFab.classList.remove('hidden');
-      if (myRole === 'host') {
-        broadcastSync();
-      } else {
-        send({ type: 'requestSync', userId: myUserId });
-      }
+      hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
+      if (myRole === 'host') broadcastSync();
+      else send({ type: 'requestSync', userId: myUserId });
       appendChatMessage('', '你已重新连接', 'sys');
     }
   }).catch(() => {
@@ -924,10 +948,8 @@ function attemptReconnect() {
 //                        计时
 // ============================================================
 function resetTimersForNewGame() {
-  hostTimeLeft = timeSettings.totalMs;
-  guestTimeLeft = timeSettings.totalMs;
-  turnStartTs = performance.now();
-  timeoutHandled = false;
+  hostTimeLeft = timeSettings.totalMs; guestTimeLeft = timeSettings.totalMs;
+  turnStartTs = performance.now(); timeoutHandled = false;
 }
 function startTimer() {
   if (gameMode === 'sync') return;
@@ -936,9 +958,7 @@ function startTimer() {
   timerInterval = setInterval(tickTimer, 200);
   tickTimer();
 }
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function commitTurnTime() {
   if (gameMode === 'sync') return;
   if (!turnStartTs) return;
@@ -947,13 +967,9 @@ function commitTurnTime() {
   const dec = (v) => noLimit ? (v - elapsed) : Math.max(0, v - elapsed);
   if (currentPlayer === 'red' || currentPlayer === 'black') {
     const isHostColor = (hostColor === currentPlayer);
-    if (isHostColor) hostTimeLeft = dec(hostTimeLeft);
-    else guestTimeLeft = dec(guestTimeLeft);
-  } else if (currentPlayer === 'host') {
-    hostTimeLeft = dec(hostTimeLeft);
-  } else if (currentPlayer === 'guest') {
-    guestTimeLeft = dec(guestTimeLeft);
-  }
+    if (isHostColor) hostTimeLeft = dec(hostTimeLeft); else guestTimeLeft = dec(guestTimeLeft);
+  } else if (currentPlayer === 'host') hostTimeLeft = dec(hostTimeLeft);
+  else if (currentPlayer === 'guest') guestTimeLeft = dec(guestTimeLeft);
   turnStartTs = performance.now();
 }
 function formatMs(ms) {
@@ -968,34 +984,24 @@ function tickTimer() {
   if (gameOver || !gameStarted || isReconnecting) return;
   const info = document.getElementById('timeInfo');
   if (!info) return;
-
   const elapsedStep = turnStartTs ? (performance.now() - turnStartTs) : 0;
-
   if (!timeSettings.enabled) {
     let hostUsed = timeSettings.totalMs - hostTimeLeft;
     let guestUsed = timeSettings.totalMs - guestTimeLeft;
-    if (isHostTurnLocal()) hostUsed += elapsedStep;
-    else guestUsed += elapsedStep;
+    if (isHostTurnLocal()) hostUsed += elapsedStep; else guestUsed += elapsedStep;
     info.textContent = `本局用时 红:${formatMs(hostUsed)} 黑:${formatMs(guestUsed)}`;
     return;
   }
-
   const stepLeft = timeSettings.stepMs - elapsedStep;
   let curLeft;
   if (currentPlayer === 'red' || currentPlayer === 'black') {
     const isHostColor = (hostColor === currentPlayer);
     curLeft = isHostColor ? hostTimeLeft : guestTimeLeft;
-  } else if (currentPlayer === 'host') {
-    curLeft = hostTimeLeft;
-  } else if (currentPlayer === 'guest') {
-    curLeft = guestTimeLeft;
-  } else {
-    curLeft = timeSettings.totalMs;
-  }
+  } else if (currentPlayer === 'host') curLeft = hostTimeLeft;
+  else if (currentPlayer === 'guest') curLeft = guestTimeLeft;
+  else curLeft = timeSettings.totalMs;
   curLeft = Math.max(0, curLeft - elapsedStep);
-
   info.textContent = `步时 ${formatMs(stepLeft)} | 局时 红:${formatMs(hostTimeLeft)} 黑:${formatMs(guestTimeLeft)}`;
-
   if (timeoutHandled) return;
   if (stepLeft <= 0) { timeoutHandled = true; onMyTimeout('步时超时'); }
   else if (curLeft <= 0) { timeoutHandled = true; onMyTimeout('局时超时'); }
@@ -1012,25 +1018,17 @@ function onMyTimeout(reason) {
 // ============================================================
 function openChatModal() {
   document.getElementById('chatModal').classList.add('show');
-  unreadChatCount = 0;
-  updateChatBadge();
-  setTimeout(() => {
-    const input = document.getElementById('chatInput');
-    if (input) input.focus();
-  }, 100);
+  unreadChatCount = 0; updateChatBadge();
+  setTimeout(() => { const input = document.getElementById('chatInput'); if (input) input.focus(); }, 100);
 }
-function closeChatModal() {
-  document.getElementById('chatModal').classList.remove('show');
-}
+function closeChatModal() { document.getElementById('chatModal').classList.remove('show'); }
 function updateChatBadge() {
   const badge = document.getElementById('chatBadge');
   if (!badge) return;
   if (unreadChatCount > 0) {
     badge.textContent = unreadChatCount > 99 ? '99+' : String(unreadChatCount);
     badge.classList.remove('hidden');
-  } else {
-    badge.classList.add('hidden');
-  }
+  } else badge.classList.add('hidden');
 }
 function initChatUI() {
   const presetsEl = document.getElementById('chatPresets');
@@ -1038,19 +1036,29 @@ function initChatUI() {
   presetsEl.innerHTML = '';
   CHAT_PRESETS.forEach(msg => {
     const btn = document.createElement('button');
-    btn.className = 'chat-preset-btn';
-    btn.textContent = msg;
+    btn.className = 'chat-preset-btn'; btn.textContent = msg;
     btn.onclick = () => sendChat(msg, 'preset');
     presetsEl.appendChild(btn);
   });
   const input = document.getElementById('chatInput');
   const sendBtn = document.getElementById('chatSendBtn');
+  if (sendBtn && !document.getElementById('checkDiscBtn')) {
+    const checkBtn = document.createElement('button');
+    checkBtn.id = 'checkDiscBtn';
+    checkBtn.className = 'btn btn-draw';
+    checkBtn.textContent = '检测断线';
+    checkBtn.style.marginLeft = '6px';
+    checkBtn.onclick = () => {
+      if (!onlineMode) { showBanner('仅在线对局可用', 'error', 1500); return; }
+      checkOpponentAlive();
+    };
+    sendBtn.parentNode.appendChild(checkBtn);
+  }
   if (sendBtn) {
     sendBtn.onclick = () => {
       const v = (input.value || '').trim();
       if (!v) return;
-      sendChat(v, 'custom');
-      input.value = '';
+      sendChat(v, 'custom'); input.value = '';
     };
   }
   if (input) {
@@ -1058,15 +1066,14 @@ function initChatUI() {
       if (e.key === 'Enter') {
         const v = (input.value || '').trim();
         if (!v) return;
-        sendChat(v, 'custom');
-        input.value = '';
+        sendChat(v, 'custom'); input.value = '';
       }
     };
   }
 }
 function sendChat(text, chatType) {
   if (!onlineMode) return;
-  send({ type: 'chat', userId: myUserId, username: myUsername, chatType: chatType, content: text });
+  send({ type: 'chat', userId: myUserId, username: myUsername, chatType, content: text });
   appendChatMessage(myUsername || '我', text, 'me');
 }
 function appendChatMessage(name, text, kind) {
@@ -1074,25 +1081,21 @@ function appendChatMessage(name, text, kind) {
   if (!log) return;
   if (kind === 'sys') {
     const line = document.createElement('div');
-    line.className = 'chat-line sys';
-    line.textContent = '· ' + text;
+    line.className = 'chat-line sys'; line.textContent = '· ' + text;
     log.appendChild(line);
   } else {
     const line = document.createElement('div');
     line.className = 'chat-line ' + (kind === 'me' ? 'me' : '');
     const nameEl = document.createElement('span');
-    nameEl.className = 'chat-name';
-    nameEl.textContent = name + '：';
+    nameEl.className = 'chat-name'; nameEl.textContent = name + '：';
     line.appendChild(nameEl);
     const textEl = document.createElement('span');
     textEl.textContent = text;
-    line.appendChild(textEl);
-    log.appendChild(line);
+    line.appendChild(textEl); log.appendChild(line);
   }
   while (log.children.length > 100) log.removeChild(log.firstChild);
   log.scrollTop = log.scrollHeight;
 }
-
 function showChatNotice(from, text) {
   const container = document.getElementById('chatNoticeContainer');
   if (!container) return;
@@ -1107,127 +1110,84 @@ function showChatNotice(from, text) {
   closeBtn.onclick = (e) => { e.stopPropagation(); dismissNotice(notice); };
   notice.onclick = () => { openChatModal(); dismissNotice(notice); };
   container.appendChild(notice);
-  if (document.getElementById('chatModal').classList.contains('show')) {
-  } else {
-    unreadChatCount++;
-    updateChatBadge();
+  if (!document.getElementById('chatModal').classList.contains('show')) {
+    unreadChatCount++; updateChatBadge();
   }
   setTimeout(() => { dismissNotice(notice); }, 8000);
 }
 function dismissNotice(notice) {
   if (!notice || !notice.parentNode) return;
   notice.classList.add('hide');
-  setTimeout(() => {
-    if (notice.parentNode) notice.parentNode.removeChild(notice);
-  }, 300);
+  setTimeout(() => { if (notice.parentNode) notice.parentNode.removeChild(notice); }, 300);
 }
 
 // ============================================================
-//                  消息处理（游戏房间）
+//                  消息处理
 // ============================================================
 function handleMessage(raw) {
-  let msg;
-  try { msg = JSON.parse(raw); } catch (e) { return; }
+  let msg; try { msg = JSON.parse(raw); } catch (e) { return; }
   netLog('收到: ' + msg.type);
+  if (!msg.userId || msg.userId !== myUserId) lastOppActivity = Date.now();
 
   switch (msg.type) {
-    case 'ping':
-      if (msg.userId !== myUserId) {
-        oppLastSeen = Date.now();
+    case 'ping': break;
+    case 'checkDisconnect': if (msg.userId !== myUserId) onReceiveCheckDisconnect(msg); break;
+    case 'checkDisconnectReply': if (msg.toUserId === myUserId) onReceiveCheckDisconnectReply(msg); break;
+    case 'goldenChoice':
+      if (myRole === 'host') {
+        const ef = msg.effect;
+        const exists = skillEffects.some(e => e.type === ef.type && e.targetId === ef.targetId && e.by === ef.by);
+        if (!exists) { addEffect(ef); broadcastSync(); }
       }
       break;
-
+    case 'askGolden':
+      if (msg.toUserId === myUserId) {
+        enterTargetPickMode(msg.ballType, msg.side, (targetId) => {
+          const ef = { type: msg.ballType, targetId, roundsLeft: msg.duration || 10, golden: true, by: msg.side };
+          send({ type: 'goldenChoice', userId: myUserId, effect: ef });
+        });
+      }
+      break;
     case 'hello': {
       if (msg.userId === myUserId) break;
-      oppLastSeen = Date.now();
-
       if (myRole === 'host') {
         if (opponentUserId && opponentUserId !== msg.userId) {
-          send({ type: 'roomFull', hostId: myUserId, oppId: opponentUserId });
-          break;
+          send({ type: 'roomFull', hostId: myUserId, oppId: opponentUserId }); break;
         }
         if (!opponentUserId && lastOpponentUserId && msg.userId !== lastOpponentUserId) {
-          send({ type: 'roomFull', hostId: myUserId, oppId: lastOpponentUserId });
-          break;
+          send({ type: 'roomFull', hostId: myUserId, oppId: lastOpponentUserId }); break;
         }
         opponentUserId = msg.userId;
         opponentUsername = msg.username || msg.userId;
-
         if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
-        const modal = document.getElementById('oppDisconnectModal');
-        if (modal) modal.classList.remove('show');
-        lastOpponentUserId = '';
-
+        hideBanner(); lastOpponentUserId = '';
         const oppLabel = document.getElementById('gameOppLabel');
-        if (oppLabel) {
-          oppLabel.textContent = '对手：' + opponentUsername;
-          oppLabel.style.color = '#b32b2b';
-        }
-
-        send({
-          type: 'hello-ack',
-          userId: myUserId,
-          username: myUsername,
-          role: myRole,
-          gameMode: gameMode,
-          syncStepsPerRound: syncStepsPerRound
-        });
-
+        if (oppLabel) { oppLabel.textContent = '对手：' + opponentUsername; oppLabel.style.color = '#b32b2b'; }
+        send({ type: 'hello-ack', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound });
         if (gameStarted && !gameOver) {
           broadcastSync();
-          hideAll();
-          gamePanel.classList.remove('hidden');
-          chatFab.classList.remove('hidden');
+          hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
           startTimer();
-          startRoomHeartbeat();
           appendChatMessage('', (msg.username || '对手') + ' 已重新加入，对局继续', 'sys');
           showBanner('对手已重新加入，对局继续', 'info', 2500);
-        } else {
-          updateWaitUI();
-          waitHint('对手已加入：' + opponentUsername, 'ok');
-          startRoomHeartbeat();
-        }
+        } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       } else if (myRole === 'guest') {
         if (msg.gameMode) gameMode = msg.gameMode;
         if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
-
         opponentUserId = msg.userId;
         opponentUsername = msg.username || msg.userId;
-
         const oppLabel = document.getElementById('gameOppLabel');
-        if (oppLabel) {
-          oppLabel.textContent = '对手：' + opponentUsername;
-          oppLabel.style.color = '#b32b2b';
-        }
-
-        send({
-          type: 'hello-ack',
-          userId: myUserId,
-          username: myUsername,
-          role: myRole,
-          gameMode: gameMode,
-          syncStepsPerRound: syncStepsPerRound
-        });
-
+        if (oppLabel) { oppLabel.textContent = '对手：' + opponentUsername; oppLabel.style.color = '#b32b2b'; }
+        send({ type: 'hello-ack', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound });
         if (gameStarted && !gameOver) {
-          hideAll();
-          gamePanel.classList.remove('hidden');
-          chatFab.classList.remove('hidden');
-          startTimer();
-          startRoomHeartbeat();
-          send({ type: 'requestSync', userId: myUserId });
-        } else {
-          updateWaitUI();
-          waitHint('对手已加入：' + opponentUsername, 'ok');
-          startRoomHeartbeat();
-        }
+          hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
+          startTimer(); send({ type: 'requestSync', userId: myUserId });
+        } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       }
       break;
     }
-
     case 'hello-ack': {
       if (msg.userId === myUserId) break;
-      oppLastSeen = Date.now();
       if (myRole === 'guest') {
         if (msg.gameMode) gameMode = msg.gameMode;
         if (msg.syncStepsPerRound) syncStepsPerRound = msg.syncStepsPerRound;
@@ -1235,29 +1195,15 @@ function handleMessage(raw) {
       opponentUserId = msg.userId;
       opponentUsername = msg.username || msg.userId;
       const oppLabel = document.getElementById('gameOppLabel');
-      if (oppLabel) {
-        oppLabel.textContent = '对手：' + opponentUsername;
-        oppLabel.style.color = '#b32b2b';
-      }
+      if (oppLabel) { oppLabel.textContent = '对手：' + opponentUsername; oppLabel.style.color = '#b32b2b'; }
       if (gameStarted && !gameOver) {
         if (gamePanel.classList.contains('hidden')) {
-          hideAll();
-          gamePanel.classList.remove('hidden');
-          chatFab.classList.remove('hidden');
-          startTimer();
+          hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden'); startTimer();
         }
-        startRoomHeartbeat();
-        if (myRole === 'guest') {
-          send({ type: 'requestSync', userId: myUserId });
-        }
-      } else {
-        updateWaitUI();
-        waitHint('对手已加入：' + opponentUsername, 'ok');
-        startRoomHeartbeat();
-      }
+        if (myRole === 'guest') send({ type: 'requestSync', userId: myUserId });
+      } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       break;
     }
-
     case 'roomFull':
       if (msg.hostId === myUserId || msg.oppId === myUserId) break;
       if (roomFullHandled) break;
@@ -1265,15 +1211,9 @@ function handleMessage(raw) {
       showBanner('房间已满，无法加入', 'error', 3000);
       setTimeout(() => { roomFullHandled = false; leaveRoom(true); }, 1500);
       break;
-
     case 'ready':
-      if (msg.userId === opponentUserId || !opponentUserId) {
-        oppReady = msg.ready;
-        updateWaitUI();
-        checkBothReady();
-      }
+      if (msg.userId === opponentUserId || !opponentUserId) { oppReady = msg.ready; updateWaitUI(); checkBothReady(); }
       break;
-
     case 'start':
       if (myRole === 'guest') {
         if (msg.gameMode) gameMode = msg.gameMode;
@@ -1281,44 +1221,28 @@ function handleMessage(raw) {
         applyStartState(msg.state);
       }
       break;
-
     case 'move':
     case 'flip':
       if (myRole === 'host' && gameMode === 'classic') handleGuestAction(msg);
       break;
-
     case 'sync':
       gameStarted = true;
       applySyncState(msg.state);
-      hideAll();
-      gamePanel.classList.remove('hidden');
-      chatFab.classList.remove('hidden');
-      startRoomHeartbeat();
+      hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
       if (gameMode !== 'sync' && !msg.state.gameOver) startTimer();
       if (gameMode === 'sync') {
         document.getElementById('syncBar').classList.remove('hidden');
         if (myColor && !colorTipShown) {
           colorTipShown = true;
           setTimeout(() => {
-            Swal.fire({
-              icon: 'info',
-              title: '颜色分配',
-              text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
-              confirmButtonText: '知道了'
-            });
+            Swal.fire({ icon: 'info', title: '颜色分配', text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`, confirmButtonText: '知道了' });
           }, 300);
         }
         if (!syncMySubmitted) renderSyncBar();
       }
       break;
-
-    case 'requestSync':
-      if (myRole === 'host' && gameStarted) broadcastSync();
-      break;
-
-    case 'requestUndo':
-      incomingUndoRequest();
-      break;
+    case 'requestSync': if (myRole === 'host' && gameStarted) broadcastSync(); break;
+    case 'requestUndo': incomingUndoRequest(); break;
     case 'undoAccepted':
       if (myRole === 'host') { doUndoLocal(); broadcastSync(); }
       pendingUndoRequest = false;
@@ -1328,12 +1252,8 @@ function handleMessage(raw) {
       pendingUndoRequest = false;
       showBanner('对方拒绝了悔棋', 'error', 2500);
       break;
-    case 'yieldFirst':
-      if (msg.userId !== myUserId) showBanner('对手让先，请你先走', 'info', 3000);
-      break;
-    case 'requestDraw':
-      incomingDrawRequest();
-      break;
+    case 'yieldFirst': if (msg.userId !== myUserId) showBanner('对手让先，请你先走', 'info', 3000); break;
+    case 'requestDraw': incomingDrawRequest(); break;
     case 'drawAccepted':
       pendingDrawRequest = false;
       if (!gameOver) endGame('双方和棋', 'draw');
@@ -1343,57 +1263,30 @@ function handleMessage(raw) {
       pendingDrawRequest = false;
       showBanner('对方拒绝和棋', 'error', 2500);
       break;
-    case 'resign':
-      if (!gameOver) endGame('对方认输，你赢了', 'win');
-      break;
+    case 'resign': if (!gameOver) endGame('对方认输，你赢了', 'win'); break;
     case 'timeout':
-      if (msg.userId !== myUserId && !gameOver) {
-        stopTimer();
-        endGame('对方超时，你赢了', 'win');
-      }
+      if (msg.userId !== myUserId && !gameOver) { stopTimer(); endGame('对方超时，你赢了', 'win'); }
       break;
     case 'chat':
       if (msg.userId === myUserId) break;
       appendChatMessage(msg.username || '对手', msg.content, 'other');
       showChatNotice(msg.username || '对手', msg.content);
       break;
-    case 'manualLeave':
-      handleOpponentManualLeave();
-      break;
-    case 'exit':
-      handleOpponentDisconnect();
-      break;
-
+    case 'manualLeave': handleOpponentManualLeave(); break;
+    case 'exit': handleOpponentDisconnect(); break;
     case 'syncModeSet':
-      gameMode = msg.gameMode;
-      syncStepsPerRound = msg.syncStepsPerRound;
+      gameMode = msg.gameMode; syncStepsPerRound = msg.syncStepsPerRound;
       showBanner('房主选择了「同步规划模式」', 'info', 3000);
       break;
-
-    case 'syncPlan':
-      if (myRole === 'host') {
-        handleOpponentSyncPlan(msg);
-      }
-      break;
-
-    case 'syncPlayback':
-      if (myRole === 'guest') {
-        playSyncPlayback(msg.script);
-      }
-      break;
-
+    case 'syncPlan': if (myRole === 'host') handleOpponentSyncPlan(msg); break;
+    case 'syncPlayback': if (myRole === 'guest') playSyncPlayback(msg.script); break;
     case 'syncOppSubmitted':
       if (msg.userId !== myUserId) {
-        syncOppSubmitted = true;
-        renderSyncBar();
-        if (!syncMySubmitted) {
-          showBanner('对手已提交规划，请尽快完成', 'info', 3000);
-        }
+        syncOppSubmitted = true; renderSyncBar();
+        if (!syncMySubmitted) showBanner('对手已提交规划，请尽快完成', 'info', 3000);
       }
       break;
-
-    default:
-      break;
+    default: break;
   }
 }
 
@@ -1402,20 +1295,15 @@ function incomingUndoRequest() {
   showConfirm(who + ' 请求悔棋，是否同意？', () => {
     send({ type: 'undoAccepted', userId: myUserId });
     if (myRole === 'host') { doUndoLocal(); broadcastSync(); }
-  }, () => {
-    send({ type: 'undoRejected', userId: myUserId });
-  });
+  }, () => { send({ type: 'undoRejected', userId: myUserId }); });
 }
 function incomingDrawRequest() {
   const who = opponentUsername || '对方';
   showConfirm(who + ' 请求和棋，是否同意？', () => {
     send({ type: 'drawAccepted', userId: myUserId });
     endGame('双方和棋', 'draw');
-  }, () => {
-    send({ type: 'drawRejected', userId: myUserId });
-  });
+  }, () => { send({ type: 'drawRejected', userId: myUserId }); });
 }
-
 function handleOpponentManualLeave() {
   if (leavingToHome) return;
   if (gameStarted && !gameOver) {
@@ -1427,116 +1315,61 @@ function handleOpponentManualLeave() {
   showBanner('⚠ 对方已离开，即将返回主页...', 'error', 2500);
   setTimeout(() => goHome(), 2000);
 }
-
 function handleOpponentDisconnect() {
   if (leavingToHome) return;
   if (opponentUserId) lastOpponentUserId = opponentUserId;
-  opponentUserId = '';
-  opponentUsername = '';
-  oppReady = false;
-
+  opponentUserId = ''; opponentUsername = ''; oppReady = false;
   const oppLabel = document.getElementById('gameOppLabel');
-  if (oppLabel) {
-    oppLabel.textContent = '对手断线，等待重连...';
-    oppLabel.style.color = '#b32b2b';
-  }
-
-  const giveUpBtn = document.getElementById('giveUpBtn');
-  if (giveUpBtn) {
-    if (myRole === 'guest') giveUpBtn.style.display = 'none';
-    else giveUpBtn.style.display = '';
-  }
-
-  const modal = document.getElementById('oppDisconnectModal');
-  if (modal) modal.classList.add('show');
+  if (oppLabel) { oppLabel.textContent = '对手断线，等待重连...'; oppLabel.style.color = '#b32b2b'; }
   oppDisconnectDeadline = Date.now() + OPP_WAIT_MS;
   if (oppDisconnectTimer) clearInterval(oppDisconnectTimer);
-  updateOppWaitTime(Math.ceil(OPP_WAIT_MS / 1000));
+  showBanner(`⚠ 对手断线，等待重连... ${Math.ceil(OPP_WAIT_MS / 1000)}s`, 'error', 0);
   oppDisconnectTimer = setInterval(() => {
     const remain = Math.max(0, Math.ceil((oppDisconnectDeadline - Date.now()) / 1000));
-    updateOppWaitTime(remain);
     if (remain <= 0) {
-      clearInterval(oppDisconnectTimer);
-      oppDisconnectTimer = null;
-      if (modal) modal.classList.remove('show');
+      clearInterval(oppDisconnectTimer); oppDisconnectTimer = null;
       if (!opponentUserId) {
         if (gameStarted && !gameOver) {
           if (myRole === 'host') endGame('对方断线超时，你赢了', 'win');
           else endGame('对方断线超时，对局结束', 'loss');
-        } else {
-          showBanner('对方断线超时，返回主页', 'error', 2500);
-        }
+        } else showBanner('对方断线超时，返回主页', 'error', 2500);
         setTimeout(() => { leavingToHome = true; goHome(); }, 2500);
       }
-    }
+    } else showBanner(`⚠ 对手断线，等待重连... ${remain}s`, 'error', 0);
   }, 500);
-
-  showBanner('对方断线，等待其重新加入...', 'error', 3000);
   appendChatMessage('', '对方已断线，等待重新加入...', 'sys');
 }
-function updateOppWaitTime(remain) {
-  const el = document.getElementById('oppWaitTime');
-  if (el && typeof remain === 'number') el.textContent = remain;
-}
-function giveUpWaiting() {
-  if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
-  const modal = document.getElementById('oppDisconnectModal');
-  if (modal) modal.classList.remove('show');
-  if (gameStarted && !gameOver && myRole === 'host') {
-    endGame('对方断线，你赢了', 'win');
-    setTimeout(() => { leavingToHome = true; goHome(); }, 2500);
-  } else {
-    showBanner('已放弃等待', 'info', 2000);
-    setTimeout(() => { leavingToHome = true; goHome(); }, 1500);
-  }
-}
-
 function goHome() {
   intentionalClose = true;
-  stopRoomHeartbeat();
   if (ws) { try { ws.close(); } catch (e) { } ws = null; }
   window.removeEventListener('beforeunload', onBeforeUnload);
-  stopTimer();
+  stopTimer(); cancelTargetPickMode();
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   if (pendingInviteTimer) { clearTimeout(pendingInviteTimer); pendingInviteTimer = null; }
   if (syncPlaybackTimer) { clearTimeout(syncPlaybackTimer); syncPlaybackTimer = null; }
-  const modal = document.getElementById('oppDisconnectModal');
-  if (modal) modal.classList.remove('show');
-  isReconnecting = false;
-  reconnectWasInGame = false;
-
+  if (pendingDisconnectCheck) { clearTimeout(pendingDisconnectCheck.timer); pendingDisconnectCheck = null; }
+  isReconnecting = false; reconnectWasInGame = false;
   sendLobby({ type: 'idle', userId: myUserId, username: myUsername });
-
   opponentUserId = ''; opponentUsername = '';
   lastOpponentUserId = '';
   selfReady = false; oppReady = false;
-  gameStarted = false;
-  onlineMode = false;
-  gameMode = 'classic';
+  gameStarted = false; onlineMode = false; gameMode = 'classic';
   myColor = null; hostColor = null;
   gameOver = false; gameEndReason = '';
-  leavingToHome = false;
-  roomFullHandled = false;
-  pendingUndoRequest = false;
-  pendingDrawRequest = false;
-  recordUploaded = false;
-  unreadChatCount = 0;
-  colorTipShown = false;
-  lastPlaybackScript = null;
-  lastPlaybackStartState = null;
-  syncMyQueue = [];
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  syncPlaying = false;
+  leavingToHome = false; roomFullHandled = false;
+  pendingUndoRequest = false; pendingDrawRequest = false; recordUploaded = false;
+  unreadChatCount = 0; colorTipShown = false;
+  lastPlaybackScript = null; lastPlaybackStartState = null;
+  syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false; syncPlaying = false;
+  syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
+  skillBalls = []; skillEffects = []; skillTurnCounter = 0; nextBallSpawnAt = 3;
+  stepBonus = { host: 0, guest: 0 };
+  syncStateVersion = 0;
   updateChatBadge();
-  const log = document.getElementById('chatLog');
-  if (log) log.innerHTML = '';
-  const nc = document.getElementById('chatNoticeContainer');
-  if (nc) nc.innerHTML = '';
-  hideBanner();
-  hideAll();
-  menuPanel.classList.remove('hidden');
+  const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
+  const nc = document.getElementById('chatNoticeContainer'); if (nc) nc.innerHTML = '';
+  hideBanner(); hideAll(); menuPanel.classList.remove('hidden');
   connectLobby();
 }
 
@@ -1544,36 +1377,17 @@ function goHome() {
 //                        确认弹窗
 // ============================================================
 function showConfirm(text, onYes, onNo) {
-  const disModal = document.getElementById('oppDisconnectModal');
-  let wasShown = false;
-  if (disModal && disModal.classList.contains('show')) {
-    wasShown = true;
-    disModal.style.visibility = 'hidden';
-  }
   document.getElementById('confirmText').textContent = text;
   document.getElementById('confirmModal').classList.add('show');
-  confirmCallback = {
-    onYes: () => {
-      if (wasShown && disModal) disModal.style.visibility = '';
-      if (onYes) onYes();
-    },
-    onNo: () => {
-      if (wasShown && disModal) disModal.style.visibility = '';
-      if (onNo) onNo();
-    }
-  };
+  confirmCallback = { onYes, onNo };
 }
 function confirmYes() {
   document.getElementById('confirmModal').classList.remove('show');
-  const disModal = document.getElementById('oppDisconnectModal');
-  if (disModal) disModal.style.visibility = '';
   if (confirmCallback && confirmCallback.onYes) confirmCallback.onYes();
   confirmCallback = null;
 }
 function confirmNo() {
   document.getElementById('confirmModal').classList.remove('show');
-  const disModal = document.getElementById('oppDisconnectModal');
-  if (disModal) disModal.style.visibility = '';
   if (confirmCallback && confirmCallback.onNo) confirmCallback.onNo();
   confirmCallback = null;
 }
@@ -1581,79 +1395,55 @@ function confirmNo() {
 // ============================================================
 //                        房间 / 模式选择
 // ============================================================
-function generateRoomId() {
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
-
+function generateRoomId() { return String(Math.floor(100000 + Math.random() * 900000)); }
 function createRoom() {
-  timeSelectMode = 'create';
-  pendingInviteTargetId = null;
+  timeSelectMode = 'create'; pendingInviteTargetId = null;
   document.getElementById('modeSelectModal').classList.add('show');
 }
 function cancelModeSelect() {
   document.getElementById('modeSelectModal').classList.remove('show');
-  timeSelectMode = 'create';
-  pendingInviteTargetId = null;
+  timeSelectMode = 'create'; pendingInviteTargetId = null;
 }
 function pickMode(mode) {
   document.getElementById('modeSelectModal').classList.remove('show');
   gameMode = mode;
-
-  if (mode === 'sync') {
-    document.getElementById('syncModeModal').classList.add('show');
-  } else {
-    document.getElementById('timeControlModal').classList.add('show');
-  }
+  if (mode === 'sync') document.getElementById('syncModeModal').classList.add('show');
+  else document.getElementById('timeControlModal').classList.add('show');
 }
 function cancelSyncMode() {
   document.getElementById('syncModeModal').classList.remove('show');
-  timeSelectMode = 'create';
-  pendingInviteTargetId = null;
+  timeSelectMode = 'create'; pendingInviteTargetId = null;
 }
 function pickSyncSteps(n) {
-  syncStepOption = n;
-  gameMode = 'sync';
-  syncStepsPerRound = n;
+  syncStepOption = n; gameMode = 'sync'; syncStepsPerRound = n;
   document.getElementById('syncModeModal').classList.remove('show');
-
   if (timeSelectMode === 'invite') {
     const target = pendingInviteTargetId;
-    timeSelectMode = 'create';
-    pendingInviteTargetId = null;
+    timeSelectMode = 'create'; pendingInviteTargetId = null;
     doInviteWithMode(target);
-  } else {
-    doCreateRoom();
-  }
+  } else doCreateRoom();
 }
-
 function cancelTimeSelect() {
   document.getElementById('timeControlModal').classList.remove('show');
-  timeSelectMode = 'create';
-  pendingInviteTargetId = null;
+  timeSelectMode = 'create'; pendingInviteTargetId = null;
 }
 function selectTimeOption(opt) {
   const presets = {
     standard: { enabled: true, totalMs: 15 * 60 * 1000, stepMs: 60 * 1000 },
-    fast:     { enabled: true, totalMs: 10 * 60 * 1000, stepMs: 30 * 1000 },
-    blitz:    { enabled: true, totalMs: 5 * 60 * 1000,  stepMs: 20 * 1000 },
-    none:     { enabled: false, totalMs: 15 * 60 * 1000, stepMs: 60 * 1000 }
+    fast: { enabled: true, totalMs: 10 * 60 * 1000, stepMs: 30 * 1000 },
+    blitz: { enabled: true, totalMs: 5 * 60 * 1000, stepMs: 20 * 1000 },
+    none: { enabled: false, totalMs: 15 * 60 * 1000, stepMs: 60 * 1000 }
   };
   Object.assign(timeSettings, presets[opt] || presets.standard);
   document.getElementById('timeControlModal').classList.remove('show');
-
   if (timeSelectMode === 'invite') {
     const target = pendingInviteTargetId;
-    timeSelectMode = 'create';
-    pendingInviteTargetId = null;
+    timeSelectMode = 'create'; pendingInviteTargetId = null;
     doInviteWithMode(target);
-  } else {
-    doCreateRoom();
-  }
+  } else doCreateRoom();
 }
-
 async function doCreateRoom() {
-  myRole = 'host';
-  roomId = generateRoomId();
+  myRole = 'host'; roomId = generateRoomId();
   document.getElementById('lobbyRoom').value = roomId;
   lobbyHint('创建房间 ' + roomId + '...');
   await enterRoom();
@@ -1661,91 +1451,42 @@ async function doCreateRoom() {
 async function joinRoom() {
   const rid = document.getElementById('lobbyRoom').value.trim();
   if (!rid || !/^\d{6}$/.test(rid)) { lobbyHint('请输入 6 位数字房间号', 'error'); return; }
-  myRole = 'guest';
-  roomId = rid;
+  myRole = 'guest'; roomId = rid;
   lobbyHint('加入房间 ' + rid + '...');
   await enterRoom();
 }
-
 async function enterRoom(directEnter) {
-  intentionalClose = false;
-  leavingToHome = false;
-  roomFullHandled = false;
-  reconnectWasInGame = false;
-  colorTipShown = false;
-  try {
-    await connectWS(roomId, myUserId, false);
-  } catch (e) {
-    lobbyHint('连接失败：' + e.message, 'error');
-    return;
-  }
-  onlineMode = true;
-  applyModeButtons();
-  startRoomHeartbeat();
-
+  intentionalClose = false; leavingToHome = false;
+  roomFullHandled = false; reconnectWasInGame = false; colorTipShown = false;
+  try { await connectWS(roomId, myUserId, false); }
+  catch (e) { lobbyHint('连接失败：' + e.message, 'error'); return; }
+  onlineMode = true; applyModeButtons();
   if (directEnter) {
-    hideAll();
-    gamePanel.classList.remove('hidden');
-    chatFab.classList.remove('hidden');
+    hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
     gameStarted = true;
-    if (!boardDomBuilt) {
-      initBoard();
-      buildBoardDOM();
-      renderFullBoard();
-      renderGraveyards();
-    }
-    setTimeout(() => {
-      if (myRole === 'host') broadcastSync();
-      else send({ type: 'requestSync', userId: myUserId });
-    }, 300);
-    setTimeout(() => {
-      if (myRole === 'host') broadcastSync();
-      else send({ type: 'requestSync', userId: myUserId });
-    }, 1200);
-    if (gameMode === 'sync') {
-      document.getElementById('syncBar').classList.remove('hidden');
-      renderSyncBar();
-    } else {
-      document.getElementById('syncBar').classList.add('hidden');
-    }
+    if (!boardDomBuilt) { initBoard(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); }
+    setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 300);
+    setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 1200);
+    if (gameMode === 'sync') { document.getElementById('syncBar').classList.remove('hidden'); renderSyncBar(); }
+    else document.getElementById('syncBar').classList.add('hidden');
   } else {
-    hideAll();
-    waitPanel.classList.remove('hidden');
+    hideAll(); waitPanel.classList.remove('hidden');
     document.getElementById('waitRoomLabel').textContent = roomId;
     document.getElementById('netLog').textContent = '';
-    selfReady = false; oppReady = false;
-    gameStarted = false;
+    selfReady = false; oppReady = false; gameStarted = false;
     opponentUserId = ''; opponentUsername = '';
     myColor = null; hostColor = null;
-    updateWaitUI();
-    waitHint('等待对手加入...');
+    updateWaitUI(); waitHint('等待对手加入...');
   }
-
-  send({
-    type: 'hello',
-    userId: myUserId,
-    username: myUsername,
-    role: myRole,
-    gameMode: gameMode,
-    syncStepsPerRound: syncStepsPerRound
-  });
+  send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound });
   setTimeout(() => {
-    if (ws && ws.readyState === 1 && !opponentUserId) {
-      send({
-        type: 'hello', userId: myUserId, username: myUsername, role: myRole,
-        gameMode: gameMode, syncStepsPerRound: syncStepsPerRound, reHello: true
-      });
-    }
+    if (ws && ws.readyState === 1 && !opponentUserId)
+      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound, reHello: true });
   }, 800);
   setTimeout(() => {
-    if (ws && ws.readyState === 1 && !opponentUserId) {
-      send({
-        type: 'hello', userId: myUserId, username: myUsername, role: myRole,
-        gameMode: gameMode, syncStepsPerRound: syncStepsPerRound, reHello: true
-      });
-    }
+    if (ws && ws.readyState === 1 && !opponentUserId)
+      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound, reHello: true });
   }, 2000);
-
   window.addEventListener('beforeunload', onBeforeUnload);
   sendLobby({ type: 'busy', userId: myUserId, username: myUsername });
 }
@@ -1761,8 +1502,7 @@ function leaveRoom(fromForce) {
     setTimeout(() => goHome(), 600);
     return;
   }
-  intentionalClose = true;
-  goHome();
+  intentionalClose = true; goHome();
 }
 function updateWaitUI() {
   document.getElementById('dotSelf').className = 'ready-dot' + (selfReady ? ' ready' : '');
@@ -1779,115 +1519,75 @@ function toggleReady() {
   if (!opponentUserId) return;
   selfReady = !selfReady;
   send({ type: 'ready', userId: myUserId, ready: selfReady });
-  updateWaitUI();
-  checkBothReady();
+  updateWaitUI(); checkBothReady();
 }
 function checkBothReady() {
   if (selfReady && oppReady && opponentUserId && !gameStarted) {
-    if (myRole === 'host') {
-      setTimeout(() => startGameAsHost(), 400);
-    }
+    if (myRole === 'host') setTimeout(() => startGameAsHost(), 400);
   }
 }
 
 // ============================================================
 //                    开局
 // ============================================================
+function resetSkillState() {
+  skillBalls = []; skillEffects = [];
+  skillTurnCounter = 0; nextBallSpawnAt = 3;
+  stepBonus = { host: 0, guest: 0 };
+  syncStateVersion = 0;
+  renderSkillBalls();
+}
 function startGameAsHost() {
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   lastOpponentUserId = '';
-
-  initBoard();
+  initBoard(); resetSkillState();
   myColor = null; hostColor = null;
-
   if (gameMode === 'sync') {
     hostColor = Math.random() < 0.5 ? 'red' : 'black';
-    myColor = hostColor;
-    currentPlayer = null;
-  } else {
-    currentPlayer = 'host';
-  }
-
+    myColor = hostColor; currentPlayer = null;
+  } else currentPlayer = 'host';
   gameOver = false; gameEndReason = '';
   selectedRow = -1; selectedCol = -1;
   lastMovedRow = -1; lastMovedCol = -1;
-  deadRed = []; deadBlack = [];
-  history = [];
-  recordUploaded = false;
-  gameStarted = true;
-  syncRoundNum = 0;
-  syncMyQueue = [];
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  colorTipShown = false;
-  lastPlaybackScript = null;
-  lastPlaybackStartState = null;
+  deadRed = []; deadBlack = []; history = []; recordUploaded = false;
+  gameStarted = true; syncRoundNum = 0;
+  syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
+  syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
+  colorTipShown = false; lastPlaybackScript = null; lastPlaybackStartState = null;
   resetTimersForNewGame();
-
-  enterGameUI();
-  buildBoardDOM();
-  renderFullBoard();
-  renderGraveyards();
-  const log = document.getElementById('chatLog');
-  if (log) log.innerHTML = '';
-
+  enterGameUI(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
+  const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
   if (gameMode === 'sync') {
     document.getElementById('syncBar').classList.remove('hidden');
     updateColorLabel();
     setTimeout(() => {
       colorTipShown = true;
-      Swal.fire({
-        icon: 'info',
-        title: '颜色分配',
-        text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
-        confirmButtonText: '知道了'
-      });
+      Swal.fire({ icon: 'info', title: '颜色分配', text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`, confirmButtonText: '知道了' });
     }, 300);
     startSyncRound();
   } else {
     document.getElementById('syncBar').classList.add('hidden');
     startTimer();
   }
-
-  send({
-    type: 'start',
-    state: serializeState(),
-    firstMover: 'host',
-    timeSettings,
-    gameMode: gameMode,
-    syncStepsPerRound: syncStepsPerRound
-  });
+  send({ type: 'start', state: serializeState(), firstMover: 'host', timeSettings, gameMode, syncStepsPerRound });
 }
 function applyStartState(state) {
   deserializeState(state);
   gameStarted = true;
   gameOver = false; gameEndReason = '';
-  recordUploaded = false;
-  syncRoundNum = 0;
-  syncMyQueue = [];
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  lastPlaybackScript = null;
-  lastPlaybackStartState = null;
-  enterGameUI();
-  buildBoardDOM();
-  renderFullBoard();
-  renderGraveyards();
-  const log = document.getElementById('chatLog');
-  if (log) log.innerHTML = '';
-
+  recordUploaded = false; syncRoundNum = 0;
+  syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
+  syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
+  lastPlaybackScript = null; lastPlaybackStartState = null;
+  enterGameUI(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
+  const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
   if (gameMode === 'sync') {
     document.getElementById('syncBar').classList.remove('hidden');
     updateColorLabel();
     if (myColor && !colorTipShown) {
       colorTipShown = true;
       setTimeout(() => {
-        Swal.fire({
-          icon: 'info',
-          title: '颜色分配',
-          text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`,
-          confirmButtonText: '知道了'
-        });
+        Swal.fire({ icon: 'info', title: '颜色分配', text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`, confirmButtonText: '知道了' });
       }, 300);
     }
     renderSyncBar();
@@ -1902,56 +1602,48 @@ function applyStartState(state) {
 // ============================================================
 function serializeState() {
   return {
-    board: board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id } : null)),
-    currentPlayer,
-    gameOver,
-    gameEndReason,
-    lastMovedRow,
-    lastMovedCol,
-    deadRed: [...deadRed],
-    deadBlack: [...deadBlack],
-    hostColor,
-    hostTimeLeft,
-    guestTimeLeft,
+    board: board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id, speedMul: c.speedMul || 1 } : null)),
+    currentPlayer, gameOver, gameEndReason, lastMovedRow, lastMovedCol,
+    deadRed: [...deadRed], deadBlack: [...deadBlack],
+    hostColor, hostTimeLeft, guestTimeLeft,
     timeSettings: { ...timeSettings },
-    gameMode: gameMode,
-    syncStepsPerRound: syncStepsPerRound,
-    syncRoundNum: syncRoundNum
+    gameMode, syncStepsPerRound, syncRoundNum,
+    skillBalls: skillBalls.map(b => ({ ...b })),
+    skillEffects: skillEffects.map(e => ({ ...e })),
+    skillTurnCounter, nextBallSpawnAt,
+    stepBonus: { ...stepBonus }
   };
 }
 function deserializeState(state) {
-  board = state.board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id } : null));
+  syncStateVersion++;   // ★ 版本号 +1
+  board = state.board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id, speedMul: c.speedMul || 1 } : null));
   currentPlayer = state.currentPlayer;
   gameOver = state.gameOver;
   gameEndReason = state.gameEndReason || '';
-  lastMovedRow = state.lastMovedRow;
-  lastMovedCol = state.lastMovedCol;
-  deadRed = [...state.deadRed];
-  deadBlack = [...state.deadBlack];
+  lastMovedRow = state.lastMovedRow; lastMovedCol = state.lastMovedCol;
+  deadRed = [...state.deadRed]; deadBlack = [...state.deadBlack];
   history = [];
-
   if (state.timeSettings) Object.assign(timeSettings, state.timeSettings);
   if (state.gameMode) gameMode = state.gameMode;
   if (state.syncStepsPerRound) syncStepsPerRound = state.syncStepsPerRound;
   if (typeof state.syncRoundNum === 'number') syncRoundNum = state.syncRoundNum;
-
+  if (state.skillBalls) skillBalls = state.skillBalls.map(b => ({ ...b }));
+  if (state.skillEffects) skillEffects = state.skillEffects.map(e => ({ ...e }));
+  if (typeof state.skillTurnCounter === 'number') skillTurnCounter = state.skillTurnCounter;
+  if (typeof state.nextBallSpawnAt === 'number') nextBallSpawnAt = state.nextBallSpawnAt;
+  if (state.stepBonus) stepBonus = { ...state.stepBonus };
   hostColor = state.hostColor || null;
   if (typeof state.hostTimeLeft === 'number') hostTimeLeft = state.hostTimeLeft;
   if (typeof state.guestTimeLeft === 'number') guestTimeLeft = state.guestTimeLeft;
   turnStartTs = performance.now();
-
   if (myRole === 'host') myColor = hostColor;
   else if (myRole === 'guest') myColor = hostColor ? (hostColor === 'red' ? 'black' : 'red') : null;
 }
-function broadcastSync() {
-  if (myRole !== 'host') return;
-  send({ type: 'sync', state: serializeState() });
-}
+function broadcastSync() { if (myRole !== 'host') return; send({ type: 'sync', state: serializeState() }); }
 function applySyncState(state) {
   deserializeState(state);
   selectedRow = -1; selectedCol = -1;
-  renderFullBoard();
-  renderGraveyards();
+  renderFullBoard(); renderGraveyards(); renderSkillBalls();
   updateColorLabel();
 }
 function updateColorLabel() {
@@ -1965,9 +1657,7 @@ function updateColorLabel() {
 //                        游戏界面
 // ============================================================
 function enterGameUI() {
-  hideAll();
-  gamePanel.classList.remove('hidden');
-  chatFab.classList.remove('hidden');
+  hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
   document.getElementById('gameRoomLabel').textContent = roomId || '离线';
   document.getElementById('gameRoleLabel').textContent =
     myRole === 'host' ? '（房主）' : (myRole === 'guest' ? '（客机）' : '');
@@ -1975,11 +1665,8 @@ function enterGameUI() {
     opponentUserId ? '对手：' + (opponentUsername || opponentUserId) : '';
   document.getElementById('gameOppLabel').style.color = '#b32b2b';
   document.getElementById('connDot').style.display = onlineMode ? 'inline-block' : 'none';
-  updateColorLabel();
-  applyModeButtons();
-  initChatUI();
-  unreadChatCount = 0;
-  updateChatBadge();
+  updateColorLabel(); applyModeButtons(); initChatUI();
+  unreadChatCount = 0; updateChatBadge();
 }
 function exitGame() {
   if (onlineMode && !gameOver) {
@@ -1991,194 +1678,160 @@ function exitGame() {
 // ============================================================
 //                    ★ 同步规划模式
 // ============================================================
-
 function renderSyncBar() {
   const bar = document.getElementById('syncBar');
   if (!bar) return;
   if (gameMode !== 'sync') { bar.classList.add('hidden'); return; }
   bar.classList.remove('hidden');
-
   const phaseEl = document.getElementById('syncPhase');
   const stepsEl = document.getElementById('syncSteps');
   const submitBtn = document.getElementById('syncSubmitBtn');
   const replayBtn = document.getElementById('syncReplayBtn');
-
   if (replayBtn) {
-    if (lastPlaybackScript && !syncPlaying && !syncMySubmitted) {
-      replayBtn.style.display = '';
-    } else {
-      replayBtn.style.display = 'none';
-    }
+    if (lastPlaybackScript && !syncPlaying && !syncMySubmitted) replayBtn.style.display = '';
+    else replayBtn.style.display = 'none';
   }
-
-  if (syncPlaying) {
-    phaseEl.textContent = '播放中...';
-    phaseEl.style.color = '#ffcc44';
-  } else if (syncMySubmitted) {
-    if (syncOppSubmitted) {
-      phaseEl.textContent = '双方已完成，准备播放';
-      phaseEl.style.color = '#1faa1f';
-    } else {
-      phaseEl.textContent = '你已完成，等待对手...';
-      phaseEl.style.color = '#00e0ff';
-    }
+  if (syncPlaying) { phaseEl.textContent = '播放中...'; phaseEl.style.color = '#ffcc44'; }
+  else if (syncMySubmitted) {
+    if (syncOppSubmitted) { phaseEl.textContent = '双方已完成，准备播放'; phaseEl.style.color = '#1faa1f'; }
+    else { phaseEl.textContent = '你已完成，等待对手...'; phaseEl.style.color = '#00e0ff'; }
   } else {
-    if (syncOppSubmitted) {
-      phaseEl.textContent = '对手已完成，请尽快完成';
-      phaseEl.style.color = '#ffaa00';
-    } else {
-      phaseEl.textContent = '规划阶段';
-      phaseEl.style.color = '#eedbba';
-    }
+    if (syncOppSubmitted) { phaseEl.textContent = '对手已完成，请尽快完成'; phaseEl.style.color = '#ffaa00'; }
+    else { phaseEl.textContent = '规划阶段'; phaseEl.style.color = '#eedbba'; }
   }
-
-  stepsEl.textContent = `步数：${syncMyQueue.length} / ${syncStepsPerRound}`;
+  const myBonus = stepBonus[myRole] || 0;
+  const effectiveSteps = Math.max(1, syncStepsPerRound + myBonus);
+  stepsEl.textContent = `步数：${syncMyQueue.length} / ${effectiveSteps}` + (myBonus !== 0 ? ` (${myBonus > 0 ? '+' : ''}${myBonus})` : '');
   submitBtn.disabled = syncMySubmitted || syncPlaying || syncMyQueue.length === 0;
   submitBtn.textContent = syncMySubmitted ? '已提交' : '完成';
 }
-
 function clearSyncQueue() {
   if (syncMySubmitted || syncPlaying) return;
-  syncMyQueue = [];
-  selectedRow = -1; selectedCol = -1;
-  highlightSyncQueue();
-  renderSyncBar();
+  syncMyQueue = []; selectedRow = -1; selectedCol = -1;
+  syncPathPieceId = -1; syncPathPiece = null;
+  syncPathCurrentPos = { row: -1, col: -1 };
+  highlightSyncQueue(); renderSyncBar();
 }
-
 function submitSyncPlan() {
   if (syncMySubmitted || syncPlaying) return;
   if (syncMyQueue.length === 0) { showBanner('请至少规划一步', 'error', 1500); return; }
   syncMySubmitted = true;
   selectedRow = -1; selectedCol = -1;
-  highlightSyncQueue();
-  renderSyncBar();
-
-  if (myRole === 'host') {
-    checkBothSyncSubmitted();
-  } else {
+  syncPathPieceId = -1; syncPathPiece = null;
+  syncPathCurrentPos = { row: -1, col: -1 };
+  highlightSyncQueue(); renderSyncBar();
+  if (myRole === 'host') checkBothSyncSubmitted();
+  else {
     send({ type: 'syncPlan', userId: myUserId, actions: syncMyQueue });
     send({ type: 'syncOppSubmitted', userId: myUserId });
     showBanner('已提交，等待对手...', 'info', 2000);
   }
 }
-
-function handleOpponentSyncPlan(msg) {
-  syncOppQueue = msg.actions || [];
-  syncOppSubmitted = true;
-  checkBothSyncSubmitted();
-}
-
+function handleOpponentSyncPlan(msg) { syncOppQueue = msg.actions || []; syncOppSubmitted = true; checkBothSyncSubmitted(); }
 function checkBothSyncSubmitted() {
   if (myRole !== 'host') return;
   if (!syncMySubmitted || !syncOppSubmitted) return;
   setTimeout(() => hostSimulateAndPlay(), 200);
 }
-
 function startSyncRound() {
   syncRoundNum++;
-  syncMyQueue = [];
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  syncOppQueue = [];
+  syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false; syncOppQueue = [];
   selectedRow = -1; selectedCol = -1;
-  clearParabolas();
-  highlightSyncQueue();
-  renderSyncBar();
-  // 不再设置 statusText，避免显示"请规划你的操作"
+  syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
+  clearParabolas(); highlightSyncQueue(); renderSyncBar();
+  onTurnAdvance();
+  if (onlineMode && myRole === 'host') broadcastSync();
 }
-
 function hostSimulateAndPlay() {
   const allActions = [];
   syncMyQueue.forEach(a => allActions.push({ ...a, by: 'host' }));
   syncOppQueue.forEach(a => allActions.push({ ...a, by: 'guest' }));
-
   const script = simulateSyncRound(allActions);
   playSyncPlayback(script);
   send({ type: 'syncPlayback', script });
-
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  syncOppQueue = [];
+  syncMySubmitted = false; syncOppSubmitted = false; syncOppQueue = [];
 }
-
 function replayLastPlayback() {
   if (syncPlaying) { showBanner('播放中，请稍候', 'info', 1200); return; }
   if (gameOver) { showBanner('对局已结束', 'error', 1200); return; }
   if (!lastPlaybackScript) { showBanner('没有可回放的记录', 'error', 1200); return; }
 
+  const savedState = {
+    board: board.map(row => row.map(c => c ? { ...c } : null)),
+    deadRed: [...deadRed], deadBlack: [...deadBlack],
+    skillBalls: skillBalls.map(b => ({ ...b })),
+    skillEffects: skillEffects.map(e => ({ ...e })),
+    skillTurnCounter, nextBallSpawnAt,
+    stepBonus: { ...stepBonus },
+    syncRoundNum, currentPlayer, gameOver, gameEndReason,
+    lastMovedRow, lastMovedCol,
+    myColor, hostColor
+  };
+
   if (lastPlaybackStartState) {
     board = lastPlaybackStartState.board.map(row => row.map(c => c ? { ...c } : null));
     deadRed = [...lastPlaybackStartState.deadRed];
     deadBlack = [...lastPlaybackStartState.deadBlack];
+    if (lastPlaybackStartState.skillBalls) {
+      skillBalls = lastPlaybackStartState.skillBalls.map(b => ({ ...b }));
+    }
     prevDeadRedCount = -1;
     prevDeadBlackCount = -1;
     renderFullBoard();
     renderGraveyards();
+    renderSkillBalls();
   }
 
-  playSyncPlayback(lastPlaybackScript);
+  playSyncPlayback(lastPlaybackScript, savedState);
 }
-
-function getPieceIdAt(row, col) {
-  const d = board[row]?.[col];
-  return d ? d.id : -1;
-}
-
 function checkSyncQueueConflict(newAction, skipIdx) {
   const queue = syncMyQueue;
-
   let targetRow, targetCol;
-  if (newAction.type === 'flip') {
-    targetRow = newAction.row; targetCol = newAction.col;
-  } else {
-    targetRow = newAction.toRow; targetCol = newAction.toCol;
-  }
-
+  if (newAction.type === 'flip') { targetRow = newAction.row; targetCol = newAction.col; }
+  else { targetRow = newAction.toRow; targetCol = newAction.toCol; }
   for (let i = 0; i < queue.length; i++) {
     if (i === skipIdx) continue;
     const a = queue[i];
     let aTargetRow, aTargetCol;
-    if (a.type === 'flip') {
-      aTargetRow = a.row; aTargetCol = a.col;
-    } else {
-      aTargetRow = a.toRow; aTargetCol = a.toCol;
-    }
-    if (aTargetRow === targetRow && aTargetCol === targetCol) {
-      return '这个格子已经被本回合其他操作占用了';
-    }
+    if (a.type === 'flip') { aTargetRow = a.row; aTargetCol = a.col; }
+    else { aTargetRow = a.toRow; aTargetCol = a.toCol; }
+    if (aTargetRow === targetRow && aTargetCol === targetCol) return '这个格子已经被本回合其他操作占用了';
   }
-
   if (newAction.type === 'move' || newAction.type === 'capture') {
-    const fromId = getPieceIdAt(newAction.fromRow, newAction.fromCol);
-    if (fromId !== -1) {
-      const alreadyPlanned = queue.some((a, idx) => {
-        if (idx === skipIdx) return false;
-        if (a.type !== 'move' && a.type !== 'capture') return false;
-        const aFromId = getPieceIdAt(a.fromRow, a.fromCol);
-        return aFromId === fromId;
-      });
-      if (alreadyPlanned) return '这个棋子已经被本回合其他操作占用了';
+    const pieceId = newAction.pieceId;
+    if (pieceId === undefined || pieceId === -1) return null;
+    let lastPos = null;
+    for (let i = 0; i < queue.length; i++) {
+      if (i === skipIdx) continue;
+      const a = queue[i];
+      if ((a.type === 'move' || a.type === 'capture') && a.pieceId === pieceId) lastPos = { row: a.toRow, col: a.toCol };
+    }
+    if (lastPos) {
+      if (lastPos.row !== newAction.fromRow || lastPos.col !== newAction.fromCol) return '这个棋子已经被本回合其他操作占用了';
     }
   }
-
   return null;
 }
-
 function removeSyncActionWithDeps(idx) {
   const target = syncMyQueue[idx];
   if (!target) return;
-
   const toRemove = new Set([idx]);
   if (target.type === 'move' || target.type === 'capture') {
     syncMyQueue.forEach((a, i) => {
       if (i === idx) return;
       if (a.type !== 'move' && a.type !== 'capture') return;
-      if (a.toRow === target.fromRow && a.toCol === target.fromCol) {
-        toRemove.add(i);
-      }
+      if (a.toRow === target.fromRow && a.toCol === target.fromCol) toRemove.add(i);
     });
+    if (target.pieceId !== undefined) {
+      let foundSelf = false;
+      for (let i = 0; i < syncMyQueue.length; i++) {
+        if (i === idx) { foundSelf = true; continue; }
+        if (!foundSelf) continue;
+        const a = syncMyQueue[i];
+        if ((a.type === 'move' || a.type === 'capture') && a.pieceId === target.pieceId) toRemove.add(i);
+      }
+    }
   }
-
   let changed = true;
   while (changed) {
     changed = false;
@@ -2189,262 +1842,274 @@ function removeSyncActionWithDeps(idx) {
         const rt = syncMyQueue[ri];
         if (!rt) continue;
         if ((rt.type === 'move' || rt.type === 'capture') &&
-            a.toRow === rt.fromRow && a.toCol === rt.fromCol) {
-          toRemove.add(i); changed = true; break;
-        }
+          a.toRow === rt.fromRow && a.toCol === rt.fromCol) { toRemove.add(i); changed = true; break; }
       }
     });
   }
-
   const arr = Array.from(toRemove).sort((a, b) => b - a);
   arr.forEach(i => syncMyQueue.splice(i, 1));
-
   selectedRow = -1; selectedCol = -1;
-  highlightSyncQueue();
-  renderSyncBar();
-
-  if (toRemove.size > 1) {
-    showBanner(`已取消 ${toRemove.size} 个相关操作`, 'info', 1500);
-  }
+  syncPathPieceId = -1; syncPathPiece = null;
+  syncPathCurrentPos = { row: -1, col: -1 };
+  highlightSyncQueue(); renderSyncBar();
+  if (toRemove.size > 1) showBanner(`已取消 ${toRemove.size} 个相关操作`, 'info', 1500);
 }
 
-// ★ 核心模拟
+// ★ 获取移动路径上的所有格子
+function getMovePathCells(mv) {
+  const cells = [];
+  if (mv.from.row === mv.to.row) {
+    const minC = Math.min(mv.from.col, mv.to.col), maxC = Math.max(mv.from.col, mv.to.col);
+    for (let c = minC; c <= maxC; c++) cells.push({ row: mv.from.row, col: c });
+  } else if (mv.from.col === mv.to.col) {
+    const minR = Math.min(mv.from.row, mv.to.row), maxR = Math.max(mv.from.row, mv.to.row);
+    for (let r = minR; r <= maxR; r++) cells.push({ row: r, col: mv.from.col });
+  } else {
+    cells.push({ row: mv.to.row, col: mv.to.col });
+  }
+  return cells;
+}
+
+// ★★★ 核心：simulateSyncRound
 function simulateSyncRound(actions) {
   const events = [];
   const workBoard = board.map(row => row.map(c => c ? { ...c } : null));
   const workDeadRed = [...deadRed];
   const workDeadBlack = [...deadBlack];
+  const pieceMap = {};
+  board.forEach(row => row.forEach(cell => {
+    if (cell && cell.id !== undefined) pieceMap[cell.id] = cell.piece;
+  }));
 
-  const moves = [];
+  // 1. 翻棋
   const flippedKeys = new Set();
-
   actions.forEach(act => {
-    if (act.type === 'flip') {
-      const key = act.row + ',' + act.col;
-      if (flippedKeys.has(key)) return;
-      const cell = workBoard[act.row]?.[act.col];
-      if (!cell || !cell.hidden || !cell.piece) return;
-      flippedKeys.add(key);
-      cell.hidden = false;
-      const color = getPieceColor(cell.piece);
-      events.push({
-        t: 0, type: 'flip',
-        row: act.row, col: act.col,
-        piece: cell.piece, color,
-        by: act.by
-      });
-    } else if (act.type === 'move' || act.type === 'capture') {
+    if (act.type !== 'flip') return;
+    const key = act.row + ',' + act.col;
+    if (flippedKeys.has(key)) return;
+    const cell = workBoard[act.row]?.[act.col];
+    if (!cell || !cell.hidden || !cell.piece) return;
+    flippedKeys.add(key);
+    cell.hidden = false;
+    events.push({ t: 0, type: 'flip', row: act.row, col: act.col, piece: cell.piece, color: getPieceColor(cell.piece), by: act.by });
+  });
+
+  // 2. 收集所有 move
+  const pieceMoves = {};
+  const allMoves = [];
+  actions.forEach(act => {
+    if (act.type !== 'move' && act.type !== 'capture') return;
+    let piece = pieceMap[act.pieceId];
+    let speedMul = 1;
+    if (!piece) {
       const fromCell = workBoard[act.fromRow]?.[act.fromCol];
       if (!fromCell) return;
-      const piece = fromCell.piece;
-      const speed = getPieceSpeed(piece);
-      const dist = Math.abs(act.toRow - act.fromRow) + Math.abs(act.toCol - act.fromCol);
-      const duration = (dist / speed) * 1000;
-      moves.push({
-        ...act, piece, speed, duration,
-        startT: 0, endT: duration
-      });
+      piece = fromCell.piece;
+      speedMul = fromCell.speedMul || 1;
+    } else {
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        if (board[r][c] && board[r][c].id === act.pieceId) speedMul = board[r][c].speedMul || 1;
+      }
     }
+    if (!piece) return;
+    const speed = getPieceSpeed(piece) * speedMul;
+    const dist = Math.abs(act.toRow - act.fromRow) + Math.abs(act.toCol - act.fromCol);
+    const duration = (dist / speed) * 1000;
+    const mv = {
+      pieceId: act.pieceId, piece,
+      from: { row: act.fromRow, col: act.fromCol },
+      to: { row: act.toRow, col: act.toCol },
+      type: act.type, by: act.by,
+      duration,
+      flying: (piece === '炮' || piece === '砲') && act.type === 'capture',
+      startT: 0, endT: 0
+    };
+    if (!pieceMoves[act.pieceId]) pieceMoves[act.pieceId] = [];
+    pieceMoves[act.pieceId].push(mv);
+    allMoves.push(mv);
   });
 
-  const STEP = 20;
-  const maxT = moves.reduce((m, mv) => Math.max(m, mv.endT), 0) + 200;
-  const pieceStates = {};
-  moves.forEach((mv, i) => {
-    const cell = workBoard[mv.fromRow][mv.fromCol];
-    const pieceId = cell.id;
-    pieceStates[pieceId] = {
-      pieceId,
-      flying: isFlying(mv.piece),
-      startT: mv.startT,
-      endT: mv.endT,
-      from: { row: mv.fromRow, col: mv.fromCol },
-      to: { row: mv.toRow, col: mv.toCol },
-      by: mv.by,
-      piece: mv.piece,
-      dead: false,
-      hasLanded: false
-    };
-    events.push({
-      t: mv.startT, type: 'moveStart',
-      pieceId,
-      from: { row: mv.fromRow, col: mv.fromCol },
-      to: { row: mv.toRow, col: mv.toCol },
-      piece: mv.piece,
-      flying: isFlying(mv.piece),
-      duration: mv.duration,
-      by: mv.by
+  // 3. 计算时间区间（同一棋子链式串行）
+  Object.keys(pieceMoves).forEach(pId => {
+    let t = 0;
+    pieceMoves[pId].forEach(mv => {
+      mv.startT = t;
+      mv.endT = t + mv.duration;
+      t = mv.endT;
     });
   });
 
-  // 时间轴推进 + 碰撞判定
+  // 4. moveStart 事件
+  allMoves.forEach(mv => {
+    events.push({
+      t: mv.startT, type: 'moveStart', pieceId: mv.pieceId,
+      from: mv.from, to: mv.to, piece: mv.piece,
+      flying: mv.flying, duration: mv.duration, by: mv.by
+    });
+  });
+
+  // 5. 碰撞检测
+  const STEP = 20;
+  const maxT = allMoves.reduce((m, mv) => Math.max(m, mv.endT), 0) + 200;
+  const moveDead = new Map();
+  allMoves.forEach(mv => moveDead.set(mv, false));
+
   for (let now = 0; now <= maxT; now += STEP) {
-    const activePieces = [];
-    Object.values(pieceStates).forEach(ps => {
-      if (ps.dead) return;
-      if (ps.hasLanded) return;
-      if (now >= ps.startT && now < ps.endT) {
-        const prog = (now - ps.startT) / (ps.endT - ps.startT);
-        const r = ps.from.row + (ps.to.row - ps.from.row) * prog;
-        const c = ps.from.col + (ps.to.col - ps.from.col) * prog;
-        activePieces.push({ ps, r, c });
-      } else if (now >= ps.endT) {
-        ps.hasLanded = true;
+    const active = [];
+    allMoves.forEach(mv => {
+      if (moveDead.get(mv)) return;
+      if (now >= mv.startT && now < mv.endT) {
+        const prog = (now - mv.startT) / (mv.endT - mv.startT);
+        const r = mv.from.row + (mv.to.row - mv.from.row) * prog;
+        const c = mv.from.col + (mv.to.col - mv.from.col) * prog;
+        active.push({ mv, r, c });
       }
     });
-
-    for (let i = 0; i < activePieces.length; i++) {
-      for (let j = i + 1; j < activePieces.length; j++) {
-        const a = activePieces[i], b = activePieces[j];
-        if (a.ps.by === b.ps.by) continue;
-
-        // ★ 双保险：直接按棋子类型判断飞行状态
-        const aFlying = isFlying(a.ps.piece);
-        const bFlying = isFlying(b.ps.piece);
-        if (aFlying !== bFlying) continue;   // 一方飞、一方不飞 → 不碰撞
-
+    for (let i = 0; i < active.length; i++) {
+      for (let j = i + 1; j < active.length; j++) {
+        const a = active[i], b = active[j];
+        if (a.mv.by === b.mv.by) continue;
+        if (moveDead.get(a.mv) || moveDead.get(b.mv)) continue;
+        if (a.mv.flying !== b.mv.flying) continue;
+        if (a.mv.pieceId === b.mv.pieceId) continue;
         const dr = a.r - b.r, dc = a.c - b.c;
         if (Math.sqrt(dr * dr + dc * dc) >= 0.6) continue;
-
-        const pieceA = a.ps.piece;
-        const pieceB = b.ps.piece;
-        const colorA = getPieceColor(pieceA);
-        const colorB = getPieceColor(pieceB);
+        const pieceA = a.mv.piece, pieceB = b.mv.piece;
+        const colorA = getPieceColor(pieceA), colorB = getPieceColor(pieceB);
         if (colorA === colorB) continue;
-
         const aEatsB = canCaptureInCollision(pieceA, pieceB);
         const bEatsA = canCaptureInCollision(pieceB, pieceA);
-
         if (aEatsB && bEatsA) {
-          a.ps.dead = true; b.ps.dead = true;
-          events.push({
-            t: now, type: 'collision',
-            pieceIds: [a.ps.pieceId, b.ps.pieceId],
-            deadIds: [a.ps.pieceId, b.ps.pieceId],
-            result: 'bothDead'
-          });
+          moveDead.set(a.mv, true); moveDead.set(b.mv, true);
+          events.push({ t: now, type: 'collision', pieceIds: [a.mv.pieceId, b.mv.pieceId], deadIds: [a.mv.pieceId, b.mv.pieceId], result: 'bothDead' });
           if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
           if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
         } else if (aEatsB) {
-          b.ps.dead = true;
-          events.push({
-            t: now, type: 'collision',
-            pieceIds: [b.ps.pieceId],
-            deadIds: [b.ps.pieceId],
-            result: 'oneDead'
-          });
+          moveDead.set(b.mv, true);
+          events.push({ t: now, type: 'collision', pieceIds: [b.mv.pieceId], deadIds: [b.mv.pieceId], result: 'oneDead' });
           if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
         } else if (bEatsA) {
-          a.ps.dead = true;
-          events.push({
-            t: now, type: 'collision',
-            pieceIds: [a.ps.pieceId],
-            deadIds: [a.ps.pieceId],
-            result: 'oneDead'
-          });
+          moveDead.set(a.mv, true);
+          events.push({ t: now, type: 'collision', pieceIds: [a.mv.pieceId], deadIds: [a.mv.pieceId], result: 'oneDead' });
           if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
         }
       }
     }
   }
 
-  // 落地：分两遍
-  const sortedStates = Object.values(pieceStates).sort((a, b) => a.endT - b.endT);
+  // 6. 落地
+  const sortedMoves = [...allMoves].sort((a, b) => a.endT - b.endT);
 
-  sortedStates.forEach(ps => {
-    if (ps.dead) {
-      const cell = workBoard[ps.from.row][ps.from.col];
-      if (cell && cell.id === ps.pieceId) {
-        workBoard[ps.from.row][ps.from.col] = null;
-      }
-    }
+  // 6a. 收集碰撞死的 pieceId
+  const deadPieceIds = new Set();
+  sortedMoves.forEach(mv => {
+    if (moveDead.get(mv)) deadPieceIds.add(mv.pieceId);
   });
 
-  sortedStates.forEach(ps => {
-    if (ps.dead) return;
+  // 6b. 从 workBoard 移除死亡棋子
+  if (deadPieceIds.size > 0) {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = workBoard[r][c];
+        if (cell && deadPieceIds.has(cell.id)) workBoard[r][c] = null;
+      }
+    }
+  }
 
-    const targetCell = workBoard[ps.to.row][ps.to.col];
-    const fromCell = workBoard[ps.from.row][ps.from.col];
-    const movingPiece = ps.piece;
-    const movingId = ps.pieceId;
+  // 6c. 失败链：被挡/起点丢失 → 只作废后续，不删棋子
+  const failedChain = new Set();
+  const successfulMoves = [];
+  sortedMoves.forEach(mv => {
+    if (moveDead.get(mv)) return;
+    if (deadPieceIds.has(mv.pieceId)) return;
+    if (failedChain.has(mv.pieceId)) return;
+
+    const sourceCell = workBoard[mv.from.row]?.[mv.from.col];
+    if (!sourceCell || sourceCell.id !== mv.pieceId) {
+      events.push({ t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'blocked', from: mv.from, to: mv.to });
+      failedChain.add(mv.pieceId);
+      return;
+    }
+
+    const targetCell = workBoard[mv.to.row]?.[mv.to.col];
+    if (targetCell && targetCell.id === mv.pieceId) return;
+
+    if (targetCell && targetCell.hidden) {
+      events.push({ t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'blocked', from: mv.from, to: mv.to });
+      failedChain.add(mv.pieceId);
+      return;
+    }
 
     if (targetCell && !targetCell.hidden) {
       const targetPiece = targetCell.piece;
-      if (getPieceColor(movingPiece) === getPieceColor(targetPiece)) {
-        workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
-        events.push({
-          t: ps.endT, type: 'moveEnd',
-          pieceId: ps.pieceId,
-          result: 'blocked',
-          from: { row: ps.from.row, col: ps.from.col },
-          to: { row: ps.to.row, col: ps.to.col }
-        });
+      if (getPieceColor(mv.piece) === getPieceColor(targetPiece)) {
+        events.push({ t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'blocked', from: mv.from, to: mv.to });
+        failedChain.add(mv.pieceId);
         return;
       }
       let canEat = false;
-      if (movingPiece === '炮' || movingPiece === '砲') {
-        canEat = isValidCannonCapture(ps.from.row, ps.from.col, ps.to.row, ps.to.col, workBoard);
+      if (mv.piece === '炮' || mv.piece === '砲') {
+        canEat = isValidCannonCapture(mv.from.row, mv.from.col, mv.to.row, mv.to.col, workBoard);
       } else {
-        canEat = canCapture(movingPiece, targetPiece);
+        canEat = canCapture(mv.piece, targetPiece);
       }
       if (canEat) {
-        const targetColor = getPieceColor(targetPiece);
-        if (targetColor === 'red') workDeadRed.push(targetPiece);
-        else if (targetColor === 'black') workDeadBlack.push(targetPiece);
-        workBoard[ps.to.row][ps.to.col] = { piece: movingPiece, hidden: false, id: movingId };
-        workBoard[ps.from.row][ps.from.col] = null;
+        const tc = getPieceColor(targetPiece);
+        if (tc === 'red') workDeadRed.push(targetPiece); else workDeadBlack.push(targetPiece);
+        workBoard[mv.to.row][mv.to.col] = { piece: mv.piece, hidden: false, id: mv.pieceId, speedMul: sourceCell.speedMul || 1 };
+        workBoard[mv.from.row][mv.from.col] = null;
         events.push({
-          t: ps.endT, type: 'moveEnd',
-          pieceId: ps.pieceId,
-          result: 'capture',
-          targetPiece,
-          targetPieceId: targetCell.id,
-          from: { row: ps.from.row, col: ps.from.col },
-          to: { row: ps.to.row, col: ps.to.col }
+          t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'capture',
+          targetPiece, targetPieceId: targetCell.id, from: mv.from, to: mv.to
         });
+        successfulMoves.push(mv);
       } else {
-        workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
-        events.push({
-          t: ps.endT, type: 'moveEnd',
-          pieceId: ps.pieceId,
-          result: 'blocked',
-          from: { row: ps.from.row, col: ps.from.col },
-          to: { row: ps.to.row, col: ps.to.col }
-        });
+        events.push({ t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'blocked', from: mv.from, to: mv.to });
+        failedChain.add(mv.pieceId);
+        return;
       }
-    } else if (targetCell && targetCell.hidden) {
-      workBoard[ps.from.row][ps.from.col] = { piece: movingPiece, hidden: false, id: movingId };
-      events.push({
-        t: ps.endT, type: 'moveEnd',
-        pieceId: ps.pieceId,
-        result: 'blocked',
-        from: { row: ps.from.row, col: ps.from.col },
-        to: { row: ps.to.row, col: ps.to.col }
-      });
     } else {
-      workBoard[ps.to.row][ps.to.col] = { piece: movingPiece, hidden: false, id: movingId };
-      const startCell = workBoard[ps.from.row][ps.from.col];
-      if (startCell && startCell.id === movingId) {
-        workBoard[ps.from.row][ps.from.col] = null;
+      workBoard[mv.to.row][mv.to.col] = { piece: mv.piece, hidden: false, id: mv.pieceId, speedMul: sourceCell.speedMul || 1 };
+      workBoard[mv.from.row][mv.from.col] = null;
+      events.push({ t: mv.endT, type: 'moveEnd', pieceId: mv.pieceId, result: 'ok', from: mv.from, to: mv.to });
+      successfulMoves.push(mv);
+    }
+  });
+
+  // 7. 检测球被吃（路径经过）
+  const ballsEatenSet = new Set();
+  const ballEaters = [];
+  successfulMoves.forEach(mv => {
+    getMovePathCells(mv).forEach(p => {
+      const ball = skillBalls.find(b => b.row === p.row && b.col === p.col);
+      if (ball && !ballsEatenSet.has(ball)) {
+        ballsEatenSet.add(ball);
+        ballEaters.push({ ball, pieceId: mv.pieceId, by: mv.by });
       }
-      events.push({
-        t: ps.endT, type: 'moveEnd',
-        pieceId: ps.pieceId,
-        result: 'ok',
-        from: { row: ps.from.row, col: ps.from.col },
-        to: { row: ps.to.row, col: ps.to.col }
-      });
+    });
+  });
+  const finalBalls = skillBalls.filter(b => !ballsEatenSet.has(b));
+
+  const ballEffects = [];
+  const goldenBalls = [];
+  ballEaters.forEach(be => {
+    const isStep = (be.ball.type === '+N' || be.ball.type === '-N');
+    events.push({ t: maxT + 100, type: 'ballEaten', ball: be.ball, pieceId: be.pieceId, side: be.by, golden: be.ball.golden, ballType: be.ball.type });
+    if (be.ball.golden && !isStep) {
+      goldenBalls.push({ ballType: be.ball.type, side: be.by });
+    } else {
+      const duration = be.ball.golden ? 10 : 5;
+      const targetId = isStep ? be.by : be.pieceId;
+      ballEffects.push({ type: be.ball.type, targetId, duration, golden: be.ball.golden, by: be.by });
     }
   });
 
   events.sort((a, b) => a.t - b.t);
-
   return {
-    events,
-    finalBoard: workBoard,
-    deadRed: workDeadRed,
-    deadBlack: workDeadBlack,
-    totalDuration: maxT
+    events, finalBoard: workBoard,
+    deadRed: workDeadRed, deadBlack: workDeadBlack,
+    totalDuration: maxT + 300,
+    finalBalls, ballEffects, goldenBalls
   };
 }
 
@@ -2462,40 +2127,41 @@ function isValidCannonCapture(fromRow, fromCol, toRow, toCol, b) {
   return count === 1;
 }
 
-function playSyncPlayback(script) {
-  lastPlaybackScript = script;
-  lastPlaybackStartState = {
-    board: board.map(row => row.map(c => c ? { ...c } : null)),
-    deadRed: [...deadRed],
-    deadBlack: [...deadBlack]
-  };
+function playSyncPlayback(script, replaySavedState) {
+  const isReplay = !!replaySavedState;
+  const startSyncVersion = syncStateVersion;   // ★ 记录播放开始时的版本号
+
+  if (!isReplay) {
+    lastPlaybackScript = script;
+    lastPlaybackStartState = {
+      board: board.map(row => row.map(c => c ? { ...c } : null)),
+      deadRed: [...deadRed], deadBlack: [...deadBlack],
+      skillBalls: skillBalls.map(b => ({ ...b }))
+    };
+  }
 
   syncPlaying = true;
   renderSyncBar();
-  document.getElementById('statusText').textContent = '播放中...';
+  document.getElementById('statusText').textContent = isReplay ? '重播中...' : '播放中...';
 
-  renderFullBoard();
-
-  script.events.forEach(ev => {
-    if (ev.type === 'moveStart') {
-      const el = pieceElMap[ev.pieceId];
-      if (el && ev.from && ev.to) {
-        const fromPos = getPiecePos(ev.from.row, ev.from.col);
-        el.style.transition = 'none';
-        el.style.left = fromPos.left + 'px';
-        el.style.top = fromPos.top + 'px';
-      }
-    }
+  Object.keys(activeAnimations).forEach(pid => {
+    cancelAnimationFrame(activeAnimations[pid].rafId);
+    delete activeAnimations[pid];
   });
+  renderFullBoard();
+  for (let id = 0; id < 32; id++) {
+    const el = pieceElMap[id];
+    if (el) el.style.transition = 'none';
+  }
   void document.body.offsetWidth;
 
-  script.events.forEach(ev => {
-    setTimeout(() => {
-      applyPlaybackEvent(ev);
-    }, ev.t);
-  });
+  script.events.forEach(ev => { setTimeout(() => applyPlaybackEvent(ev), ev.t); });
 
   syncPlaybackTimer = setTimeout(() => {
+    Object.keys(activeAnimations).forEach(pid => {
+      cancelAnimationFrame(activeAnimations[pid].rafId);
+      delete activeAnimations[pid];
+    });
     for (let id = 0; id < 32; id++) {
       const el = pieceElMap[id];
       if (el) {
@@ -2507,53 +2173,119 @@ function playSyncPlayback(script) {
     }
     void document.body.offsetWidth;
 
+    // ★★★ 重播：完全恢复状态，不推进回合，不应用 effect
+    if (isReplay) {
+      board = replaySavedState.board;
+      deadRed = replaySavedState.deadRed;
+      deadBlack = replaySavedState.deadBlack;
+      skillBalls = replaySavedState.skillBalls;
+      skillEffects = replaySavedState.skillEffects;
+      skillTurnCounter = replaySavedState.skillTurnCounter;
+      nextBallSpawnAt = replaySavedState.nextBallSpawnAt;
+      stepBonus = replaySavedState.stepBonus;
+      syncRoundNum = replaySavedState.syncRoundNum;
+      currentPlayer = replaySavedState.currentPlayer;
+      gameOver = replaySavedState.gameOver;
+      gameEndReason = replaySavedState.gameEndReason;
+      lastMovedRow = replaySavedState.lastMovedRow;
+      lastMovedCol = replaySavedState.lastMovedCol;
+      if (replaySavedState.myColor) myColor = replaySavedState.myColor;
+      if (replaySavedState.hostColor) hostColor = replaySavedState.hostColor;
+      prevDeadRedCount = -1;
+      prevDeadBlackCount = -1;
+
+      syncPlaying = false;
+      renderFullBoard();
+      renderGraveyards();
+      renderSkillBalls();
+      renderSyncBar();
+      document.getElementById('statusText').textContent = '';
+      return;
+    }
+
+    // ★★★ 播放期间收到过 host 的新 sync → 已是最新状态，不用旧 script 覆盖
+    if (syncStateVersion !== startSyncVersion) {
+      syncPlaying = false;
+      renderFullBoard();
+      renderGraveyards();
+      renderSkillBalls();
+      renderSyncBar();
+      if (myRole === 'host') {
+        if (!gameOver) startSyncRound();
+      } else {
+        syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
+        selectedRow = -1; selectedCol = -1;
+        syncPathPieceId = -1; syncPathPiece = null;
+        syncPathCurrentPos = { row: -1, col: -1 };
+        clearParabolas(); highlightSyncQueue(); renderSyncBar();
+      }
+      return;
+    }
+
+    // ===== 正常播放流程 =====
     board = script.finalBoard.map(row => row.map(c => c ? { ...c } : null));
-    deadRed = [...script.deadRed];
-    deadBlack = [...script.deadBlack];
-    prevDeadRedCount = -1;
-    prevDeadBlackCount = -1;
-    renderFullBoard();
-    renderGraveyards();
+    deadRed = [...script.deadRed]; deadBlack = [...script.deadBlack];
+    prevDeadRedCount = -1; prevDeadBlackCount = -1;
+
+    if (script.finalBalls) { skillBalls = script.finalBalls.map(b => ({ ...b })); renderSkillBalls(); }
+
+    if (!onlineMode || myRole === 'host') {
+      if (script.ballEffects) {
+        script.ballEffects.forEach(ef => {
+          const exists = skillEffects.some(e => e.type === ef.type && e.targetId === ef.targetId && e.by === ef.by);
+          if (!exists) addEffect({ ...ef, roundsLeft: ef.duration || 5 });
+        });
+      }
+      if (script.goldenBalls && script.goldenBalls.length > 0) {
+        const myGoldens = script.goldenBalls.filter(gb => gb.side === (myRole || 'host'));
+        const oppGoldens = script.goldenBalls.filter(gb => gb.side !== (myRole || 'host'));
+        if (onlineMode) broadcastSync();
+        myGoldens.forEach(gb => {
+          setTimeout(() => {
+            enterTargetPickMode(gb.ballType, gb.side, (targetId) => {
+              const ef = { type: gb.ballType, targetId, roundsLeft: 10, golden: true, by: gb.side };
+              addEffect(ef); broadcastSync(); renderFullBoard();
+            });
+          }, 300);
+        });
+        oppGoldens.forEach(gb => {
+          send({ type: 'askGolden', userId: myUserId, toUserId: opponentUserId, ballType: gb.ballType, side: gb.side, duration: 10 });
+        });
+      } else {
+        if (onlineMode) broadcastSync();
+      }
+    }
+
+    renderFullBoard(); renderGraveyards();
     syncPlaying = false;
 
     const redCount = countPiecesByColor('red');
     const blackCount = countPiecesByColor('black');
     if (redCount === 0 || blackCount === 0) {
       const winnerColor = redCount === 0 ? 'black' : 'red';
-      gameOver = true;
-      currentPlayer = null;
+      gameOver = true; currentPlayer = null;
       if (onlineMode && myColor) {
         const myWin = (myColor === winnerColor);
         gameEndReason = myWin ? '你赢了！' : '你输了';
         if (myWin) playVictorySound(); else playDefeatSound();
         uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
-      } else {
-        playVictorySound();
-      }
-      showWinnerModal(winnerColor);
-      stopTimer();
-      return;
+      } else playVictorySound();
+      showWinnerModal(winnerColor); stopTimer(); return;
     }
-
-    if (myRole === 'host') {
-      startSyncRound();
-    } else {
-      syncMyQueue = [];
-      syncMySubmitted = false;
-      syncOppSubmitted = false;
+    if (myRole === 'host') startSyncRound();
+    else {
+      syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
       selectedRow = -1; selectedCol = -1;
-      clearParabolas();
-      highlightSyncQueue();
-      renderSyncBar();
+      syncPathPieceId = -1; syncPathPiece = null;
+      syncPathCurrentPos = { row: -1, col: -1 };
+      clearParabolas(); highlightSyncQueue(); renderSyncBar();
     }
   }, script.totalDuration + 200);
 }
 
 function applyPlaybackEvent(ev) {
   switch (ev.type) {
-    case 'flip':
-      playFlipSound();
-      break;
+    case 'flip': playFlipSound(); break;
     case 'moveStart':
       playMoveSound();
       animatePieceMove(ev.pieceId, ev.from, ev.to, ev.duration, ev.flying);
@@ -2562,19 +2294,17 @@ function applyPlaybackEvent(ev) {
       playCollisionSound();
       (ev.deadIds || ev.pieceIds).forEach(pid => {
         const el = pieceElMap[pid];
-        if (el) {
-          el.classList.add('dead-anim');
-          el.style.zIndex = '70';
-        }
+        if (el) { el.classList.add('dead-anim'); el.style.zIndex = '70'; }
       });
       break;
+    case 'ballEaten': playSkillSound(); break;
     case 'moveEnd': {
       const moverEl = pieceElMap[ev.pieceId];
       if (!moverEl) break;
-
+      const isAnimating = !!activeAnimations[ev.pieceId];
       if (ev.result === 'capture') {
         playCaptureSound();
-        if (ev.to) {
+        if (!isAnimating && ev.to) {
           const toPos = getPiecePos(ev.to.row, ev.to.col);
           moverEl.style.transition = 'none';
           moverEl.style.left = toPos.left + 'px';
@@ -2583,21 +2313,23 @@ function applyPlaybackEvent(ev) {
         }
         if (ev.targetPieceId !== undefined) {
           const deadEl = pieceElMap[ev.targetPieceId];
-          if (deadEl) {
-            deadEl.classList.add('dead-anim');
-            deadEl.style.zIndex = '70';
-          }
+          if (deadEl) { deadEl.classList.add('dead-anim'); deadEl.style.zIndex = '70'; }
         }
       } else if (ev.result === 'blocked') {
+        if (activeAnimations[ev.pieceId]) {
+          cancelAnimationFrame(activeAnimations[ev.pieceId].rafId);
+          delete activeAnimations[ev.pieceId];
+        }
         if (ev.from) {
           const fromPos = getPiecePos(ev.from.row, ev.from.col);
           moverEl.style.transition = 'none';
           moverEl.style.left = fromPos.left + 'px';
           moverEl.style.top = fromPos.top + 'px';
           moverEl.style.zIndex = '';
+          moverEl.classList.remove('flying-piece');
         }
       } else {
-        if (ev.to) {
+        if (!isAnimating && ev.to) {
           const toPos = getPiecePos(ev.to.row, ev.to.col);
           moverEl.style.transition = 'none';
           moverEl.style.left = toPos.left + 'px';
@@ -2612,90 +2344,83 @@ function applyPlaybackEvent(ev) {
 
 function animatePieceMove(pieceId, from, to, duration, flying) {
   const el = pieceElMap[pieceId];
-  if (!el) return;
-  if (!from || !to) return;
+  if (!el || !from || !to) return;
+  if (activeAnimations[pieceId]) {
+    cancelAnimationFrame(activeAnimations[pieceId].rafId);
+    delete activeAnimations[pieceId];
+  }
+  const fromPos = getPiecePos(from.row, from.col);
   const toPos = getPiecePos(to.row, to.col);
-  el.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
+  el.style.transition = 'none';
+  el.style.left = fromPos.left + 'px';
+  el.style.top = fromPos.top + 'px';
   el.style.zIndex = flying ? '60' : '50';
-  if (flying) el.classList.add('flying-piece');
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      el.style.left = toPos.left + 'px';
-      el.style.top = toPos.top + 'px';
-    });
-  });
-  setTimeout(() => {
-    el.style.transition = '';
-    el.classList.remove('flying-piece');
-    el.style.zIndex = '';
-  }, duration);
+  if (flying) el.classList.add('flying-piece'); else el.classList.remove('flying-piece');
+  const startTime = performance.now();
+  const animObj = { rafId: 0, pieceId };
+  activeAnimations[pieceId] = animObj;
+  function step(now) {
+    if (activeAnimations[pieceId] !== animObj) return;
+    const elapsed = now - startTime;
+    const t = duration > 0 ? Math.min(1, elapsed / duration) : 1;
+    const x = fromPos.left + (toPos.left - fromPos.left) * t;
+    const y = fromPos.top + (toPos.top - fromPos.top) * t;
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    if (t < 1) animObj.rafId = requestAnimationFrame(step);
+    else {
+      el.style.zIndex = '';
+      el.classList.remove('flying-piece');
+      delete activeAnimations[pieceId];
+    }
+  }
+  animObj.rafId = requestAnimationFrame(step);
 }
 
 function highlightSyncQueue() {
   document.querySelectorAll('.piece.sync-selected').forEach(el => el.classList.remove('sync-selected'));
   document.querySelectorAll('.cell.sync-target').forEach(el => el.classList.remove('sync-target'));
   clearParabolas();
-
   if (selectedRow !== -1 && selectedCol !== -1) {
-    const d = board[selectedRow][selectedCol];
+    const d = board[selectedRow]?.[selectedCol];
     if (d && !d.hidden && d.id !== undefined) {
       const el = pieceElMap[d.id];
       if (el) el.classList.add('sync-selected');
     }
   }
-
   syncMyQueue.forEach(act => {
     if (act.type === 'flip') {
       const cell = cellEls[act.row]?.[act.col];
       if (cell) cell.classList.add('sync-target');
     } else if (act.type === 'move' || act.type === 'capture') {
-      const fromData = board[act.fromRow]?.[act.fromCol];
-      if (fromData && fromData.id !== undefined) {
-        const el = pieceElMap[fromData.id];
-        if (el) el.classList.add('sync-selected');
-      }
+      if (act.pieceId !== undefined && pieceElMap[act.pieceId]) pieceElMap[act.pieceId].classList.add('sync-selected');
       const toCell = cellEls[act.toRow]?.[act.toCol];
       if (toCell) toCell.classList.add('sync-target');
-      if (act.type === 'capture') {
-        drawParabola(act.fromRow, act.fromCol, act.toRow, act.toCol);
-      }
+      if (act.type === 'capture') drawParabola(act.fromRow, act.fromCol, act.toRow, act.toCol);
     }
   });
 }
-
 function drawParabola(fromRow, fromCol, toRow, toCol) {
   const svg = document.getElementById('boardOverlay');
   if (!svg) return;
   const CELL = 76;
-  const x1 = fromCol * CELL + CELL / 2;
-  const y1 = fromRow * CELL + CELL / 2;
-  const x2 = toCol * CELL + CELL / 2;
-  const y2 = toRow * CELL + CELL / 2;
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2 - 40;
+  const x1 = fromCol * CELL + CELL / 2, y1 = fromRow * CELL + CELL / 2;
+  const x2 = toCol * CELL + CELL / 2, y2 = toRow * CELL + CELL / 2;
+  const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2 - 40;
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
-  path.setAttribute('stroke', '#ffaa00');
-  path.setAttribute('stroke-width', '3');
-  path.setAttribute('fill', 'none');
-  path.setAttribute('stroke-dasharray', '6 4');
-  path.setAttribute('opacity', '0.9');
-  path.classList.add('sync-parabola');
+  path.setAttribute('stroke', '#ffaa00'); path.setAttribute('stroke-width', '3');
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke-dasharray', '6 4');
+  path.setAttribute('opacity', '0.9'); path.classList.add('sync-parabola');
   svg.appendChild(path);
   const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  circle.setAttribute('cx', x2);
-  circle.setAttribute('cy', y2);
-  circle.setAttribute('r', '6');
-  circle.setAttribute('fill', '#ffaa00');
-  circle.setAttribute('opacity', '0.85');
+  circle.setAttribute('cx', x2); circle.setAttribute('cy', y2); circle.setAttribute('r', '6');
+  circle.setAttribute('fill', '#ffaa00'); circle.setAttribute('opacity', '0.85');
   circle.classList.add('sync-parabola');
   svg.appendChild(circle);
 }
-
 function clearParabolas() {
   const svg = document.getElementById('boardOverlay');
-  if (!svg) return;
-  svg.innerHTML = '';
+  if (svg) svg.innerHTML = '';
 }
 
 // ============================================================
@@ -2709,21 +2434,17 @@ function initBoard() {
     const j = Math.floor(Math.random() * (i + 1));
     [allPieces[i], allPieces[j]] = [allPieces[j], allPieces[i]];
   }
-  let idx = 0;
-  board = [];
+  let idx = 0; board = [];
   for (let r = 0; r < ROWS; r++) {
     const row = [];
-    for (let c = 0; c < COLS; c++) {
-      row.push({ piece: allPieces[idx], hidden: true, id: idx });
-      idx++;
-    }
+    for (let c = 0; c < COLS; c++) { row.push({ piece: allPieces[idx], hidden: true, id: idx, speedMul: 1 }); idx++; }
     board.push(row);
   }
 }
 function getCellPos(row, col) { return { left: col * CELL_SIZE, top: row * CELL_SIZE }; }
 function getPiecePos(row, col) { return { left: col * CELL_SIZE + OFFSET, top: row * CELL_SIZE + OFFSET }; }
 function cloneBoard(b) {
-  return b.map(row => row.map(cell => cell ? { piece: cell.piece, hidden: cell.hidden, id: cell.id } : null));
+  return b.map(row => row.map(cell => cell ? { piece: cell.piece, hidden: cell.hidden, id: cell.id, speedMul: cell.speedMul || 1 } : null));
 }
 
 let cellEls = [];
@@ -2733,9 +2454,7 @@ let boardDomBuilt = false;
 function buildBoardDOM() {
   const boardEl = document.getElementById('board');
   boardEl.innerHTML = '';
-  pieceElMap = {};
-  cellEls = [];
-  boardDomBuilt = true;
+  pieceElMap = {}; cellEls = []; boardDomBuilt = true;
   for (let r = 0; r < ROWS; r++) {
     cellEls[r] = [];
     for (let c = 0; c < COLS; c++) {
@@ -2743,8 +2462,7 @@ function buildBoardDOM() {
       cell.className = 'cell';
       cell.dataset.row = r; cell.dataset.col = c;
       const pos = getCellPos(r, c);
-      cell.style.left = pos.left + 'px';
-      cell.style.top = pos.top + 'px';
+      cell.style.left = pos.left + 'px'; cell.style.top = pos.top + 'px';
       cell.addEventListener('click', () => handleCellClick(r, c));
       boardEl.appendChild(cell);
       cellEls[r][c] = cell;
@@ -2758,8 +2476,7 @@ function buildBoardDOM() {
     el.dataset.id = id;
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      const rr = parseInt(el.dataset.row);
-      const cc = parseInt(el.dataset.col);
+      const rr = parseInt(el.dataset.row), cc = parseInt(el.dataset.col);
       if (!isNaN(rr) && !isNaN(cc)) handleCellClick(rr, cc);
     });
     boardEl.appendChild(el);
@@ -2778,18 +2495,12 @@ function pushHistory() {
 function doUndoLocal() {
   if (history.length === 0) return;
   const prev = history.pop();
-  board = prev.board;
-  currentPlayer = prev.currentPlayer;
-  gameOver = prev.gameOver;
-  deadRed = prev.deadRed;
-  deadBlack = prev.deadBlack;
-  lastMovedRow = prev.lastMovedRow;
-  lastMovedCol = prev.lastMovedCol;
+  board = prev.board; currentPlayer = prev.currentPlayer; gameOver = prev.gameOver;
+  deadRed = prev.deadRed; deadBlack = prev.deadBlack;
+  lastMovedRow = prev.lastMovedRow; lastMovedCol = prev.lastMovedCol;
   selectedRow = -1; selectedCol = -1;
   turnStartTs = performance.now();
-  renderFullBoard();
-  renderGraveyards();
-  updateColorLabel();
+  renderFullBoard(); renderGraveyards(); updateColorLabel();
 }
 function undo() {
   if (gameOver) return;
@@ -2807,8 +2518,7 @@ function renderGraveyards() {
     redEl.innerHTML = '';
     deadRed.forEach(piece => {
       const el = document.createElement('div');
-      el.className = 'dead-piece red-dead';
-      el.textContent = piece;
+      el.className = 'dead-piece red-dead'; el.textContent = piece;
       redEl.appendChild(el);
     });
     prevDeadRedCount = deadRed.length;
@@ -2817,8 +2527,7 @@ function renderGraveyards() {
     blackEl.innerHTML = '';
     deadBlack.forEach(piece => {
       const el = document.createElement('div');
-      el.className = 'dead-piece black-dead';
-      el.textContent = piece;
+      el.className = 'dead-piece black-dead'; el.textContent = piece;
       blackEl.appendChild(el);
     });
     prevDeadBlackCount = deadBlack.length;
@@ -2854,11 +2563,8 @@ function getValidMoves(row, col) {
     else if (!target.hidden) {
       const targetColor = getPieceColor(target.piece);
       if (targetColor !== color) {
-        if (isCannon) {
-          if (isValidCannonCapture(row, col, nr, nc, board)) moves.push({ row: nr, col: nc, isCapture: true });
-        } else {
-          if (canCapture(piece, target.piece)) moves.push({ row: nr, col: nc, isCapture: true });
-        }
+        if (isCannon) { if (isValidCannonCapture(row, col, nr, nc, board)) moves.push({ row: nr, col: nc, isCapture: true }); }
+        else { if (canCapture(piece, target.piece)) moves.push({ row: nr, col: nc, isCapture: true }); }
       }
     }
   }
@@ -2872,9 +2578,7 @@ function getValidMoves(row, col) {
           else {
             if (!target.hidden) {
               const targetColor = getPieceColor(target.piece);
-              if (targetColor !== color && !moves.some(m => m.row === r && m.col === c)) {
-                moves.push({ row: r, col: c, isCapture: true });
-              }
+              if (targetColor !== color && !moves.some(m => m.row === r && m.col === c)) moves.push({ row: r, col: c, isCapture: true });
             }
             break;
           }
@@ -2887,9 +2591,7 @@ function getValidMoves(row, col) {
 }
 function updateCellHighlights() {
   let validMoves = [];
-  if (selectedRow !== -1 && selectedCol !== -1 && !gameOver) {
-    validMoves = getValidMoves(selectedRow, selectedCol);
-  }
+  if (selectedRow !== -1 && selectedCol !== -1 && !gameOver) validMoves = getValidMoves(selectedRow, selectedCol);
   const moveMap = {};
   validMoves.forEach(m => { moveMap[m.row + ',' + m.col] = m.isCapture; });
   for (let r = 0; r < ROWS; r++) {
@@ -2906,10 +2608,7 @@ function updateCellHighlights() {
 }
 function refreshSelection() {
   if (!boardDomBuilt) return;
-  for (let id = 0; id < 32; id++) {
-    const el = pieceElMap[id];
-    if (el) el.classList.remove('selected');
-  }
+  for (let id = 0; id < 32; id++) { const el = pieceElMap[id]; if (el) el.classList.remove('selected'); }
   if (selectedRow !== -1 && selectedCol !== -1) {
     const d = board[selectedRow]?.[selectedCol];
     if (d && !d.hidden && d.id !== undefined) {
@@ -2922,32 +2621,24 @@ function refreshSelection() {
 function renderFullBoard() {
   if (!boardDomBuilt) buildBoardDOM();
   const idPos = {};
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const d = board[r][c];
-      if (d && d.id !== undefined && d.id !== null) idPos[d.id] = { r, c, data: d };
-    }
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    const d = board[r][c];
+    if (d && d.id !== undefined && d.id !== null) idPos[d.id] = { r, c, data: d };
   }
   for (let id = 0; id < 32; id++) {
     const el = pieceElMap[id];
     if (!el) continue;
     const info = idPos[id];
-    if (!info) {
-      if (el.style.display !== 'none') el.style.display = 'none';
-      continue;
-    }
+    if (!info) { if (el.style.display !== 'none') el.style.display = 'none'; continue; }
     const { r, c, data } = info;
     const pos = getPiecePos(r, c);
-    el.style.left = pos.left + 'px';
-    el.style.top = pos.top + 'px';
+    el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px';
     el.style.display = '';
     el.dataset.row = r; el.dataset.col = c;
     const wasHidden = el.classList.contains('hidden-piece');
     el.className = 'piece';
-    if (data.hidden) {
-      el.classList.add('hidden-piece');
-      el.textContent = '';
-    } else {
+    if (data.hidden) { el.classList.add('hidden-piece'); el.textContent = ''; }
+    else {
       el.textContent = data.piece;
       const color = getPieceColor(data.piece);
       if (color === 'red') el.classList.add('red-piece');
@@ -2956,17 +2647,22 @@ function renderFullBoard() {
     if (selectedRow === r && selectedCol === c && !data.hidden && !gameOver) el.classList.add('selected');
     if (lastMovedRow === r && lastMovedCol === c) el.classList.add('last-moved');
     if (wasHidden && !data.hidden) playAnim(el, 'flip-in');
+    const efs = getPieceEffects(id);
+    if (efs.length > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'effect-badge';
+      const types = efs.map(e => e.type).join('');
+      badge.textContent = types;
+      badge.classList.add(types[0] === '+' ? 'plus' : 'minus');
+      el.appendChild(badge);
+    }
+    if (targetPickMode && !data.hidden) el.classList.add('target-pick-hint');
   }
-  updateCellHighlights();
-  updateTurnIcon();
-  updateButtons();
-  if (gameMode === 'sync' && !syncPlaying) {
-    highlightSyncQueue();
-  }
+  updateCellHighlights(); updateTurnIcon(); updateButtons();
+  if (gameMode === 'sync' && !syncPlaying) highlightSyncQueue();
 }
 function playAnim(el, cls) {
-  el.classList.remove(cls);
-  void el.offsetWidth;
+  el.classList.remove(cls); void el.offsetWidth;
   el.classList.add(cls);
   const onEnd = () => { el.classList.remove(cls); el.removeEventListener('animationend', onEnd); };
   el.addEventListener('animationend', onEnd);
@@ -2975,16 +2671,8 @@ function updateTurnIcon() {
   const el = document.getElementById('turnIcon');
   const st = document.getElementById('statusText');
   el.className = 'turn-icon';
-  if (gameOver) {
-    el.classList.add('unknown-icon'); el.textContent = '';
-    st.textContent = gameEndReason || '对局结束';
-    return;
-  }
-  if (gameMode === 'sync') {
-    el.classList.add('unknown-icon'); el.textContent = '';
-    // ★ 不再设置 statusText
-    return;
-  }
+  if (gameOver) { el.classList.add('unknown-icon'); el.textContent = ''; st.textContent = gameEndReason || '对局结束'; return; }
+  if (gameMode === 'sync') { el.classList.add('unknown-icon'); el.textContent = ''; return; }
   if (currentPlayer === 'red') { el.classList.add('red-icon'); el.textContent = '帥'; }
   else if (currentPlayer === 'black') { el.classList.add('black-icon'); el.textContent = '將'; }
   else { el.classList.add('unknown-icon'); el.textContent = ''; }
@@ -2992,27 +2680,19 @@ function updateTurnIcon() {
     if (currentPlayer === 'red') st.textContent = '轮到红方';
     else if (currentPlayer === 'black') st.textContent = '轮到黑方';
     else st.textContent = '请翻棋开局';
-  } else if (currentPlayer) {
-    st.textContent = isMyTurn() ? '★ 轮到你走棋' : '等待对方走棋...';
-  } else {
-    st.textContent = '';
-  }
+  } else if (currentPlayer) st.textContent = isMyTurn() ? '★ 轮到你走棋' : '等待对方走棋...';
+  else st.textContent = '';
 }
 function updateButtons() {
   const yieldBtn = document.getElementById('yieldBtn');
   const undoBtn = document.getElementById('undoBtn');
   const drawBtn = document.getElementById('drawBtn');
   const resignBtn = document.getElementById('resignBtn');
-  if (gameOver) {
-    yieldBtn.disabled = true; undoBtn.disabled = true;
-    drawBtn.disabled = true; resignBtn.disabled = true;
-    return;
-  }
+  if (gameOver) { yieldBtn.disabled = true; undoBtn.disabled = true; drawBtn.disabled = true; resignBtn.disabled = true; return; }
   if (!onlineMode) { undoBtn.disabled = history.length === 0; return; }
   yieldBtn.disabled = !(myRole === 'host' && currentPlayer === 'host');
   undoBtn.disabled = history.length === 0 || gameMode === 'sync';
-  drawBtn.disabled = false;
-  resignBtn.disabled = false;
+  drawBtn.disabled = false; resignBtn.disabled = false;
 }
 function countPiecesByColor(color) {
   let n = 0;
@@ -3027,25 +2707,16 @@ function checkGameOver() {
   const blackCount = countPiecesByColor('black');
   if (redCount === 0 || blackCount === 0) {
     const winnerColor = redCount === 0 ? 'black' : 'red';
-    gameOver = true;
-    currentPlayer = null;
+    gameOver = true; currentPlayer = null;
     if (onlineMode && myColor) {
       const myWin = (myColor === winnerColor);
       const reason = myWin ? '你赢了！' : '你输了';
       gameEndReason = reason + `（${winnerColor === 'red' ? '红方' : '黑方'}获胜）`;
-      if (!recordUploaded) {
-        uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
-      }
-    } else {
-      gameEndReason = (winnerColor === 'red' ? '红方胜' : '黑方胜');
-    }
-    if (onlineMode && myColor) {
-      if (myColor === winnerColor) playVictorySound();
-      else playDefeatSound();
-    } else playVictorySound();
-    showWinnerModal(winnerColor);
-    stopTimer();
-    return true;
+      if (!recordUploaded) uploadMyRecord(opponentUserId, myWin ? 1 : 0, myWin ? 0 : 1);
+    } else gameEndReason = (winnerColor === 'red' ? '红方胜' : '黑方胜');
+    if (onlineMode && myColor) { if (myColor === winnerColor) playVictorySound(); else playDefeatSound(); }
+    else playVictorySound();
+    showWinnerModal(winnerColor); stopTimer(); return true;
   }
   return false;
 }
@@ -3054,12 +2725,10 @@ function checkGameOver() {
 //                        点击处理
 // ============================================================
 function handleCellClick(row, col) {
+  if (targetPickMode) { handleTargetPickClick(row, col); return; }
   if (gameOver) return;
   if (isReconnecting) { showBanner('正在重连，请稍候...', 'error', 1500); return; }
-  if (gameMode === 'sync') {
-    handleSyncCellClick(row, col);
-    return;
-  }
+  if (gameMode === 'sync') { handleSyncCellClick(row, col); return; }
   if (onlineMode && !isMyTurn()) {
     if (currentPlayer === 'host') showBanner('等待房主先翻棋...', 'info', 1000);
     else if (currentPlayer === 'guest') showBanner('等待客机先翻棋...', 'info', 1000);
@@ -3103,8 +2772,7 @@ function handleCellClick(row, col) {
   if (pieceColor === currentPlayer) {
     if (selectedRow === row && selectedCol === col) { selectedRow = -1; selectedCol = -1; }
     else { selectedRow = row; selectedCol = col; }
-    refreshSelection();
-    return;
+    refreshSelection(); return;
   }
   if (selectedRow !== -1 && selectedCol !== -1) {
     const fromRow = selectedRow, fromCol = selectedCol;
@@ -3136,131 +2804,123 @@ function handleCellClick(row, col) {
 function handleSyncCellClick(row, col) {
   if (syncPlaying) { showBanner('播放中，请稍候', 'info', 1200); return; }
   if (syncMySubmitted) { showBanner('已提交，等待对手', 'info', 1200); return; }
-
-  const cellData = board[row][col];
-
+  const cellData = board[row]?.[col];
   if (cellData && cellData.hidden) {
+    if (syncPathPieceId !== -1) {
+      syncPathPieceId = -1; syncPathPiece = null;
+      selectedRow = -1; selectedCol = -1; highlightSyncQueue(); return;
+    }
     const idx = syncMyQueue.findIndex(a => a.type === 'flip' && a.row === row && a.col === col);
-    if (idx >= 0) {
-      removeSyncActionWithDeps(idx);
-      return;
-    }
+    if (idx >= 0) { removeSyncActionWithDeps(idx); return; }
     if (!cellData.piece) { showBanner('这里没有棋子', 'error', 1200); return; }
-    if (syncMyQueue.length >= syncStepsPerRound) {
-      showBanner('已达本回合步数上限', 'error', 1500);
-      return;
-    }
+    const myBonus = stepBonus[myRole] || 0;
+    const maxSteps = Math.max(1, syncStepsPerRound + myBonus);
+    if (syncMyQueue.length >= maxSteps) { showBanner('已达本回合步数上限', 'error', 1500); return; }
     const act = { type: 'flip', row, col };
     const conflict = checkSyncQueueConflict(act);
     if (conflict) { showBanner(conflict, 'error', 1500); return; }
     syncMyQueue.push(act);
     selectedRow = -1; selectedCol = -1;
-    highlightSyncQueue();
-    renderSyncBar();
-    return;
+    highlightSyncQueue(); renderSyncBar(); return;
   }
-
+  if (syncPathPieceId !== -1) {
+    if (cellData && !cellData.hidden && cellData.id === syncPathPieceId &&
+      !(syncPathCurrentPos.row === row && syncPathCurrentPos.col === col)) {
+      syncPathPieceId = -1; syncPathPiece = null;
+      selectedRow = -1; selectedCol = -1; highlightSyncQueue(); return;
+    }
+    if (syncPathCurrentPos.row === row && syncPathCurrentPos.col === col) {
+      syncPathPieceId = -1; syncPathPiece = null;
+      selectedRow = -1; selectedCol = -1; highlightSyncQueue(); return;
+    }
+    const rd = Math.abs(syncPathCurrentPos.row - row);
+    const cd = Math.abs(syncPathCurrentPos.col - col);
+    const dist = rd + cd;
+    const isCannonPiece = (syncPathPiece === '炮' || syncPathPiece === '砲');
+    const targetCell = board[row]?.[col];
+    const isTargetEnemy = targetCell && !targetCell.hidden &&
+      getPieceColor(targetCell.piece) !== getPieceColor(syncPathPiece);
+    const isCannonCaptureClick = isCannonPiece && isTargetEnemy &&
+      (syncPathCurrentPos.row === row || syncPathCurrentPos.col === col) && dist >= 2;
+    if (dist !== 1 && !isCannonCaptureClick) {
+      syncPathPieceId = -1; syncPathPiece = null;
+      selectedRow = -1; selectedCol = -1; highlightSyncQueue(); return;
+    }
+    const myBonus = stepBonus[myRole] || 0;
+    const maxSteps = Math.max(1, syncStepsPerRound + myBonus);
+    if (syncMyQueue.length >= maxSteps) { showBanner('已达本回合步数上限', 'error', 1500); return; }
+    if (targetCell && targetCell.hidden) { showBanner('不能移动到未翻开的棋子上', 'error', 1200); return; }
+    let act;
+    if (targetCell === null || targetCell === undefined) {
+      act = { type: 'move', fromRow: syncPathCurrentPos.row, fromCol: syncPathCurrentPos.col, toRow: row, toCol: col, pieceId: syncPathPieceId };
+    } else {
+      const targetColor = getPieceColor(targetCell.piece);
+      const fromColor = getPieceColor(syncPathPiece);
+      if (targetColor === fromColor) { showBanner('不能移动到己方棋子', 'error', 1200); return; }
+      const projected = getProjectedBoard();
+      let canEat = false;
+      if (isCannonPiece) canEat = isValidCannonCapture(syncPathCurrentPos.row, syncPathCurrentPos.col, row, col, projected);
+      else canEat = canCapture(syncPathPiece, targetCell.piece);
+      if (!canEat) { showBanner('无法吃这个棋子', 'error', 1200); return; }
+      act = { type: 'capture', fromRow: syncPathCurrentPos.row, fromCol: syncPathCurrentPos.col, toRow: row, toCol: col, pieceId: syncPathPieceId };
+    }
+    const conflict = checkSyncQueueConflict(act);
+    if (conflict) { showBanner(conflict, 'error', 1500); return; }
+    syncMyQueue.push(act);
+    syncPathCurrentPos = { row, col };
+    selectedRow = row; selectedCol = col;
+    highlightSyncQueue(); renderSyncBar(); return;
+  }
   if (cellData && !cellData.hidden) {
     const mvIdx = syncMyQueue.findIndex(a =>
-      (a.type === 'move' || a.type === 'capture') &&
-      a.fromRow === row && a.fromCol === col
-    );
-    if (mvIdx >= 0) {
-      removeSyncActionWithDeps(mvIdx);
-      return;
-    }
+      (a.type === 'move' || a.type === 'capture') && a.fromRow === row && a.fromCol === col);
+    if (mvIdx >= 0) { removeSyncActionWithDeps(mvIdx); return; }
   }
-
-  if (selectedRow !== -1 && selectedCol !== -1) {
-    if (selectedRow === row && selectedCol === col) {
-      selectedRow = -1; selectedCol = -1;
-      highlightSyncQueue();
-      return;
-    }
-    const fromData = board[selectedRow][selectedCol];
-    const fromPiece = fromData?.piece;
-
-    if (cellData === null && fromPiece) {
-      const rd = Math.abs(selectedRow - row), cd = Math.abs(selectedCol - col);
-      if (rd + cd !== 1) { showBanner('只能走一格', 'error', 1200); return; }
-      if (syncMyQueue.length >= syncStepsPerRound) {
-        showBanner('已达本回合步数上限', 'error', 1500);
-        return;
-      }
-      const act = {
-        type: 'move',
-        fromRow: selectedRow, fromCol: selectedCol,
-        toRow: row, toCol: col
-      };
-      const conflict = checkSyncQueueConflict(act);
-      if (conflict) { showBanner(conflict, 'error', 1500); return; }
-      syncMyQueue.push(act);
-      selectedRow = -1; selectedCol = -1;
-      highlightSyncQueue();
-      renderSyncBar();
-      return;
-    }
-
-    if (cellData && !cellData.hidden && fromPiece &&
-        getPieceColor(fromPiece) !== getPieceColor(cellData.piece)) {
-      const rd = Math.abs(selectedRow - row), cd = Math.abs(selectedCol - col);
-      let canEat = false;
-      if (fromPiece === '炮' || fromPiece === '砲') {
-        canEat = isValidCannonCapture(selectedRow, selectedCol, row, col, board);
-      } else {
-        canEat = (rd + cd === 1) && canCapture(fromPiece, cellData.piece);
-      }
-      if (!canEat) { showBanner('无法吃这个棋子', 'error', 1200); return; }
-      if (syncMyQueue.length >= syncStepsPerRound) {
-        showBanner('已达本回合步数上限', 'error', 1500);
-        return;
-      }
-      const act = {
-        type: 'capture',
-        fromRow: selectedRow, fromCol: selectedCol,
-        toRow: row, toCol: col
-      };
-      const conflict = checkSyncQueueConflict(act);
-      if (conflict) { showBanner(conflict, 'error', 1500); return; }
-      syncMyQueue.push(act);
-      selectedRow = -1; selectedCol = -1;
-      highlightSyncQueue();
-      renderSyncBar();
-      return;
-    }
-  }
-
   if (cellData && !cellData.hidden) {
     const color = getPieceColor(cellData.piece);
-    if (color !== myColor) {
-      showBanner('只能操作自己的棋子', 'error', 1200);
-      return;
-    }
+    if (color !== myColor) { showBanner('只能操作自己的棋子', 'error', 1200); return; }
+    syncPathPieceId = cellData.id;
+    syncPathPiece = cellData.piece;
+    syncPathCurrentPos = { row, col };
     selectedRow = row; selectedCol = col;
-    highlightSyncQueue();
-    return;
+    highlightSyncQueue(); return;
   }
+}
+
+function getProjectedBoard(excludeIdx) {
+  const proj = board.map(row => row.map(c => c ? { ...c } : null));
+  syncMyQueue.forEach((a, i) => {
+    if (i === excludeIdx) return;
+    if (a.type === 'move' || a.type === 'capture') {
+      const fromCell = proj[a.fromRow]?.[a.fromCol];
+      if (fromCell) { proj[a.toRow][a.toCol] = fromCell; proj[a.fromRow][a.fromCol] = null; }
+    }
+  });
+  return proj;
 }
 
 function executeMove(fromRow, fromCol, toRow, toCol, movingPiece, targetPiece, skipBroadcast) {
   const targetColor = targetPiece ? getPieceColor(targetPiece) : null;
-  if (targetPiece) {
-    if (targetColor === 'red') deadRed.push(targetPiece);
-    else if (targetColor === 'black') deadBlack.push(targetPiece);
-  }
+  if (targetPiece) { if (targetColor === 'red') deadRed.push(targetPiece); else if (targetColor === 'black') deadBlack.push(targetPiece); }
   const movingId = board[fromRow][fromCol]?.id;
-  board[toRow][toCol] = { piece: movingPiece, hidden: false, id: movingId };
+  const speedMul = board[fromRow][fromCol]?.speedMul || 1;
+  board[toRow][toCol] = { piece: movingPiece, hidden: false, id: movingId, speedMul };
   board[fromRow][fromCol] = null;
   lastMovedRow = toRow; lastMovedCol = toCol;
   selectedRow = -1; selectedCol = -1;
   if (targetPiece) playCaptureSound(); else playMoveSound();
-  checkGameOver();
-  if (!gameOver) {
-    currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
-    turnStartTs = performance.now();
+  if (gameMode === 'classic') {
+    const ball = ballAt(toRow, toCol);
+    if (ball) {
+      const side = getPieceColor(movingPiece) === hostColor ? 'host' : 'guest';
+      const eaterSide = !onlineMode ? (myRole || 'host') : side;
+      handleBallEatenClassic(ball, movingId, eaterSide);
+    }
   }
-  renderFullBoard();
-  renderGraveyards();
+  checkGameOver();
+  if (!gameOver) { currentPlayer = (currentPlayer === 'red' ? 'black' : 'red'); turnStartTs = performance.now(); }
+  if (!gameOver) onTurnAdvance();
+  renderFullBoard(); renderGraveyards();
   if (!skipBroadcast && onlineMode && myRole === 'host') broadcastSync();
 }
 function executeFlip(row, col, skipBroadcast) {
@@ -3275,20 +2935,14 @@ function executeFlip(row, col, skipBroadcast) {
     currentPlayer = (flippedColor === 'red' ? 'black' : 'red');
   } else if (currentPlayer === 'guest') {
     hostColor = (flippedColor === 'red' ? 'black' : 'red');
-    if (onlineMode) {
-      if (myRole === 'guest') myColor = flippedColor;
-      else if (myRole === 'host') myColor = hostColor;
-    }
+    if (onlineMode) { if (myRole === 'guest') myColor = flippedColor; else if (myRole === 'host') myColor = hostColor; }
     currentPlayer = (flippedColor === 'red' ? 'black' : 'red');
-  } else if (currentPlayer === 'red' || currentPlayer === 'black') {
-    currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
-  }
+  } else if (currentPlayer === 'red' || currentPlayer === 'black') currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
   selectedRow = -1; selectedCol = -1;
   checkGameOver();
   if (!gameOver) turnStartTs = performance.now();
-  renderFullBoard();
-  renderGraveyards();
-  updateColorLabel();
+  if (!gameOver) onTurnAdvance();
+  renderFullBoard(); renderGraveyards(); updateColorLabel();
   if (!skipBroadcast && onlineMode && myRole === 'host') broadcastSync();
 }
 function handleGuestAction(msg) {
@@ -3303,59 +2957,41 @@ function handleGuestAction(msg) {
     if (targetPiece && getPieceColor(targetPiece) === getPieceColor(movingPiece)) { broadcastSync(); return; }
     const rd = Math.abs(from.row - to.row), cd = Math.abs(from.col - to.col);
     if (movingPiece === '炮' || movingPiece === '砲') {
-      if (targetPiece) {
-        if (!isValidCannonCapture(from.row, from.col, to.row, to.col, board)) { broadcastSync(); return; }
-      } else {
-        if (rd + cd !== 1) { broadcastSync(); return; }
-      }
+      if (targetPiece) { if (!isValidCannonCapture(from.row, from.col, to.row, to.col, board)) { broadcastSync(); return; } }
+      else { if (rd + cd !== 1) { broadcastSync(); return; } }
     } else {
       if (targetPiece && !canCapture(movingPiece, targetPiece)) { broadcastSync(); return; }
       if (rd + cd !== 1) { broadcastSync(); return; }
     }
-    commitTurnTime();
-    pushHistory();
+    commitTurnTime(); pushHistory();
     executeMove(from.row, from.col, to.row, to.col, movingPiece, targetPiece);
   } else if (msg.type === 'flip') {
     const { row, col } = msg;
     if (!board[row] || !board[row][col] || !board[row][col].hidden) { broadcastSync(); return; }
-    if (currentPlayer !== 'host' && currentPlayer !== 'guest' &&
-        currentPlayer !== 'red' && currentPlayer !== 'black') { broadcastSync(); return; }
-    commitTurnTime();
-    pushHistory();
+    if (currentPlayer !== 'host' && currentPlayer !== 'guest' && currentPlayer !== 'red' && currentPlayer !== 'black') { broadcastSync(); return; }
+    commitTurnTime(); pushHistory();
     executeFlip(row, col);
   }
 }
 function resetGame() {
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
   lastOpponentUserId = '';
-
-  initBoard();
+  initBoard(); resetSkillState();
   currentPlayer = 'host';
   gameOver = false; gameEndReason = '';
   selectedRow = -1; selectedCol = -1;
   lastMovedRow = -1; lastMovedCol = -1;
-  deadRed = []; deadBlack = [];
-  history = [];
-  pendingUndoRequest = false;
-  pendingDrawRequest = false;
-  recordUploaded = false;
-  syncRoundNum = 0;
-  syncMyQueue = [];
-  syncMySubmitted = false;
-  syncOppSubmitted = false;
-  syncPlaying = false;
-  lastPlaybackScript = null;
-  lastPlaybackStartState = null;
+  deadRed = []; deadBlack = []; history = [];
+  pendingUndoRequest = false; pendingDrawRequest = false; recordUploaded = false;
+  syncRoundNum = 0; syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false; syncPlaying = false;
+  syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
+  lastPlaybackScript = null; lastPlaybackStartState = null;
   resetTimersForNewGame();
-  buildBoardDOM();
-  renderFullBoard();
-  renderGraveyards();
-  const log = document.getElementById('chatLog');
-  if (log) log.innerHTML = '';
+  buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
+  const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
   if (gameMode === 'sync') {
     document.getElementById('syncBar').classList.remove('hidden');
-    renderSyncBar();
-    startSyncRound();
+    renderSyncBar(); startSyncRound();
   } else {
     document.getElementById('syncBar').classList.add('hidden');
     startTimer();
@@ -3363,9 +2999,8 @@ function resetGame() {
 }
 document.getElementById('resetBtn').addEventListener('click', () => {
   if (onlineMode) {
-    if (myRole === 'host') {
-      if (confirm('确定重新开局？')) startGameAsHost();
-    } else showBanner('只有房主可以重新开局', 'error', 2000);
+    if (myRole === 'host') { if (confirm('确定重新开局？')) startGameAsHost(); }
+    else showBanner('只有房主可以重新开局', 'error', 2000);
   } else resetGame();
 });
 document.getElementById('undoBtn').addEventListener('click', undo);
@@ -3379,10 +3014,8 @@ function yieldFirst() {
   if (!onlineMode) { showBanner('离线模式无需让先', 'error', 1500); return; }
   if (myRole !== 'host') { showBanner('只有房主可以让先', 'error', 1500); return; }
   if (currentPlayer !== 'host') { showBanner('开局后才能让先', 'error', 1500); return; }
-  currentPlayer = 'guest';
-  turnStartTs = performance.now();
-  broadcastSync();
-  send({ type: 'yieldFirst', userId: myUserId });
+  currentPlayer = 'guest'; turnStartTs = performance.now();
+  broadcastSync(); send({ type: 'yieldFirst', userId: myUserId });
   showBanner('已让先给对手', 'info', 1500);
   renderFullBoard();
 }
@@ -3397,22 +3030,15 @@ function requestDraw() {
 function resign() {
   if (gameOver) return;
   if (!confirm('确定认输吗？')) return;
-  if (onlineMode) {
-    send({ type: 'resign', userId: myUserId });
-    endGame('你认输了', 'loss');
-  } else endGame('你认输了', 'loss');
+  if (onlineMode) { send({ type: 'resign', userId: myUserId }); endGame('你认输了', 'loss'); }
+  else endGame('你认输了', 'loss');
 }
 function endGame(reason, type) {
   if (gameOver) return;
-  gameOver = true;
-  currentPlayer = null;
-  gameEndReason = reason;
+  gameOver = true; currentPlayer = null; gameEndReason = reason;
   selectedRow = -1; selectedCol = -1;
   stopTimer();
-  stopRoomHeartbeat();
   if (oppDisconnectTimer) { clearInterval(oppDisconnectTimer); oppDisconnectTimer = null; }
-  const modal = document.getElementById('oppDisconnectModal');
-  if (modal) modal.classList.remove('show');
   lastOpponentUserId = '';
   renderFullBoard();
   showBanner(reason, 'info', 5000);
@@ -3441,11 +3067,8 @@ function endGame(reason, type) {
 // ============================================================
 function getPlayerNameByColor(color) {
   if (!onlineMode) return color === 'red' ? '红方' : '黑方';
-  if (hostColor === color) {
-    return myRole === 'host' ? (myUsername || '房主') : (opponentUsername || '房主');
-  } else {
-    return myRole === 'guest' ? (myUsername || '客机') : (opponentUsername || '客机');
-  }
+  if (hostColor === color) return myRole === 'host' ? (myUsername || '房主') : (opponentUsername || '房主');
+  else return myRole === 'guest' ? (myUsername || '客机') : (opponentUsername || '客机');
 }
 function showWinnerModal(winnerColor) {
   const modal = document.getElementById('winnerModal');
@@ -3453,8 +3076,7 @@ function showWinnerModal(winnerColor) {
   const titleEl = document.getElementById('winnerTitle');
   titleEl.className = 'winner-title';
   if (!winnerColor) {
-    iconEl.textContent = '🤝';
-    titleEl.textContent = '和棋';
+    iconEl.textContent = '🤝'; titleEl.textContent = '和棋';
     titleEl.classList.add('draw-title');
   } else {
     iconEl.textContent = '🏆';
@@ -3465,9 +3087,7 @@ function showWinnerModal(winnerColor) {
   }
   modal.classList.add('show');
 }
-function closeWinnerModal() {
-  document.getElementById('winnerModal').classList.remove('show');
-}
+function closeWinnerModal() { document.getElementById('winnerModal').classList.remove('show'); }
 
 // ============================================================
 //                    战绩上传 & 排行榜
@@ -3475,8 +3095,7 @@ function closeWinnerModal() {
 async function getUserCustomData(userId) {
   try {
     const res = await fetch(`${SERVER_URL}/get-custom-data-by-id`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId })
     });
     const data = await res.json();
@@ -3486,8 +3105,7 @@ async function getUserCustomData(userId) {
 }
 async function updateUserCustomData(userId, customData) {
   const res = await fetch(`${SERVER_URL}/update-custom-data`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, customData })
   });
   const data = await res.json();
@@ -3513,10 +3131,7 @@ function updateRecord(currentData, newRecord) {
 async function uploadMyRecord(oppUserId, myWin, oppWin) {
   if (recordUploaded) return;
   if (!myUserId || !oppUserId) return;
-  if (!/^[a-zA-Z0-9_-]+$/.test(oppUserId)) {
-    console.warn('对方 userId 格式无效，跳过上传:', oppUserId);
-    return;
-  }
+  if (!/^[a-zA-Z0-9_-]+$/.test(oppUserId)) { console.warn('对方 userId 格式无效，跳过上传:', oppUserId); return; }
   recordUploaded = true;
   try {
     const record = `chessflip_record_with_${oppUserId}:${myWin},${oppWin}`;
@@ -3530,8 +3145,7 @@ async function uploadMyRecord(oppUserId, myWin, oppWin) {
   }
 }
 async function showRecords() {
-  hideAll();
-  recordsPanel.classList.remove('hidden');
+  hideAll(); recordsPanel.classList.remove('hidden');
   document.getElementById('recordsHint').textContent = '';
   await refreshRecords();
 }
@@ -3558,14 +3172,12 @@ async function refreshRecords() {
         if (isNaN(w) || isNaN(l)) return;
         totalW += w; totalL += l; matches++;
       });
-      if (matches > 0) {
-        stats.push({
-          username: user.username || '未知用户',
-          wins: totalW, losses: totalL,
-          matches: totalW + totalL,
-          winRate: (totalW + totalL) > 0 ? Math.round(totalW / (totalW + totalL) * 100) : 0
-        });
-      }
+      if (matches > 0) stats.push({
+        username: user.username || '未知用户',
+        wins: totalW, losses: totalL,
+        matches: totalW + totalL,
+        winRate: (totalW + totalL) > 0 ? Math.round(totalW / (totalW + totalL) * 100) : 0
+      });
     });
     stats.sort((a, b) => b.wins - a.wins || b.winRate - a.winRate);
     if (stats.length === 0) {
@@ -3599,16 +3211,57 @@ function escapeHtml(s) {
 }
 
 // ============================================================
+//                    动态 UI 注入
+// ============================================================
+function injectSkillUI() {
+  if (document.getElementById('skillStyle')) return;
+  const style = document.createElement('style');
+  style.id = 'skillStyle';
+  style.textContent = `
+    .skill-ball {
+      position: absolute; width: 68px; height: 68px;
+      border-radius: 50%; display: flex; justify-content: center; align-items: center;
+      font-size: 22px; font-weight: 900; font-family: 'Segoe UI', sans-serif;
+      pointer-events: none; z-index: 8;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 -3px 6px rgba(0,0,0,0.3);
+      animation: ballPulse 1.6s ease-in-out infinite;
+    }
+    .skill-ball.plus { background: radial-gradient(circle at 30% 30%, #ff9090, #e63946 60%, #8b1e26); color: #fff; text-shadow: 0 2px 3px rgba(0,0,0,0.6); }
+    .skill-ball.minus { background: radial-gradient(circle at 30% 30%, #90b8ff, #457b9d 60%, #1d3557); color: #fff; text-shadow: 0 2px 3px rgba(0,0,0,0.6); }
+    .skill-ball.golden { box-shadow: 0 0 0 4px #ffd700, 0 0 20px #ffd700, 0 4px 8px rgba(0,0,0,0.5); animation: ballPulseGold 1.2s ease-in-out infinite; }
+    @keyframes ballPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @keyframes ballPulseGold { 0%,100% { transform: scale(1); box-shadow: 0 0 0 4px #ffd700, 0 0 20px #ffd700, 0 4px 8px rgba(0,0,0,0.5); } 50% { transform: scale(1.12); box-shadow: 0 0 0 6px #ffe066, 0 0 30px #ffe066, 0 4px 8px rgba(0,0,0,0.5); } }
+    .piece .effect-badge {
+      position: absolute; top: -4px; right: -4px; min-width: 20px; height: 18px;
+      border-radius: 9px; font-size: 10px; font-weight: bold;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 4px; color: #fff; letter-spacing: 0.5px; z-index: 15;
+      border: 1px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      pointer-events: none;
+    }
+    .piece .effect-badge.plus { background: rgba(230,57,70,0.85); }
+    .piece .effect-badge.minus { background: rgba(69,123,157,0.85); }
+    .piece.target-pick-hint { cursor: crosshair; animation: targetPickPulse 1s ease-in-out infinite; }
+    @keyframes targetPickPulse {
+      0%,100% { box-shadow: 0 7px 0 #8a6437, 0 8px 0 #5a3f22, 0 0 16px 3px rgba(255,215,0,0.6); }
+      50% { box-shadow: 0 7px 0 #8a6437, 0 8px 0 #5a3f22, 0 0 26px 8px rgba(255,215,0,0.95); }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ============================================================
 //                    页面加载 / 卸载
 // ============================================================
 window.addEventListener('load', async () => {
+  injectSkillUI();
   hideAll();
   menuPanel.classList.remove('hidden');
   await loadUserInfo();
   updateLobbyUserLabel();
   connectLobby();
 });
-
 window.addEventListener('beforeunload', () => {
   window._pageUnloading = true;
   sendLobby({ type: 'exit', userId: myUserId, username: myUsername });
