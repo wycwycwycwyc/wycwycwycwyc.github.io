@@ -480,5 +480,19 @@
       "zh": "更好地优化手机端体验",
       "en": "Better optimized mobile device experience"
     }
+  },
+  "update22": {
+    "time": {
+      "zh": "2026年10月1日",
+      "en": "October 1, 2026"
+    },
+    "title": {
+      "zh": "更新",
+      "en": "Updates"
+    },
+    "text1": {
+      "zh": "网站支持了<WebSocket>通信，可实现多机同步，在线连接等功能",
+      "en": "Website now supports <WebSocket> communication for multi-device synchronization and online connectivity"
+    }
   }
 }
