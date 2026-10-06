@@ -147,6 +147,21 @@ function playSkillSound() {
     osc.start(t); osc.stop(t + 0.3);
   });
 }
+function playTimeoutWarningSound() {
+  const ctx = getAudioCtx(); if (!ctx) return;
+  const now = ctx.currentTime;
+  [0, 0.15, 0.3].forEach(offset => {
+    const t = now + offset;
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.13);
+  });
+}
 
 // ============================================================
 //                        全局状态
@@ -215,8 +230,14 @@ let syncPathPieceId = -1;
 let syncPathPiece = null;
 let syncPathCurrentPos = { row: -1, col: -1 };
 
-// ★ 状态版本号：防止客机播放结束后用旧脚本覆盖新同步状态
 let syncStateVersion = 0;
+// ★ 碰撞阈值：0.67（深入半径一半）
+const COLLISION_THRESHOLD = 0.67;
+let playSyncPlaybackStartTime = 0;
+
+let playbackRafId = 0;
+let pendingPlaybackEvents = [];
+const collidedIds = new Set();
 
 const activeAnimations = {};
 
@@ -229,6 +250,10 @@ let stepBonus = { host: 0, guest: 0 };
 let pendingDisconnectCheck = null;
 let lastOppActivity = Date.now();
 let targetPickMode = null;
+
+let stepWarningIssued = false;
+let gameWarningIssued = false;
+let lastActionSent = null;
 
 const ROWS = 8, COLS = 4;
 const CELL_SIZE = 76, PIECE_SIZE = 68;
@@ -315,7 +340,7 @@ function findPieceById(id) {
 }
 
 function trySpawnBall() {
-  if(gameMode !== "sync") return;
+  if (gameMode !== 'sync') return;
   if (skillBalls.length >= 2) return;
   const empty = [];
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
@@ -331,7 +356,7 @@ function trySpawnBall() {
 
 function renderSkillBalls() {
   document.querySelectorAll('.skill-ball').forEach(el => el.remove());
-  if(gameMode !== "sync") return;
+  if (gameMode !== 'sync') return;
   const boardEl = document.getElementById('board');
   if (!boardEl) return;
   skillBalls.forEach(ball => {
@@ -354,8 +379,7 @@ function addEffect(ef) {
 }
 
 function onTurnAdvance() {
-  if(gameMode !== "sync") return;
-  // guest 只做效果计时，不生成球、不重算 nextBallSpawnAt
+  if (gameMode !== 'sync') return;
   if (onlineMode && myRole === 'guest') {
     tickSkillEffects();
     return;
@@ -464,7 +488,6 @@ function handleBallEatenClassic(ball, eaterPieceId, eaterSide) {
   playSkillSound();
 
   const isStep = (ball.type === '+N' || ball.type === '-N');
-
   if (ball.golden && !isStep) {
     enterTargetPickMode(ball.type, eaterSide, (targetPieceId) => {
       const picked = findPieceById(targetPieceId);
@@ -511,7 +534,46 @@ function handleTargetPickClick(row, col) {
 }
 
 // ============================================================
-//                    断线检测
+//                ★ 棋桌右上角按钮（检测断线 / 已走棋）
+// ============================================================
+function initCornerButtons() {
+  const gamePanel = document.getElementById('gamePanel');
+  if (!gamePanel) return;
+  let container = document.getElementById('gameCornerBtns');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'gameCornerBtns';
+    container.className = 'game-corner-btns';
+    gamePanel.appendChild(container);
+  }
+  container.innerHTML = '';
+  if (!onlineMode) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = '';
+
+  const checkBtn = document.createElement('button');
+  checkBtn.className = 'btn btn-draw';
+  checkBtn.textContent = '检测断线';
+  checkBtn.onclick = () => {
+    if (!onlineMode) { showBanner('仅在线对局可用', 'error', 1500); return; }
+    checkOpponentAlive();
+  };
+  container.appendChild(checkBtn);
+
+  const resendBtn = document.createElement('button');
+  resendBtn.className = 'btn btn-undo';
+  resendBtn.textContent = '已走棋';
+  resendBtn.onclick = () => {
+    if (!onlineMode) { showBanner('仅在线对局可用', 'error', 1500); return; }
+    resendLastAction();
+  };
+  container.appendChild(resendBtn);
+}
+
+// ============================================================
+//                    断线 / 重发
 // ============================================================
 function checkOpponentAlive() {
   if (!onlineMode || !ws || ws.readyState !== 1) { showBanner('未连接', 'error', 1500); return; }
@@ -534,6 +596,50 @@ function onReceiveCheckDisconnectReply(msg) {
     clearTimeout(pendingDisconnectCheck.timer);
     pendingDisconnectCheck = null;
     showBanner('对方在线 ✓', 'info', 2000);
+  }
+}
+
+function resendLastAction() {
+  if (!onlineMode || !ws || ws.readyState !== 1) {
+    showBanner('未连接', 'error', 1500); return;
+  }
+  if (!gameStarted || gameOver) {
+    showBanner('未在对局中', 'error', 1500); return;
+  }
+
+  if (myRole === 'host') {
+    if (gameMode === 'sync') {
+      if (lastPlaybackScript && !syncPlaying) {
+        send({ type: 'syncPlayback', script: lastPlaybackScript });
+        showBanner('已重发本轮动画', 'info', 2000);
+      } else {
+        broadcastSync();
+        showBanner('已重新同步棋盘给对手', 'info', 2000);
+      }
+    } else {
+      broadcastSync();
+      showBanner('已重新同步棋盘给对手', 'info', 2000);
+    }
+    return;
+  }
+
+  if (gameMode === 'classic') {
+    if (lastActionSent && Date.now() - lastActionSent.timestamp < 60000) {
+      send(lastActionSent.payload);
+      showBanner('已重发上一步走棋', 'info', 2000);
+    } else {
+      send({ type: 'requestSync', userId: myUserId });
+      showBanner('已请求主机重新同步', 'info', 2000);
+    }
+  } else {
+    if (syncMySubmitted && syncMyQueue.length > 0) {
+      send({ type: 'syncPlan', userId: myUserId, actions: syncMyQueue });
+      send({ type: 'syncOppSubmitted', userId: myUserId });
+      showBanner('已重发本轮规划', 'info', 2000);
+    } else {
+      send({ type: 'requestSync', userId: myUserId });
+      showBanner('已请求主机重新同步', 'info', 2000);
+    }
   }
 }
 
@@ -615,6 +721,7 @@ function showOffline() {
   document.getElementById('syncBar').classList.add('hidden');
   resetGame();
   applyModeButtons();
+  initCornerButtons();
 }
 function showOnline() {
   hideAll(); lobbyPanel.classList.remove('hidden');
@@ -906,6 +1013,11 @@ function handleDisconnect() {
 }
 function send(obj) {
   if (!ws || ws.readyState !== 1) { netLog('未连接'); return false; }
+  if (obj && typeof obj === 'object') {
+    if (obj.type === 'move' || obj.type === 'flip' || obj.type === 'syncPlan') {
+      lastActionSent = { type: obj.type, payload: { ...obj }, timestamp: Date.now() };
+    }
+  }
   ws.send(typeof obj === 'string' ? obj : JSON.stringify(obj));
   return true;
 }
@@ -937,6 +1049,7 @@ function attemptReconnect() {
     startTimer();
     if (reconnectWasInGame && gameStarted) {
       hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
+      initCornerButtons();
       if (myRole === 'host') broadcastSync();
       else send({ type: 'requestSync', userId: myUserId });
       appendChatMessage('', '你已重新连接', 'sys');
@@ -953,6 +1066,8 @@ function attemptReconnect() {
 function resetTimersForNewGame() {
   hostTimeLeft = timeSettings.totalMs; guestTimeLeft = timeSettings.totalMs;
   turnStartTs = performance.now(); timeoutHandled = false;
+  stepWarningIssued = false;
+  gameWarningIssued = false;
 }
 function startTimer() {
   if (gameMode === 'sync') return;
@@ -974,6 +1089,7 @@ function commitTurnTime() {
   } else if (currentPlayer === 'host') hostTimeLeft = dec(hostTimeLeft);
   else if (currentPlayer === 'guest') guestTimeLeft = dec(guestTimeLeft);
   turnStartTs = performance.now();
+  stepWarningIssued = false;
 }
 function formatMs(ms) {
   ms = Math.max(0, ms);
@@ -1005,6 +1121,36 @@ function tickTimer() {
   else curLeft = timeSettings.totalMs;
   curLeft = Math.max(0, curLeft - elapsedStep);
   info.textContent = `步时 ${formatMs(stepLeft)} | 局时 红:${formatMs(hostTimeLeft)} 黑:${formatMs(guestTimeLeft)}`;
+
+  if (isMyTurn()) {
+    if (!stepWarningIssued && stepLeft <= 10000 && stepLeft > 0) {
+      stepWarningIssued = true;
+      playTimeoutWarningSound();
+      try {
+        Swal.fire({
+          icon: 'warning',
+          title: '步时不足 10 秒',
+          text: '请尽快落子',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } catch (e) { }
+    }
+    if (!gameWarningIssued && curLeft <= 10000 && curLeft > 0) {
+      gameWarningIssued = true;
+      playTimeoutWarningSound();
+      try {
+        Swal.fire({
+          icon: 'warning',
+          title: '局时不足 10 秒',
+          text: '你的总时间即将耗尽',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } catch (e) { }
+    }
+  }
+
   if (timeoutHandled) return;
   if (stepLeft <= 0) { timeoutHandled = true; onMyTimeout('步时超时'); }
   else if (curLeft <= 0) { timeoutHandled = true; onMyTimeout('局时超时'); }
@@ -1045,18 +1191,6 @@ function initChatUI() {
   });
   const input = document.getElementById('chatInput');
   const sendBtn = document.getElementById('chatSendBtn');
-  if (sendBtn && !document.getElementById('checkDiscBtn')) {
-    const checkBtn = document.createElement('button');
-    checkBtn.id = 'checkDiscBtn';
-    checkBtn.className = 'btn btn-draw';
-    checkBtn.textContent = '检测断线';
-    checkBtn.style.marginLeft = '6px';
-    checkBtn.onclick = () => {
-      if (!onlineMode) { showBanner('仅在线对局可用', 'error', 1500); return; }
-      checkOpponentAlive();
-    };
-    sendBtn.parentNode.appendChild(checkBtn);
-  }
   if (sendBtn) {
     sendBtn.onclick = () => {
       const v = (input.value || '').trim();
@@ -1171,6 +1305,7 @@ function handleMessage(raw) {
           broadcastSync();
           hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
           startTimer();
+          initCornerButtons();
           appendChatMessage('', (msg.username || '对手') + ' 已重新加入，对局继续', 'sys');
           showBanner('对手已重新加入，对局继续', 'info', 2500);
         } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
@@ -1184,7 +1319,8 @@ function handleMessage(raw) {
         send({ type: 'hello-ack', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound });
         if (gameStarted && !gameOver) {
           hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
-          startTimer(); send({ type: 'requestSync', userId: myUserId });
+          startTimer(); initCornerButtons();
+          send({ type: 'requestSync', userId: myUserId });
         } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       }
       break;
@@ -1201,7 +1337,8 @@ function handleMessage(raw) {
       if (oppLabel) { oppLabel.textContent = '对手：' + opponentUsername; oppLabel.style.color = '#b32b2b'; }
       if (gameStarted && !gameOver) {
         if (gamePanel.classList.contains('hidden')) {
-          hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden'); startTimer();
+          hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
+          startTimer(); initCornerButtons();
         }
         if (myRole === 'guest') send({ type: 'requestSync', userId: myUserId });
       } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
@@ -1232,6 +1369,7 @@ function handleMessage(raw) {
       gameStarted = true;
       applySyncState(msg.state);
       hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
+      initCornerButtons();
       if (gameMode !== 'sync' && !msg.state.gameOver) startTimer();
       if (gameMode === 'sync') {
         document.getElementById('syncBar').classList.remove('hidden');
@@ -1369,6 +1507,11 @@ function goHome() {
   skillBalls = []; skillEffects = []; skillTurnCounter = 0; nextBallSpawnAt = 3;
   stepBonus = { host: 0, guest: 0 };
   syncStateVersion = 0;
+  playSyncPlaybackStartTime = 0;
+  stopPlaybackLoop();
+  stepWarningIssued = false;
+  gameWarningIssued = false;
+  lastActionSent = null;
   updateChatBadge();
   const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
   const nc = document.getElementById('chatNoticeContainer'); if (nc) nc.innerHTML = '';
@@ -1468,6 +1611,7 @@ async function enterRoom(directEnter) {
     hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
     gameStarted = true;
     if (!boardDomBuilt) { initBoard(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); }
+    initCornerButtons();
     setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 300);
     setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 1200);
     if (gameMode === 'sync') { document.getElementById('syncBar').classList.remove('hidden'); renderSyncBar(); }
@@ -1538,6 +1682,8 @@ function resetSkillState() {
   skillTurnCounter = 0; nextBallSpawnAt = 3;
   stepBonus = { host: 0, guest: 0 };
   syncStateVersion = 0;
+  playSyncPlaybackStartTime = 0;
+  stopPlaybackLoop();
   renderSkillBalls();
 }
 function startGameAsHost() {
@@ -1557,6 +1703,7 @@ function startGameAsHost() {
   syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
   syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
   colorTipShown = false; lastPlaybackScript = null; lastPlaybackStartState = null;
+  lastActionSent = null;
   resetTimersForNewGame();
   enterGameUI(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
   const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
@@ -1582,6 +1729,7 @@ function applyStartState(state) {
   syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
   syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
   lastPlaybackScript = null; lastPlaybackStartState = null;
+  lastActionSent = null;
   enterGameUI(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
   const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
   if (gameMode === 'sync') {
@@ -1618,7 +1766,7 @@ function serializeState() {
   };
 }
 function deserializeState(state) {
-  syncStateVersion++;   // ★ 版本号 +1
+  syncStateVersion++;
   board = state.board.map(row => row.map(c => c ? { piece: c.piece, hidden: c.hidden, id: c.id, speedMul: c.speedMul || 1 } : null));
   currentPlayer = state.currentPlayer;
   gameOver = state.gameOver;
@@ -1642,7 +1790,10 @@ function deserializeState(state) {
   if (myRole === 'host') myColor = hostColor;
   else if (myRole === 'guest') myColor = hostColor ? (hostColor === 'red' ? 'black' : 'red') : null;
 }
-function broadcastSync() { if (myRole !== 'host') return; send({ type: 'sync', state: serializeState() }); }
+function broadcastSync() {
+  if (myRole !== 'host') return;
+  send({ type: 'sync', state: serializeState() });
+}
 function applySyncState(state) {
   deserializeState(state);
   selectedRow = -1; selectedCol = -1;
@@ -1669,6 +1820,7 @@ function enterGameUI() {
   document.getElementById('gameOppLabel').style.color = '#b32b2b';
   document.getElementById('connDot').style.display = onlineMode ? 'inline-block' : 'none';
   updateColorLabel(); applyModeButtons(); initChatUI();
+  initCornerButtons();
   unreadChatCount = 0; updateChatBadge();
 }
 function exitGame() {
@@ -1858,7 +2010,6 @@ function removeSyncActionWithDeps(idx) {
   if (toRemove.size > 1) showBanner(`已取消 ${toRemove.size} 个相关操作`, 'info', 1500);
 }
 
-// ★ 获取移动路径上的所有格子
 function getMovePathCells(mv) {
   const cells = [];
   if (mv.from.row === mv.to.row) {
@@ -1873,7 +2024,65 @@ function getMovePathCells(mv) {
   return cells;
 }
 
-// ★★★ 核心：simulateSyncRound
+function solveQuadratic(A, B, C) {
+  if (Math.abs(A) < 1e-12) {
+    if (Math.abs(B) < 1e-12) return [];
+    return [-C / B];
+  }
+  const disc = B * B - 4 * A * C;
+  if (disc < 0) return [];
+  if (disc < 1e-12) return [-B / (2 * A)];
+  const sq = Math.sqrt(disc);
+  return [(-B - sq) / (2 * A), (-B + sq) / (2 * A)];
+}
+
+function findFirstCollision(mvA, mvB, threshold) {
+  const tStart = Math.max(mvA.startT, mvB.startT);
+  const tEnd = Math.min(mvA.endT, mvB.endT);
+  if (tStart >= tEnd) return null;
+
+  const durA = mvA.endT - mvA.startT;
+  const durB = mvB.endT - mvB.startT;
+  if (durA <= 0 || durB <= 0) return null;
+
+  const vrA = (mvA.to.row - mvA.from.row) / durA;
+  const vcA = (mvA.to.col - mvA.from.col) / durA;
+  const vrB = (mvB.to.row - mvB.from.row) / durB;
+  const vcB = (mvB.to.col - mvB.from.col) / durB;
+
+  const rA0 = mvA.from.row + vrA * (tStart - mvA.startT);
+  const cA0 = mvA.from.col + vcA * (tStart - mvA.startT);
+  const rB0 = mvB.from.row + vrB * (tStart - mvB.startT);
+  const cB0 = mvB.from.col + vcB * (tStart - mvB.startT);
+
+  const dr0 = rA0 - rB0;
+  const dc0 = cA0 - cB0;
+  if (dr0 * dr0 + dc0 * dc0 <= threshold * threshold) {
+    return {
+      t: tStart,
+      posA: { row: rA0, col: cA0 },
+      posB: { row: rB0, col: cB0 }
+    };
+  }
+
+  const vr = vrA - vrB;
+  const vc = vcA - vcB;
+  const A = vr * vr + vc * vc;
+  const B = 2 * (dr0 * vr + dc0 * vc);
+  const C = dr0 * dr0 + dc0 * dc0 - threshold * threshold;
+
+  const dur = tEnd - tStart;
+  const sCandidates = solveQuadratic(A, B, C).filter(s => s >= 0 && s <= dur);
+  if (sCandidates.length === 0) return null;
+
+  const s = Math.min(...sCandidates);
+  return {
+    t: tStart + s,
+    posA: { row: rA0 + vrA * s, col: cA0 + vcA * s },
+    posB: { row: rB0 + vrB * s, col: cB0 + vcB * s }
+  };
+}
+
 function simulateSyncRound(actions) {
   const events = [];
   const workBoard = board.map(row => row.map(c => c ? { ...c } : null));
@@ -1884,7 +2093,6 @@ function simulateSyncRound(actions) {
     if (cell && cell.id !== undefined) pieceMap[cell.id] = cell.piece;
   }));
 
-  // 1. 翻棋
   const flippedKeys = new Set();
   actions.forEach(act => {
     if (act.type !== 'flip') return;
@@ -1897,7 +2105,6 @@ function simulateSyncRound(actions) {
     events.push({ t: 0, type: 'flip', row: act.row, col: act.col, piece: cell.piece, color: getPieceColor(cell.piece), by: act.by });
   });
 
-  // 2. 收集所有 move
   const pieceMoves = {};
   const allMoves = [];
   actions.forEach(act => {
@@ -1932,7 +2139,6 @@ function simulateSyncRound(actions) {
     allMoves.push(mv);
   });
 
-  // 3. 计算时间区间（同一棋子链式串行）
   Object.keys(pieceMoves).forEach(pId => {
     let t = 0;
     pieceMoves[pId].forEach(mv => {
@@ -1942,74 +2148,80 @@ function simulateSyncRound(actions) {
     });
   });
 
-  // 4. moveStart 事件
-  allMoves.forEach(mv => {
-    events.push({
-      t: mv.startT, type: 'moveStart', pieceId: mv.pieceId,
-      from: mv.from, to: mv.to, piece: mv.piece,
-      flying: mv.flying, duration: mv.duration, by: mv.by
-    });
-  });
-
-  // 5. 碰撞检测
-  const STEP = 20;
   const maxT = allMoves.reduce((m, mv) => Math.max(m, mv.endT), 0) + 200;
   const moveDead = new Map();
   allMoves.forEach(mv => moveDead.set(mv, false));
 
-  for (let now = 0; now <= maxT; now += STEP) {
-    const active = [];
-    allMoves.forEach(mv => {
-      if (moveDead.get(mv)) return;
-      if (now >= mv.startT && now < mv.endT) {
-        const prog = (now - mv.startT) / (mv.endT - mv.startT);
-        const r = mv.from.row + (mv.to.row - mv.from.row) * prog;
-        const c = mv.from.col + (mv.to.col - mv.from.col) * prog;
-        active.push({ mv, r, c });
-      }
-    });
-    for (let i = 0; i < active.length; i++) {
-      for (let j = i + 1; j < active.length; j++) {
-        const a = active[i], b = active[j];
-        if (a.mv.by === b.mv.by) continue;
-        if (moveDead.get(a.mv) || moveDead.get(b.mv)) continue;
-        if (a.mv.flying !== b.mv.flying) continue;
-        if (a.mv.pieceId === b.mv.pieceId) continue;
-        const dr = a.r - b.r, dc = a.c - b.c;
-        if (Math.sqrt(dr * dr + dc * dc) >= 0.6) continue;
-        const pieceA = a.mv.piece, pieceB = b.mv.piece;
-        const colorA = getPieceColor(pieceA), colorB = getPieceColor(pieceB);
-        if (colorA === colorB) continue;
-        const aEatsB = canCaptureInCollision(pieceA, pieceB);
-        const bEatsA = canCaptureInCollision(pieceB, pieceA);
-        if (aEatsB && bEatsA) {
-          moveDead.set(a.mv, true); moveDead.set(b.mv, true);
-          events.push({ t: now, type: 'collision', pieceIds: [a.mv.pieceId, b.mv.pieceId], deadIds: [a.mv.pieceId, b.mv.pieceId], result: 'bothDead' });
-          if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
-          if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
-        } else if (aEatsB) {
-          moveDead.set(b.mv, true);
-          events.push({ t: now, type: 'collision', pieceIds: [b.mv.pieceId], deadIds: [b.mv.pieceId], result: 'oneDead' });
-          if (colorB === 'red') workDeadRed.push(pieceB); else workDeadBlack.push(pieceB);
-        } else if (bEatsA) {
-          moveDead.set(a.mv, true);
-          events.push({ t: now, type: 'collision', pieceIds: [a.mv.pieceId], deadIds: [a.mv.pieceId], result: 'oneDead' });
-          if (colorA === 'red') workDeadRed.push(pieceA); else workDeadBlack.push(pieceA);
-        }
-      }
+  const collisionPairs = [];
+  for (let i = 0; i < allMoves.length; i++) {
+    for (let j = i + 1; j < allMoves.length; j++) {
+      const a = allMoves[i], b = allMoves[j];
+      if (a.by === b.by) continue;
+      if (a.flying !== b.flying) continue;
+      if (a.pieceId === b.pieceId) continue;
+      const colorA = getPieceColor(a.piece), colorB = getPieceColor(b.piece);
+      if (colorA === colorB) continue;
+      const aEatsB = canCaptureInCollision(a.piece, b.piece);
+      const bEatsA = canCaptureInCollision(b.piece, a.piece);
+      if (!aEatsB && !bEatsA) continue;
+
+      const col = findFirstCollision(a, b, COLLISION_THRESHOLD);
+      if (!col) continue;
+      collisionPairs.push({
+        a, b,
+        tCollision: col.t,
+        posA: col.posA, posB: col.posB,
+        aEatsB, bEatsA, colorA, colorB
+      });
+    }
+  }
+  collisionPairs.sort((x, y) => x.tCollision - y.tCollision);
+
+  for (const col of collisionPairs) {
+    if (moveDead.get(col.a) || moveDead.get(col.b)) continue;
+
+    if (col.aEatsB && col.bEatsA) {
+      moveDead.set(col.a, true);
+      moveDead.set(col.b, true);
+      events.push({
+        t: col.tCollision, type: 'collision',
+        pieceIds: [col.a.pieceId, col.b.pieceId],
+        deadIds: [col.a.pieceId, col.b.pieceId],
+        result: 'bothDead',
+        posA: col.posA, posB: col.posB
+      });
+      if (col.colorA === 'red') workDeadRed.push(col.a.piece); else workDeadBlack.push(col.a.piece);
+      if (col.colorB === 'red') workDeadRed.push(col.b.piece); else workDeadBlack.push(col.b.piece);
+    } else if (col.aEatsB) {
+      moveDead.set(col.b, true);
+      events.push({
+        t: col.tCollision, type: 'collision',
+        pieceIds: [col.b.pieceId],
+        deadIds: [col.b.pieceId],
+        result: 'oneDead',
+        posA: col.posA, posB: col.posB
+      });
+      if (col.colorB === 'red') workDeadRed.push(col.b.piece); else workDeadBlack.push(col.b.piece);
+    } else if (col.bEatsA) {
+      moveDead.set(col.a, true);
+      events.push({
+        t: col.tCollision, type: 'collision',
+        pieceIds: [col.a.pieceId],
+        deadIds: [col.a.pieceId],
+        result: 'oneDead',
+        posA: col.posA, posB: col.posB
+      });
+      if (col.colorA === 'red') workDeadRed.push(col.a.piece); else workDeadBlack.push(col.a.piece);
     }
   }
 
-  // 6. 落地
   const sortedMoves = [...allMoves].sort((a, b) => a.endT - b.endT);
 
-  // 6a. 收集碰撞死的 pieceId
   const deadPieceIds = new Set();
   sortedMoves.forEach(mv => {
     if (moveDead.get(mv)) deadPieceIds.add(mv.pieceId);
   });
 
-  // 6b. 从 workBoard 移除死亡棋子
   if (deadPieceIds.size > 0) {
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
@@ -2019,7 +2231,6 @@ function simulateSyncRound(actions) {
     }
   }
 
-  // 6c. 失败链：被挡/起点丢失 → 只作废后续，不删棋子
   const failedChain = new Set();
   const successfulMoves = [];
   sortedMoves.forEach(mv => {
@@ -2052,7 +2263,7 @@ function simulateSyncRound(actions) {
       }
       let canEat = false;
       if (mv.piece === '炮' || mv.piece === '砲') {
-        canEat = isValidCannonCapture(mv.from.row, mv.from.col, mv.to.row, mv.to.col, workBoard);
+        canEat = true;
       } else {
         canEat = canCapture(mv.piece, targetPiece);
       }
@@ -2079,7 +2290,21 @@ function simulateSyncRound(actions) {
     }
   });
 
-  // 7. 检测球被吃（路径经过）
+  const deadMoveSet = new Set();
+  allMoves.forEach(mv => {
+    if (moveDead.get(mv)) deadMoveSet.add(mv);
+  });
+  const successfulSet = new Set(successfulMoves);
+
+  allMoves.forEach(mv => {
+    if (!deadMoveSet.has(mv) && !successfulSet.has(mv)) return;
+    events.push({
+      t: mv.startT, type: 'moveStart', pieceId: mv.pieceId,
+      from: mv.from, to: mv.to, piece: mv.piece,
+      flying: mv.flying, duration: mv.duration, by: mv.by
+    });
+  });
+
   const ballsEatenSet = new Set();
   const ballEaters = [];
   successfulMoves.forEach(mv => {
@@ -2130,9 +2355,38 @@ function isValidCannonCapture(fromRow, fromCol, toRow, toCol, b) {
   return count === 1;
 }
 
+function startPlaybackLoop(script) {
+  stopPlaybackLoop();
+  pendingPlaybackEvents = [...script.events].sort((a, b) => a.t - b.t);
+  playSyncPlaybackStartTime = performance.now();
+
+  function tick() {
+    if (!syncPlaying) { playbackRafId = 0; return; }
+    const elapsed = performance.now() - playSyncPlaybackStartTime;
+    while (pendingPlaybackEvents.length > 0 && pendingPlaybackEvents[0].t <= elapsed) {
+      const ev = pendingPlaybackEvents.shift();
+      applyPlaybackEvent(ev);
+    }
+    if (pendingPlaybackEvents.length > 0) {
+      playbackRafId = requestAnimationFrame(tick);
+    } else {
+      playbackRafId = 0;
+    }
+  }
+  playbackRafId = requestAnimationFrame(tick);
+}
+
+function stopPlaybackLoop() {
+  if (playbackRafId) {
+    cancelAnimationFrame(playbackRafId);
+    playbackRafId = 0;
+  }
+  pendingPlaybackEvents = [];
+}
+
 function playSyncPlayback(script, replaySavedState) {
   const isReplay = !!replaySavedState;
-  const startSyncVersion = syncStateVersion;   // ★ 记录播放开始时的版本号
+  const startSyncVersion = syncStateVersion;
 
   if (!isReplay) {
     lastPlaybackScript = script;
@@ -2144,6 +2398,7 @@ function playSyncPlayback(script, replaySavedState) {
   }
 
   syncPlaying = true;
+  collidedIds.clear();
   renderSyncBar();
   document.getElementById('statusText').textContent = isReplay ? '重播中...' : '播放中...';
 
@@ -2158,9 +2413,10 @@ function playSyncPlayback(script, replaySavedState) {
   }
   void document.body.offsetWidth;
 
-  script.events.forEach(ev => { setTimeout(() => applyPlaybackEvent(ev), ev.t); });
+  startPlaybackLoop(script);
 
   syncPlaybackTimer = setTimeout(() => {
+    stopPlaybackLoop();
     Object.keys(activeAnimations).forEach(pid => {
       cancelAnimationFrame(activeAnimations[pid].rafId);
       delete activeAnimations[pid];
@@ -2176,7 +2432,6 @@ function playSyncPlayback(script, replaySavedState) {
     }
     void document.body.offsetWidth;
 
-    // ★★★ 重播：完全恢复状态，不推进回合，不应用 effect
     if (isReplay) {
       board = replaySavedState.board;
       deadRed = replaySavedState.deadRed;
@@ -2198,6 +2453,7 @@ function playSyncPlayback(script, replaySavedState) {
       prevDeadBlackCount = -1;
 
       syncPlaying = false;
+      playSyncPlaybackStartTime = 0;
       renderFullBoard();
       renderGraveyards();
       renderSkillBalls();
@@ -2206,13 +2462,24 @@ function playSyncPlayback(script, replaySavedState) {
       return;
     }
 
-    // ★★★ 播放期间收到过 host 的新 sync → 已是最新状态，不用旧 script 覆盖
     if (syncStateVersion !== startSyncVersion) {
       syncPlaying = false;
+      playSyncPlaybackStartTime = 0;
       renderFullBoard();
       renderGraveyards();
       renderSkillBalls();
       renderSyncBar();
+      if (gameOver) {
+        if (!document.getElementById('winnerModal').classList.contains('show')) {
+          let winnerColor = null;
+          const redCount = countPiecesByColor('red');
+          const blackCount = countPiecesByColor('black');
+          if (redCount === 0 && blackCount > 0) winnerColor = 'black';
+          else if (blackCount === 0 && redCount > 0) winnerColor = 'red';
+          showWinnerModal(winnerColor);
+        }
+        return;
+      }
       if (myRole === 'host') {
         if (!gameOver) startSyncRound();
       } else {
@@ -2225,7 +2492,6 @@ function playSyncPlayback(script, replaySavedState) {
       return;
     }
 
-    // ===== 正常播放流程 =====
     board = script.finalBoard.map(row => row.map(c => c ? { ...c } : null));
     deadRed = [...script.deadRed]; deadBlack = [...script.deadBlack];
     prevDeadRedCount = -1; prevDeadBlackCount = -1;
@@ -2261,6 +2527,7 @@ function playSyncPlayback(script, replaySavedState) {
 
     renderFullBoard(); renderGraveyards();
     syncPlaying = false;
+    playSyncPlaybackStartTime = 0;
 
     const redCount = countPiecesByColor('red');
     const blackCount = countPiecesByColor('black');
@@ -2291,17 +2558,44 @@ function applyPlaybackEvent(ev) {
     case 'flip': playFlipSound(); break;
     case 'moveStart':
       playMoveSound();
-      animatePieceMove(ev.pieceId, ev.from, ev.to, ev.duration, ev.flying);
+      animatePieceMove(ev.pieceId, ev.from, ev.to, ev.duration, ev.flying, ev.t);
       break;
-    case 'collision':
+    case 'collision': {
       playCollisionSound();
-      (ev.deadIds || ev.pieceIds).forEach(pid => {
+      const ids = ev.pieceIds || [];
+      const positions = [ev.posA, ev.posB];
+      ids.forEach((pid, idx) => {
+        collidedIds.add(pid);
         const el = pieceElMap[pid];
-        if (el) { el.classList.add('dead-anim'); el.style.zIndex = '70'; }
+        if (!el) return;
+        if (activeAnimations[pid]) {
+          cancelAnimationFrame(activeAnimations[pid].rafId);
+          delete activeAnimations[pid];
+        }
+        const p = positions[idx];
+        if (p) {
+          const left = p.col * CELL_SIZE + OFFSET;
+          const top = p.row * CELL_SIZE + OFFSET;
+          el.style.transition = 'none';
+          el.style.left = left + 'px';
+          el.style.top = top + 'px';
+          el.style.zIndex = '70';
+          el.classList.add('dead-anim');
+          // ★ 监听动画结束事件，淡出完成后立即隐藏
+          const hideOnEnd = () => {
+            if (el.classList.contains('dead-anim')) {
+              el.style.display = 'none';
+            }
+            el.removeEventListener('animationend', hideOnEnd);
+          };
+          el.addEventListener('animationend', hideOnEnd);
+        }
       });
       break;
+    }
     case 'ballEaten': playSkillSound(); break;
     case 'moveEnd': {
+      if (collidedIds.has(ev.pieceId)) break;
       const moverEl = pieceElMap[ev.pieceId];
       if (!moverEl) break;
       const isAnimating = !!activeAnimations[ev.pieceId];
@@ -2316,7 +2610,10 @@ function applyPlaybackEvent(ev) {
         }
         if (ev.targetPieceId !== undefined) {
           const deadEl = pieceElMap[ev.targetPieceId];
-          if (deadEl) { deadEl.classList.add('dead-anim'); deadEl.style.zIndex = '70'; }
+          if (deadEl && !collidedIds.has(ev.targetPieceId)) {
+            deadEl.classList.add('dead-anim');
+            deadEl.style.zIndex = '70';
+          }
         }
       } else if (ev.result === 'blocked') {
         if (activeAnimations[ev.pieceId]) {
@@ -2345,7 +2642,7 @@ function applyPlaybackEvent(ev) {
   }
 }
 
-function animatePieceMove(pieceId, from, to, duration, flying) {
+function animatePieceMove(pieceId, from, to, duration, flying, logicalStartT) {
   const el = pieceElMap[pieceId];
   if (!el || !from || !to) return;
   if (activeAnimations[pieceId]) {
@@ -2359,12 +2656,15 @@ function animatePieceMove(pieceId, from, to, duration, flying) {
   el.style.top = fromPos.top + 'px';
   el.style.zIndex = flying ? '60' : '50';
   if (flying) el.classList.add('flying-piece'); else el.classList.remove('flying-piece');
-  const startTime = performance.now();
+
+  const logicalStartTime = playSyncPlaybackStartTime + (logicalStartT || 0);
   const animObj = { rafId: 0, pieceId };
   activeAnimations[pieceId] = animObj;
+
   function step(now) {
     if (activeAnimations[pieceId] !== animObj) return;
-    const elapsed = now - startTime;
+    const elapsed = now - logicalStartTime;
+    if (elapsed < 0) { animObj.rafId = requestAnimationFrame(step); return; }
     const t = duration > 0 ? Math.min(1, elapsed / duration) : 1;
     const x = fromPos.left + (toPos.left - fromPos.left) * t;
     const y = fromPos.top + (toPos.top - fromPos.top) * t;
@@ -2650,8 +2950,8 @@ function renderFullBoard() {
     if (selectedRow === r && selectedCol === c && !data.hidden && !gameOver) el.classList.add('selected');
     if (lastMovedRow === r && lastMovedCol === c) el.classList.add('last-moved');
     if (wasHidden && !data.hidden) playAnim(el, 'flip-in');
-    const efs = getPieceEffects(id);
-    if (gameMode === "sync") {
+    if (gameMode === 'sync') {
+      const efs = getPieceEffects(id);
       if (efs.length > 0) {
         const badge = document.createElement('span');
         badge.className = 'effect-badge';
@@ -2983,6 +3283,7 @@ function resetGame() {
   syncRoundNum = 0; syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false; syncPlaying = false;
   syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
   lastPlaybackScript = null; lastPlaybackStartState = null;
+  lastActionSent = null;
   resetTimersForNewGame();
   buildBoardDOM(); renderFullBoard(); renderGraveyards(); renderSkillBalls();
   const log = document.getElementById('chatLog'); if (log) log.innerHTML = '';
@@ -3068,9 +3369,11 @@ function getPlayerNameByColor(color) {
   else return myRole === 'guest' ? (myUsername || '客机') : (opponentUsername || '客机');
 }
 function showWinnerModal(winnerColor) {
+  hideBanner();
   const modal = document.getElementById('winnerModal');
   const iconEl = document.getElementById('winnerIcon');
   const titleEl = document.getElementById('winnerTitle');
+  if (!modal || !iconEl || !titleEl) return;
   titleEl.className = 'winner-title';
   if (!winnerColor) {
     iconEl.textContent = '🤝'; titleEl.textContent = '和棋';
@@ -3243,6 +3546,40 @@ function injectSkillUI() {
     @keyframes targetPickPulse {
       0%,100% { box-shadow: 0 7px 0 #8a6437, 0 8px 0 #5a3f22, 0 0 16px 3px rgba(255,215,0,0.6); }
       50% { box-shadow: 0 7px 0 #8a6437, 0 8px 0 #5a3f22, 0 0 26px 8px rgba(255,215,0,0.95); }
+    }
+
+    /* ★ 棋桌右上角按钮 */
+    .game-panel { position: relative; }
+    .game-corner-btns {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      display: flex;
+      gap: 6px;
+      z-index: 50;
+    }
+    .game-corner-btns .btn {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    /* ★ 炮飞行时不放大，仅保留阴影高亮 */
+    .piece.flying-piece {
+      animation: none !important;
+      transform: none !important;
+      filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 20px rgba(255, 220, 120, 0.6));
+    }
+
+    /* ★ 碰撞死亡动画时长缩短 */
+    .piece.dead-anim {
+      animation: pieceDeath 0.18s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes pieceDeath {
+      0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+      50% { transform: scale(1.3); opacity: 0.9; filter: brightness(2.5); }
+      100% { transform: scale(0.2); opacity: 0; filter: brightness(0.5); }
     }
   `;
   document.head.appendChild(style);
