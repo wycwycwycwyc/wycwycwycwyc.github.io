@@ -39,6 +39,7 @@
         <a id="sound-si" href="#sound" data-en="Sound">音效</a>
         <a id="settingsData-si" href="#settingsData" data-en="Settings Data">设置数据</a>
         <a id="account-si" href="#account" data-en="Account">账户</a>
+        <a id="boardcast-si" href="#boardcast" data-en="Broadcast">消息推送</a>
         <a id="language-si" href="#language" data-en="Language">语言</a>
         <a id="section-si" href="#section" data-en="Features">功能说明</a>
         <a id="developers" style="display: none;" href="#developer" data-en="Developer Options">开发者选项</a>
@@ -264,6 +265,29 @@
                 data-en="Login">登录</button>
         </div>
         <br>
+        <div id="boardcast" class="section">
+        <!-- 在 account 区域下方添加消息推送设置 -->
+        <div class="input-group" style="margin-top: 20px;">
+            <h2 data-en="Message Push">消息推送</h2>
+        
+            <!-- 接收消息开关（换行放在文字下方） -->
+            <div style="margin-bottom: 15px;">
+                <label for="msgPushToggle" data-en="Receive Messages" style="display: block; margin-bottom: 8px;">接收消息</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="msgPushToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+            <!-- 展示模式 -->
+            <div id="msgPushModeWrapper">
+                <label for="msgPushMode" data-en="Display Mode" style="display: block; margin-bottom: 8px;">展示模式</label>
+                <select id="msgPushMode" class="styled-select" style="width: 100%; max-width: 300px;">
+                    <option value="active" data-en="Active">主动展示</option>
+                    <option value="passive" data-en="Passive">仅消息中查看</option>
+                </select>
+            </div>
+        </div>
         <div id="language" class="section">
             <h1 data-en="Language">语言</h1>
             <label for="languageSelect" data-en="Select Language">选择语言</label>
@@ -448,8 +472,8 @@
 
                 <h2 data-en="Dark Mode Toggle">深色模式切换</h2>
                 <p
-                    data-en="Considering different users' habits and environments, we have specially designed a dark mode toggle feature. Users can switch between light mode and dark mode at any time according to their preferences and environment. Dark mode not only reduces eye fatigue but also provides better visibility in low-light conditions. Whether during the day or night, users can enjoy a comfortable experience.">
-                    考虑到不同用户的使用习惯和环境，我们特别设计了深色模式切换功能。用户可以根据自己的喜好和使用环境，随时在浅色模式和深色模式之间进行切换。深色模式不仅可以减轻眼睛的疲劳，还能在低光环境下提供更好的可视性。无论是在白天还是夜晚，用户都可以享受到舒适的使用体验。
+                    data-en="Considering different users' habits and environments, we have specially designed a dark mode toggle feature. Users can switch between light mode and dark mode at any time according to their preferences and environment, including by tapping the homepage background. Dark mode not only reduces eye fatigue but also provides better visibility in low-light conditions.">
+                    考虑到不同用户的使用习惯和环境，我们特别设计了深色模式切换功能。用户可以在设置中切换浅色/深色模式，也可以轻点主页背景切换。深色模式还可以在低光环境下提供更舒适的浏览体验。
                 </p>
 
                 <h2 data-en="Opacity Settings">可见度设置</h2>

@@ -3333,4 +3333,35 @@ document.addEventListener('DOMContentLoaded', function() {
             refreshBroadcastList();
         }, 400);
     }
+    // ==================== 消息推送设置 ====================
+var msgPushToggle = document.getElementById('msgPushToggle');
+var msgPushMode = document.getElementById('msgPushMode');
+var msgPushModeWrapper = document.getElementById('msgPushModeWrapper');
+
+if (msgPushToggle && msgPushMode) {
+    var pushSettings = { enabled: true, mode: 'active' };
+    try {
+        var savedPush = localStorage.getItem('broadcast_push_settings');
+        if (savedPush) {
+            var parsed = JSON.parse(savedPush);
+            if (parsed.enabled !== undefined) pushSettings.enabled = parsed.enabled;
+            if (parsed.mode) pushSettings.mode = parsed.mode;
+        }
+    } catch (e) {}
+
+    msgPushToggle.checked = pushSettings.enabled;
+    msgPushMode.value = pushSettings.mode;
+    msgPushModeWrapper.style.display = pushSettings.enabled ? 'block' : 'none';
+
+    msgPushToggle.addEventListener('change', function() {
+        pushSettings.enabled = this.checked;
+        localStorage.setItem('broadcast_push_settings', JSON.stringify(pushSettings));
+        msgPushModeWrapper.style.display = this.checked ? 'block' : 'none';
+    });
+
+    msgPushMode.addEventListener('change', function() {
+        pushSettings.mode = this.value;
+        localStorage.setItem('broadcast_push_settings', JSON.stringify(pushSettings));
+    });
+}
 });

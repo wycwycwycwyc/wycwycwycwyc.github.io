@@ -1,3 +1,10 @@
+function getOpacityBlurTargetSelectors() {
+    if (new URLSearchParams(window.location.search).has('preview')) {
+        return 'th, table, thead, #searchBox';
+    }
+    return 'th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchBox';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var opacitySelect = document.getElementById('opacitySelect');
     var blurSelect = document.getElementById('blurSelect');
@@ -49,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.location.href.includes('settings.html')) {
                             return;
                         }
-                        const targetElements = node.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchbox');
+                        const targetElements = node.querySelectorAll(getOpacityBlurTargetSelectors());
                         targetElements.forEach(function(element) {
                             applyStyleToElement(element, selectedOpacity, selectedBlur + 'px', isDarkMode);
                         });
@@ -70,7 +77,7 @@ function isTargetElement(element) {
         window.location.href.includes('settings.html')) {
         return;
     }
-    const targetSelectors = ['th', 'table', 'thead', '.bottom-bar', '#busuanzi-container', '#tips', '#time', '#searchBox'];
+    const targetSelectors = getOpacityBlurTargetSelectors().split(',').map(selector => selector.trim());
     return targetSelectors.some(selector => {
         if (selector.startsWith('.') && element.classList.contains(selector.slice(1))) {
             return true;
@@ -98,7 +105,7 @@ function setElementsStyle(opacity, blur, isDarkMode) {
         window.location.href.includes('settings.html')) {
         return;
     }
-    var elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchBox');
+    var elements = document.querySelectorAll(getOpacityBlurTargetSelectors());
 
     if (elements.length === 0) {
         return;

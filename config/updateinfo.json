@@ -494,5 +494,23 @@
       "zh": "网站支持了<WebSocket>通信，可实现多机同步，在线连接等功能",
       "en": "Website now supports <WebSocket> communication for multi-device synchronization and online connectivity"
     }
+  },
+  "update23": {
+    "time": {
+      "zh": "2026年11月4日",
+      "en": "November 4, 2026"
+    },
+    "title": {
+      "zh": "更新",
+      "en": "Updates"
+    },
+    "text1": {
+      "zh": "清除了网站主页的四周提示，新增了侧边菜单，提升了视觉效果",
+      "en": "Cleared the surrounding prompts on the website homepage, added a sidebar menu, and improved the visual效果"
+    },
+    "text2": {
+      "zh": "网站支持了<消息推送>,可更精细调整推送程度",
+      "en": "Website now supports <message push notifications> for more granular control over notification settings"
+    }
   }
 }

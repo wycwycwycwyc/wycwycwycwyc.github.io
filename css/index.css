@@ -55,32 +55,6 @@
               animation: fadeInFromBottom 1.5s ease-out forwards;
             }
 
-            #settingsButton {
-              position: fixed;
-              top: 0;
-              right: 250px;
-              /* 调整位置，使其在时间旁边 */
-              background-color: transparent;
-              border: none;
-              cursor: pointer;
-              padding: 5px;
-              z-index: 1000;
-              transition: transform 0.3s ease;
-              /* 添加过渡效果 */
-            }
-
-            #settingsButton img {
-              width: 40px;
-              height: 40px;
-              transition: transform 0.3s ease;
-              /* 添加过渡效果 */
-            }
-
-            #settingsButton:hover img {
-              transform: rotate(90deg);
-              /* 悬停时旋转180度 */
-            }
-
             /* 原有的样式保持不变 */
             body {
               font-family: Arial, sans-serif;
@@ -644,6 +618,10 @@
               background-color: #0056b3;
             }
 
+            .login-icon-container.account-avatar-entered {
+              animation: none;
+            }
+
             .login-icon {
               width: 20px;
               height: 20px;
@@ -1076,6 +1054,349 @@ body.dark-mode #searchInput::placeholder {
 body.dark-mode #searchInput:focus {
   background-color: rgba(18, 18, 18, 0.8);
 }
+
+body.has-account-menu .bottom-bar,
+body.has-account-menu #busuanzi-container,
+body.has-account-menu > #time {
+  display: none;
+}
+
+body.account-ui-enabled #tips {
+  display: none;
+}
+
+.account-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  visibility: hidden;
+  transition: visibility 300ms;
+}
+
+.account-overlay.is-open {
+  visibility: visible;
+}
+
+.account-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: rgba(14, 18, 28, 0.32);
+  backdrop-filter: blur(8px) brightness(0.65);
+  -webkit-backdrop-filter: blur(8px) brightness(0.65);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  cursor: default;
+}
+
+.account-overlay.is-open .account-backdrop {
+  opacity: 1;
+}
+
+.account-panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: min(310px, 86vw);
+  height: 100%;
+  overflow: hidden;
+  color: #20232a;
+  background: rgba(255, 255, 255, 0.94);
+  border-right: 1px solid rgba(30, 38, 50, 0.14);
+  box-shadow: 12px 0 42px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transform: translateX(-102%);
+  transition: transform 300ms cubic-bezier(.2, .75, .25, 1);
+}
+
+.account-overlay.is-open .account-panel {
+  transform: translateX(0);
+}
+
+.account-view {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 260ms ease;
+}
+
+.account-view.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.account-profile {
+  min-height: 148px;
+  padding: 24px 18px 18px;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  grid-template-rows: 42px auto;
+  column-gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid rgba(110, 120, 135, 0.38);
+}
+
+.account-avatar-slot {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-username {
+  min-width: 0;
+  overflow: hidden;
+  padding-top: 5px;
+  font-size: 22px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 13px;
+  align-items: center;
+}
+
+.account-text-action,
+.account-nav-item,
+.account-back-button,
+.account-close-button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.account-text-action {
+  padding: 3px 0;
+  background: none;
+  color: #525c6b;
+  font-size: 15px;
+}
+
+.account-text-action:hover,
+.about-section a:hover {
+  color: #0878d1;
+  text-decoration: underline;
+}
+
+.account-navigation {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-nav-item {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 22px;
+  border-bottom: 1px solid rgba(110, 120, 135, 0.32);
+  background: transparent;
+  text-align: left;
+  font-size: 16px;
+  transition: background-color 160ms ease;
+}
+
+.account-nav-item:hover,
+.account-nav-item:focus-visible {
+  background: rgba(70, 130, 190, 0.1);
+}
+
+.about-section a {
+  color: #0878d1;
+  text-decoration: none;
+}
+
+.account-subpage-header {
+  min-height: 64px;
+  padding: 0 15px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid rgba(110, 120, 135, 0.32);
+}
+
+.account-subpage-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.account-back-button,
+.account-close-button {
+  padding: 8px;
+  background: transparent;
+}
+
+.account-back-button {
+  justify-self: start;
+  color: #0878d1;
+}
+
+.account-close-button {
+  justify-self: end;
+  font-size: 24px;
+}
+
+.account-about-content {
+  padding: 18px 20px 30px;
+}
+
+.about-stat-line {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.about-stat-line strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.about-section {
+  padding: 14px 0;
+  border-top: 1px solid rgba(110, 120, 135, 0.25);
+}
+
+.about-section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.about-section a {
+  display: block;
+  width: fit-content;
+  margin: 7px 0;
+}
+
+.about-section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.about-time #time {
+  position: static;
+  display: block !important;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+}
+
+.account-avatar-flight {
+  position: fixed !important;
+  z-index: 10002 !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.account-avatar-flight .login-status {
+  font-size: 18px;
+}
+
+.login-icon-container.account-avatar-in-panel {
+  position: relative;
+  inset: auto;
+  flex: 0 0 92px;
+  width: 92px;
+  height: 92px;
+  animation: none;
+}
+
+body:not(.has-account-menu) .account-profile {
+  min-height: 160px;
+  display: flex;
+  justify-content: center;
+  padding: 28px 18px;
+}
+
+body:not(.has-account-menu) .account-avatar-slot {
+  width: 104px;
+  height: 104px;
+}
+
+body:not(.has-account-menu) .login-icon-container.account-avatar-in-panel {
+  flex-basis: 104px;
+  width: 104px;
+  height: 104px;
+}
+
+body:not(.has-account-menu) .account-username,
+body:not(.has-account-menu) .account-profile-actions {
+  display: none;
+}
+
+body:not(.has-account-menu) .login-status {
+  font-size: 18px;
+}
+
+body.dark-mode .account-panel {
+  color: #f0f2f6;
+  background: rgba(27, 30, 37, 0.96);
+  border-color: rgba(220, 228, 240, 0.14);
+}
+
+body.dark-mode .account-profile {
+  border-color: rgba(210, 220, 235, 0.28);
+}
+
+body.dark-mode .account-text-action {
+  color: #c3cad5;
+}
+
+body.dark-mode .account-nav-item {
+  border-color: rgba(210, 220, 235, 0.2);
+}
+
+body.dark-mode .account-nav-item:hover,
+body.dark-mode .account-nav-item:focus-visible {
+  background: rgba(120, 170, 220, 0.16);
+}
+
+body.dark-mode .about-section a,
+body.dark-mode .account-back-button {
+  color: #72baff;
+}
+
+body.dark-mode .about-section,
+body.dark-mode .account-subpage-header {
+  border-color: rgba(210, 220, 235, 0.2);
+}
+
+html.preview-mode #tables-container {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+html.preview-mode .table-wrapper {
+  height: auto;
+  margin-bottom: 0;
+}
+
+html.preview-mode table {
+  height: calc(100vh - 170px);
+  min-height: 240px;
+  max-height: calc(100vh - 170px);
+}
+
+.swal2-container {
+  z-index: 11000 !important;
+}
+
 @media (max-width: 768px) {
 
   /* 隐藏底部栏 */

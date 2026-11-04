@@ -1,5 +1,8 @@
 const urlParams = new URLSearchParams(window.location.search);
 const isPreview = urlParams.has('preview');
+if (isPreview) {
+    document.documentElement.classList.add('preview-mode');
+}
 
 // ==================== 主题管理模块 ====================
 const ThemeManager = {
@@ -293,7 +296,10 @@ const ThemeManager = {
     
     // 设置元素透明度
     setElementsOpacity: function(opacity, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time,#searchBox');
+        const selectors = isPreview
+            ? 'th, table, thead, #searchBox'
+            : 'th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchBox';
+        const elements = document.querySelectorAll(selectors);
         
         elements.forEach(function(element) {
             if (isDarkMode) {
@@ -306,7 +312,10 @@ const ThemeManager = {
     
     // 设置元素模糊效果
     setElementsBlur: function(blur, isDarkMode) {
-        const elements = document.querySelectorAll('th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time,#searchBox');
+        const selectors = isPreview
+            ? 'th, table, thead, #searchBox'
+            : 'th, table, thead, .bottom-bar, #busuanzi-container, #tips, #time, #searchBox';
+        const elements = document.querySelectorAll(selectors);
         
         elements.forEach(function(element) {
             element.style.backdropFilter = `blur(${blur}px)`;
@@ -477,6 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 // 预览模式处理
 if (isPreview) {
+    document.body.classList.add('preview-mode');
     if (mainImage) {
         mainImage.style.width = '30%';
     }
@@ -502,18 +512,39 @@ if (isPreview) {
                             <td data-en="You are previewing the main interface. You can slide the slider in the settings to change the homepage style">你正在预览主界面，你可以在设置界面中拖动滑块改变主页样式</td>
                             <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
                         </tr>
-                        <!-- 其他示例行类似 -->
+                        <tr>
+                            <td data-en="Example Script 2">示例脚本 2</td>
+                            <td data-en="A second example script">第二个示例脚本的简介</td>
+                            <td data-en="Preview layout sample">预览布局示例</td>
+                            <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td data-en="Example Script 3">示例脚本 3</td>
+                            <td data-en="A third example script">第三个示例脚本的简介</td>
+                            <td data-en="Preview layout sample">预览布局示例</td>
+                            <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td data-en="Example Script 4">示例脚本 4</td>
+                            <td data-en="A fourth example script">第四个示例脚本的简介</td>
+                            <td data-en="Preview layout sample">预览布局示例</td>
+                            <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
+                        </tr>
+                        <tr>
+                            <td data-en="Example Script 5">示例脚本 5</td>
+                            <td data-en="A fifth example script">第五个示例脚本的简介</td>
+                            <td data-en="Preview layout sample">预览布局示例</td>
+                            <td><button class="custom-button" onclick="alert('Preview mode, cannot view actual content')" data-en="View">查看</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         `;
     }
-    document.getElementById('settingsButton').remove();
-    document.getElementById('loginStatus').remove();
-    document.getElementById('busuanzi_container_site_pv').style.fontSize = '16px';
-    document.getElementById('busuanzi_container_site_pv').innerHTML = "当前为预览模式<br>无访问量运行时间数据";
-    document.getElementById('time_now').innerHTML = '当前时间：正在预览模式';
-    document.getElementById('date_now').innerHTML = '当前日期：正在预览模式';
+    ['loginStatus', 'accountOverlay', 'busuanzi-container', 'tips', 'time'].forEach(function(id) {
+        const element = document.getElementById(id);
+        if (element) element.remove();
+    });
     return;
 }
     // ==================== 站点运行时间 ====================
@@ -529,13 +560,11 @@ var busuanziElement = document.getElementById('busuanzi_container_site_pv');
 if (busuanziElement) {
     // 拆分成两部分，中间插入动态天数
     busuanziElement.innerHTML = `
-        <span data-en="Total site visits: ">本站总访问量</span>
-        <span id='busuanzi_value_site_pv'></span>
-        <span data-en=" times">次</span>
-        <br>
-        <span data-en="Site running time: ">主站运行总时间:</span>
+        <span data-en="Running for ">已运行 </span>
         <span>${diffDays}</span>
-        <span data-en=" days">天</span>
+        <span data-en=" days · visits "> 天 · 访问 </span>
+        <span id='busuanzi_value_site_pv'></span>
+        <span data-en=" times"> 次</span>
     `;
     
     // 注册新添加的翻译元素
@@ -543,28 +572,43 @@ if (busuanziElement) {
 }
     
     // ==================== 登录状态处理 ====================
+    document.body.classList.add('account-ui-enabled');
     var loginStatusElement = document.getElementById('loginStatus');
-    var logoutButton = document.getElementById('logoutButton');
     var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     var menuVisible = false;
+    var aboutLoaded = false;
+    var avatarMotionId = 0;
+    var avatarHomeRect = loginStatusElement && loginStatusElement.getBoundingClientRect();
+    var accountOverlay = document.getElementById('accountOverlay');
+    var accountAvatarSlot = document.getElementById('accountAvatarSlot');
+    var accountAbout = document.getElementById('accountAbout');
+    var accountHome = document.getElementById('accountHome');
 
 // 登录状态处理
 if (!isLoggedIn) {
-    if (logoutButton) logoutButton.style.display = 'none';
     if (loginStatusElement) {
         loginStatusElement.onclick = function() {
-            var loginUrl = '/account/Login/index.html?redirect=/index.html';
-            window.location.href = loginUrl;
+            if (menuVisible) {
+                window.location.href = '/account/Login/index.html?redirect=/index.html';
+            } else {
+                toggleMenu();
+            }
         };
     }
 } else {
+    document.body.classList.add('has-account-menu');
     if (loginStatusElement) {
         // 创建带翻译的加载状态
         const loginStatusSpan = loginStatusElement.querySelector('.login-status');
-        loginStatusSpan.textContent = '正在加载';
-        loginStatusSpan.setAttribute('data-en', 'Loading');
+        if (loginStatusSpan) {
+            loginStatusSpan.textContent = '正在加载';
+            loginStatusSpan.removeAttribute('data-en');
+        }
         
-        var user = localStorage.getItem('username');
+        const accountUsername = document.getElementById('accountUsername');
+        if (accountUsername) {
+            accountUsername.textContent = localStorage.getItem('username') || '用户';
+        }
         let userId = localStorage.getItem('userid');
         const imageUrl = `${serverurl}/get-icon-by-id?id=${localStorage.getItem('userid')}`;
         loginStatusElement.style.backgroundImage = `url('${imageUrl}')`;
@@ -580,8 +624,11 @@ if (!isLoggedIn) {
             if (data.success) {
                 console.log('用户名:', data.data.username);
                 localStorage.setItem('username', data.data.username);
-                if (loginStatusElement) {
-                    const statusSpan = loginStatusElement.querySelector('.login-status');
+                if (accountUsername) {
+                    accountUsername.textContent = data.data.username;
+                }
+                if (loginStatusElement && loginStatusSpan) {
+                    const statusSpan = loginStatusSpan;
                     statusSpan.textContent = '';
                     statusSpan.removeAttribute('data-en'); // 清空后不需要翻译
                 }
@@ -598,12 +645,15 @@ if (!isLoggedIn) {
             event.stopPropagation();
             toggleMenu();
         };
-
-        document.addEventListener('click', function() {
-            if (!menuVisible) return;
-            hideMenu();
-        });
     }
+}
+if (loginStatusElement) {
+    loginStatusElement.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            loginStatusElement.click();
+        }
+    });
 }
 
     // 登录错误处理函数
@@ -715,7 +765,7 @@ function sa() {
         }
     });
 }
-    // 菜单显示/隐藏函数
+    // 账户侧栏显示/隐藏函数
     function toggleMenu() {
         if (menuVisible) {
             hideMenu();
@@ -725,92 +775,333 @@ function sa() {
     }
 
     function showMenu() {
-        var menu = document.createElement('ul');
-        isDarkMode = localStorage.getItem('darkMode') === 'enabled';
-        menu.style.position = 'absolute';
-        menu.style.listStyle = 'none';
-        menu.style.padding = '2px 0';
-        menu.style.margin = '0';
-        menu.style.width = '200px';
-        menu.style.height = 'auto';
-        menu.style.backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-        menu.style.color = isDarkMode ? 'white' : 'black';
-        menu.style.border = '1px solid #ccc';
-        menu.style.borderRadius = '10px';
-        menu.style.boxShadow = '2px 2px 5px rgba(0, 0, 0, 0.3)';
-        menu.style.zIndex = '1000';
-        menu.style.top = '100%';
-        menu.style.left = '0';
-        menu.style.opacity = '0';
-        menu.style.transform = 'translateY(-20px)';
-        menu.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        if (!accountOverlay || !loginStatusElement || !accountAvatarSlot) return;
+        avatarHomeRect = loginStatusElement.getBoundingClientRect();
+        const panelRect = document.querySelector('.account-panel').getBoundingClientRect();
+        const slotRect = accountAvatarSlot.getBoundingClientRect();
+        const targetRect = {
+            left: slotRect.left - panelRect.left,
+            top: slotRect.top - panelRect.top,
+            width: slotRect.width,
+            height: slotRect.height
+        };
+        loginStatusElement.style.transition = 'none';
+        loginStatusElement.style.left = `${avatarHomeRect.left}px`;
+        loginStatusElement.style.top = `${avatarHomeRect.top}px`;
+        loginStatusElement.style.width = `${avatarHomeRect.width}px`;
+        loginStatusElement.style.height = `${avatarHomeRect.height}px`;
+        loginStatusElement.style.right = 'auto';
+        loginStatusElement.style.bottom = 'auto';
+        loginStatusElement.classList.add('account-avatar-entered');
+        loginStatusElement.classList.add('account-avatar-flight');
+        loginStatusElement.getBoundingClientRect();
+        menuVisible = true;
+        setGuestLoginLabel(true);
+        accountOverlay.setAttribute('aria-hidden', 'false');
+        accountOverlay.classList.add('is-open');
+        window.requestAnimationFrame(function() {
+            transitionAvatarTo(targetRect, function() {
+                if (!menuVisible) return;
+                accountAvatarSlot.appendChild(loginStatusElement);
+                loginStatusElement.classList.remove('account-avatar-flight');
+                loginStatusElement.classList.add('account-avatar-in-panel');
+                clearAvatarPosition();
+            });
+        });
+    }
 
-        var menuItems = [
-            { text: '账户设置', enText: 'Account Settings', action: function () { if(navigator.userAgent.match(/Mobile/i)){ window.location.href = 'settings.html#account'; }else{window.location.href = 'settings.html#account';} } },
-            { text: '切换账号', enText: 'Switch Account', action: function () { sa(); } },
-            { text: '退出登录', enText: 'Logout', action: function () { logout(); } }
-        ];
+function hideMenu() {
+    if (!menuVisible || !accountOverlay || !loginStatusElement) return;
+    menuVisible = false;
 
-        menuItems.forEach(function (item, index) {
-            if (index > 0) {
-                var separator = document.createElement('li');
-                separator.className = 'menu-separator';
-                separator.style.height = '1px';
-                separator.style.backgroundColor = '#ccc';
-                separator.style.margin = '4px 0';
-                separator.style.padding = '0';
-                menu.appendChild(separator);
+    // 隐藏所有子页面（关于、消息推送），并重置主页状态
+    accountAbout.classList.remove('is-active');
+    accountAbout.setAttribute('aria-hidden', 'true');
+    
+    if (accountMessages) {
+        accountMessages.classList.remove('is-active');
+        accountMessages.setAttribute('aria-hidden', 'true');
+    }
+    
+    accountHome.classList.add('is-active');
+
+    // 恢复头像位置和遮罩层关闭
+    if (loginStatusElement.parentNode === accountAvatarSlot) {
+        const start = loginStatusElement.getBoundingClientRect();
+        document.body.appendChild(loginStatusElement);
+        loginStatusElement.classList.remove('account-avatar-in-panel');
+        loginStatusElement.classList.add('account-avatar-flight');
+        loginStatusElement.style.transition = 'none';
+        loginStatusElement.style.left = `${start.left}px`;
+        loginStatusElement.style.top = `${start.top}px`;
+        loginStatusElement.style.width = `${start.width}px`;
+        loginStatusElement.style.height = `${start.height}px`;
+        loginStatusElement.style.right = 'auto';
+        loginStatusElement.style.bottom = 'auto';
+        loginStatusElement.getBoundingClientRect();
+        
+        accountOverlay.classList.remove('is-open');
+        accountOverlay.setAttribute('aria-hidden', 'true');
+        setGuestLoginLabel(false);
+        transitionAvatarTo(avatarHomeRect, resetAvatarPosition);
+    } else {
+        // 如果头像不在面板里，直接关闭遮罩即可
+        accountOverlay.classList.remove('is-open');
+        accountOverlay.setAttribute('aria-hidden', 'true');
+        setGuestLoginLabel(false);
+    }
+}
+
+    function setGuestLoginLabel(isLoginAction) {
+        if (isLoggedIn) return;
+        const label = loginStatusElement.querySelector('.login-status');
+        const text = isLoginAction ? '登录' : '更多';
+        loginStatusElement.setAttribute('aria-label', text);
+        if (label) {
+            label.textContent = text;
+            label.setAttribute('data-en', isLoginAction ? 'Login' : 'More');
+            if (window.i18n) window.i18n.register(label);
+        }
+    }
+
+    function transitionAvatarTo(targetRect, onComplete) {
+        const motionId = ++avatarMotionId;
+        loginStatusElement.style.transition = 'left 300ms cubic-bezier(.2,.8,.2,1), top 300ms cubic-bezier(.2,.8,.2,1), width 300ms ease, height 300ms ease';
+        window.requestAnimationFrame(function() {
+            if (motionId !== avatarMotionId) return;
+            loginStatusElement.style.left = `${targetRect.left}px`;
+            loginStatusElement.style.top = `${targetRect.top}px`;
+            loginStatusElement.style.width = `${targetRect.width}px`;
+            loginStatusElement.style.height = `${targetRect.height}px`;
+        });
+        if (onComplete) {
+            window.setTimeout(function() {
+                if (motionId === avatarMotionId) onComplete();
+            }, 320);
+        }
+    }
+
+    function resetAvatarPosition() {
+        loginStatusElement.classList.remove('account-avatar-flight');
+        clearAvatarPosition();
+    }
+
+    function clearAvatarPosition() {
+        ['transition', 'left', 'top', 'right', 'bottom', 'width', 'height'].forEach(function(property) {
+            loginStatusElement.style.removeProperty(property);
+        });
+    }
+
+    function loadAboutContent() {
+        if (aboutLoaded) return;
+        const visitCount = document.getElementById('busuanzi_value_site_pv');
+        accountAbout.innerHTML = `
+            <header class="account-subpage-header">
+                <button id="aboutBack" class="account-back-button" data-en="Back">返回</button>
+                <h2 data-en="About">关于</h2>
+                <button id="aboutClose" class="account-close-button" aria-label="关闭" data-en-aria-label="Close">×</button>
+            </header>
+            <div class="account-about-content">
+                <p class="about-stat-line">
+                    <span data-en="Running for ">已运行 </span><strong>${diffDays}</strong><span data-en=" days"> 天</span>
+                    <span aria-hidden="true"> · </span>
+                    <span data-en="visits ">访问 </span><strong id="aboutVisitCount">${visitCount && visitCount.textContent.trim() || '…'}</strong><span data-en=" times"> 次</span>
+                </p>
+                <section class="about-section">
+                    <h3 data-en="Access address">访问地址</h3>
+                    <a href="https://wycwycwycwyc.github.io" target="_blank" rel="noopener noreferrer" data-en="Main address">主地址</a>
+                    <a href="https://imaginative-babka-6c8416.netlify.app" target="_blank" rel="noopener noreferrer" data-en="Backup address">备用地址</a>
+                </section>
+                <section class="about-section">
+                    <h3 data-en="Homepage tips">首页提示</h3>
+                    <p data-en="Tap the page background to switch between light and dark mode.">轻点页面背景可以切换浅色/深色模式。</p>
+                </section>
+                <section class="about-section about-time"></section>
+            </div>`;
+        const aboutTime = accountAbout.querySelector('.about-time');
+        const timeElement = document.getElementById('time');
+        if (timeElement && aboutTime) aboutTime.appendChild(timeElement);
+        registerI18nElements(accountAbout);
+        if (visitCount) {
+            new MutationObserver(function() {
+                const aboutVisitCount = document.getElementById('aboutVisitCount');
+                if (aboutVisitCount) aboutVisitCount.textContent = visitCount.textContent.trim() || '…';
+            }).observe(visitCount, { childList: true, characterData: true, subtree: true });
+        }
+        document.getElementById('aboutBack').addEventListener('click', showAccountHome);
+        document.getElementById('aboutClose').addEventListener('click', hideMenu);
+        aboutLoaded = true;
+    }
+
+    function showAccountHome() {
+        accountAbout.classList.remove('is-active');
+        accountAbout.setAttribute('aria-hidden', 'true');
+        accountHome.classList.add('is-active');
+        window.setTimeout(function() {
+            accountHome.classList.add('is-active');
+        }, 20);
+    }
+
+    function showAbout() {
+        loadAboutContent();
+        accountHome.classList.remove('is-active');
+        accountAbout.setAttribute('aria-hidden', 'false');
+        window.requestAnimationFrame(function() {
+            accountAbout.classList.add('is-active');
+        });
+    }
+
+    document.getElementById('accountBackdrop').addEventListener('click', hideMenu);
+    document.getElementById('openSettings').addEventListener('click', function() {
+        window.location.href = '/settings.html';
+    });
+    document.getElementById('accountSettings').addEventListener('click', function() {
+        window.location.href = '/settings.html#account';
+    });
+    document.getElementById('accountLogout').addEventListener('click', function() {
+        hideMenu();
+        window.setTimeout(logout, 320);
+    });
+    document.getElementById('accountSwitch').addEventListener('click', function() {
+        hideMenu();
+        window.setTimeout(sa, 320);
+    });
+    document.getElementById('openAbout').addEventListener('click', showAbout);
+    // ==================== 消息推送逻辑 ====================
+var accountMessages = document.getElementById('accountMessages');
+var messagesLoaded = false;
+function loadBroadcastsList() {
+    var container = document.getElementById('messagesContentArea');
+    if (!container) return;
+
+    // 1. 检查推送开关是否被关闭
+    var settings = window.BroadcastExtension && window.BroadcastExtension.getPushSettings
+        ? window.BroadcastExtension.getPushSettings()
+        : { enabled: true };
+
+    if (!settings.enabled) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #999;">
+                <p style="font-size: 16px;" data-en="Message push is disabled">消息推送已关闭</p>
+                <p style="font-size: 14px; margin-top: 10px;" data-en="Please enable it in settings">请在设置中开启</p>
+            </div>`;
+        return;
+    }
+
+    // 2. 检查广播扩展对象是否存在
+    if (!window.BroadcastExtension || !window.BroadcastExtension.fetchBroadcasts) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;" data-en="No message data available">暂无消息数据</div>';
+        return;
+    }
+
+    // 3. 拉取广播列表
+    window.BroadcastExtension.fetchBroadcasts().then(function(broadcasts) {
+        // 如果没有任何广播
+        if (!broadcasts || broadcasts.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;" data-en="No messages found">暂无消息</div>';
+            return;
+        }
+
+        // 4. 生成 HTML
+        var html = '';
+        broadcasts.forEach(function(b) {
+            var title = b.title || '未命名';
+            var createdAt = b.createdAt ? new Date(b.createdAt).toLocaleString() : '未知时间';
+            var snippet = '';
+            
+            // 仅文本广播显示简略内容，HTML广播显示提示字样
+            if (b.type === 'text') {
+                var text = b.content || '';
+                snippet = text.length > 20 ? text.substring(0, 20) + '...' : text;
+            } else {
+                snippet = '[HTML 广播]';
             }
 
-            var menuItem = document.createElement('li');
-            menuItem.className = 'menu-item';
-            menuItem.textContent = item.text;
-            menuItem.setAttribute('data-en', item.enText); // 添加翻译
-            menuItem.style.padding = '8px 15px';
-            menuItem.style.cursor = 'pointer';
-            menuItem.style.fontSize = '14px';
-            menuItem.onmouseover = function() {
-                this.style.backgroundColor = isDarkMode ? '#333' : '#f0f0f0';
-            };
-            menuItem.onmouseout = function() {
+            html += `
+                <div class="message-card" data-bid="${b.broadcastId}" style="padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.08); cursor: pointer; transition: background 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
+                        <h4 style="margin: 0; font-size: 15px; color: #333; font-weight: bold;">${title}</h4>
+                        <span style="font-size: 12px; color: #999;">${createdAt}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 13px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${snippet}</p>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+
+        // 5. 绑定点击事件，调用弹出广播的接口
+        container.querySelectorAll('.message-card').forEach(function(card) {
+            // 可选：添加鼠标悬停效果
+            card.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(0,0,0,0.03)';
+            });
+            card.addEventListener('mouseleave', function() {
                 this.style.backgroundColor = 'transparent';
-            };
-            menuItem.onclick = function () {
-                item.action();
-                hideMenu();
-            };
-            menu.appendChild(menuItem);
+            });
+
+            card.addEventListener('click', function() {
+                var bid = this.getAttribute('data-bid');
+                var target = broadcasts.find(function(x) { return x.broadcastId === bid; });
+                // 如果找到了目标广播并且弹出函数存在，则展示
+                if (target && window.BroadcastExtension && window.BroadcastExtension.displayBroadcast) {
+                    window.BroadcastExtension.displayBroadcast(target);
+                }
+            });
         });
 
-        loginStatusElement.appendChild(menu);
-        
-        // 注册菜单项到 i18n 系统
-        if (window.i18n) {
-            const menuItems = menu.querySelectorAll('[data-en]');
-            menuItems.forEach(el => window.i18n.register(el));
-        }
-        
-        setTimeout(function () {
-            menu.style.opacity = '1';
-            menu.style.transform = 'translateY(0)';
-            menuVisible = true;
-        }, 10);
-    }
-    function hideMenu() {
-        if (!loginStatusElement) return;
-        
-        var menu = loginStatusElement.querySelector('ul');
-        if (menu) {
-            menu.style.opacity = '0';
-            menu.style.transform = 'translateY(-20px)';
-            setTimeout(function() {
-                if (menu.parentNode === loginStatusElement) {
-                    loginStatusElement.removeChild(menu);
-                    menuVisible = false;
-                }
-            }, 500);
-        }
-    }
+    }).catch(function(err) {
+        console.warn('[Messages] 加载广播列表失败:', err);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;" data-en="Failed to load messages">加载消息失败</div>';
+    });
+}
+function loadMessagesContent() {
+    if (messagesLoaded) return;
+    accountMessages.innerHTML = `
+        <header class="account-subpage-header">
+            <button id="messagesBack" class="account-back-button" data-en="Back">返回</button>
+            <h2 data-en="Message Push">消息推送</h2>
+            <button id="messagesClose" class="account-close-button" aria-label="关闭">×</button>
+        </header>
+        <div class="account-messages-content" id="messagesContentArea" style="flex:1; overflow-y:auto;">
+            <div style="text-align:center; padding: 40px; color: #999;">加载中...</div>
+        </div>
+        <div style="padding: 15px 20px; text-align: center; border-top: 1px solid rgba(0,0,0,0.1); margin-top: auto;">
+            <a href="/settings.html#boardcast" style="color: #007bff; text-decoration: none; font-size: 14px;" data-en="Message Push Settings">消息推送设置</a>
+        </div>
+    `;
+    registerI18nElements(accountMessages);
+
+    // 返回按钮：移出消息页的 active，恢复主页面的 active
+    document.getElementById('messagesBack').addEventListener('click', function() {
+        accountMessages.classList.remove('is-active');
+        accountMessages.setAttribute('aria-hidden', 'true');
+        accountHome.classList.add('is-active');
+    });
+
+    document.getElementById('messagesClose').addEventListener('click', hideMenu);
+
+    loadBroadcastsList();
+    messagesLoaded = true;
+}
+
+function showMessages() {
+    loadMessagesContent();
+    // 确保关闭其他子页面
+    accountAbout.classList.remove('is-active');
+    accountAbout.setAttribute('aria-hidden', 'true');
+    accountHome.classList.remove('is-active');
+    
+    accountMessages.setAttribute('aria-hidden', 'false');
+    window.requestAnimationFrame(function() {
+        accountMessages.classList.add('is-active');
+    });
+}
+
+document.getElementById('openMessages').addEventListener('click', showMessages);
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && menuVisible) hideMenu();
+    });
+
     // ==================== 日期时间更新 ====================
     function updateLocalDateTime() {
         const nowUtc = new Date();
@@ -851,20 +1142,6 @@ function sa() {
     }
     updateLocalDateTime();
     setInterval(updateLocalDateTime, 1000);
-
-    // 动画监听
-    var timeElement = document.getElementById('time');
-    var settingsButton = document.getElementById('settingsButton');
-
-    if (timeElement && settingsButton) {
-        timeElement.addEventListener('animationstart', function() {
-            settingsButton.style.right = '250px';
-        });
-
-        timeElement.addEventListener('animationend', function() {
-            settingsButton.style.right = '250px';
-        });
-    }
 
     // ==================== 表格加载 ====================
     const tablesContainer = document.getElementById('tables-container');
