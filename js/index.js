@@ -776,7 +776,12 @@ function sa() {
 
     function showMenu() {
         if (!accountOverlay || !loginStatusElement || !accountAvatarSlot) return;
-        avatarHomeRect = loginStatusElement.getBoundingClientRect();
+        const isAvatarMoving = loginStatusElement.classList.contains('account-avatar-flight')
+            || loginStatusElement.classList.contains('account-avatar-in-panel');
+        if (!isAvatarMoving) {
+            avatarHomeRect = loginStatusElement.getBoundingClientRect();
+        }
+        const startRect = loginStatusElement.getBoundingClientRect();
         const panelRect = document.querySelector('.account-panel').getBoundingClientRect();
         const slotRect = accountAvatarSlot.getBoundingClientRect();
         const targetRect = {
@@ -785,13 +790,17 @@ function sa() {
             width: slotRect.width,
             height: slotRect.height
         };
+        if (loginStatusElement.parentNode === accountAvatarSlot) {
+            document.body.appendChild(loginStatusElement);
+        }
         loginStatusElement.style.transition = 'none';
-        loginStatusElement.style.left = `${avatarHomeRect.left}px`;
-        loginStatusElement.style.top = `${avatarHomeRect.top}px`;
-        loginStatusElement.style.width = `${avatarHomeRect.width}px`;
-        loginStatusElement.style.height = `${avatarHomeRect.height}px`;
+        loginStatusElement.style.left = `${startRect.left}px`;
+        loginStatusElement.style.top = `${startRect.top}px`;
+        loginStatusElement.style.width = `${startRect.width}px`;
+        loginStatusElement.style.height = `${startRect.height}px`;
         loginStatusElement.style.right = 'auto';
         loginStatusElement.style.bottom = 'auto';
+        loginStatusElement.classList.remove('account-avatar-in-panel');
         loginStatusElement.classList.add('account-avatar-entered');
         loginStatusElement.classList.add('account-avatar-flight');
         loginStatusElement.getBoundingClientRect();
@@ -799,14 +808,12 @@ function sa() {
         setGuestLoginLabel(true);
         accountOverlay.setAttribute('aria-hidden', 'false');
         accountOverlay.classList.add('is-open');
-        window.requestAnimationFrame(function() {
-            transitionAvatarTo(targetRect, function() {
-                if (!menuVisible) return;
-                accountAvatarSlot.appendChild(loginStatusElement);
-                loginStatusElement.classList.remove('account-avatar-flight');
-                loginStatusElement.classList.add('account-avatar-in-panel');
-                clearAvatarPosition();
-            });
+        transitionAvatarTo(targetRect, function() {
+            if (!menuVisible) return;
+            accountAvatarSlot.appendChild(loginStatusElement);
+            loginStatusElement.classList.remove('account-avatar-flight');
+            loginStatusElement.classList.add('account-avatar-in-panel');
+            clearAvatarPosition();
         });
     }
 
@@ -826,7 +833,8 @@ function hideMenu() {
     accountHome.classList.add('is-active');
 
     // 恢复头像位置和遮罩层关闭
-    if (loginStatusElement.parentNode === accountAvatarSlot) {
+    if (loginStatusElement.classList.contains('account-avatar-flight')
+        || loginStatusElement.classList.contains('account-avatar-in-panel')) {
         const start = loginStatusElement.getBoundingClientRect();
         document.body.appendChild(loginStatusElement);
         loginStatusElement.classList.remove('account-avatar-in-panel');
@@ -843,9 +851,11 @@ function hideMenu() {
         accountOverlay.classList.remove('is-open');
         accountOverlay.setAttribute('aria-hidden', 'true');
         setGuestLoginLabel(false);
-        transitionAvatarTo(avatarHomeRect, resetAvatarPosition);
+        transitionAvatarTo(avatarHomeRect || start, function() {
+            resetAvatarPosition();
+            avatarHomeRect = loginStatusElement.getBoundingClientRect();
+        });
     } else {
-        // 如果头像不在面板里，直接关闭遮罩即可
         accountOverlay.classList.remove('is-open');
         accountOverlay.setAttribute('aria-hidden', 'true');
         setGuestLoginLabel(false);
