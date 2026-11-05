@@ -1261,6 +1261,10 @@ body.account-ui-enabled #tips {
   overflow: hidden;
 }
 
+.account-favorites:not(.is-active) {
+  content-visibility: hidden;
+}
+
 .account-favorites .account-subpage-header,
 .account-favorites .favorites-settings {
   flex: 0 0 auto;

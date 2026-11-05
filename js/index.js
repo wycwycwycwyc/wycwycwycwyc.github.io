@@ -1236,7 +1236,12 @@ document.getElementById('openMessages').addEventListener('click', showMessages);
 
                 if (!headerRow || favoriteRows.length === 0) return null;
 
-                const tableData = { row1: headerRow };
+                const tableData = {
+                    row1: {
+                        ...headerRow,
+                        name: { zh: '脚本名(收藏)', en: 'Script Name (Favorites)' }
+                    }
+                };
                 favoriteRows.forEach(({ tableType, rowKey, rowData }) => {
                     tableData[`${tableType}::${rowKey}`] = rowData;
                 });
@@ -1407,8 +1412,8 @@ document.getElementById('openMessages').addEventListener('click', showMessages);
             if (accountFavorites) {
                 document.getElementById('openFavorites').addEventListener('click', function() {
                     favoriteSortSnapshot = readFavorites();
-                    loadFavoritesContent();
-                    renderFavoriteItems();
+                    if (favoritesManagerLoaded) renderFavoriteItems();
+                    else loadFavoritesContent();
                     accountAbout.classList.remove('is-active');
                     accountAbout.setAttribute('aria-hidden', 'true');
                     accountMessages.classList.remove('is-active');

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>QR Studio - 二维码编辑器<（未完成）/title>
+  <title>QR Studio - 二维码编辑器</title>
 
   <!-- 引入全局依赖 -->
   <script src="/config/serverUrl.js"></script>
@@ -23,9 +23,9 @@
   <script src="/js/script4_goBackOrHome.js"></script>
   <script src="/js/script14_setLanguage.js"></script>
 
-  <!-- 【核心库】qrcodejs (davidshimjs 版) + jsQR -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <!-- 【核心库】采用 node-qrcode (原生完美 UTF-8) + jsQR 扫码 -->
+  <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -546,8 +546,9 @@
 
     let currentQRCodeUrl = '';
 
-    function generateQRCode() {
-      const text = document.getElementById('qrText').value || ' ';
+    async function generateQRCode() {
+      const textInput = document.getElementById('qrText').value;
+      const text = textInput.trim() === '' ? ' ' : textInput;
 
       let size = parseInt(sizeInput.value) || 400;
       if (size < 200) { size = 200; sizeInput.value = 200; sizeSlider.value = 200; Swal.fire('提示', '最小尺寸为 200px', 'info'); }
@@ -564,69 +565,28 @@
       container.innerHTML = '';
 
       try {
-        // 1. 先用 qrcodejs 在后台渲染一个标准的纯黑纯白二维码 (完美解决中文乱码)
-        const tempDiv = document.createElement('div');
-        new QRCode(tempDiv, {
-          text: text,
-          width: size,
-          height: size,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel[correctStr] // L, M, Q, H
-        });
-
-        // 2. 从其生成的 canvas 里提取像素，转换为我们自定义的样式
-        const sourceCanvas = tempDiv.querySelector('canvas');
-        if (!sourceCanvas) throw new Error("二维码生成失败");
+        // 使用 node-qrcode 提取底层的矩阵数据
+        // 这个库原生完美支持 UTF-8 编码，扫出来绝不可能乱码
+        const qrData = QRCode.create(text, { errorCorrectionLevel: correctStr });
+        const moduleCount = qrData.modules.size;
+        const data = qrData.modules.data;
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = size;
         canvas.height = size;
 
-        const srcCtx = sourceCanvas.getContext('2d');
-        const imgData = srcCtx.getImageData(0, 0, size, size).data;
-
-        // 推算模块大小 (标准二维码的单元格大小)
-        // 由于不知道确切版本号，可以通过扫描首个黑色像素来估算，或者直接根据像素画
-        // 为了样式精准，这里直接按像素方块绘制。
-        // 既然原本点阵已经被渲染成方块，如果我们要画圆，必须知道 cellSize。
-        // qrcodejs 内部其实没有直接暴露 moduleCount。
-        // 但我们知道：二维码模块总数一定是奇数，且尺寸是 moduleCount * cellSize。
-        // 这里用个简单的办法：遍历像素找最小黑块宽度，或者直接估算 300px 以下都按像素画。
-
-        // 为了保证完美无瑕：直接用原生的清晰图，背景和颜色做替换。不做圆点或流体（因为从图里反推模块极易出错）。
-        // 等等，那之前用户要的圆点怎么办？
-        // 只能用最暴力的办法：把原生的黑白方块当作遮罩层。
-
-        // 我们其实可以用之前第 3 版的算法（基于 qrcode-generator 的 matrix）。
-        // 但这个 qrcodejs 库底层就是 qrcode-generator！我们可以用内置的方法解决乱码。
-
-        // 为了确保 100% 不乱码且样式生效，我切回了标准的 qrcode-generator，并重写了核心编码。
-        // 为了不乱码，我们手动把中文字符串转为正确的 UTF-8 字节。
-        // 具体的做法是：不依赖上面的 qrcodejs 库了，直接用一个极简的库。
-
-        // 实际上，刚才的问题出在 TextEncoder 上。我们换个最原始的转码法：
-        const utf8Encode = function (str) {
-          return unescape(encodeURIComponent(str)).split('').map(function (c) {
-            return c.charCodeAt(0);
-          });
-        };
-        const qr = qrcode(0, correctStr);
-        qr.stringToBytes = utf8Encode;
-        qr.addData(text);
-        qr.make();
-
-        const moduleCount = qr.getModuleCount();
         const cellSize = size / moduleCount;
 
+        // 绘制背景
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, size, size);
 
+        // 绘制点阵
         ctx.fillStyle = fgColor;
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
-            if (qr.isDark(row, col)) {
+            if (data[row * moduleCount + col]) {
               const x = col * cellSize;
               const y = row * cellSize;
 
@@ -648,12 +608,14 @@
                 }
                 ctx.fill();
               } else {
+                // 经典方块
                 ctx.fillRect(x, y, cellSize + 0.5, cellSize + 0.5);
               }
             }
           }
         }
 
+        // 处理 Logo
         if (logoInput.files && logoInput.files[0]) {
           const reader = new FileReader();
           reader.onload = function (e) {
