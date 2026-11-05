@@ -1255,6 +1255,126 @@ body.account-ui-enabled #tips {
   padding: 18px 20px 30px;
 }
 
+.account-favorites {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.account-favorites .account-subpage-header,
+.account-favorites .favorites-settings {
+  flex: 0 0 auto;
+}
+
+.favorites-settings {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(110, 120, 135, 0.25);
+}
+
+.favorites-clear-button {
+  justify-self: start;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: #d94b4b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.favorites-clear-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.favorites-default-setting {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.favorites-default-setting input {
+  margin: 3px 0 0;
+}
+
+.favorites-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid rgba(110, 120, 135, 0.35);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.75);
+  color: inherit;
+  font: inherit;
+}
+
+.favorite-items {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px 20px;
+  scrollbar-color: rgba(100, 115, 135, 0.55) transparent;
+  scrollbar-width: thin;
+}
+
+.favorite-items::-webkit-scrollbar {
+  width: 7px;
+}
+
+.favorite-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.favorite-items::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: rgba(100, 115, 135, 0.55);
+  background-clip: padding-box;
+}
+
+.favorite-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(70, 90, 115, 0.8);
+  background-clip: padding-box;
+}
+
+.favorite-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 2px;
+  border-bottom: 1px solid rgba(110, 120, 135, 0.2);
+  font-size: 13px;
+}
+
+.favorite-item span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.favorite-item button {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.favorite-add-button {
+  background: #0878d1;
+}
+
+.favorite-remove-button {
+  background: #767d87;
+}
+
 .about-stat-line {
   margin: 0 0 20px;
   font-size: 15px;
@@ -1356,6 +1476,31 @@ body.dark-mode .account-profile {
 
 body.dark-mode .account-text-action {
   color: #c3cad5;
+}
+
+body.dark-mode .favorites-settings,
+body.dark-mode .favorite-item {
+  border-color: rgba(210, 220, 235, 0.2);
+}
+
+body.dark-mode .favorites-search {
+  border-color: rgba(210, 220, 235, 0.3);
+  background: rgba(20, 23, 29, 0.75);
+  color: inherit;
+}
+
+body.dark-mode .favorite-items {
+  scrollbar-color: rgba(180, 195, 215, 0.45) transparent;
+}
+
+body.dark-mode .favorite-items::-webkit-scrollbar-thumb {
+  background: rgba(180, 195, 215, 0.45);
+  background-clip: padding-box;
+}
+
+body.dark-mode .favorite-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(205, 215, 230, 0.7);
+  background-clip: padding-box;
 }
 
 body.dark-mode .account-nav-item {

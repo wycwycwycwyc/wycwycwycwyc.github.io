@@ -583,6 +583,7 @@ if (busuanziElement) {
     var accountAvatarSlot = document.getElementById('accountAvatarSlot');
     var accountAbout = document.getElementById('accountAbout');
     var accountHome = document.getElementById('accountHome');
+    var accountFavorites = document.getElementById('accountFavorites');
 
 // 登录状态处理
 if (!isLoggedIn) {
@@ -824,6 +825,11 @@ function hideMenu() {
     // 隐藏所有子页面（关于、消息推送），并重置主页状态
     accountAbout.classList.remove('is-active');
     accountAbout.setAttribute('aria-hidden', 'true');
+
+    if (accountFavorites) {
+        accountFavorites.classList.remove('is-active');
+        accountFavorites.setAttribute('aria-hidden', 'true');
+    }
     
     if (accountMessages) {
         accountMessages.classList.remove('is-active');
@@ -946,6 +952,12 @@ function hideMenu() {
     function showAccountHome() {
         accountAbout.classList.remove('is-active');
         accountAbout.setAttribute('aria-hidden', 'true');
+        accountMessages.classList.remove('is-active');
+        accountMessages.setAttribute('aria-hidden', 'true');
+        if (accountFavorites) {
+            accountFavorites.classList.remove('is-active');
+            accountFavorites.setAttribute('aria-hidden', 'true');
+        }
         accountHome.classList.add('is-active');
         window.setTimeout(function() {
             accountHome.classList.add('is-active');
@@ -954,6 +966,12 @@ function hideMenu() {
 
     function showAbout() {
         loadAboutContent();
+        if (accountFavorites) {
+            accountFavorites.classList.remove('is-active');
+            accountFavorites.setAttribute('aria-hidden', 'true');
+        }
+        accountMessages.classList.remove('is-active');
+        accountMessages.setAttribute('aria-hidden', 'true');
         accountHome.classList.remove('is-active');
         accountAbout.setAttribute('aria-hidden', 'false');
         window.requestAnimationFrame(function() {
@@ -1099,6 +1117,10 @@ function showMessages() {
     // 确保关闭其他子页面
     accountAbout.classList.remove('is-active');
     accountAbout.setAttribute('aria-hidden', 'true');
+    if (accountFavorites) {
+        accountFavorites.classList.remove('is-active');
+        accountFavorites.setAttribute('aria-hidden', 'true');
+    }
     accountHome.classList.remove('is-active');
     
     accountMessages.setAttribute('aria-hidden', 'false');
@@ -1162,21 +1184,259 @@ document.getElementById('openMessages').addEventListener('click', showMessages);
         const tables = [];
         const tableNames = [];
         let currentTableIndex = 0;
+            const favoritesStorageKey = 'favoriteTables';
+            const favoritesShowStorageKey = 'showFavoritesTableOnOpen';
+            const favoritesTableName = getCurrentLang() === 'en' ? 'Favorites' : '收藏夹';
+            let favoritesManagerLoaded = false;
+            let favoriteSortSnapshot = {};
 
-        // 从服务器加载tables.json
-fetch('/config/tables.json')
+            function readFavorites() {
+                try {
+                    const savedFavorites = JSON.parse(localStorage.getItem(favoritesStorageKey) || '{}');
+                    if (!savedFavorites || typeof savedFavorites !== 'object' || Array.isArray(savedFavorites)) {
+                        throw new Error('收藏夹数据格式无效');
+                    }
+                    return savedFavorites;
+                } catch (error) {
+                    console.error('读取收藏夹失败:', error);
+                    return {};
+                }
+            }
+
+            function saveFavorites(favorites) {
+                try {
+                    localStorage.setItem(favoritesStorageKey, JSON.stringify(favorites));
+                    return true;
+                } catch (error) {
+                    console.error('保存收藏夹失败:', error);
+                    Swal.fire(
+                        getCurrentLang() === 'en' ? 'Unable to save favorites' : '无法保存收藏夹',
+                        getCurrentLang() === 'en' ? 'Please check your browser storage settings.' : '请检查浏览器的本地存储设置。',
+                        'error'
+                    );
+                    return false;
+                }
+            }
+
+            function getFavoriteTableData(data) {
+                const favorites = readFavorites();
+                let headerRow = null;
+                const favoriteRows = [];
+
+                Object.entries(favorites).forEach(([tableType, rowEntries]) => {
+                    if (!rowEntries || typeof rowEntries !== 'object' || !data[tableType]) return;
+                    const rowKeys = Array.isArray(rowEntries) ? rowEntries : Object.keys(rowEntries);
+                    rowKeys.forEach(rowKey => {
+                        const rowData = data[tableType][rowKey];
+                        if (!rowData || typeof rowData !== 'object' || rowKey === 'row1') return;
+                        if (!headerRow) headerRow = data[tableType].row1;
+                        favoriteRows.push({ tableType, rowKey, rowData });
+                    });
+                });
+
+                if (!headerRow || favoriteRows.length === 0) return null;
+
+                const tableData = { row1: headerRow };
+                favoriteRows.forEach(({ tableType, rowKey, rowData }) => {
+                    tableData[`${tableType}::${rowKey}`] = rowData;
+                });
+                return tableData;
+            }
+
+            function hasFavorite(favorites, tableType, rowKey) {
+                const rowEntries = favorites[tableType];
+                return Array.isArray(rowEntries)
+                    ? rowEntries.includes(rowKey)
+                    : Boolean(rowEntries && Object.prototype.hasOwnProperty.call(rowEntries, rowKey));
+            }
+
+            function toggleFavorite(tableType, rowKey) {
+                const favorites = readFavorites();
+                const rowEntries = favorites[tableType] && !Array.isArray(favorites[tableType])
+                    ? { ...favorites[tableType] }
+                    : Object.fromEntries((favorites[tableType] || []).map(key => [key, true]));
+
+                if (Object.prototype.hasOwnProperty.call(rowEntries, rowKey)) delete rowEntries[rowKey];
+                else rowEntries[rowKey] = true;
+
+                if (Object.keys(rowEntries).length) favorites[tableType] = rowEntries;
+                else delete favorites[tableType];
+
+                if (!saveFavorites(favorites)) return;
+                refreshTables(true);
+                renderFavoriteItems();
+            }
+
+            function refreshTables(focusFavorites) {
+                const previousTableName = tableNames[currentTableIndex];
+                createTablesFromJSON(allTablesData);
+                createNavigationButtons();
+                let nextIndex = tableNames.indexOf(previousTableName);
+                const favoritesIndex = tableNames.indexOf(favoritesTableName);
+                const showFavorites = localStorage.getItem(favoritesShowStorageKey) !== 'false';
+                if (focusFavorites && showFavorites && favoritesIndex !== -1) {
+                    nextIndex = favoritesIndex;
+                } else if (nextIndex === -1) {
+                    nextIndex = favoritesIndex === -1
+                        ? 0
+                        : (showFavorites ? favoritesIndex : Math.min(1, tables.length - 1));
+                }
+                showTable(nextIndex);
+            }
+
+            function loadFavoritesContent() {
+                if (!accountFavorites || favoritesManagerLoaded) return;
+                const isEnglish = getCurrentLang() === 'en';
+                accountFavorites.innerHTML = `
+                    <header class="account-subpage-header">
+                        <button id="favoritesBack" class="account-back-button" data-en="Back">返回</button>
+                        <h2 data-en="Favorites">收藏夹</h2>
+                        <button id="favoritesClose" class="account-close-button" aria-label="关闭">×</button>
+                    </header>
+                    <div class="favorites-settings">
+                        <label class="favorites-default-setting">
+                            <input id="showFavoritesOnOpen" type="checkbox">
+                            <span data-en="Show favorites table when opening the page">${isEnglish ? 'Show favorites table when opening the page' : '打开主页时默认展示收藏夹表格'}</span>
+                        </label>
+                        <button id="clearFavorites" class="favorites-clear-button" type="button" data-en="Clear all favorites">${isEnglish ? 'Clear all favorites' : '清空所有收藏'}</button>
+                        <input id="favoritesSearch" class="favorites-search" type="search"
+                            placeholder="${isEnglish ? 'Search scripts...' : '搜索工具...'}"
+                            aria-label="${isEnglish ? 'Search scripts' : '搜索工具'}">
+                    </div>
+                    <div id="favoriteItems" class="favorite-items"></div>
+                `;
+                registerI18nElements(accountFavorites);
+                document.getElementById('favoritesBack').addEventListener('click', showAccountHome);
+                document.getElementById('favoritesClose').addEventListener('click', hideMenu);
+                document.getElementById('favoritesSearch').addEventListener('input', renderFavoriteItems);
+                document.getElementById('clearFavorites').addEventListener('click', clearFavorites);
+                document.getElementById('showFavoritesOnOpen').checked = localStorage.getItem(favoritesShowStorageKey) !== 'false';
+                document.getElementById('showFavoritesOnOpen').addEventListener('change', function() {
+                    localStorage.setItem(favoritesShowStorageKey, this.checked ? 'true' : 'false');
+                });
+                favoritesManagerLoaded = true;
+                renderFavoriteItems();
+            }
+
+            function clearFavorites() {
+                if (!Object.values(readFavorites()).some(rowEntries =>
+                    Array.isArray(rowEntries) ? rowEntries.length > 0 : rowEntries && Object.keys(rowEntries).length > 0
+                )) return;
+
+                const isEnglish = getCurrentLang() === 'en';
+                Swal.fire({
+                    title: isEnglish ? 'Clear all favorites?' : '确定清空所有收藏吗？',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: isEnglish ? 'Clear all' : '全部清空',
+                    cancelButtonText: isEnglish ? 'Cancel' : '取消'
+                }).then(result => {
+                    if (!result.isConfirmed || !saveFavorites({})) return;
+                    refreshTables(true);
+                    renderFavoriteItems();
+                });
+            }
+
+            function renderFavoriteItems() {
+                const itemsContainer = document.getElementById('favoriteItems');
+                if (!itemsContainer) return;
+                if (!allTablesData) {
+                    itemsContainer.textContent = getCurrentLang() === 'en' ? 'Loading scripts...' : '工具加载中...';
+                    return;
+                }
+
+                const isEnglish = getCurrentLang() === 'en';
+                const searchTerm = (document.getElementById('favoritesSearch').value || '').trim().toLowerCase();
+                const favorites = readFavorites();
+                const clearButton = document.getElementById('clearFavorites');
+                if (clearButton) {
+                    clearButton.disabled = !Object.values(favorites).some(rowEntries =>
+                        Array.isArray(rowEntries) ? rowEntries.length > 0 : rowEntries && Object.keys(rowEntries).length > 0
+                    );
+                }
+                itemsContainer.innerHTML = '';
+                let itemCount = 0;
+
+                const availableItems = Object.entries(allTablesData).flatMap(([tableType, tableData]) =>
+                    Object.entries(tableData)
+                        .filter(([rowKey]) => rowKey !== 'row1')
+                        .map(([rowKey, rowData]) => ({ tableType, rowKey, rowData }))
+                );
+                availableItems.sort((first, second) =>
+                    Number(hasFavorite(favoriteSortSnapshot, second.tableType, second.rowKey))
+                    - Number(hasFavorite(favoriteSortSnapshot, first.tableType, first.rowKey))
+                );
+
+                availableItems.forEach(({ tableType, rowKey, rowData }) => {
+                    const searchableText = [tableType, rowKey].concat(
+                        Object.values(rowData).map(value => {
+                            if (value && typeof value === 'object') return `${value.zh || ''} ${value.en || ''}`;
+                            return String(value || '');
+                        })
+                    ).join(' ').toLowerCase();
+                    if (searchTerm && !searchableText.includes(searchTerm)) return;
+
+                    itemCount++;
+                    const item = document.createElement('div');
+                    item.className = 'favorite-item';
+                    const name = document.createElement('span');
+                    const nameValue = rowData.name;
+                    const displayName = nameValue && typeof nameValue === 'object'
+                        ? nameValue[isEnglish ? 'en' : 'zh'] || nameValue.zh || rowKey
+                        : nameValue || rowKey;
+                    name.textContent = `${tableType} · ${displayName}`;
+                    const action = document.createElement('button');
+                    action.type = 'button';
+                    const isFavorite = hasFavorite(favorites, tableType, rowKey);
+                    action.textContent = isFavorite
+                        ? (isEnglish ? 'Remove' : '移除')
+                        : (isEnglish ? 'Add' : '添加');
+                    action.className = isFavorite ? 'favorite-remove-button' : 'favorite-add-button';
+                    action.addEventListener('click', function() {
+                        toggleFavorite(tableType, rowKey);
+                    });
+                    item.append(name, action);
+                    itemsContainer.appendChild(item);
+                });
+
+                if (!itemCount) {
+                    itemsContainer.textContent = isEnglish ? 'No matching scripts found' : '没有找到匹配的工具';
+                }
+            }
+
+            if (accountFavorites) {
+                document.getElementById('openFavorites').addEventListener('click', function() {
+                    favoriteSortSnapshot = readFavorites();
+                    loadFavoritesContent();
+                    renderFavoriteItems();
+                    accountAbout.classList.remove('is-active');
+                    accountAbout.setAttribute('aria-hidden', 'true');
+                    accountMessages.classList.remove('is-active');
+                    accountMessages.setAttribute('aria-hidden', 'true');
+                    accountHome.classList.remove('is-active');
+                    accountFavorites.setAttribute('aria-hidden', 'false');
+                    window.requestAnimationFrame(function() {
+                        accountFavorites.classList.add('is-active');
+                    });
+                });
+            }
+
+            // 从服务器加载tables.json
+    fetch('/config/tables.json')
     .then(response => response.json())
     .then(data => {
         // 保存数据供搜索使用
         allTablesData = data;
         
-        Object.keys(data).forEach(tableType => {
-            tableNames.push(tableType);
-        });
-
+        if (favoritesManagerLoaded) renderFavoriteItems();
         createTablesFromJSON(data);
         createNavigationButtons();
-        showTable(0);
+        const favoriteTableIndex = tableNames.indexOf(favoritesTableName);
+        const shouldShowFavorites = localStorage.getItem(favoritesShowStorageKey) !== 'false';
+        const defaultTableIndex = favoriteTableIndex === -1
+            ? 0
+            : (shouldShowFavorites ? favoriteTableIndex : Math.min(1, tables.length - 1));
+        showTable(defaultTableIndex);
         
         // 初始化搜索
         initSearch();
@@ -1452,8 +1712,16 @@ function createTablesFromJSON(data) {
     }
     
     tablesContainer.innerHTML = '';
+    tables.length = 0;
+    tableNames.length = 0;
 
-    Object.entries(data).forEach(([tableType, tableData], index) => {
+    const favoriteTable = getFavoriteTableData(data);
+    const displayData = favoriteTable
+        ? { [favoritesTableName]: favoriteTable, ...data }
+        : data;
+    Object.keys(displayData).forEach(tableName => tableNames.push(tableName));
+
+    Object.entries(displayData).forEach(([tableType, tableData], index) => {
         const tableWrapper = document.createElement('div');
         tableWrapper.className = 'table-wrapper';
         tableWrapper.style.display = 'none';
