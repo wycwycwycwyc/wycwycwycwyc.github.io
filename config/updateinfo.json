@@ -512,5 +512,23 @@
       "zh": "网站支持了<消息推送>,可更精细调整推送程度",
       "en": "Website now supports <message push notifications> for more granular control over notification settings"
     }
+  },
+  "update24": {
+    "time": {
+      "zh": "2026年11月6日",
+      "en": "November 6, 2026"
+    },
+    "title": {
+      "zh": "更新与修复",
+      "en": "Updates"
+    },
+    "text1": {
+      "zh": "新增了<收藏夹>功能，可收藏网站内的网页",
+      "en": "Added <favorites> functionality to bookmark pages within the website"
+    },
+    "text2": {
+      "zh": "修复了打开关闭<菜单>不连贯的问题",
+      "en": "Fixed issue with inconsistent opening and closing of the <menu>"
+    }
   }
 }

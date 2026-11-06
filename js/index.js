@@ -589,11 +589,12 @@ if (busuanziElement) {
 if (!isLoggedIn) {
     if (loginStatusElement) {
         loginStatusElement.onclick = function() {
-            if (menuVisible) {
+            const avatarIsMoving = loginStatusElement.classList.contains('account-avatar-flight');
+            if (menuVisible && !avatarIsMoving) {
                 window.location.href = '/account/Login/index.html?redirect=/index.html';
-            } else {
-                toggleMenu();
+                return;
             }
+            toggleMenu();
         };
     }
 } else {
@@ -868,17 +869,17 @@ function hideMenu() {
     }
 }
 
-    function setGuestLoginLabel(isLoginAction) {
-        if (isLoggedIn) return;
-        const label = loginStatusElement.querySelector('.login-status');
-        const text = isLoginAction ? '登录' : '更多';
-        loginStatusElement.setAttribute('aria-label', text);
-        if (label) {
-            label.textContent = text;
-            label.setAttribute('data-en', isLoginAction ? 'Login' : 'More');
-            if (window.i18n) window.i18n.register(label);
-        }
+function setGuestLoginLabel(isLoginAction) {
+    if (isLoggedIn) return;
+    const label = loginStatusElement.querySelector('.login-status');
+    const text = isLoginAction ? '登录' : '更多';
+    loginStatusElement.setAttribute('aria-label', text);
+    if (label) {
+        label.textContent = text;
+        label.setAttribute('data-en', isLoginAction ? 'Login' : 'More');
+        if (window.i18n) window.i18n.register(label);
     }
+}
 
     function transitionAvatarTo(targetRect, onComplete) {
         const motionId = ++avatarMotionId;
@@ -985,6 +986,9 @@ function hideMenu() {
     });
     document.getElementById('accountSettings').addEventListener('click', function() {
         window.location.href = '/settings.html#account';
+    });
+    document.getElementById('openLogin').addEventListener('click', function() {
+        window.location.href = '/account/Login/index.html?redirect=/index.html';
     });
     document.getElementById('accountLogout').addEventListener('click', function() {
         hideMenu();

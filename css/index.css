@@ -1464,6 +1464,10 @@ body:not(.has-account-menu) .account-profile-actions {
   display: none;
 }
 
+body.has-account-menu #openLogin {
+  display: none;
+}
+
 body:not(.has-account-menu) .login-status {
   font-size: 18px;
 }

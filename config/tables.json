@@ -494,6 +494,21 @@
         "en": "Play online, no download required, score tracking"
       },
       "path": "/code/webapp/FlipChess"
+    },
+      "tool13": {
+      "name": {
+        "zh": "二维码条码生成器",
+        "en": "QR & Barcode Generator"
+      },
+      "Introduction": {
+        "zh": "一个网页版的二维码与条形码生成器",
+        "en": "A web version of QR & Barcode generator."
+      },
+      "note": {
+        "zh": "可以在线生成二维码和条形码，支持多种格式",
+        "en": "Generate QR codes and barcodes online,supports multiple formats"
+      },
+      "path": "/code/webapp/QR%26Barcode"
     }
   }
 }
