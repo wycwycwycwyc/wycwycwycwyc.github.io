@@ -987,9 +987,6 @@ function setGuestLoginLabel(isLoginAction) {
     document.getElementById('accountSettings').addEventListener('click', function() {
         window.location.href = '/settings.html#account';
     });
-    document.getElementById('openLogin').addEventListener('click', function() {
-        window.location.href = '/account/Login/index.html?redirect=/index.html';
-    });
     document.getElementById('accountLogout').addEventListener('click', function() {
         hideMenu();
         window.setTimeout(logout, 320);
