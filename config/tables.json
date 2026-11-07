@@ -375,36 +375,6 @@
     },
     "tool5": {
       "name": {
-        "zh": "贪吃蛇双人版",
-        "en": "Two-Player Snake Game"
-      },
-      "Introduction": {
-        "zh": "一个网页版的双人版贪吃蛇",
-        "en": "A web version of two-player Snake game"
-      },
-      "note": {
-        "zh": "可以在线游玩，无需下载，记录分数",
-        "en": "Play online, no download required, score tracking"
-      },
-      "path": "/code/webapp/snakegamepro/snakegamepro.html"
-    },
-    "tool6": {
-      "name": {
-        "zh": "贪吃蛇3D双人版",
-        "en": "3D Two-Player Snake Game"
-      },
-      "Introduction": {
-        "zh": "一个网页版的3D双人版贪吃蛇",
-        "en": "A web version of 3D two-player Snake game"
-      },
-      "note": {
-        "zh": "可以在线游玩，无需下载，记录分数",
-        "en": "Play online, no download required, score tracking"
-      },
-      "path": "/code/webapp/snakegame3Dpro/snakegame3Dpro.html"
-    },
-    "tool7": {
-      "name": {
         "zh": "旧版网站",
         "en": "Old Website"
       },
@@ -418,7 +388,7 @@
       },
       "path": "/code/webapp/oldwebsite"
     },
-    "tool8": {
+    "tool6": {
       "name": {
         "zh": "天气查询",
         "en": "Weather Forecast"
@@ -433,7 +403,7 @@
       },
       "path": "/code/webapp/weatherForecast"
     },  
-      "tool9": {
+      "tool7": {
       "name": {
         "zh": "视频帧提取器",
         "en": "Video Frame Extractor"
@@ -448,7 +418,7 @@
       },
       "path": "/code/webapp/FrameExtractor"
     },
-      "tool10": {
+      "tool8": {
       "name": {
         "zh": "音频剪辑器",
         "en": "Audio Editor"
@@ -464,7 +434,7 @@
       "path": "/code/webapp/AudioEditor"
     },
     
-      "tool11": {
+      "tool9": {
       "name": {
         "zh": "汽车质量分析",
         "en": "Car Quality Analysis"
@@ -480,7 +450,7 @@
       "path": "/code/webapp/CarQualityAnalysis"
     },
     
-      "tool12": {
+      "tool10": {
       "name": {
         "zh": "象棋翻棋",
         "en": "Flip Chess"
@@ -493,9 +463,9 @@
         "zh": "可以多人在线游玩，无需下载，记录分数",
         "en": "Play online, no download required, score tracking"
       },
-      "path": "/code/webapp/FlipChess"
+      "path": "/code/webapp/ChineseChess"
     },
-      "tool13": {
+      "tool11": {
       "name": {
         "zh": "二维码条码生成器",
         "en": "QR & Barcode Generator"

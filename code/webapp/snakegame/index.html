@@ -2,56 +2,263 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-en="🐍 Cool Snake Game 🐍">炫酷贪吃蛇</title>
-    <script src="/config/serverUrl.js"></script>
-
-    <link rel="stylesheet" href="/css/styles_button.css">
-    <script src="/js/script3_darkMode.js"></script>
-    <script src="/js/script4_goBackOrHome.js"></script>
-    <script src="/js/script13_checkIslogin.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
-    <link href="/css/message.min.css" rel="stylesheet" />
-    <script src="/js/message.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
-    <script src="./snakegame.js"></script>
-    <script src="/js/script14_setLanguage.js"></script>
-    <button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;"
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-en="Snake Game · Select Version">贪吃蛇 · 选择版本</title>
+      <link rel="stylesheet" href="/css/styles_button.css">
+      <script src="/js/script3_darkMode.js"></script>
+      <script src="/js/script4_goBackOrHome.js"></script>
+      <script src="/js/script13_checkIslogin.js"></script>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+      <link href="/css/message.min.css" rel="stylesheet" />
+      <script src="/js/message.min.js"></script>
+      <script src="/js/script14_setLanguage.js"></script>
+      <button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;"
         onclick="goBackOrHome()" data-en="Back">返回</button>
+  <style>
+    :root {
+      --bg: #f3f4f7;
+      --panel: #ffffff;
+      --line: #e3e5ea;
+      --line-hover: #c9ccd4;
+      --text: #1c1d22;
+      --muted: #6b6e7a;
+      --faint: #9a9daa;
+      --p1: #e07000;
+      --p2: #2f5bd0;
+      --p3: #7a4fc4;
+    }
+
+    body.dark-mode {
+      --bg: #0e0e16;
+      --panel: #16161f;
+      --line: #26262f;
+      --line-hover: #3a3a48;
+      --text: #d8d8e0;
+      --muted: #7a7a88;
+      --faint: #52525e;
+      --p1: #ff7f00;
+      --p2: #4169e1;
+      --p3: #9370db;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      transition: background .2s, color .2s;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 820px;
+    }
+
+    header {
+      margin-bottom: 32px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    header h1 {
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 16px 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .15s, background .15s;
+    }
+
+    .item:hover {
+      border-color: var(--line-hover);
+    }
+
+    .item:hover .arrow {
+      transform: translateX(3px);
+    }
+
+    .mark {
+      width: 3px;
+      align-self: stretch;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .mark.a {
+      background: var(--p1);
+    }
+
+    .mark.b {
+      background: var(--p2);
+    }
+
+    .mark.c {
+      background: var(--p3);
+    }
+
+    .body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .body h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .body h2 small {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--faint);
+    }
+
+    .body p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .body .note {
+      font-size: 12px;
+      color: var(--faint);
+      margin-top: 5px;
+    }
+
+    .arrow {
+      color: var(--faint);
+      font-size: 17px;
+      align-self: center;
+      transition: transform .15s;
+      flex-shrink: 0;
+    }
+
+    footer {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--faint);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 560px) {
+      .item {
+        padding: 14px 16px;
+        gap: 14px;
+      }
+
+      footer {
+        font-size: 11px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="game-container">
-        <div class="start-screen">
-            <h1 class="game-title" data-en="🐍 Snake Game 🐍">🐍 贪吃蛇 🐍</h1>
-            <button class="start-btn" data-en="Start Game">开始游戏</button>
-            <div class="instructions">
-                <p data-en="Use arrow keys or WASD to control the snake">使用方向键或WASD控制蛇的移动</p>
-                <p data-en="Eat colorful food to increase your score">吃到彩色食物可以增加分数</p>
-                <p data-en="Don't hit the walls or your own body!">不要撞到墙壁或自己的身体!</p>
-            </div>
-        </div>
+  <div class="wrap">
+    <header>
+      <h1 data-en="Snake Game">贪吃蛇</h1>
+      <p data-en="Choose a version to enter">选择要进入的版本</p>
+    </header>
 
-        <div class="particles" id="particles"></div>
+    <nav class="list" id="game-list"></nav>
 
-        <div id="game-board"></div>
-        <div class="fps-counter" id="fps-counter">
-            <span id="fps">--</span> <span data-en="FPS">FPS</span>
-        </div>
-        <div class="score-board">
-            <div><span data-en="Current Score: ">当前分数: </span><span id="current-score">0</span></div>
-            <div><span data-en="High Score: ">最高分数: </span><span id="high-score">0</span></div>
-            <a onclick="goBackOrHome()" data-en="Back">返回</a>
-        </div>
+    <footer>
+      <span
+        data-en="All versions require no download, play online and automatically record scores.">所有版本均无需下载，在线游玩并自动记录分数。</span>
+    </footer>
+  </div>
 
-        <div class="game-over">
-            <h2 data-en="Game Over!">游戏结束!</h2>
-            <div><span data-en="Your Score: ">你的分数: </span><span id="final-score">0</span></div>
-            <button class="restart-btn" data-en="Play Again">再来一局</button>
-        </div>
-    </div>
+  <script>
+    // 复用三个游戏相同的配置结构，中文为默认，英文放 data-en
+    const TOOLS = {
+      tool4: {
+        name: { zh: "贪吃蛇", en: "Snake Game" },
+        Introduction: { zh: "一个网页版的贪吃蛇", en: "A web version of Snake game" },
+        note: { zh: "可以在线游玩，无需下载，记录分数", en: "Play online, no download required, score tracking" },
+        path: "./snakegame/index.html"
+      },
+      tool5: {
+        name: { zh: "贪吃蛇双人版", en: "Two-Player Snake Game" },
+        Introduction: { zh: "一个网页版的双人版贪吃蛇", en: "A web version of two-player Snake game" },
+        note: { zh: "可以在线游玩，无需下载，记录分数", en: "Play online, no download required, score tracking" },
+        path: "./snakegamepro/snakegamepro.html"
+      },
+      tool6: {
+        name: { zh: "贪吃蛇3D双人版", en: "3D Two-Player Snake Game" },
+        Introduction: { zh: "一个网页版的3D双人版贪吃蛇", en: "A web version of 3D two-player Snake game" },
+        note: { zh: "可以在线游玩，无需下载，记录分数", en: "Play online, no download required, score tracking" },
+        path: "./snakegame3Dpro/snakegame3Dpro.html"
+      }
+    };
+
+    const MARKS = { tool4: "a", tool5: "b", tool6: "c" };
+    const list = document.getElementById("game-list");
+
+    // 动态渲染卡片，和三个游戏一样：中文为内容，英文放在 data-en 属性上
+    Object.entries(TOOLS).forEach(([id, tool]) => {
+      const a = document.createElement("a");
+      a.className = "item";
+      a.href = tool.path;
+      a.innerHTML = `
+      <span class="mark ${MARKS[id] || ""}"></span>
+      <div class="body">
+        <h2>
+          <span data-en="${tool.name.en}">${tool.name.zh}</span>
+          <small data-en="${tool.name.zh}">${tool.name.en}</small>
+        </h2>
+        <p data-en="${tool.Introduction.en}">${tool.Introduction.zh}</p>
+        <div class="note" data-en="${tool.note.en}">${tool.note.zh}</div>
+      </div>
+      <span class="arrow">›</span>
+    `;
+      list.appendChild(a);
+    });
+
+    // 注册新增的 data-en 元素，让 script14_setLanguage.js 能识别并切换
+    if (window.i18n && typeof window.i18n.registerAll === "function") {
+      window.i18n.registerAll();
+    } else if (window.i18n && typeof window.i18n.register === "function") {
+      document.querySelectorAll("[data-en]").forEach(el => window.i18n.register(el));
+    }
+  </script>
 </body>
 
 </html>

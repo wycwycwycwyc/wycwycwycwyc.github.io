@@ -262,6 +262,11 @@ const OFFSET = (CELL_SIZE - PIECE_SIZE) / 2;
 const WS_BASE = 'wss://scripthub.serveousercontent.com/ws';
 const SERVER_URL = (typeof serverurl !== 'undefined') ? serverurl : 'https://scripthub.serveousercontent.com';
 const LOBBY_ROOM = 'lobby';
+const WS_ROOM_PREFIX = 'flipchees:';
+
+function getWsRoomName(room) {
+  return WS_ROOM_PREFIX + room;
+}
 
 const RANK = {
   '將': 7, '帥': 7, '士': 6, '仕': 6, '象': 5, '相': 5,
@@ -754,18 +759,24 @@ function applyModeButtons() {
 function connectLobby() {
   if (lobbyWs && (lobbyWs.readyState === WebSocket.OPEN || lobbyWs.readyState === WebSocket.CONNECTING)) return;
   if (!myUserId) return;
-  const url = WS_BASE + '?room=' + LOBBY_ROOM + '&userId=' + encodeURIComponent(myUserId);
-  try { lobbyWs = new WebSocket(url); } catch (e) { return; }
-  lobbyWs.onopen = () => {
+  const url = WS_BASE + '?room=' + encodeURIComponent(getWsRoomName(LOBBY_ROOM)) + '&userId=' + encodeURIComponent(myUserId);
+  let socket;
+  try { socket = new WebSocket(url); } catch (e) { return; }
+  lobbyWs = socket;
+  socket.onopen = () => {
+    if (lobbyWs !== socket) return;
     sendLobby({ type: 'hello', userId: myUserId, username: myUsername, role: 'lobby' });
     setTimeout(() => queryOnlineUsers(), 200);
   };
-  lobbyWs.onmessage = (e) => handleLobbyMessage(e.data);
-  lobbyWs.onclose = () => {
+  socket.onmessage = (e) => {
+    if (lobbyWs === socket) handleLobbyMessage(e.data);
+  };
+  socket.onclose = () => {
+    if (lobbyWs !== socket) return;
     lobbyWs = null;
     if (!window._pageUnloading) setTimeout(() => { if (!window._pageUnloading) connectLobby(); }, 3000);
   };
-  lobbyWs.onerror = () => { };
+  socket.onerror = () => { };
 }
 function sendLobby(obj) {
   if (!lobbyWs || lobbyWs.readyState !== 1) return false;
@@ -875,11 +886,6 @@ function handleIncomingJoin(msg) {
   showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
     const requesterRole = (myRole === 'host') ? 'guest' : 'host';
     sendLobby({ type: 'joinGameAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId, continueGame: true, hostColor, timeSettings: { ...timeSettings }, gameMode, syncStepsPerRound, assignRole: requesterRole });
-    if (myRole === 'host') {
-      setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
-      setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
-      setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 3000);
-    }
     showBanner('已允许对方加入棋局', 'info', 2000);
   }, () => {
     sendLobby({ type: 'joinGameReject', fromUserId: myUserId, toUserId: msg.fromUserId, reason: 'refused' });
@@ -894,7 +900,7 @@ function handleJoinAccepted(msg) {
   else if (!myRole) myRole = 'guest';
   roomId = msg.roomId;
   showBanner('对方已允许你加入，正在进入对局...', 'info', 2000);
-  setTimeout(() => enterRoom(true), 150);
+  enterRoom(true);
 }
 function handleIncomingInvite(msg) {
   if (msg.gameMode) gameMode = msg.gameMode;
@@ -903,11 +909,6 @@ function handleIncomingInvite(msg) {
     showConfirm(`${msg.fromUsername} 想加入棋局，是否允许？`, () => {
       const requesterRole = (myRole === 'host') ? 'guest' : 'host';
       sendLobby({ type: 'joinGameAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId, continueGame: true, hostColor, timeSettings: { ...timeSettings }, gameMode, syncStepsPerRound, assignRole: requesterRole });
-      if (myRole === 'host') {
-        setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 800);
-        setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 1800);
-        setTimeout(() => { if (onlineMode && ws && ws.readyState === 1) broadcastSync(); }, 3000);
-      }
     }, () => {
       sendLobby({ type: 'joinGameReject', fromUserId: myUserId, toUserId: msg.fromUserId, reason: 'refused' });
     });
@@ -917,7 +918,7 @@ function handleIncomingInvite(msg) {
   showConfirm(`${msg.fromUsername} ${modeText} 邀请你下棋，是否接受？`, () => {
     if (msg.timeSettings) Object.assign(timeSettings, msg.timeSettings);
     sendLobby({ type: 'inviteAccept', fromUserId: myUserId, toUserId: msg.fromUserId, roomId: msg.roomId });
-    setTimeout(() => { myRole = 'guest'; roomId = msg.roomId; enterRoom(); }, 150);
+    myRole = 'guest'; roomId = msg.roomId; enterRoom();
   }, () => {
     sendLobby({ type: 'inviteReject', fromUserId: myUserId, toUserId: msg.fromUserId });
   });
@@ -930,12 +931,12 @@ function handleInviteAccepted(msg) {
     else if (!myRole) myRole = 'guest';
     roomId = msg.roomId;
     showBanner('对方已允许你重新加入对局', 'info', 2000);
-    setTimeout(() => enterRoom(true), 150);
+    enterRoom(true);
   } else {
     myRole = 'host'; roomId = msg.roomId;
     const modeText = gameMode === 'sync' ? '【同步规划模式】' : '【经典模式】';
     showBanner(modeText + ' 对方接受邀请，进入房间...', 'info', 2000);
-    setTimeout(() => enterRoom(), 150);
+    enterRoom();
   }
 }
 
@@ -972,35 +973,46 @@ function closeExistingWS() {
 function connectWS(room, userId, isReconnect) {
   return new Promise((resolve, reject) => {
     closeExistingWS();
-    const url = WS_BASE + '?room=' + encodeURIComponent(room) + '&userId=' + encodeURIComponent(userId);
+    const url = WS_BASE + '?room=' + encodeURIComponent(getWsRoomName(room)) + '&userId=' + encodeURIComponent(userId);
     netLog('连接 ' + url + (isReconnect ? ' (重连)' : ''));
-    try { ws = new WebSocket(url); } catch (e) { reject(e); return; }
+    let socket;
+    try { socket = new WebSocket(url); } catch (e) { reject(e); return; }
+    ws = socket;
     let settled = false;
     const timeout = setTimeout(() => {
       if (settled) return; settled = true;
       netLog('连接超时');
-      try { ws.close(); } catch (e) { }
+      try { socket.close(); } catch (e) { }
       reject(new Error('连接超时'));
     }, 8000);
-    ws.onopen = () => {
-      if (settled) return; settled = true;
+    socket.onopen = () => {
+      if (ws !== socket || settled) return;
+      settled = true;
       clearTimeout(timeout);
       netLog('已连接'); setConnIndicator('');
       resolve();
     };
-    ws.onerror = () => {
-      if (settled) return; settled = true;
+    socket.onerror = () => {
+      if (ws !== socket || settled) return;
+      settled = true;
       clearTimeout(timeout);
       netLog('连接错误'); setConnIndicator('dead');
       reject(new Error('连接错误'));
     };
-    ws.onclose = (e) => {
+    socket.onclose = (e) => {
       clearTimeout(timeout);
+      if (ws !== socket) return;
       netLog('关闭 code=' + e.code);
       setConnIndicator('dead'); ws = null;
+      if (!settled) {
+        settled = true;
+        reject(new Error('连接已关闭'));
+      }
       if (!intentionalClose) handleDisconnect(e.code);
     };
-    ws.onmessage = (e) => handleMessage(e.data);
+    socket.onmessage = (e) => {
+      if (ws === socket) handleMessage(e.data);
+    };
   });
 }
 function handleDisconnect() {
@@ -1051,7 +1063,6 @@ function attemptReconnect() {
       hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
       initCornerButtons();
       if (myRole === 'host') broadcastSync();
-      else send({ type: 'requestSync', userId: myUserId });
       appendChatMessage('', '你已重新连接', 'sys');
     }
   }).catch(() => {
@@ -1320,7 +1331,6 @@ function handleMessage(raw) {
         if (gameStarted && !gameOver) {
           hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
           startTimer(); initCornerButtons();
-          send({ type: 'requestSync', userId: myUserId });
         } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       }
       break;
@@ -1340,7 +1350,6 @@ function handleMessage(raw) {
           hideAll(); gamePanel.classList.remove('hidden'); chatFab.classList.remove('hidden');
           startTimer(); initCornerButtons();
         }
-        if (myRole === 'guest') send({ type: 'requestSync', userId: myUserId });
       } else { updateWaitUI(); waitHint('对手已加入：' + opponentUsername, 'ok'); }
       break;
     }
@@ -1612,8 +1621,6 @@ async function enterRoom(directEnter) {
     gameStarted = true;
     if (!boardDomBuilt) { initBoard(); buildBoardDOM(); renderFullBoard(); renderGraveyards(); }
     initCornerButtons();
-    setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 300);
-    setTimeout(() => { if (myRole === 'host') broadcastSync(); else send({ type: 'requestSync', userId: myUserId }); }, 1200);
     if (gameMode === 'sync') { document.getElementById('syncBar').classList.remove('hidden'); renderSyncBar(); }
     else document.getElementById('syncBar').classList.add('hidden');
   } else {
@@ -1626,14 +1633,6 @@ async function enterRoom(directEnter) {
     updateWaitUI(); waitHint('等待对手加入...');
   }
   send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound });
-  setTimeout(() => {
-    if (ws && ws.readyState === 1 && !opponentUserId)
-      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound, reHello: true });
-  }, 800);
-  setTimeout(() => {
-    if (ws && ws.readyState === 1 && !opponentUserId)
-      send({ type: 'hello', userId: myUserId, username: myUsername, role: myRole, gameMode, syncStepsPerRound, reHello: true });
-  }, 2000);
   window.addEventListener('beforeunload', onBeforeUnload);
   sendLobby({ type: 'busy', userId: myUserId, username: myUsername });
 }
@@ -1714,7 +1713,7 @@ function startGameAsHost() {
       colorTipShown = true;
       Swal.fire({ icon: 'info', title: '颜色分配', text: `你执 ${myColor === 'red' ? '红方' : '黑方'}`, confirmButtonText: '知道了' });
     }, 300);
-    startSyncRound();
+    startSyncRound(true);
   } else {
     document.getElementById('syncBar').classList.add('hidden');
     startTimer();
@@ -1725,7 +1724,7 @@ function applyStartState(state) {
   deserializeState(state);
   gameStarted = true;
   gameOver = false; gameEndReason = '';
-  recordUploaded = false; syncRoundNum = 0;
+  recordUploaded = false;
   syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false;
   syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
   lastPlaybackScript = null; lastPlaybackStartState = null;
@@ -1888,14 +1887,14 @@ function checkBothSyncSubmitted() {
   if (!syncMySubmitted || !syncOppSubmitted) return;
   setTimeout(() => hostSimulateAndPlay(), 200);
 }
-function startSyncRound() {
+function startSyncRound(skipBroadcast = false) {
   syncRoundNum++;
   syncMyQueue = []; syncMySubmitted = false; syncOppSubmitted = false; syncOppQueue = [];
   selectedRow = -1; selectedCol = -1;
   syncPathPieceId = -1; syncPathPiece = null; syncPathCurrentPos = { row: -1, col: -1 };
   clearParabolas(); highlightSyncQueue(); renderSyncBar();
   onTurnAdvance();
-  if (onlineMode && myRole === 'host') broadcastSync();
+  if (!skipBroadcast && onlineMode && myRole === 'host') broadcastSync();
 }
 function hostSimulateAndPlay() {
   const allActions = [];
