@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-en="P2P File Transfer">P2P 传文件</title>
+      <button id="back" class="custom-button" style="position: fixed; top: 10px; left: 10px;z-index: 10;"
+        onclick="goBackOrHome()" data-en="Back">返回</button>
+  <!-- 引入公共依赖（按需保留，这里保留了你惯用的框架引入结构，如果没有可删） -->
+  <script src="/config/serverUrl.js"></script>
+  <link rel="stylesheet" href="/css/styles_button.css">
+  <script src="/js/script3_darkMode.js"></script>
+  <script src="/js/script4_goBackOrHome.js"></script>
+  <script src="/js/script13_checkIslogin.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.23.0/sweetalert2.min.js"></script>
+  <link href="/css/message.min.css" rel="stylesheet" />
+  <script src="/js/message.min.js"></script>
+  <script src="/js/script14_setLanguage.js"></script>
+
+  <!-- 引入本页样式 -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="card">
+    <h1 data-en="P2P File Transfer">P2P 传文件</h1>
+    <p class="sub"
+      data-en="Open this page on two devices. Create a room on one and join it on the other. Files are transferred directly via LAN/P2P and are not stored on the server.">
+      两台设备打开本页。一台创建房间，另一台输入相同房间号加入。文件通过局域网（P2P）直接传输，不经过服务器存储。
+    </p>
+
+    <label data-en="Room Number (6 digits)">房间号（6 位数字）</label>
+    <input type="text" id="room" maxlength="6" inputmode="numeric" placeholder="例如 482915"
+      data-en-placeholder="e.g. 482915">
+
+    <div class="divider">
+      <button id="createBtn" class="green" data-en="Create Room">创建房间</button>
+      <button id="joinBtn" data-en="Join Room">加入房间</button>
+    </div>
+
+    <div class="status">
+      <span class="dot" id="dot"></span>
+      <span id="statusText" data-en="Not connected">未连接</span>
+    </div>
+
+    <div class="drop disabled" id="drop">
+      <span data-en="Click to select files or drag them here (multiple allowed)">点击选择文件，或拖到这里（可多选）</span>
+      <br>
+      <small style="opacity:.6" id="dropHint" data-en="Waiting for peer...">等待对方就绪…</small>
+    </div>
+    <input type="file" id="fileInput" multiple hidden>
+
+    <div class="progress" id="progress">
+      <div class="bar">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="txt" id="progressTxt"></div>
+    </div>
+
+    <div class="incoming-head" id="incomingHead">
+      <span class="title" id="incomingTitle" data-en="Received Files">已接收文件</span>
+      <div class="actions">
+        <button class="ghost" id="downloadAllBtn" data-en="Download All">全部下载</button>
+        <button class="ghost" id="zipAllBtn" data-en="Download as ZIP">打包为 ZIP 下载</button>
+      </div>
+    </div>
+
+    <div class="incoming-list" id="incomingList"></div>
+
+    <div class="log" id="log"></div>
+    <div class="note" id="saveNote"></div>
+  </div>
+
+  <script src="./p2pTransfer.js"></script>
+</body>
+
+</html>

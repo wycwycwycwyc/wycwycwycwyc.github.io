@@ -479,6 +479,21 @@
         "en": "Generate QR codes and barcodes online,supports multiple formats"
       },
       "path": "/code/webapp/QR%26Barcode"
+    },
+    "tool12": {
+      "name": {
+        "zh": "P2P传文件",
+        "en": "P2P File Transfer"
+      },
+      "Introduction": {
+        "zh": "一个网页版的P2P传文件工具",
+        "en": "A web version of P2P file transfer tool."
+      },
+      "note": {
+        "zh": "可以在线传输文件，支持多种格式",
+        "en": "Transfer files online, supports multiple formats"
+      },
+      "path": "/code/webapp/p2pTransfer"
     }
   }
 }
