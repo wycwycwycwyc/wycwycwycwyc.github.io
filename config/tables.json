@@ -452,16 +452,16 @@
     
       "tool10": {
       "name": {
-        "zh": "象棋翻棋",
-        "en": "Flip Chess"
+        "zh": "中国象棋",
+        "en": "Chinese Chess"
       },
       "Introduction": {
-        "zh": "一个网页版的翻棋象棋",
-        "en": "A web version of Flip Chess."
+        "zh": "一个网页版的中国象棋合集",
+        "en": "A web version of Chinese Chess collection."
       },
       "note": {
-        "zh": "可以多人在线游玩，无需下载，记录分数",
-        "en": "Play online, no download required, score tracking"
+        "zh": "可以多人在线游玩，无需下载，多种玩法",
+        "en": "Play online, no download required, multiple game modes"
       },
       "path": "/code/webapp/ChineseChess"
     },
